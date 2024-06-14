@@ -63,17 +63,17 @@ namespace UnicontaClient.Pages.CustomPage
                         it._DiscountPct, it._Discount, it._Variant1, it._Variant2, it._Variant3, it._Variant4, it._Variant5, it._Unit, it._Date, it._Week, it._Note));
                 }
             }
-            else if (row is ProjectInvoiceProposalLineClient)
+            else if (row is ProjectBudgetLineClient)
             {
                 lst = new List<ProjectReservationLineClient>();
                 foreach (var _it in copyFromRows)
                 {
-                    var it = (ProjectInvoiceProposalLineClient)_it;
+                    var it = (ProjectBudgetLineClient)_it;
                     var itemCache = api.CompanyEntity.GetCache(typeof(InvItem));
-                    if (it._Item == null || (itemCache?.Get(it._Item) as InvItem)?._ItemType != (byte)ItemType.Item)
+                    if (it._Item == null || (itemCache?.Get(it._Item) as InvItem)?._ItemType != (byte)ItemType.Item || it._QtyPurchased != 0d || it._QtyTaken != 0d)
                         continue;
-                    lst.Add(CreateNewReservationLine(it._Item, it._Qty, it._Text, it._Price, it._AmountEntered, it._DiscountPct, it._Discount, it._Variant1, it._Variant2, it._Variant3, it._Variant4, it._Variant5, it._Unit,
-                        it._Date, it._Week, it._Note));
+                    lst.Add(CreateNewReservationLine(it._Item, it._Qty, it._Text, 0d, 0d, 0d, 0d, it._Variant1, it._Variant2, it._Variant3, it._Variant4, it._Variant5, it._Unit,
+                    it._Date, 0, null));
                 }
             }
             else if (row is DCOrderLine)
@@ -240,11 +240,13 @@ namespace UnicontaClient.Pages.CustomPage
                 Task.ShowInColumnChooser = true;
             SetVariantColumns();
             UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
-            Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
-            CostValue.Visible = CostValue.ShowInColumnChooser = CostPrice.Visible = CostPrice.ShowInColumnChooser = !api.CompanyEntity.HideCostPrice;
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
             if (company.HideCostPrice)
+            {
+                Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
+            CostValue.Visible = CostValue.ShowInColumnChooser = CostPrice.Visible = CostPrice.ShowInColumnChooser = false;
                 UtilDisplay.RemoveMenuCommand(rb, new string[] { "CostValue", "DB" });
+            }
         }
 
         void SetVariantColumns()
@@ -692,7 +694,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             try
             {
-                AddDockItem(TabControls.CopyOfferLines, new object[1] { api }, true, String.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), Uniconta.ClientTools.Localization.lookup("OfferLine")), null, new Point(250, 200));
+                AddDockItem(TabControls.CopyOfferLines, new object[2] { api, Order }, true, String.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), Uniconta.ClientTools.Localization.lookup("OfferLine")), null, new Point(250, 200));
             }
             catch (Exception ex)
             {

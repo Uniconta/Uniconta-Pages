@@ -11,6 +11,7 @@ x:Class="UnicontaClient.Pages.CustomPage.VATSettlementReport"
     <UserControl.Resources>
         <Util:DoubleValueFormatConvert x:Key="FormatConverter"/>
         <Style x:Key="HeaderTextEditStyle" TargetType="{x:Type dxe:TextEdit}">
+            <Setter Property="Foreground" Value="Black" />
             <Setter Property="TextWrapping" Value="Wrap" />
             <Setter Property="FontWeight" Value="Bold" />
             <Setter Property="FontSize" Value="13" />
@@ -21,6 +22,7 @@ x:Class="UnicontaClient.Pages.CustomPage.VATSettlementReport"
             <Setter Property="Padding" Value="2" />
         </Style>
         <Style x:Key="DetailTextEditStyle" TargetType="{x:Type dxe:TextEdit}">
+            <Setter Property="Foreground" Value="Black" />
             <Setter Property="TextWrapping" Value="Wrap" />
             <Setter Property="FontSize" Value="13" />
             <Setter Property="dxp:ExportSettings.BorderThickness" Value="1 0 0 1" />
@@ -45,9 +47,9 @@ x:Class="UnicontaClient.Pages.CustomPage.VATSettlementReport"
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <dxe:TextEdit HorizontalAlignment="Left" Grid.Row="0" Grid.Column="1" Text="Momsopgørelse" VerticalAlignment="Center" FontSize="20" Foreground="Black" FontWeight="Bold"/>
-                <dxe:TextEdit Grid.Row="1" Text="{Binding Content.CompanyInfo}" VerticalAlignment="Center" FontSize="13" Grid.Column="1" />
-                <dxe:TextEdit Grid.Row="2" Text="{Binding Content.CompanyRegNr}" VerticalAlignment="Center" FontSize="13" Grid.Column="1" />
-                <dxe:TextEdit Grid.Row="3" Text="{Binding Content.VatPeriod}" FontSize="13" Grid.Column="1" />
+                <dxe:TextEdit Grid.Row="1" Text="{Binding Content.CompanyInfo}" VerticalAlignment="Center" FontSize="13" Grid.Column="1" Foreground="Black"/>
+                <dxe:TextEdit Grid.Row="2" Text="{Binding Content.CompanyRegNr}" VerticalAlignment="Center" FontSize="13" Grid.Column="1" Foreground="Black"/>
+                <dxe:TextEdit Grid.Row="3" Text="{Binding Content.VatPeriod}" FontSize="13" Grid.Column="1" Foreground="Black"/>
             </Grid>
         </DataTemplate>
         <Style x:Key="LastColumnHeaderTextEditStyle" TargetType="{x:Type dxe:TextEdit}" BasedOn="{StaticResource HeaderTextEditStyle}">

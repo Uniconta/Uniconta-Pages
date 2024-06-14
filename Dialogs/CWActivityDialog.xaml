@@ -81,7 +81,7 @@
             <TextBlock Text="{Binding TotalTime,Converter={StaticResource TimeSpanValueToHoursMinuteSecondConverter},ConverterParameter='H:M'}" Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="7" HorizontalAlignment="Center" />
 
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Comment}" Grid.Row="10" Grid.Column="0" />
-            <ClientToolCtrl:TextEditor AcceptsReturn="True" MinHeight="50" Text="{Binding Commment}" Grid.Column="2" Grid.ColumnSpan="5" Grid.Row="10" VerticalContentAlignment="Top" />
+            <ClientToolCtrl:TextEditor AcceptsReturn="True" MinHeight="50" Text="{Binding Comment}" Grid.Column="2" Grid.ColumnSpan="5" Grid.Row="10" VerticalContentAlignment="Top" />
 
         </Grid>
         <StackPanel x:Name="actionButton" HorizontalAlignment="Center" Grid.Row="1" Orientation="Horizontal" Margin="0 10 0 0">

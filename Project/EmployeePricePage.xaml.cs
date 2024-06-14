@@ -125,7 +125,10 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 colItem.ShowInColumnChooser = colItemName.ShowInColumnChooser = colPrCategory.ShowInColumnChooser = colCategoryName.ShowInColumnChooser = true;
             }
-            CostPrice.Visible = CostPrice.ShowInColumnChooser = !api.CompanyEntity.HideCostPrice;
+            if (Comp.HideCostPrice)
+            {
+                CostPrice.Visible = CostPrice.ShowInColumnChooser = false;
+            }
         }
 
         private void localMenu_OnItemClicked(string ActionType)

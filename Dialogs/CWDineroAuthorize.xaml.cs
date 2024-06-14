@@ -10,6 +10,7 @@ using System.Web;
 using System.Windows;
 using System.Windows.Input;
 using Uniconta.ClientTools;
+using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using static ImportingTool.Model.Dinero;
 
@@ -24,8 +25,8 @@ namespace UnicontaClient.Controls.Dialogs
         internal CompanyModel DineroCompany;
 
         const string REDIRECT_URI = "https://web.uniconta.com/DineroCode.htm";
-        const string CLIENT_ID = "isv_7N_Marketing_App";
-        const string CLIENT_SECRET_CODE = "2MPnKTv6HkGMTIV99gTP01IGCMYeHAyWq8d6TmFalBQ8S0EqaFahE8aLv76xIKU3";
+        string CLIENT_ID;
+        string CLIENT_SECRET_CODE;
 
         public CWDineroAuthorize()
         {
@@ -50,14 +51,22 @@ namespace UnicontaClient.Controls.Dialogs
             }
         }
 
-        private void CWDineroAuthorize_Loaded(object sender, RoutedEventArgs e)
+        private async void CWDineroAuthorize_Loaded(object sender, RoutedEventArgs e)
         {
-            var consentUrl = $"https://connect.visma.com/consent?returnUrl=" + $"{HttpUtility.UrlEncode("/connect/authorize/callback?")}" +
+            var ses = BasePage.session;
+            var s = await ses.GetKeys();
+            if (s != null)
+            {
+                CLIENT_ID = s[0];
+                CLIENT_SECRET_CODE = s[1];
+
+                var consentUrl = $"https://connect.visma.com/consent?returnUrl=" + $"{HttpUtility.UrlEncode("/connect/authorize/callback?")}" +
                 $"{HttpUtility.UrlEncode("response_type=code&")}" + $"{HttpUtility.UrlEncode($"client_id={CLIENT_ID}&")}" +
                 $"{HttpUtility.UrlEncode("scope=dineropublicapi:read dineropublicapi:write offline_access&")}" +
                 $"{HttpUtility.UrlEncode($"redirect_uri={REDIRECT_URI}")}";
 
-            webViewer.UriSource = new Uri(consentUrl);
+                webViewer.UriSource = new Uri(consentUrl);
+            }
         }
 
         async private Task LoadCompanies(string authorizeCode)
@@ -91,9 +100,12 @@ namespace UnicontaClient.Controls.Dialogs
                         lbCompanies.ItemsSource = companies;
                         lbCompanies.Visibility = Visibility.Visible;
                     }
+                    ClientHelper.Dispose();
                 }
                 else
                     MessageBox.Show(Uniconta.ClientTools.Localization.lookup("Invalid"));
+
+                client.Dispose();
             }
             catch (Exception ex)
             {

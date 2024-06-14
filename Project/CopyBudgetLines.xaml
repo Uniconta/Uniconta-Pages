@@ -41,8 +41,8 @@ x:Class="UnicontaClient.Pages.CustomPage.CopyBudgetLines"
                 </localPage:ProjectBudgetEstimationGrid.Columns>
             </localPage:ProjectBudgetEstimationGrid>
         </StackPanel>
-        <CheckBox Grid.Row="2" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OnlyCopyTotals}" HorizontalAlignment="Left" IsChecked="{Binding OnlyCopyTotals}" />
-        <CheckBox Grid.Row="3" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DeleteProposalLines}" HorizontalAlignment="Left" IsChecked="{Binding IsDeleteLines}" />
+        <CheckBox Grid.Row="2" x:Name="chkOnlyCopyTotals" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OnlyCopyTotals}" HorizontalAlignment="Left" IsChecked="{Binding OnlyCopyTotals}" />
+        <CheckBox Grid.Row="3" x:Name="chkDeleteProposalLines" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DeleteProposalLines}" HorizontalAlignment="Left" IsChecked="{Binding IsDeleteLines}" />
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 0 0 10">
             <Button x:Name="CreateButton" IsDefault="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Copylines}" Click="OKButton_Click"  Height="23" HorizontalAlignment="Right" />
             <Button x:Name="CancelButton" IsCancel="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Cancel}" Click="CancelButton_Click"  Height="23"  Margin="3,0,0,0" />

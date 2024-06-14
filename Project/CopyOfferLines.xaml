@@ -56,7 +56,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CopyOfferLines"
                 </docking:LayoutGroup>
             </docking:DockLayoutManager>
         </CorasauControls:BusyIndicator>
-        <CheckBox Grid.Row="2" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DeleteProposalLines}" Height="23" HorizontalAlignment="Left" IsChecked="{Binding IsDeleteLines}" />
+        <CheckBox Grid.Row="2" x:Name="chkDelete" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DeleteProposalLines}" Height="23" HorizontalAlignment="Left" IsChecked="{Binding IsDeleteLines}" />
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 10 0 10">
             <Button x:Name="CreateButton" IsDefault="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Copylines}" Click="OKButton_Click"  Height="23" HorizontalAlignment="Right" />
             <Button x:Name="CancelButton" IsCancel="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Cancel}" Click="CancelButton_Click"  Height="23"  Margin="3,0,0,0" />

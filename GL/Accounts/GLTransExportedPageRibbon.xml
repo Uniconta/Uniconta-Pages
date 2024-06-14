@@ -16,8 +16,8 @@
     <RibbonItem Action="DatevHeader" LocalizedNameKey="DatevHeader" LargeGlyph="CreateExit_32x32"/>
     <RibbonItem Action="DatevVerbinden" LocalizedNameKey="HideOBJ"  Parameter="Green" LargeGlyph="datevconnectb"/>
     <RibbonItem Action="Upload" LocalizedNameKey="Upload" Parameter="SupplementaryTransactions3" LargeGlyph="datevupload"/>
-    <RibbonItem Action="ConnectedApplications" LocalizedNameKey="Connected Applications" Parameter="SupplementaryTransactions3" LargeGlyph="datevrework"/>
-    <RibbonItem Action="ShowLog" LocalizedNameKey="Log Anzigen" Parameter="SupplementaryTransactions3" LargeGlyph="datevlog"/>
+    <RibbonItem Action="ConnectedApplications" LocalizedNameKey="Verbundene Anwendungen" Parameter="SupplementaryTransactions3" LargeGlyph="datevrework"/>
+    <RibbonItem Action="ShowLog" LocalizedNameKey="Protokoll" Parameter="SupplementaryTransactions3" LargeGlyph="datevlog"/>
   </RibbonItem>
   <RibbonItem>
     <!---If we want to create a new group in same PageTab-->
@@ -35,10 +35,10 @@
   </RibbonItem>
   <RibbonItem>
     <!--RibbonItem LocalizedNameKey="ShowAmount" Action="ShowAmount" LargeGlyph="Budget_32x32"/-->
-    <RibbonItem LocalizedNameKey="TokenValid" StatusValue="to"></RibbonItem>
+    <RibbonItem LocalizedNameKey="Zugriff gültig bis" StatusValue=""></RibbonItem>
     <RibbonItem LocalizedNameKey="ToTime" StatusValue="a" />
-    <RibbonItem LocalizedNameKey="ToService" StatusValue="b" />
+    <RibbonItem LocalizedNameKey="Service" StatusValue="b" />
     <RibbonItem LocalizedNameKey="User" StatusValue="c" />
-    <RibbonItem LocalizedNameKey="Send" StatusValue="d" />
+    <RibbonItem LocalizedNameKey="DocSent" StatusValue="d" />
   </RibbonItem>
 </root>

@@ -603,9 +603,9 @@ namespace UnicontaClient.Pages.CustomPage
                 editrow.DeliveryCountry = debtor._DeliveryCountry;
             else
                 editrow.DeliveryCountry = null;
-            editrow.DeliveryPhone = debtor._Phone;
-            editrow.DeliveryContactPerson = debtor._ContactPerson;
-            editrow.DeliveryContactEmail = debtor._ContactEmail;
+            editrow.DeliveryPhone = debtor._DeliveryPhone;
+            editrow.DeliveryContactPerson = debtor._DeliveryContactPerson;
+            editrow.DeliveryContactEmail = debtor._DeliveryContactEmail;
         }
 
         private void lblCompanyAddress_ButtonClicked(object sender)

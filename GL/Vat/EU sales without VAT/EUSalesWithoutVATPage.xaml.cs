@@ -258,43 +258,27 @@ namespace UnicontaClient.Pages.CustomPage
                     }
 
                     DebtorOk = true;
-                    debtorCVR = debtor._LegalIdent;
-                    if (!string.IsNullOrWhiteSpace(debtorCVR))
-                    {
-                        debtorCVR = Regex.Replace(debtorCVR, "[^0-9]", "");
-                        switch (debtor._Country)
-                        {
-                            case CountryCode.Sweden:
-                                if (debtorCVR.Length == 10)
-                                    debtorCVR = string.Concat(debtorCVR, CreateEUSaleWithoutVATFile.SWEDEN_POSTFIX_01);
-                                break;
-                        }
-                    }
+                    debtorCVR = PrepareVIES(debtor);
                 }
 
                 if (! DebtorOk)
                     continue;
 
-                if (companyCountryId == CountryCode.Denmark)
+                if (lastVat != invLine._Vat)
                 {
-                    if (lastVat != invLine._Vat)
+                    lastVat = invLine._Vat;
+                    var type = glVatCache.Get(lastVat)?._TypeSales;
+                    var vatType = glVatTypeCache.Get(type);
+
+                    if (companyCountryId == CountryCode.Denmark && type == "s7")
+                        triangularTrade = true;
+                    else if (vatType != null)
                     {
-                        lastVat = invLine._Vat;
-                        var type = glVatCache.Get(lastVat)?._TypeSales;
-                        if (type != null)
-                        {
-                            if (type == "s3")
-                                itemOrService = ItemOrServiceType.Item;
-                            else if (type == "s4")
-                                itemOrService = ItemOrServiceType.Service;
-                            else if (type == "s7")
-                                triangularTrade = true;
-                        }
+                        if (vatType._EUSalesService)
+                            itemOrService = ItemOrServiceType.Service;
+                        else
+                            itemOrService = ItemOrServiceType.Item;
                     }
-                }
-                else if (invLine._Item != null && invLine.InvItem != null)
-                {
-                    itemOrService = invLine.InvItem._ItemType == 1 ? ItemOrServiceType.Service : ItemOrServiceType.Item;
                 }
 
                 var invoice = new EUSaleWithoutVAT();
@@ -319,6 +303,37 @@ namespace UnicontaClient.Pages.CustomPage
 
             return listOfResults;
         }
+
+
+        private string PrepareVIES(DebtorClient debtor)
+        {
+            string twolettercode = null;
+            var debtorCVR = debtor._LegalIdent;
+            if (!string.IsNullOrWhiteSpace(debtorCVR))
+            {
+                var cvr = debtorCVR;
+                if (Char.IsLetter(cvr.FirstOrDefault()) && cvr.Length > 3)
+                {
+                    var cCode = cvr.Substring(0, 2);
+                    cvr = cvr.Substring(2, cvr.Length - 2);
+                    if (Enum.TryParse(cCode, out CountryISOCode isoCode))
+                        twolettercode = cCode;
+
+                    if (twolettercode != null && Country2Language.IsEU(debtor._Country))
+                        debtorCVR = cvr;
+
+                    switch (debtor._Country)
+                    {
+                        case CountryCode.Sweden:
+                            if (debtorCVR.Length == 10)
+                                debtorCVR = string.Concat(debtorCVR, CreateEUSaleWithoutVATFile.SWEDEN_POSTFIX_01);
+                            break;
+                    }
+                }
+            }
+            return debtorCVR;
+        }
+
 
         private bool CallPrevalidate()
         {

@@ -151,8 +151,9 @@ namespace UnicontaClient.Pages.CustomPage
             UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
             SetDimensionLocalMenu();
             SetLayoutSalesCostValue();
-
-            EmployeeFeeCostValue.Visible = EmployeeFeeCostValue.ShowInColumnChooser =
+            if (api.CompanyEntity.HideCostPrice && !showWIPCostvalue)
+            {
+                EmployeeFeeCostValue.Visible = EmployeeFeeCostValue.ShowInColumnChooser =
             EmployeeFeeJournalCostValue.Visible = EmployeeFeeJournalCostValue.ShowInColumnChooser =
             ExpensesCostValue.Visible = ExpensesCostValue.ShowInColumnChooser =
             RevenueCostValue.Visible = RevenueCostValue.ShowInColumnChooser =
@@ -160,7 +161,8 @@ namespace UnicontaClient.Pages.CustomPage
             TotalInvoicedCostValue.Visible = TotalInvoicedCostValue.ShowInColumnChooser =
             AdjustmentCostValue.Visible = AdjustmentCostValue.ShowInColumnChooser =
             OpeningBalanceCostValue.Visible = OpeningBalanceCostValue.ShowInColumnChooser =
-            ClosingBalanceCostValue.Visible = ClosingBalanceCostValue.ShowInColumnChooser = !api.CompanyEntity.HideCostPrice && showWIPCostvalue;
+            ClosingBalanceCostValue.Visible = ClosingBalanceCostValue.ShowInColumnChooser = false;
+            }
         }
 
         public override Task InitQuery()
@@ -377,7 +379,7 @@ namespace UnicontaClient.Pages.CustomPage
             var tmLines = tmJourLines.Where(s => (s._Project != null &&
                                                   s._PayrollCategory != null &&
                                                   s._Date > empCache.Get(s._Employee)._TMApproveDate))
-                                                  .GroupBy(x => new { x._Employee, x._Project, x._PayrollCategory, x._WorkSpace, x._Task, x._Date }).Select(x => new TMJournalLineHelper.TMJournalLineClientLocal
+                                                  .GroupBy(x => new { x._Employee, x._Project, x._PayrollCategory, x._WorkSpace, x._Task, x._Date }).Select(x => new TMJournalLineClient
                                                   {
                                                       Date = x.Key._Date,
                                                       Project = x.Key._Project,

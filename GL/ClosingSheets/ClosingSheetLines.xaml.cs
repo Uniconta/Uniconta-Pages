@@ -578,7 +578,23 @@ namespace UnicontaClient.Pages.CustomPage
                     var linOffset = FindLine(acc.Lines, RowId);
                     if (linOffset != null) // we found line
                     {
-                        ((List<GLClosingSheetLineLocal>)acc.Lines).Remove(linOffset);
+                        var lst = acc.Lines as List<GLClosingSheetLineLocal>;
+                        if (lst == null)
+                        {
+                            lst = new List<GLClosingSheetLineLocal>(acc.Lines.Count() + 1);
+                            foreach (var r in acc.Lines)
+                            {
+                                var rx = r as GLClosingSheetLineLocal;
+                                if (rx == null)
+                                {
+                                    rx = new GLClosingSheetLineLocal();
+                                    StreamingManager.Copy(r, rx);
+                                }
+                                lst.Add(rx);
+                            }
+                            acc.Lines = lst;
+                        }
+                        lst.Remove(linOffset);
                         SumLines(acc);
                     }
                 }
@@ -591,14 +607,31 @@ namespace UnicontaClient.Pages.CustomPage
                 var acc = FindAccount(account);
                 if (acc != null)
                 {
-                    var accLines = acc.Lines;
-                    if (accLines == null)
+                    if (acc.Lines == null)
                         acc.Lines = new List<GLClosingSheetLineLocal>() { clone };
                     else
                     {
-                        var linOffset = FindLine(accLines, lin.RowId);
+                        var linOffset = FindLine(acc.Lines, lin.RowId);
                         if (linOffset == null)
-                            ((List<GLClosingSheetLineLocal>)accLines).Add(clone);
+                        {
+                            var lst = acc.Lines as List<GLClosingSheetLineLocal>;
+                            if (lst == null)
+                            {
+                                lst = new List<GLClosingSheetLineLocal>(acc.Lines.Count() + 1);
+                                foreach (var r in acc.Lines)
+                                {
+                                    var rx = r as GLClosingSheetLineLocal;
+                                    if (rx == null)
+                                    {
+                                        rx = new GLClosingSheetLineLocal();
+                                        StreamingManager.Copy(r, rx);
+                                    }
+                                    lst.Add(rx);
+                                }
+                                acc.Lines = lst;
+                            }
+                            lst.Add(clone);
+                        }
                         else
                             StreamingManager.Copy(lin, linOffset);
                     }

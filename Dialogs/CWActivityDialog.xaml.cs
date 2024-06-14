@@ -42,7 +42,7 @@ namespace UnicontaClient.Controls.Dialogs
         protected override bool ShowTableValueButton { get { return true; } }
 
         private DateTime _startDate, _endDate;
-        private TimeSpan _endTime, _startTime;
+        private static TimeSpan _endTime, _startTime;
         private EmployeeRegistrationLineClient employeeRegistrationLineClient;
 
         public CWActivityDialog()
@@ -50,6 +50,15 @@ namespace UnicontaClient.Controls.Dialogs
             this.DataContext = this;
             InitializeComponent();
             Title = string.Format(Uniconta.ClientTools.Localization.lookup("AddOBJ"), Uniconta.ClientTools.Localization.lookup("Activity"));
+        }
+
+        public CWActivityDialog(DateTime currentWeekDate) : this()
+        {
+            StartDate = ToDate = currentWeekDate;
+            if (_startTime == TimeSpan.Zero)
+                StartTime = new TimeSpan(8, 0, 0);
+            if (_endTime == TimeSpan.Zero)
+                EndTime = new TimeSpan(16, 0, 0);
         }
 
         public CWActivityDialog(UnicontaBaseEntity entity) : this()

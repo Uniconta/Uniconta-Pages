@@ -377,12 +377,7 @@ namespace UnicontaClient.Pages.CustomPage
             VatCache = Comp.GetCache(typeof(Uniconta.DataModel.GLVat));
             DebtorCache = Comp.GetCache(typeof(Uniconta.DataModel.Debtor));
             CreditorCache = Comp.GetCache(typeof(Uniconta.DataModel.Creditor));
-
-#if SILVERLIGHT
-            Application.Current.RootVisual.KeyDown += RootVisual_KeyDown;
-#else
             this.PreviewKeyDown += RootVisual_KeyDown;
-#endif
             this.BeforeClose += GLDailyJournalLine_BeforeClose;
         }
 
@@ -468,11 +463,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void GLDailyJournalLine_BeforeClose()
         {
-#if SILVERLIGHT
-            Application.Current.RootVisual.KeyDown -= RootVisual_KeyDown;
-#else
             this.PreviewKeyDown -= RootVisual_KeyDown;
-#endif
             var lines = dgGLDailyJournalLine.ItemsSource as IList;
             int cnt = lines != null ? lines.Count : 0;
             var mClient = masterRecord as GLDailyJournalClient;
@@ -496,6 +487,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     dgGLDailyJournalLine.tableView.CloseEditor();
                     ribbonControl.PerformRibbonAction("OpenTran");
+                    e.Handled = true;
                 }
             }
             else if (e.Key == Key.F5)
@@ -518,7 +510,6 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                 }
             }
-#if !SILVERLIGHT
             else if (Keyboard.Modifiers.HasFlag(ModifierKeys.Alt) || Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
             {
                 if (dgGLDailyJournalLine.CurrentColumn.Name == "HasOffsetAccounts" && e.Key == Key.Down)
@@ -529,7 +520,6 @@ namespace UnicontaClient.Pages.CustomPage
                         CallOffsetAccount(currentRow);
                 }
             }
-#endif
         }
 
         protected override void OnLayoutLoaded()
@@ -1269,9 +1259,7 @@ namespace UnicontaClient.Pages.CustomPage
             else
                 dateMsg = null;
             CWPosting postingDialog = new CWPosting(masterRecord, api.CompanyEntity.Name, dateMsg);
-#if !SILVERLIGHT
             postingDialog.DialogTableId = 2000000014;
-#endif
             postingDialog.Closed += async delegate
             {
                 if (postingDialog.DialogResult == true)

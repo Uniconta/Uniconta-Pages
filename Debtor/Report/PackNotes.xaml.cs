@@ -90,7 +90,8 @@ namespace UnicontaClient.Pages.CustomPage
             Account.Visible = showFields;
             Name.Visible = showFields;
             setDim();
-            if (!api.CompanyEntity.DeliveryAddress)
+            var company = api.CompanyEntity;
+            if (!company.DeliveryAddress)
             {
                 DeliveryName.Visible = false;
                 DeliveryAddress1.Visible = false;
@@ -103,8 +104,11 @@ namespace UnicontaClient.Pages.CustomPage
                 DeliveryPhone.Visible = false;
                 DeliveryContactEmail.Visible = false;
             }
-            Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
-            CostValue.Visible = CostValue.ShowInColumnChooser = !api.CompanyEntity.HideCostPrice;
+            if (company.HideCostPrice)
+            {
+                Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
+            CostValue.Visible = CostValue.ShowInColumnChooser = false;
+            }
         }
 
         public async override Task InitQuery()

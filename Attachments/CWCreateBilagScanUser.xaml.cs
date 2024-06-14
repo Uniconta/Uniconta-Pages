@@ -8,6 +8,7 @@ using Uniconta.API.System;
 using Uniconta.ClientTools;
 using Uniconta.ClientTools.Controls;
 using Uniconta.Common;
+using Localization = Uniconta.ClientTools.Localization;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -63,51 +64,58 @@ namespace UnicontaClient.Pages.CustomPage
 
         private async void OKButton_Click(object sender, RoutedEventArgs e)
         {
-            var response = await UserService.Create(txtFirstName.Text, txtLastName.Text, txtEmail.Text, txtPassword.Text);
+            var email = txtEmail.Text;
+            var response = await UserService.Create(txtFirstName.Text, txtLastName.Text, email, txtPassword.Text);
             var error = response?.error;
-            if (error != null)
+            if (error == null)
             {
-                var message = error.message;
+                SetDialogResult(true);
+                return;
+            }
+
+            var message = error.message;
+            if (message.Contains("e-mail address is already in use"))
+            {
+                var emailInUse = string.Format(Localization.lookup("EmailObjInUse"), email) + ". " + Localization.lookup("InviteUser") +
+                        " " + string.Format(Localization.lookup("ToOBJ"), Localization.lookup("Organisation")).ToLower() + "?";
+
+                var inviteUser = UnicontaMessageBox.Show(emailInUse, Localization.lookup("Bilagscan"), MessageBoxButton.YesNo);
+                if (MessageBoxResult.Yes.Equals(inviteUser))
+                {
+                    SetDialogResult(true);
+                    return;
+                }
+            }
+            else
                 PromptBilagscanWarningMessage(message);
 
-                if (!message.Equals("e-mail address is already in use"))
+            // TODO: Creating a support ticket for paperflow, this does not work
+            /*
+            var emailExistMessage = string.Format(Uniconta.ClientTools.Localization.lookup("AlreadyExistOBJ") + ". {1}?",
+                Uniconta.ClientTools.Localization.lookup("Email"), Uniconta.ClientTools.Localization.lookup("ChangePassword"));
+
+            var resut = UnicontaMessageBox.Show(emailExistMessage, Uniconta.ClientTools.Localization.lookup("Bilagscan"), MessageBoxButton.YesNo);
+            if (resut == MessageBoxResult.Yes)
+            {
+                try
                 {
+                    await User.ForgotPassword(txtEmail.Text);
+                    UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("PasswordNote"),
+                        Uniconta.ClientTools.Localization.lookup("Bilagscan"));
+                }
+                catch (Exception ex2)
+                {
+                    PromptBilagscanWarningMessage(ex2.Message);
                     SetDialogResult(false);
                     return;
                 }
+            }*/
 
-                // TODO: Creating a support ticket for paperflow, this does not work
-                /*
-                var emailExistMessage = string.Format(Uniconta.ClientTools.Localization.lookup("AlreadyExistOBJ") + ". {1}?",
-                    Uniconta.ClientTools.Localization.lookup("Email"), Uniconta.ClientTools.Localization.lookup("ChangePassword"));
-
-                var resut = UnicontaMessageBox.Show(emailExistMessage, Uniconta.ClientTools.Localization.lookup("Bilagscan"), MessageBoxButton.YesNo);
-                if (resut == MessageBoxResult.Yes)
-                {
-                    try
-                    {
-                        await User.ForgotPassword(txtEmail.Text);
-                        UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("PasswordNote"),
-                            Uniconta.ClientTools.Localization.lookup("Bilagscan"));
-                    }
-                    catch (Exception ex2)
-                    {
-                        PromptBilagscanWarningMessage(ex2.Message);
-                        SetDialogResult(false);
-                        return;
-                    }
-                }*/
-            }
-
-
-            SetDialogResult(true);
+            SetDialogResult(false);
         }
 
-        private void PromptBilagscanWarningMessage(string message)
-        {
-            UnicontaMessageBox.Show(string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Bilagscan"), message),
-                    Uniconta.ClientTools.Localization.lookup("Warning"));
-        }
+        private void PromptBilagscanWarningMessage(string message) =>
+            UnicontaMessageBox.Show(string.Format("{0}: {1}", Localization.lookup("Bilagscan"), message), Localization.lookup("Warning"));
 
         private void CancelButton_Click(object sender, RoutedEventArgs e) => SetDialogResult(false);
     }

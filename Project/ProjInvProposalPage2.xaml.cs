@@ -400,9 +400,9 @@ namespace UnicontaClient.Pages.CustomPage
                     editrow.DeliveryCountry = debtor._DeliveryCountry;
                 else
                     editrow.DeliveryCountry = null;
-                editrow.DeliveryPhone = debtor._Phone;
-                editrow.DeliveryContactPerson = debtor._ContactPerson;
-                editrow.DeliveryContactEmail = debtor._ContactEmail;
+                editrow.DeliveryPhone = debtor._DeliveryPhone;
+                editrow.DeliveryContactPerson = debtor._DeliveryContactPerson;
+                editrow.DeliveryContactEmail = debtor._DeliveryContactEmail;
             }
             if (ProjectCache != null)
                 Projectlookupeditor.cache = ProjectCache;

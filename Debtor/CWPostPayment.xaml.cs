@@ -30,7 +30,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.BankStatement))]
         [InputFieldData]
-        [Display(Name = "BankAcccount", ResourceType = typeof(CompanyClientText))]
+        [Display(Name = "Bank", ResourceType = typeof(GLDailyJournalLineText))]
         public string Bank { get { return _Bank; } set { _Bank = value; } }
 
         [InputFieldData]
@@ -83,11 +83,6 @@ namespace UnicontaClient.Pages.CustomPage
             if (string.IsNullOrEmpty(Journal))
             {
                 UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("MandatoryField"), (Uniconta.ClientTools.Localization.lookup("Journal"))), Uniconta.ClientTools.Localization.lookup("Warning"));
-                return;
-            }
-            else if (string.IsNullOrEmpty(Bank))
-            {
-                UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("MandatoryField"), (Uniconta.ClientTools.Localization.lookup("Bank"))), Uniconta.ClientTools.Localization.lookup("Warning"));
                 return;
             }
             SetDialogResult(true);

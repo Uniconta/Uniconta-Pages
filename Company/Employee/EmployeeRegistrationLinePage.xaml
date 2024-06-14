@@ -99,18 +99,19 @@ x:Class="UnicontaClient.Pages.CustomPage.EmployeeRegistrationLinePage"
                 <localPage:EmployeeRegistrationLinePageGrid x:Name="dgEmployeeRegistrationLinePageGrid" Grid.Row="1" AutoGenerateColumns="None" HorizontalAlignment="Stretch" CustomSummary="dgEmployeeRegistrationLinePageGrid_CustomSummary">
                     <localPage:EmployeeRegistrationLinePageGrid.Columns>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Activity" AllowEditing="False"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="FromTime" ShowTime="True" AllowEditing="False">
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="FromTime" ShowTime="True" AllowEditing="False" Width="130">
                             <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
                                 <dxe:TextEditSettings DisplayFormat="g" MaskType="DateTime" />
                             </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
                         </localPage:CorasauDataGridTemplateColumnClient>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="ToTime" ShowTime="True" AllowEditing="False">
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="ToTime" ShowTime="True" AllowEditing="False" Width="130">
                             <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
                                 <dxe:TextEditSettings DisplayFormat="g" MaskType="DateTime" />
                             </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
                         </localPage:CorasauDataGridTemplateColumnClient>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" Visible="False" AllowEditing="False"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="TotalTime" UnboundDataType="{x:Type sys:TimeSpan}" AllowEditing="False" ShowCriteriaInAutoFilterRow="False">
+                        <localPage:CorasauDataGridTemplateColumnClient FieldName="TotalTime" UnboundDataType="{x:Type sys:TimeSpan}" AllowEditing="False" ShowCriteriaInAutoFilterRow="False"
+                                                                       Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TotalHours}" >
                             <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
                                 <dxe:TextEditSettings DisplayFormat="hh\:mm" />
                             </localPage:CorasauDataGridTemplateColumnClient.EditSettings>

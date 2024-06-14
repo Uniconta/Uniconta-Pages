@@ -38,6 +38,18 @@ namespace UnicontaClient.Pages.CustomPage
     /// </summary>
     public partial class DocsSendLogGridPage : GridBasePage
     {
+        DateTime filterDate;
+
+        protected override Filter[] DefaultFilters()
+        {
+            if (filterDate != DateTime.MinValue)
+            {
+                Filter dateFilter = new Filter() { name = "Date", value = String.Format("{0:d}..", filterDate) };
+                return new Filter[] { dateFilter };
+            }
+            return base.DefaultFilters();
+        }
+
         public DocsSendLogGridPage(BaseAPI Api) : base(Api, string.Empty)
         {
             InitPage();
@@ -58,6 +70,8 @@ namespace UnicontaClient.Pages.CustomPage
         private void InitPage(UnicontaBaseEntity master = null)
         {
             InitializeComponent();
+            if (master == null)
+                filterDate = BasePage.GetSystemDefaultDate().AddMonths(-2);
             ((TableView)dgDocsSendLogDataGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
             dgDocsSendLogDataGrid.UpdateMaster(master);
             SetRibbonControl(localMenu, dgDocsSendLogDataGrid);

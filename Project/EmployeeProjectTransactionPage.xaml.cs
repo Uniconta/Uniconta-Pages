@@ -48,8 +48,11 @@ namespace UnicontaClient.Pages.CustomPage
                 this.Task.Visible = this.Task.ShowInColumnChooser = false;
             Utility.SetupVariants(api, null, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
             Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
-            Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
-           CostPrice.Visible = CostPrice.ShowInColumnChooser = !api.CompanyEntity.HideCostPrice;
+            if (api.CompanyEntity.HideCostPrice)
+            {
+                Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
+           CostPrice.Visible = CostPrice.ShowInColumnChooser = false;
+            }
         }
 
         public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)

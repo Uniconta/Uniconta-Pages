@@ -28,7 +28,7 @@
   </RibbonItem>
   <RibbonItem>
 	 <RibbonItem Action="BudgetPanningSchedule" LocalizedNameKey="ProjectBudgetSchedule" ControlName="ProjectBudgetPlanningSchedulePage" Module="_ProjectPlanning" LargeGlyph="Schedule_Task_32x32"/>
-    <RibbonItem Action="TimeSheet" LocalizedNameKey="ProjectTimeEntry" ControlName="TMJournalLinePage" Module="TimeManagement" LargeGlyph="Timesheet_32x32"/>
+    <RibbonItem Action="TimeSheet" LocalizedNameKey="TimeRegistration" ControlName="TMJournalLinePage" Module="TimeManagement" LargeGlyph="Timesheet_32x32"/>
     <RibbonItem Action="ProjectTask" LocalizedNameKey="Tasks" Module="ProjectTask" LargeGlyph="GanttChart_32x32">
       <RibbonItem Action="GridView" LocalizedNameKey="DataGrid" ControlName="ProjectTaskGridPage" Glyph="Multiple_16x16" />
       <RibbonItem Action="ChartView" LocalizedNameKey="EnableChart" Glyph="Report_16x16" />

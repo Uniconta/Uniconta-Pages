@@ -184,8 +184,8 @@ x:Class="UnicontaClient.Pages.CustomPage.ConfigureFunctionalityPage"
                   <CorasauControls:CorasauLayoutItem x:Name="cbIntegrationPack" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=IntegrationPack}">
                     <CorasauControls:CheckEditor IsChecked="{Binding IntegrationPack, Mode=TwoWay}"/>
                   </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="cbDatev" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Datev}">
-                        <CorasauControls:CheckEditor IsChecked="{Binding Datev, Mode=TwoWay}"/>
+                    <CorasauControls:CorasauLayoutItem x:Name="cbDatev" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DATEV}">
+                        <CorasauControls:CheckEditor IsChecked="{Binding DATEV, Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup x:Name="grpBoxAddins" View="GroupBox" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">

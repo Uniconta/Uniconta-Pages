@@ -184,7 +184,7 @@ namespace UnicontaClient.Pages.CustomPage
                 LoadCreditorTransOpen();
             dgOpenTransactionGrid.Focus();
 
-           
+
         }
 
         async private void LoadDebtorTransOpen()
@@ -430,9 +430,13 @@ namespace UnicontaClient.Pages.CustomPage
             return false;
         }
 
+        bool firstCurrencyFound = false;
         void Check(int voucher, string invoice, int rowId, double amtOpen, byte currency, double amtOpenCur)
         {
             bool isFirst = ResetFields();
+
+            if (!firstCurrencyFound)
+                firstCurrencyFound = currency != 0;
 
             if ((OpenTransactionType == 1 && amtOpen < 0d) || // we want to insert creditnotes and payments first.
                 (OpenTransactionType == 2 && amtOpen > 0d))
@@ -456,19 +460,12 @@ namespace UnicontaClient.Pages.CustomPage
 
             RemainingAmt += amtOpen;
 
-            if (isFirst && currency != 0)
+            if (firstCurrencyFound && currency != 0)
                 settleCur = currency;
 
-            if (settleCur != 0)
-            {
-                if (settleCur == currency)
-                    RemainingAmtCur += amtOpenCur;
-                else
-                {
-                    RemainingAmtCur = 0d;
-                    settleCur = 0;
-                }
-            }
+            if (settleCur != 0 && settleCur == currency)
+                RemainingAmtCur += amtOpenCur;
+
             SetStatusText(RemainingAmt, RemainingAmtCur);
         }
 
@@ -481,7 +478,7 @@ namespace UnicontaClient.Pages.CustomPage
             selectedRowIds.Remove(rowId);
             RemainingAmt -= amtOpen;
 
-            if (settleCur != 0)
+            if (settleCur != 0 && settleCur == currency)
                 RemainingAmtCur -= amtOpenCur;
 
             SetStatusText(RemainingAmt, RemainingAmtCur);

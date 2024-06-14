@@ -299,7 +299,7 @@ namespace UnicontaClient.Pages.CustomPage
             var tmLines = tmJourLines.Where(s => (s._Project != null &&
                                                   s._PayrollCategory != null &&
                                                   s._Date > empCache.Get(s._Employee)._TMApproveDate))
-                                                  .GroupBy(x => new { x._Employee, x._Project, x._PayrollCategory, x._WorkSpace, x._Task, x._Date }).Select(x => new TMJournalLineHelper.TMJournalLineClientLocal
+                                                  .GroupBy(x => new { x._Employee, x._Project, x._PayrollCategory, x._WorkSpace, x._Task, x._Date }).Select(x => new TMJournalLineClient
                                                   {
                                                       Date = x.Key._Date,
                                                       Project = x.Key._Project,

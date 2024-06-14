@@ -11,7 +11,7 @@
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="ViewDownloadRow" ShortcutKey="F7" LocalizedNameKey="PhysicalVoucher" Glyph="View_Voucher_32x32" LargeGlyph="View_Voucher_32x32" />
-    <!--<RibbonItem Action="SendDocToDatev" LocalizedNameKey="" LargeGlyph="datevupload" />-->
+    <RibbonItem Action="SendDocToDatev" LocalizedNameKey="Upload" LargeGlyph="datevupload" />
   </RibbonItem>
   <RibbonItem>
     <!---If we want to create a new group in same PageTab-->

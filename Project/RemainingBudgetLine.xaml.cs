@@ -66,7 +66,7 @@ namespace UnicontaClient.Pages.CustomPage
             iAllTransaction = UtilDisplay.GetMenuCommandByName(rb, "AllTransactions");
             iAllTransaction.IsChecked = false;
             qtyFilter = PropValuePair.GenereteWhereElements("Qty", 0, CompareOperator.NotEqual);
-            employeeFilter = PropValuePair.GenereteWhereElements("Employee", ((Project.TimeManagement.TMJournalLineHelper.TMJournalLineClientLocal)_master).Employee, CompareOperator.Equal);
+            employeeFilter = PropValuePair.GenereteWhereElements("Employee", ((TMJournalLineClient)_master).Employee, CompareOperator.Equal);
             var date = DateTime.Now.AddMonths(-1);
             var startDate = new DateTime(date.Year, date.Month, 1);
             var enddate = startDate.AddMonths(3).AddDays(-1);
@@ -117,8 +117,11 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else
                 Task.ShowInColumnChooser = true;
-            Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
-            CostPrice.Visible = CostPrice.ShowInColumnChooser = !api.CompanyEntity.HideCostPrice;
+            if (Comp.HideCostPrice)
+            {
+                Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
+            CostPrice.Visible = CostPrice.ShowInColumnChooser = false;
+            }
         }
 
         async public override Task InitQuery()
@@ -370,7 +373,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 case "AddRow":
                     var addedRow = dgProjectBgtPlangLine.AddRow() as ProjectBudgetLineLocal;
-                    if (_master is Project.TimeManagement.TMJournalLineHelper.TMJournalLineClientLocal tMJournalLineClient)
+                    if (_master is TMJournalLineClient tMJournalLineClient)
                     {
                         addedRow.Date = tMJournalLineClient.Date;
                         addedRow.Project = tMJournalLineClient.Project;

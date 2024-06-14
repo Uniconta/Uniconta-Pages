@@ -237,6 +237,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var grid = dasdboard.Items[item.ComponentName] as GridDashboardItem;
                     if (grid != null)
                     {
+                        grid.ColumnFilterOptions.UpdateTotals = true;
                         var targetLst = grid.Columns;
                         foreach (var col in targetLst)
                         {
@@ -788,7 +789,12 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 var comp = currentUserSessionCompanies[index];
                 var cmpUser = crudApi.CompanyEntity.CreateUserType<CompanyClient>();
-                StreamingManager.Copy(comp, cmpUser);
+
+                if (comp.CompanyId == crudApi.CompanyEntity.CompanyId)
+                    StreamingManager.Copy(crudApi.CompanyEntity, cmpUser);
+                else
+                    StreamingManager.Copy(comp, cmpUser);
+
                 companies[index] = cmpUser;
             }
             return companies;

@@ -199,8 +199,11 @@ namespace UnicontaClient.Pages.CustomPage
                 SerieBatch.ShowInColumnChooser = true;
             Utility.SetupVariants(api, colVariant, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
             Utility.SetDimensionsGrid(api, colDim1, colDim2, colDim3, colDim4, colDim5);
-            Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
-            CostPrice.Visible = CostPrice.ShowInColumnChooser = !api.CompanyEntity.HideCostPrice;
+            if (api.CompanyEntity.HideCostPrice)
+            {
+                Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
+            CostPrice.Visible = CostPrice.ShowInColumnChooser = false;
+            }
         }
 
         Uniconta.API.DebtorCreditor.FindPrices SetPriceLookup(CreditorOrderLineClient rec)

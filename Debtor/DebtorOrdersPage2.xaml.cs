@@ -261,7 +261,7 @@ namespace UnicontaClient.Pages.CustomPage
                     editrow.OneTimeDebtor = api.CompanyEntity.CreateUserType<DebtorClient>();
 
                 var debtor = editrow.OneTimeDebtor;
-                debtor.Country = (CountryCode)api.CompanyEntity._Country;
+                debtor._Country = (CountryCode)api.CompanyEntity._Country;
                 var debtorAccountPage2 = dockCtrl.AddDockItem(TabControls.DebtorAccountPage2, this.ParentControl, new object[2] { debtor, true }, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), "Add_16x16") as DebtorAccountPage2;
                 debtorAccountPage2.DoNotSave = true;
                 oneTimeDebtor = true;
@@ -648,26 +648,33 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void CopyFromDebtor(Debtor debtor)
         {
-            if (debtor == null)
-                return;
-
-            editrow.DeliveryName = debtor._DeliveryName;
-            editrow.DeliveryAddress1 = debtor._DeliveryAddress1;
-            editrow.DeliveryAddress2 = debtor._DeliveryAddress2;
-            editrow.DeliveryAddress3 = debtor._DeliveryAddress3;
-            editrow.DeliveryCity = debtor._DeliveryCity;
-            if (editrow.DeliveryZipCode != debtor._DeliveryZipCode)
+            try
             {
-                lookupZipCode = false;
-                editrow.DeliveryZipCode = debtor._DeliveryZipCode;
+                if (debtor == null || editrow == null)
+                    return;
+
+                editrow.DeliveryName = debtor._DeliveryName;
+                editrow.DeliveryAddress1 = debtor._DeliveryAddress1;
+                editrow.DeliveryAddress2 = debtor._DeliveryAddress2;
+                editrow.DeliveryAddress3 = debtor._DeliveryAddress3;
+                editrow.DeliveryCity = debtor._DeliveryCity;
+                if (editrow.DeliveryZipCode != debtor._DeliveryZipCode)
+                {
+                    lookupZipCode = false;
+                    editrow.DeliveryZipCode = debtor._DeliveryZipCode;
+                }
+                if (debtor._DeliveryCountry != 0)
+                    editrow.DeliveryCountry = debtor._DeliveryCountry;
+                else
+                    editrow.DeliveryCountry = null;
+                editrow.DeliveryPhone = debtor._DeliveryPhone;
+                editrow.DeliveryContactPerson = debtor._DeliveryContactPerson;
+                editrow.DeliveryContactEmail = debtor._DeliveryContactEmail;
             }
-            if (debtor._DeliveryCountry != 0)
-                editrow.DeliveryCountry = debtor._DeliveryCountry;
-            else
-                editrow.DeliveryCountry = null;
-            editrow.DeliveryPhone = debtor._Phone;
-            editrow.DeliveryContactPerson = debtor._ContactPerson;
-            editrow.DeliveryContactEmail = debtor._ContactEmail;
+            catch (Exception ex)
+            {
+                api.ReportException(ex, string.Format("Exception : {0}", debtor == null ? "Debtor is Null" : editrow == null ? "EditRow is null" : ex.Message));
+            }
         }
         private void AcItem_ComboBoxClicked(object sender)
         {

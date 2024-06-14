@@ -56,7 +56,10 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 var args = new object[2];
                 args[0] = IsDeleteLines;
-                args[1] = ProposalLines;
+                if (proposal is ProjectReservation)
+                    args[1] = BudgetLines;
+                else
+                    args[1] = ProposalLines;
                 globalEvents.OnRefresh(NameOfControl, args);
             }
             position = AttachVoucherGridPage.GetPosition(dockCtrl);
@@ -87,6 +90,9 @@ namespace UnicontaClient.Pages.CustomPage
             dgBudgetLinesGrid.ItemsSourceChanged += DgBudgetLinesGrid_ItemsSourceChanged;
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
             dgBudgetLinesGrid.treeListView.ShowNodeFooters = false;
+
+            if (proposal is ProjectReservation)
+                chkOnlyCopyTotals.Visibility = chkDeleteProposalLines.Visibility = Visibility.Collapsed;
         }
 
         private void DgBudgetLinesGrid_ItemsSourceChanged(object sender, ItemsSourceChangedEventArgs e)
@@ -145,6 +151,8 @@ namespace UnicontaClient.Pages.CustomPage
                 OKButton_Click(null, null);
             }
         }
+
+        public List<ProjectBudgetLineLocal> BudgetLines;
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
             busyIndicator.IsBusy = true;
@@ -153,6 +161,7 @@ namespace UnicontaClient.Pages.CustomPage
                 ProposalLines = new List<ProjectInvoiceProposalLineClient>();
                 List<ProjectBudgetLineLocal> treeSource = new List<ProjectBudgetLineLocal>();
                 GenerateProjectEstimateReportSource(dgBudgetLinesGrid.treeListView.Nodes, treeSource);
+                BudgetLines = treeSource;
                 foreach (var ProjectBudgetLineLocal in treeSource)
                 {
                     if (OnlyCopyTotals && !ProjectBudgetLineLocal.Header)

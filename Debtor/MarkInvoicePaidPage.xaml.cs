@@ -146,6 +146,17 @@ namespace UnicontaClient.Pages.CustomPage
                         return;
                     }
 
+                    if (string.IsNullOrEmpty(postingDialog.Bank))
+                    {
+                        var cache = api.GetCache(typeof(Uniconta.DataModel.BankStatement));
+                        if (cache != null && cache.Count == 1)
+                            postingDialog.Bank = cache.First().KeyStr;
+                        else
+                        {
+                            UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("MandatoryField"), (Uniconta.ClientTools.Localization.lookup("Bank"))), Uniconta.ClientTools.Localization.lookup("Warning"));
+                            return;
+                        }
+                    }
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
                     busyIndicator.IsBusy = true;
 

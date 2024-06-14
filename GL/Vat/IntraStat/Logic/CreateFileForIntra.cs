@@ -167,13 +167,13 @@ namespace UnicontaClient.Pages.CustomPage
                         intra.SystemInfo += string.Format(Localization.lookup("MissingOBJ"), Localization.lookup("DebtorRegNo"));
                     }
 
-                    if (!hasErrors && intra.fDebtorRegNo != UNKNOWN_CVRNO)
+                    if (!hasErrors && intra.DebtorRegNoVIES != UNKNOWN_CVRNO)
                     {
                         bool validVatNumber = false;
-                        if (!dictVatNumber.TryGetValue(intra.fDebtorRegNo, out validVatNumber))
+                        if (!dictVatNumber.TryGetValue(intra.DebtorRegNoVIES, out validVatNumber))
                         {
-                            validVatNumber = CheckEuropeanVatInformation(intra.fDebtorRegNo, intra.Country);
-                            dictVatNumber.Add(intra.fDebtorRegNo, validVatNumber);
+                            validVatNumber = CheckEuropeanVatInformation(intra.DebtorRegNoVIES, intra.Country);
+                            dictVatNumber.Add(intra.DebtorRegNoVIES, validVatNumber);
                         }
 
                         if (!validVatNumber)
@@ -191,13 +191,10 @@ namespace UnicontaClient.Pages.CustomPage
                     intra.SystemInfo = VALIDATE_OK;
             }
         }
-
         private bool CheckEuropeanVatInformation(string cvr, CountryCode country)
         {
             if (string.IsNullOrEmpty(cvr))
                 return false;
-
-            cvr = Regex.Replace(cvr, "[^0-9]", "");
 
             int countryCode = (int)country;
             var twolettercode = Enum.GetName(typeof(CountryISOCode), countryCode);

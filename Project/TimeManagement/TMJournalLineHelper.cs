@@ -284,7 +284,30 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
                 err = true;
             }
 
-           
+            if (rec._RegistrationType == RegistrationType.Mileage)
+            {
+                if (rec.Text == null)
+                {
+                    checkErrors.Add(new TMJournalLineError()
+                    {
+                        Message = fieldCannotBeEmpty("Purpose"),
+                        RowId = rec.RowId
+                    });
+
+                    err = true;
+                }
+
+                if (rec.VechicleRegNo == null)
+                {
+                    checkErrors.Add(new TMJournalLineError()
+                    {
+                        Message = fieldCannotBeEmpty("VechicleRegNo"),
+                        RowId = rec.RowId
+                    });
+
+                    err = true;
+                }
+            }
         }
 
         /// <summary>
@@ -584,122 +607,9 @@ namespace UnicontaClient.Pages.CustomPage.Project.TimeManagement
             checkList.Add(value);
         }
 
-#if !SILVERLIGHT
         public static double GetDistance(string fromAddress, string toAddress, bool avoidFerries = true, int decimals = 1)
         {
             return Uniconta.ClientTools.GoogleMaps.GetDistance(fromAddress, toAddress, avoidFerries, decimals);
         }
-#endif
-
-#region TMJournalLineClientPage
-        public class TMJournalLineClientLocal : TMJournalLineClient 
-        {
-            internal bool InsidePropChange;
-            internal object _projectSource;
-            public object ProjectSource { get { return _projectSource; } }
-
-            internal object _payrollSource;
-            public object PayrollSource { get { return _payrollSource; } }
-
-            internal object _projectTaskSource;
-            public object ProjectTaskSource { get { return _projectTaskSource; } }
-
-            internal object _mileageProjectTaskSource;
-            public object MileageProjectTaskSource { get { return _mileageProjectTaskSource; } }
-
-            public int StatusDay1 { get { return GetStatus(_Date); } }
-            public int StatusDay2 { get { return GetStatus(_Date.AddDays(1)); } }
-            public int StatusDay3 { get { return GetStatus(_Date.AddDays(2)); } }
-            public int StatusDay4 { get { return GetStatus(_Date.AddDays(3)); } }
-            public int StatusDay5 { get { return GetStatus(_Date.AddDays(4)); } }
-            public int StatusDay6 { get { return GetStatus(_Date.AddDays(5)); } }
-            public int StatusDay7 { get { return GetStatus(_Date.AddDays(6)); } }
-
-            public int IsEditable
-            {
-                get
-                {
-                    if (_RowId > 0 && !AllSevenDaysStatus(_Date, true))
-                        return 1;
-                    else
-                        return 0;
-                }
-            }
-
-            int GetStatus(DateTime date)
-            {
-                var EmployeeRef = this.EmployeeRef;
-                if (_Employee == null || EmployeeRef == null)
-                    return 0;
-                if (EmployeeRef._Hired != DateTime.MinValue && date < EmployeeRef._Hired)
-                    return 3;
-                else if (EmployeeRef._TMCloseDate == DateTime.MinValue || date > EmployeeRef._TMCloseDate)
-                    return 0; //Editable
-                else if (date <= EmployeeRef._TMApproveDate)
-                    return 2; //Non Edittable green
-                else if (date <= EmployeeRef._TMCloseDate)
-                    return 1; //Non Edittable yellow
-                return 0;
-            }
-
-            bool AllSevenDaysStatus(DateTime Date, bool isStartdate = false)
-            {
-                var EmployeeRef = this.EmployeeRef;
-                if (this._Employee != null && EmployeeRef != null)
-                {
-                    if (isStartdate && Date > EmployeeRef._TMCloseDate)
-                        return true;
-                    if (isStartdate && Date <= EmployeeRef._TMCloseDate && (Total == 0d || IsFieldEditable()))
-                        return true;
-                }
-                return false;
-            }
-
-            DateTime FirstDayOfWeek(DateTime selectedDate)
-            {
-                var dt = selectedDate;
-                int diff = (7 + (dt.DayOfWeek - DayOfWeek.Monday)) % 7;
-                return dt.AddDays(-diff).Date;
-            }
-
-            bool IsFieldEditable()
-            {
-                double sum = 0d;
-                var status = StatusDay1;
-                if (status == 1 || status == 2)
-                    sum +=_Day1;
-                status = StatusDay2;
-                if (status == 1 || status == 2)
-                    sum += _Day2;
-                status = StatusDay3;
-                if (status == 1 || status == 2)
-                    sum += _Day3;
-                status = StatusDay4;
-                if (status == 1 || status == 2)
-                    sum += _Day4;
-                status = StatusDay5;
-                if (status == 1 || status == 2)
-                    sum += _Day5;
-                status = StatusDay6;
-                if (status == 1 || status == 2)
-                    sum += _Day6;
-                status = StatusDay7;
-                if (status == 1 || status == 2)
-                    sum += _Day7;
-                return (sum == 0);
-            }
-
-            public bool IsMatched
-            {
-                get
-                {
-                    if (_RegistrationType == Uniconta.DataModel.RegistrationType.Hours)
-                        if (!string.IsNullOrEmpty(PayrollCategory) && !string.IsNullOrEmpty(InternalType))
-                            return true;
-                    return false;
-                }
-            }
-        }
-#endregion
     }
 }

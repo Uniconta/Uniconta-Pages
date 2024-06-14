@@ -59,7 +59,7 @@ namespace UnicontaClient.Pages.CustomPage
         Company company;
         Debtor debtor;
         WorkInstallation installation;
-        TMJournalLineClientLocal journalline;
+        TMJournalLineClient journalline;
         CrudAPI crudApi;
         SQLCache payrollCache, projectCache;
         SQLTableCache<Uniconta.DataModel.CompanyAddress> companyAddressCache;
@@ -71,7 +71,7 @@ namespace UnicontaClient.Pages.CustomPage
         private int fromIndex;
         private int toIndex;
 
-        public CwTransportRegistration(TMJournalLineClientLocal tmJournalLine, CrudAPI _crudApi)
+        public CwTransportRegistration(TMJournalLineClient tmJournalLine, CrudAPI _crudApi)
         {
             crudApi = _crudApi;
             journalline = tmJournalLine;
@@ -336,7 +336,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var mileage = new EmployeeRegistrationLineClient();
             mileage.SetMaster(crudApi.CompanyEntity);
-            mileage._VechicleRegNo = employee._VechicleRegNo;
+            mileage._VechicleRegNo = VechicleRegNo ?? employee._VechicleRegNo;
 
             SetFromToDetails(mileage);
 
@@ -347,7 +347,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var mileageReturn = new EmployeeRegistrationLineClient();
             mileageReturn.SetMaster(crudApi.CompanyEntity);
-            mileageReturn._VechicleRegNo = employee._VechicleRegNo;
+            mileageReturn._VechicleRegNo = VechicleRegNo ?? employee._VechicleRegNo;
 
             SwapFromToDetails(mileage, mileageReturn);
 

@@ -31,7 +31,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override Type TableType { get { return typeof(DatevLogClient); } }
         public override bool Readonly { get { return true; } }
 
-        public override IComparer GridSorting { get { return new LogTimeSort(); } }
+        public override IComparer GridSorting { get { return new DatevLogTimeSort(); } }
     }
     /// <summary>
     /// Interaction logic for DatevLogPage.xaml

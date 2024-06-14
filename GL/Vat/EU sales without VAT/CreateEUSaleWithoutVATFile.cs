@@ -207,14 +207,6 @@ namespace UnicontaClient.Pages.CustomPage
                     else
                         euSale.SystemInfo += Environment.NewLine + Localization.lookup("NoValues");
                 }
-                else if (euSale.IsTriangularTrade && euSale.TriangularTradeAmount == 0)
-                {
-                    hasErrors = true;
-                    if (euSale.SystemInfo == VALIDATE_OK)
-                        euSale.SystemInfo = "Triangular trade amount is 0";
-                    else
-                        euSale.SystemInfo += Environment.NewLine + "Triangular trade amount is 0";
-                }
 
                 if (debtor?.Country == CountryCode.Unknown)
                 {

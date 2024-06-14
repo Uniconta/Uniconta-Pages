@@ -1234,6 +1234,7 @@ namespace UnicontaClient.Pages.CustomPage
                             if (qty != 0)
                             {
                                 var lineclient = new ProjectJournalLineClient();
+                                lineclient.CopyFrom(line);
 
                                 if (line._RegistrationType == RegistrationType.Hours)
                                 {
@@ -1250,14 +1251,17 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
                                 else
                                 {
+                                    if (line?._Mileage._VechicleRegNo != line.VechicleRegNo)
+                                        line._Mileage._VechicleRegNo = line.VechicleRegNo;
                                     lineclient._Mileage = line._Mileage;
                                     lineclient._Text = line._Text;
                                     lineclient._Unit = Uniconta.DataModel.ItemUnit.km;
-
                                     lineclient._Qty = qty;
                                 }
 
                                 lineclient._Date = line._Date.AddDays(x - 1);
+                                lineclient._TimeFrom = line._TimeFrom;
+                                lineclient._TimeTo = line._TimeTo;
                                 lineclient._Approved = true;
                                 lineclient._TransType = line._TransType;
                                 lineclient._Project = line._Project;
@@ -1282,6 +1286,16 @@ namespace UnicontaClient.Pages.CustomPage
                                     lineclient._Dim4 = emplApprove._Dim4;
                                     lineclient._Dim5 = emplApprove._Dim5;
                                 }
+                                if (line._Dim1 != null)
+                                    lineclient._Dim1 = line._Dim1;
+                                if (line._Dim2 != null)
+                                    lineclient._Dim2 = line._Dim2;
+                                if (line._Dim3 != null)
+                                    lineclient._Dim3 = line._Dim3;
+                                if (line._Dim4 != null)
+                                    lineclient._Dim4 = line._Dim4;
+                                if (line._Dim5 != null)
+                                    lineclient._Dim5 = line._Dim5;
 
                                 lineclient._WorkSpace = line._WorkSpace;
 
@@ -1304,9 +1318,6 @@ namespace UnicontaClient.Pages.CustomPage
                                     lineclient._SalesPrice = line.GetSalesPricesDayN(x);
                                     lineclient._CostPrice = line.GetCostPricesDayN(x);
                                 }
-
-
-
                                 lstInsert.Add(lineclient);
                             }
                         }

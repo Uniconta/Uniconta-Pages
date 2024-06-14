@@ -320,12 +320,13 @@ namespace UnicontaClient.Pages.CustomPage
             layOutInvItemStorage.Visibility = OnHandScreenInOrder ? Visibility.Visible : Visibility.Collapsed;
 
             UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
-            Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
-           CostPrice.Visible = CostPrice.ShowInColumnChooser = CostValue.Visible = CostValue.ShowInColumnChooser = !api.CompanyEntity.HideCostPrice;
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
             if (company.HideCostPrice)
-                UtilDisplay.RemoveMenuCommand(rb, new string[] { "CostValue","DB"});
-
+            {
+                Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
+               CostPrice.Visible = CostPrice.ShowInColumnChooser = CostValue.Visible = CostValue.ShowInColumnChooser = false;
+                UtilDisplay.RemoveMenuCommand(rb, new string[] { "CostValue", "DB" });
+            }
         }
 
         void SetVariantColumns()

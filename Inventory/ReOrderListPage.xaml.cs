@@ -408,9 +408,10 @@ namespace UnicontaClient.Pages.CustomPage
                 ReservedTask = null;
 
             IEnumerable<InvItem> lstEntity;
+            ReOrderListPageGridClient[] query;
             if (propValuePair != null)
             {
-                var query = await api.Query<ReOrderListPageGridClient>(propValuePair);
+                query = await api.Query<ReOrderListPageGridClient>(propValuePair);
                 Array.Sort(query, new SearchItem());
                 lstEntity = query;
                 isCorrectType = true;
@@ -424,6 +425,7 @@ namespace UnicontaClient.Pages.CustomPage
                 this.items = cache;
                 lstEntity = (IEnumerable<InvItem>)cache?.GetKeyStrRecords;
                 isCorrectType = false;
+                query = null;
             }
 
             reservedSort = null;
@@ -433,16 +435,24 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 Uniconta.DataModel.DCOrderLineStorageRef[] ExclOrders = null;
                 if (FromDate != DateTime.MinValue || ToDate != DateTime.MinValue)
-                    ExclOrders = await api.Query<Uniconta.DataModel.DCOrderLineStorageRef>();
+                {
+                    if (query != null && query.Length == 1)
+                        ExclOrders = await api.Query<Uniconta.DataModel.DCOrderLineStorageRef>(query[0]);
+                    else
+                        ExclOrders = await api.Query<Uniconta.DataModel.DCOrderLineStorageRef>();
+                }
 
                 Reserved = await ReservedTask;
                 if (Reserved != null)
                 {
-                    reservedSort = new InvItemStorageClientSort();
+                    reservedSort = new InvItemStorageClientSort(ReorderPrWarehouse, ReorderPrLocation);
                     Array.Sort(Reserved, reservedSort);
                     searchrec = new Uniconta.DataModel.InvItemStorage();
                     if (! ReOrderListPage.ReorderPrWarehouse)
                         ReOrderListPage.ReorderPrLocation = false;
+
+                    if (ToDate == DateTime.MinValue)
+                        ToDate = new DateTime(3000, 1, 1);
 
                     if (ExclOrders != null && ExclOrders.Length > 0)
                     {
@@ -454,10 +464,9 @@ namespace UnicontaClient.Pages.CustomPage
                                 var d = ord._LineDate != DateTime.MinValue ? ord._LineDate : ord._OrderDeliveryDate;
                                 if (d == DateTime.MinValue)
                                     continue;
-                                if (FromDate == DateTime.MinValue || FromDate <= d)
+                                if (d >= FromDate && d <= ToDate)
                                     continue;
-                                if (ToDate == DateTime.MinValue || ToDate >= d)
-                                    continue;
+
                                 // we need to exclude this reservation
                                 searchrec._Item = ord._Item;
                                 searchrec._Variant1 = ord._Variant1;

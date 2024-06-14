@@ -67,10 +67,12 @@ namespace UnicontaClient.Pages.CustomPage
             if (e.Key == Key.F8 && Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
             {
                 ribbonControl.PerformRibbonAction("CreditorTran");
+                e.Handled = true;
             }
             else if (e.Key == Key.F8)
             {
                 ribbonControl.PerformRibbonAction("OpenTran");
+                e.Handled = true;
             }
         }
 

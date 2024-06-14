@@ -418,9 +418,9 @@ namespace UnicontaClient.Pages.CustomPage
                     editrow.DeliveryCountry = creditor._DeliveryCountry;
                 else
                     editrow.DeliveryCountry = null;
-                editrow.DeliveryPhone = creditor._Phone;
-                editrow.DeliveryContactPerson = creditor._ContactPerson;
-                editrow.DeliveryContactEmail = creditor._ContactEmail;
+                editrow.DeliveryPhone = creditor._DeliveryPhone;
+                editrow.DeliveryContactPerson = creditor._DeliveryContactPerson;
+                editrow.DeliveryContactEmail = creditor._DeliveryContactEmail;
             }
             TableField.SetUserFieldsFromRecord(creditor, editrow);
             BindContact(creditor);

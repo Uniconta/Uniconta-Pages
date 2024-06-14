@@ -84,7 +84,8 @@ namespace UnicontaClient.Pages.CustomPage
         {
             base.OnLayoutLoaded();
             setDim();
-            if (!api.CompanyEntity.DeliveryAddress)
+            var Comp = api.CompanyEntity;
+            if (!Comp.DeliveryAddress)
             {
                 DeliveryName.Visible = false;
                 DeliveryAddress1.Visible = false;
@@ -94,8 +95,11 @@ namespace UnicontaClient.Pages.CustomPage
                 DeliveryCity.Visible = false;
                 DeliveryCountry.Visible = false;
             }
-            Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
-            CostValue.Visible = CostValue.ShowInColumnChooser = !api.CompanyEntity.HideCostPrice;
+            if (Comp.HideCostPrice)
+            {
+                Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
+            CostValue.Visible = CostValue.ShowInColumnChooser = false;
+            }
         }
 
         private void LocalMenu_OnItemClicked(string ActionType)

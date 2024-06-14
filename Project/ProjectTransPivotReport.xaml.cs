@@ -88,8 +88,8 @@ namespace UnicontaClient.Pages.CustomPage
                 labelVisibility = chartControl.Diagram.SeriesTemplate.LabelsVisibility;
                 seriesIndex = GetSeriesId();
             }
-            fieldCostAmount.Visible = fieldCostAmount.ShowInCustomizationForm = !api.CompanyEntity.HideCostPrice;
-
+            if (api.CompanyEntity.HideCostPrice)
+                fieldCostAmount.Visible = fieldCostAmount.ShowInCustomizationForm = false;
         }
 
         int seriesIndex = 0;

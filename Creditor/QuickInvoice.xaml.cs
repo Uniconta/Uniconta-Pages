@@ -779,9 +779,9 @@ namespace UnicontaClient.Pages.CustomPage
                 Order.DeliveryZipCode = creditor._DeliveryZipCode;
                 if (creditor._DeliveryCountry != 0)
                     Order.DeliveryCountry = creditor._DeliveryCountry;
-                Order.DeliveryPhone = creditor._Phone;
-                Order.DeliveryContactPerson = creditor._ContactPerson;
-                Order.DeliveryContactEmail = creditor._ContactEmail;
+                Order.DeliveryPhone = creditor._DeliveryPhone;
+                Order.DeliveryContactPerson = creditor._DeliveryContactPerson;
+                Order.DeliveryContactEmail = creditor._DeliveryContactEmail;
                 hasEmail = creditor._InvoiceEmail != null || creditor._EmailDocuments;
                 if (OrderCurrency != 0 && OrderCurrency != CompCurrency)
                     loadExchange();

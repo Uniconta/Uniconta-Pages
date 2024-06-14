@@ -45,7 +45,7 @@ namespace UnicontaClient.Pages.CustomPage
 {
     public class TMJournalLinePageGrid : CorasauDataGridClient
     {
-        public override Type TableType { get { return typeof(TMJournalLineClientLocal); } }
+        public override Type TableType { get { return typeof(TMJournalLineClient); } }
 
         public override string LineNumberProperty { get { return "_LineNumber"; } }
         public override IComparer GridSorting { get { return new TMJournalLineSort(); } }
@@ -57,7 +57,7 @@ namespace UnicontaClient.Pages.CustomPage
         public Uniconta.DataModel.Employee Employee { get; set; }
         public override bool AddRowOnPageDown()
         {
-            var selectedItem = (TMJournalLineClientLocal)this.SelectedItem;
+            var selectedItem = (TMJournalLineClient)this.SelectedItem;
             if ((selectedItem != null && (JnlLineDate.AddDays(6) <= Employee._TMApproveDate || JnlLineDate.AddDays(6) <= Employee._TMCloseDate)) || selectedItem == null || selectedItem._Project == null || selectedItem._PayrollCategory == null)
                 return false;
             return true;
@@ -66,7 +66,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override void SetDefaultValues(UnicontaBaseEntity dataEntity, int selectedIndex)
         {
             var header = (Uniconta.DataModel.Employee)this.masterRecord;
-            var newRow = (TMJournalLineClientLocal)dataEntity;
+            var newRow = (TMJournalLineClient)dataEntity;
             newRow.Date = JnlLineDate;
             newRow.RegistrationType = RegType;
             newRow._WorkSpace = WorkSpaceDefault;
@@ -234,7 +234,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void TableView_ShowingEditor1(object sender, ShowingEditorEventArgs e)
         {
-            var selectedItem = dgTMJournalLineTransRegGrid.SelectedItem as TMJournalLineClientLocal;
+            var selectedItem = dgTMJournalLineTransRegGrid.SelectedItem as TMJournalLineClient;
             if (selectedItem != null)
             {
                 if (e.Column.FieldName != "Invoiceable") return;
@@ -244,7 +244,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void TableView_ShowingEditor(object sender, ShowingEditorEventArgs e)
         {
-            var selectedItem = dgTMJournalLineTransRegGrid.SelectedItem as TMJournalLineClientLocal;
+            var selectedItem = dgTMJournalLineTransRegGrid.SelectedItem as TMJournalLineClient;
             if (selectedItem != null)
             {
                 if (e.Column.FieldName != "Invoiceable") return;
@@ -313,11 +313,11 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void DgTMJournalLineTransRegGridDataControl_CurrentItemChanged1(object sender, CurrentItemChangedEventArgs e)
         {
-            TMJournalLineClientLocal oldselectedItem = e.OldItem as TMJournalLineClientLocal;
+            TMJournalLineClient oldselectedItem = e.OldItem as TMJournalLineClient;
             if (oldselectedItem != null)
                 oldselectedItem.PropertyChanged -= DgTMJournalLineTransRegSelectedItem_PropertyChanged;
 
-            TMJournalLineClientLocal selectedItem = e.NewItem as TMJournalLineClientLocal;
+            TMJournalLineClient selectedItem = e.NewItem as TMJournalLineClient;
             if (selectedItem != null)
             {
                 selectedItem.PropertyChanged += DgTMJournalLineTransRegSelectedItem_PropertyChanged;
@@ -325,7 +325,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
         private void DgTMJournalLineTransRegSelectedItem_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            var rec = (TMJournalLineClientLocal)sender;
+            var rec = (TMJournalLineClient)sender;
             if (e.PropertyName == "Project" ||
                 e.PropertyName == "Day1" ||
                 e.PropertyName == "Day2" ||
@@ -417,11 +417,11 @@ namespace UnicontaClient.Pages.CustomPage
 
         bool KeyAllowed(string shortCut)
         {
-            TMJournalLineClientLocal selectedItem;
+            TMJournalLineClient selectedItem;
             if (mileageGridFocus)
-                selectedItem = dgTMJournalLineTransRegGrid.SelectedItem as TMJournalLineClientLocal;
+                selectedItem = dgTMJournalLineTransRegGrid.SelectedItem as TMJournalLineClient;
             else
-                selectedItem = dgTMJournalLineGrid.SelectedItem as TMJournalLineClientLocal;
+                selectedItem = dgTMJournalLineGrid.SelectedItem as TMJournalLineClient;
 
             if (selectedItem == null)
                 return false;
@@ -504,11 +504,11 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void DataControl_CurrentItemChanged(object sender, DevExpress.Xpf.Grid.CurrentItemChangedEventArgs e)
         {
-            TMJournalLineClientLocal oldselectedItem = e.OldItem as TMJournalLineClientLocal;
+            TMJournalLineClient oldselectedItem = e.OldItem as TMJournalLineClient;
             if (oldselectedItem != null)
                 oldselectedItem.PropertyChanged -= SelectedItem_PropertyChanged;
 
-            TMJournalLineClientLocal selectedItem = e.NewItem as TMJournalLineClientLocal;
+            TMJournalLineClient selectedItem = e.NewItem as TMJournalLineClient;
             if (selectedItem != null)
             {
                 selectedItem.PropertyChanged += SelectedItem_PropertyChanged;
@@ -517,7 +517,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void SelectedItem_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            var rec = (TMJournalLineClientLocal)sender;
+            var rec = (TMJournalLineClient)sender;
             var PropertyName = e.PropertyName;
             if (PropertyName == "Project" ||
                 PropertyName == "Day1" ||
@@ -593,36 +593,36 @@ namespace UnicontaClient.Pages.CustomPage
             dgTMJournalLineGrid.UpdateTotalSummary();
         }
 
-        async void SetProjectTask(Uniconta.DataModel.Project project, TMJournalLineClientLocal rec)
+        async void SetProjectTask(Uniconta.DataModel.Project project, TMJournalLineClient rec)
         {
             if (api.CompanyEntity.ProjectTask)
             {
                 if (project != null)
                 {
                     var tasks = project.Tasks ?? await project.LoadTasks(api);
-                    rec._projectTaskSource = tasks?.Where(s => s.Ended == false && (rec._WorkSpace == null || s._WorkSpace == rec._WorkSpace));
+                    rec.ProjectTaskSource = tasks?.Where(s => s.Ended == false && (rec._WorkSpace == null || s._WorkSpace == rec._WorkSpace));
                 }
                 else
                 {
-                    rec._projectTaskSource = null;
+                    rec.ProjectTaskSource = null;
                     rec.Task = null;
                 }
                 rec.NotifyPropertyChanged("ProjectTaskSource");
             }
         }
 
-        async void SetMileageProjectTask(Uniconta.DataModel.Project project, TMJournalLineClientLocal rec)
+        async void SetMileageProjectTask(Uniconta.DataModel.Project project, TMJournalLineClient rec)
         {
             if (api.CompanyEntity.ProjectTask)
             {
                 if (project != null)
                 {
                     var tasks = project.Tasks ?? await project.LoadTasks(api);
-                    rec._mileageProjectTaskSource = tasks?.Where(s => s.Ended == false && (rec._WorkSpace == null || s._WorkSpace == rec._WorkSpace));
+                    rec.MileageProjectTaskSource = tasks?.Where(s => s.Ended == false && (rec._WorkSpace == null || s._WorkSpace == rec._WorkSpace));
                 }
                 else
                 {
-                    rec._mileageProjectTaskSource = null;
+                    rec.MileageProjectTaskSource = null;
                     rec.Task = null;
                 }
                 rec.NotifyPropertyChanged("MileageProjectTaskSource");
@@ -631,7 +631,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void ProjectTask_GotFocus(object sender, RoutedEventArgs e)
         {
-            var selectedItem = dgTMJournalLineGrid.SelectedItem as TMJournalLineClientLocal;
+            var selectedItem = dgTMJournalLineGrid.SelectedItem as TMJournalLineClient;
             if (selectedItem?._Project != null)
             {
                 var selected = (Uniconta.DataModel.Project)projCache.Get(selectedItem._Project);
@@ -641,7 +641,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void Mileage_ProjectTask_GotFocus(object sender, RoutedEventArgs e)
         {
-            var selectedItem = dgTMJournalLineTransRegGrid.SelectedItem as TMJournalLineClientLocal;
+            var selectedItem = dgTMJournalLineTransRegGrid.SelectedItem as TMJournalLineClient;
             if (selectedItem?._Project != null)
             {
                 var selected = (Uniconta.DataModel.Project)projCache.Get(selectedItem._Project);
@@ -813,7 +813,7 @@ namespace UnicontaClient.Pages.CustomPage
                 PropValuePair.GenereteWhereElements(nameof(TMJournalLineClient.RegistrationType), typeof(int), "0"),
                 PropValuePair.GenereteWhereElements(nameof(TMJournalLineClient.CopyLine), typeof(bool), "1")
             };
-            var copyPrevJournalLine = await api.Query<TMJournalLineClientLocal>(pairJournalTrans);
+            var copyPrevJournalLine = await api.Query<TMJournalLineClient>(pairJournalTrans);
             if (copyPrevJournalLine == null || copyPrevJournalLine.Length == 0)
                 return;
 
@@ -858,7 +858,7 @@ namespace UnicontaClient.Pages.CustomPage
             return dt.AddDays(-diff).Date;
         }
 
-        void SetInvoiceable(TMJournalLineClientLocal rec)
+        void SetInvoiceable(TMJournalLineClient rec)
         {
             var payroll = (Uniconta.DataModel.EmpPayrollCategory)payrollCache?.Get(rec.PayrollCategory);
             if (payroll != null)
@@ -1521,7 +1521,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void GetGridColumnsSum()
         {
-            var lst = dgTMJournalLineGrid.ItemsSource as List<TMJournalLineClientLocal>;
+            var lst = dgTMJournalLineGrid.ItemsSource as List<TMJournalLineClient>;
             if (lst == null)
                 return;
             day1Sum = lst.Select(x => x.Day1).Sum();
@@ -1542,7 +1542,7 @@ namespace UnicontaClient.Pages.CustomPage
         CorasauGridLookupEditorClient prevProject, prevMilageProject;
         private void Hours_Project_GotFocus(object sender, RoutedEventArgs e)
         {
-            TMJournalLineClientLocal selectedItem = dgTMJournalLineGrid.SelectedItem as TMJournalLineClientLocal;
+            TMJournalLineClient selectedItem = dgTMJournalLineGrid.SelectedItem as TMJournalLineClient;
             if (selectedItem != null)
             {
                 SetProjectSource(selectedItem);
@@ -1556,7 +1556,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void Milage_Project_GotFocus(object sender, RoutedEventArgs e)
         {
-            TMJournalLineClientLocal selectedItem = dgTMJournalLineTransRegGrid.SelectedItem as TMJournalLineClientLocal;
+            TMJournalLineClient selectedItem = dgTMJournalLineTransRegGrid.SelectedItem as TMJournalLineClient;
             if (selectedItem != null)
             {
                 SetProjectSource(selectedItem);
@@ -1580,7 +1580,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void SetProjectByLookupText(object sender, bool isHours)
         {
-            TMJournalLineClientLocal selectedItem = isHours ? dgTMJournalLineGrid.SelectedItem as TMJournalLineClientLocal : dgTMJournalLineTransRegGrid.SelectedItem as TMJournalLineClientLocal;
+            TMJournalLineClient selectedItem = isHours ? dgTMJournalLineGrid.SelectedItem as TMJournalLineClient : dgTMJournalLineTransRegGrid.SelectedItem as TMJournalLineClient;
             if (selectedItem == null)
                 return;
             var le = sender as CorasauGridLookupEditor;
@@ -1610,7 +1610,7 @@ namespace UnicontaClient.Pages.CustomPage
         CorasauGridLookupEditorClient prevPayroll, prevMilagePayroll;
         private void Hours_Payroll_GotFocus(object sender, RoutedEventArgs e)
         {
-            TMJournalLineClientLocal selectedItem = dgTMJournalLineGrid.SelectedItem as TMJournalLineClientLocal;
+            TMJournalLineClient selectedItem = dgTMJournalLineGrid.SelectedItem as TMJournalLineClient;
             if (selectedItem != null)
             {
                 SetPayrollSource(selectedItem);
@@ -1624,7 +1624,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void Milage_Payroll_GotFocus(object sender, RoutedEventArgs e)
         {
-            TMJournalLineClientLocal selectedItem = dgTMJournalLineTransRegGrid.SelectedItem as TMJournalLineClientLocal;
+            TMJournalLineClient selectedItem = dgTMJournalLineTransRegGrid.SelectedItem as TMJournalLineClient;
             if (selectedItem != null)
             {
                 SetPayrollSource(selectedItem, isHoursPayroll: false);
@@ -1647,7 +1647,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
         void SetPayrollByLookupText(object sender, bool isHours)
         {
-            TMJournalLineClientLocal selectedItem = isHours ? dgTMJournalLineGrid.SelectedItem as TMJournalLineClientLocal : dgTMJournalLineTransRegGrid.SelectedItem as TMJournalLineClientLocal;
+            TMJournalLineClient selectedItem = isHours ? dgTMJournalLineGrid.SelectedItem as TMJournalLineClient : dgTMJournalLineTransRegGrid.SelectedItem as TMJournalLineClient;
             if (selectedItem == null)
                 return;
             var le = sender as CorasauGridLookupEditor;
@@ -1832,14 +1832,14 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void localMenu_OnItemClicked(string ActionType)
         {
-            var selectedItem = dgTMJournalLineGrid.SelectedItem as TMJournalLineClientLocal;
+            var selectedItem = dgTMJournalLineGrid.SelectedItem as TMJournalLineClient;
             var selectedItems = dgTMJournalLineGrid.SelectedItems;
             switch (ActionType)
             {
                 case "AddRow":
                     if (JournalLineDate.AddDays(6) <= employee._TMApproveDate || JournalLineDate.AddDays(6) <= employee._TMCloseDate)
                         return;
-                    var journalLine = new TMJournalLineClientLocal();
+                    var journalLine = new TMJournalLineClient();
                     journalLine.SetMaster(api.CompanyEntity);
                     journalLine._Date = JournalLineDate;
                     journalLine._WorkSpace = defaultWrkSpace;
@@ -1870,7 +1870,7 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     else
                     {
-                        var selectedMileage = dgTMJournalLineTransRegGrid.SelectedItem as TMJournalLineClientLocal;
+                        var selectedMileage = dgTMJournalLineTransRegGrid.SelectedItem as TMJournalLineClient;
                         if (selectedMileage != null && KeyAllowed("DeleteLine") && mileageGridFocus)
                             dgTMJournalLineTransRegGrid.DeleteRow();
                     }
@@ -1990,14 +1990,14 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        void TimeRegistration(TMJournalLineClientLocal selectedItem)
+        void TimeRegistration(TMJournalLineClient selectedItem)
         {
             var cw = new CwTransportRegistration(selectedItem, api);
             cw.Closed += delegate
             {
                 if (cw.DialogResult == true)
                 {
-                    var journalLine = new TMJournalLineClientLocal
+                    var journalLine = new TMJournalLineClient
                     {
                         _Project = cw.RegistrationProject,
                         _Date = JournalLineDate,
@@ -2005,6 +2005,7 @@ namespace UnicontaClient.Pages.CustomPage
                         _WorkSpace = cw.WorkSpace,
                         _Task = cw.PrTask,
                         _Text = cw.Purpose,
+                        _VechicleRegNo = cw.VechicleRegNo,
                         _PayrollCategory = cw.PayType,
                         _Day1 = cw.Day1,
                         _Day2 = cw.Day2,
@@ -2117,8 +2118,8 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 #endregion
 
-                var tmLines = dgTMJournalLineGrid.ItemsSource as IEnumerable<TMJournalLineClientLocal>;
-                var tmLinesMileage = dgTMJournalLineTransRegGrid.ItemsSource as IEnumerable<TMJournalLineClientLocal>;
+                var tmLines = dgTMJournalLineGrid.ItemsSource as IEnumerable<TMJournalLineClient>;
+                var tmLinesMileage = dgTMJournalLineTransRegGrid.ItemsSource as IEnumerable<TMJournalLineClient>;
 
                 var tmLinesLst = tmLines.ToList<TMJournalLineClient>();
                 var tmLinesMileageLst = tmLinesMileage.ToList<TMJournalLineClient>();
@@ -2171,6 +2172,8 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
                                 else
                                 {
+                                    if (rec?._Mileage._VechicleRegNo != rec.VechicleRegNo)
+                                        rec._Mileage._VechicleRegNo = rec.VechicleRegNo;
                                     lineclient._Mileage = rec._Mileage;
                                     lineclient._Text = rec._Text;
                                     lineclient._Unit = Uniconta.DataModel.ItemUnit.km;
@@ -2178,6 +2181,8 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
 
                                 lineclient._Date = rec._Date.AddDays(x - 1);
+                                lineclient._TimeFrom = rec._TimeFrom;
+                                lineclient._TimeTo = rec._TimeTo;
                                 lineclient._Item = payrollCat._Item;
                                 lineclient._PrCategory = payrollCat._PrCategory;
 
@@ -2198,15 +2203,25 @@ namespace UnicontaClient.Pages.CustomPage
                                     lineclient._Dim5 = employee._Dim5;
                                 }
 
+                                if (rec._Dim1 != null)
+                                    lineclient._Dim1 = rec._Dim1;
+                                if (rec._Dim2 != null)
+                                    lineclient._Dim2 = rec._Dim2;
+                                if (rec._Dim3 != null)
+                                    lineclient._Dim3 = rec._Dim3;
+                                if (rec._Dim4 != null)
+                                    lineclient._Dim4 = rec._Dim4;
+                                if (rec._Dim5 != null)
+                                    lineclient._Dim5 = rec._Dim5;
 
                                 if (payrollCat._Item != null)
                                 {
-                                    lineclient._Item = payrollCat._Item;
                                     var item = (InvItem)ItemCache.Get(lineclient._Item);
-                                    if (item == null)
-                                        return;
-                                    SetDCPriceLookup(lineclient)?.SetPriceFromItem(lineclient, item);
-
+                                    if (item != null)
+                                    {
+                                        lineclient._Item = item._Item;
+                                        SetDCPriceLookup(lineclient)?.SetPriceFromItem(lineclient, item);
+                                    }
                                     if (lineclient._Invoiceable && lineclient._SalesPrice == 0)
                                     {
                                         lineclient._SalesPrice = rec.GetSalesPricesDayN(x);
@@ -2440,7 +2455,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (actionType == TMJournalActionType.Close && dialogDate < JournalLineDate.AddDays(6))
             {
-                var tmLinesHours = dgTMJournalLineGrid.ItemsSource as IEnumerable<TMJournalLineClientLocal>;
+                var tmLinesHours = dgTMJournalLineGrid.ItemsSource as IEnumerable<TMJournalLineClient>;
 
                 var approveDate = employee._TMApproveDate;
                 var closeDate = dialogDate;
@@ -2530,8 +2545,8 @@ namespace UnicontaClient.Pages.CustomPage
                 dgTMJournalLineGrid.Columns.GetColumnByName("ErrorInfo").Visible = true;
                 dgTMJournalLineTransRegGrid.Columns.GetColumnByName("colErrorInfo").Visible = true;
 
-                var tmLines = dgTMJournalLineGrid.ItemsSource as IEnumerable<TMJournalLineClientLocal>;
-                var tmLinesMileage = dgTMJournalLineTransRegGrid.ItemsSource as IEnumerable<TMJournalLineClientLocal>;
+                var tmLines = dgTMJournalLineGrid.ItemsSource as IEnumerable<TMJournalLineClient>;
+                var tmLinesMileage = dgTMJournalLineTransRegGrid.ItemsSource as IEnumerable<TMJournalLineClient>;
 
                 var tmLinesLst = tmLines.ToList<TMJournalLineClient>();
                 var tmLinesMileageLst = tmLinesMileage.ToList<TMJournalLineClient>();
@@ -2575,8 +2590,8 @@ namespace UnicontaClient.Pages.CustomPage
                         var overtimeN = payrollCategoryArr.Length > 0 ? payrollCategoryArr[0] : null;
                         var overtime1 = payrollCategoryArr.Length > 1 ? payrollCategoryArr[1] : null;
 
-                        var journalLineLst = new List<TMJournalLineClientLocal>();
-                        var journalLine = new TMJournalLineClientLocal();
+                        var journalLineLst = new List<TMJournalLineClient>();
+                        var journalLine = new TMJournalLineClient();
                         journalLine.SetMaster(api.CompanyEntity);
 
                         journalLine._Date = JournalLineDate;
@@ -2682,7 +2697,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 journalLine._PayrollCategory = overtime1._Number;
                                 journalLineLst.Add(journalLine);
 
-                                journalLine = new TMJournalLineClientLocal();
+                                journalLine = new TMJournalLineClient();
                                 journalLine.SetMaster(api.CompanyEntity);
                                 journalLine._Date = JournalLineDate;
                                 journalLine._Invoiceable = false;
@@ -2756,7 +2771,7 @@ namespace UnicontaClient.Pages.CustomPage
             return ret;
         }
 
-        void SetOverTimeDayN(TMJournalLineClientLocal jourLine, int day, double hours)
+        void SetOverTimeDayN(TMJournalLineClient jourLine, int day, double hours)
         {
             switch (day)
             {
@@ -2780,7 +2795,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        private void SetProjectSource(TMJournalLineClientLocal rec)
+        private void SetProjectSource(TMJournalLineClient rec)
         {
             if (employee.EmpProjects != null && employee.EmpProjects.Count() != 0)
                 rec._projectSource = employee.EmpProjects;
@@ -2808,15 +2823,15 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        private void SetPayrollSource(TMJournalLineClientLocal rec, bool isHoursPayroll = true)
+        private void SetPayrollSource(TMJournalLineClient rec, bool isHoursPayroll = true)
         {
             if (payrollCache != null && payrollCache.Count != 0)
             {
                 var pg = rec.ProjectRef?.ProjectGroup;
                 if (pg != null)
                 {
-                    rec._payrollSource = new TMJournalPayrollFilter(payrollCache.cache, pg._Invoiceable, isHoursPayroll);
-                    if (rec._payrollSource != null)
+                    rec.PayrollSource = new TMJournalPayrollFilter(payrollCache.cache, pg._Invoiceable, isHoursPayroll);
+                    if (rec.PayrollSource != null)
                         rec.NotifyPropertyChanged("PayrollSource");
                 }
             }

@@ -90,8 +90,11 @@ namespace UnicontaClient.Pages.CustomPage
             UtilDisplay.RemoveMenuCommand(rb, new string[] { "Aggregate" });
 
             LoadType(typeof(Uniconta.DataModel.Debtor));
-            Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
-            CostValue.Visible = CostValue.ShowInColumnChooser = !api.CompanyEntity.HideCostPrice;
+            if (api.CompanyEntity.HideCostPrice)
+            {
+                Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
+            CostValue.Visible = CostValue.ShowInColumnChooser = false;
+            }
         }
 
         void localMenu_OnItemClicked(string ActionType)

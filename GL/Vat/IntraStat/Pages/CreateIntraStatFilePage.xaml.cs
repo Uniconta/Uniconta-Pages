@@ -433,11 +433,13 @@ namespace UnicontaClient.Pages.CustomPage
                                 break;
                         }
                         intraStat.fDebtorRegNo = string.Concat(intraStat.PartnerCountry, fdebtorCVR);
+                        intraStat.DebtorRegNoVIES = PrepareVIES(intraStat.Debtor);
                     }
                     else
                     {
                         intraStat.DebtorRegNo = IntraHelper.UNKNOWN_CVRNO;
                         intraStat.fDebtorRegNo = IntraHelper.UNKNOWN_CVRNO;
+                        intraStat.DebtorRegNoVIES = IntraHelper.UNKNOWN_CVRNO;
                     }
                 }
 
@@ -479,6 +481,35 @@ namespace UnicontaClient.Pages.CustomPage
                 intraList.Add(intraStat);
             }
             return intraList;
+        }
+
+        private string PrepareVIES(DebtorClient debtor)
+        {
+            string twolettercode = null;
+            var debtorCVR = debtor._LegalIdent;
+            if (!string.IsNullOrWhiteSpace(debtorCVR))
+            {
+                var cvr = debtorCVR;
+                if (Char.IsLetter(cvr.FirstOrDefault()) && cvr.Length > 3)
+                {
+                    var cCode = cvr.Substring(0, 2);
+                    cvr = cvr.Substring(2, cvr.Length - 2);
+                    if (Enum.TryParse(cCode, out CountryISOCode isoCode))
+                        twolettercode = cCode;
+
+                    if (twolettercode != null && Country2Language.IsEU(debtor._Country))
+                        debtorCVR = cvr;
+
+                    switch (debtor._Country)
+                    {
+                        case CountryCode.Sweden:
+                            if (debtorCVR.Length == 10)
+                                debtorCVR = string.Concat(debtorCVR, CreateEUSaleWithoutVATFile.SWEDEN_POSTFIX_01);
+                            break;
+                    }
+                }
+            }
+            return debtorCVR;
         }
 
         private bool CallPrevalidate()
@@ -695,6 +726,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
+        public string DebtorRegNoVIES;
         private string _DebtorRegNo;
         [Display(Name = "DebtorRegNo", ResourceType = typeof(IntrastatClassText))]
         public string DebtorRegNo { get { return _DebtorRegNo; } set { _DebtorRegNo = value; NotifyPropertyChanged("DebtorRegNo"); } }

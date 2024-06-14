@@ -38,18 +38,25 @@ namespace UnicontaClient.Pages.CustomPage
             dgGLTransExported.api = api;
             dgGLTransExported.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
+            if (!api.CompanyEntity.DATEV)
+            {
+                ribbonControl.DisableButtons("DatevVerbinden");
+                ribbonControl.DisableButtons("Upload");
+                ribbonControl.DisableButtons("ConnectedApplications");
+                ribbonControl.DisableButtons("ShowLog");
+
+            }
             if (api.CompanyEntity._Country != (byte)CountryCode.Germany)
             {
                 RibbonBase rb = (RibbonBase)localMenu.DataContext;
                 if (rb != null)
-                    UtilDisplay.RemoveMenuCommand(rb, new string[] { "Upload", "DatevVerbinden", "ConnectedApplications", "ShowLog" });  //PG 10.05
+                    UtilDisplay.RemoveMenuCommand(rb, new string[] { "Upload", "DatevVerbinden", "ConnectedApplications", "ShowLog" });
             }
             if (DatevDetails.AccessToken != null && DatevDetails.Tokenvalidto > DateTime.Now)
             {
                 setShowHideGreen(true);
-                DatevDetails.ToTime = DatevDetails.Tokenvalidto.ToString("dd.mm.yy HH:mm:ss");
-                GetUser(null, Convert.ToString(API.CompanyId), DatevDetails.AccessToken); // PG 10.05  //GetUser(DatevDetails.AccessToken, Convert.ToString(API.CompanyId));              
-                clientId = UtilDisplay.GetKey("DatevClientId"); //PG 10.05
+                GetUser(null, Convert.ToString(API.CompanyId), DatevDetails.AccessToken);
+                clientId = UtilDisplay.GetKey("DatevClientId");
                 SetStatusText();
             }
             else
@@ -62,7 +69,7 @@ namespace UnicontaClient.Pages.CustomPage
                 DatevDetails.Tokenvalidto = DateTime.MinValue;
                 DatevDetails.ToTime = null;
                 DatevDetails.ToService = null;
-                DatevDetails.Send = false; //Anurag 17.05
+                DatevDetails.Send = false;
                 SetStatusText();
             }
         }
@@ -134,13 +141,21 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         ConnectToDatev(selectedItem);
                     break;
-                case "Upload": //PG                  
-                    FilUpload(selectedItem);
+                case "Upload":
+                    if (UnicontaMessageBox.Show(String.Format("Möchten Sie {0:d} - {1:d} Version {3} ({2}) zu DATEV hochladen?", selectedItem._FromDate, selectedItem._ToDate, selectedItem.Comment, selectedItem._SuppVersion), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+                        if ((!string.IsNullOrEmpty(selectedItem._SendToDatevDOC)) || (!string.IsNullOrEmpty(selectedItem.SendToDatevEXTF)))
+
+                            if (UnicontaMessageBox.Show(String.Format("Sie haben {0:d} - {1:d} Version {3} ({2}) bereits zu DATEV hochgeladen. Möchten Sie noch einmal hochladen?", selectedItem._FromDate, selectedItem._ToDate, selectedItem.Comment, selectedItem._SuppVersion), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+                                FilUpload(selectedItem);
+                            else
+                                FilUpload(selectedItem);
+                        else
+                            FilUpload(selectedItem);
                     break;
-                case "ConnectedApplications": //PG                                      
+                case "ConnectedApplications":
                     Process.Start("https://apps.datev.de/tokrevui");
                     break;
-                case "ShowLog":           
+                case "ShowLog":
                     AddDockItem(TabControls.DatevLogPage, selectedItem, Uniconta.ClientTools.Localization.lookup("DatevLog"));
                     break;
                 default:
@@ -168,23 +183,40 @@ namespace UnicontaClient.Pages.CustomPage
             };
             cw.Show();
         }
-        public async void GetUser(GLTransExportedClient selectedItem, string CompID, string token) //PG
+        public async void GetUser(GLTransExportedClient selectedItem, string CompID, string token)
         {
-            byte status = 0; // Anurag 26.05
+            byte status = 0;
             var clientu = new HttpClient();
             var requestu = new HttpRequestMessage(HttpMethod.Get, "https://api.datev.de/userinfo");
             requestu.Headers.Add("X-DATEV-Client-Id", clientId);
             requestu.Headers.Add("Authorization", "Bearer " + token);
             requestu.Headers.Add("Cookie", "DATEV_SECURE=1");
             var responseu = await clientu.SendAsync(requestu);
-            responseu.EnsureSuccessStatusCode();
-            var Output = responseu.Content.ReadAsStringAsync().Result;
-            var serializeru = new JavaScriptSerializer();
 
-            var User = serializeru.Deserialize<Root>(Output);
-            DatevDetails.User = User.name;
-            SetStatusText();
-            InsDatevLog(selectedItem, DateTime.Now, "https://api.datev.de/userinfo HttpMethod.Get", "X-DATEV-Client-Id" + clientId, "", 1, Output);
+            if (responseu.IsSuccessStatusCode == false)
+            {
+                setShowHideGreen(false);
+                DatevDetails.ToTime = "";
+                DatevDetails.ToService = "";
+                DatevDetails.User = "";
+                DatevDetails.Send = false;
+                SetStatusText();
+                busyIndicator.IsBusy = false;
+                UnicontaMessageBox.Show("Sie sind nun von DATEV abgemeldet", "DATEV", MessageBoxButton.OK);
+                return;
+
+            }
+            else
+            {
+                var Output = responseu.Content.ReadAsStringAsync().Result;
+                var serializeru = new JavaScriptSerializer();
+
+                var User = serializeru.Deserialize<Root>(Output);
+                DatevDetails.User = User.name;
+                status = 1;
+                SetStatusText();
+                InsDatevLog(selectedItem, DateTime.Now, "https://api.datev.de/userinfo HttpMethod.Get", "X-DATEV-Client-Id" + clientId, "", status, Output);
+            }
 
         }
 
@@ -194,11 +226,11 @@ namespace UnicontaClient.Pages.CustomPage
             byte status = 0;
             if (!string.IsNullOrEmpty(DatevDetails.AccessToken) && DatevDetails.Tokenvalidto > DateTime.Now)
             {
-                var UCServiceText = DatevDetails.DatevServiceText;
-                if (((UCServiceText == "Voucher Image Service") || (UCServiceText == "Booking Data Service and Voucher Image Service")) && (DatevDetails.Send == true) && (selectedItem.SendToDatevDOC == ""))
+                var UCService = DatevDetails.UCService;
+                if (UCService == 2 || UCService == 3 && (DatevDetails.Send == true) && (selectedItem.SendToDatevDOC == null))
                 {
                     busyIndicator.IsBusy = false;
-                    UnicontaMessageBox.Show("You cannot log out of Datev before the server has uploaded the document!", "Error", MessageBoxButton.OK);
+                    UnicontaMessageBox.Show("Sie können sich nicht von DATEV abmelden, solange noch Dokumente hochgeladen werden", "Fehler", MessageBoxButton.OK);
                     return;
                 }
                 else
@@ -207,7 +239,7 @@ namespace UnicontaClient.Pages.CustomPage
                     DatevDetails.Send = false;
                     SetStatusText();
                     busyIndicator.IsBusy = false;
-                    UnicontaMessageBox.Show("You is now logged out of Datev", "Datev", MessageBoxButton.OK);
+                    UnicontaMessageBox.Show("Sie sind nun von DATEV abgemeldet", "DATEV", MessageBoxButton.OK);
                     return;
                 }
             }
@@ -233,14 +265,14 @@ namespace UnicontaClient.Pages.CustomPage
                 else
                 {
                     setShowHideGreen(false);
-                    UnicontaMessageBox.Show("Error when logging in to Datev " + array[5], "Error", MessageBoxButton.OK);
+                    UnicontaMessageBox.Show("Fehler beim Anmelden an DATEV " + array[5], "Fehler", MessageBoxButton.OK);
                     status = 1;
                 }
             }
             catch (Exception e)
             {
                 setShowHideGreen(false);
-                UnicontaMessageBox.Show("Error when logging in to Datev " + e.Message, "Error", MessageBoxButton.OK);
+                UnicontaMessageBox.Show("Fehler beim Anmelden an DATEV " + e.Message, "Fehler", MessageBoxButton.OK);
                 status = 1;
                 busyIndicator.IsBusy = false;
 
@@ -248,20 +280,20 @@ namespace UnicontaClient.Pages.CustomPage
             if (string.IsNullOrEmpty(DatevDetails.AccessToken))
             {
                 setShowHideGreen(false);
-                UnicontaMessageBox.Show("The Datev token is invalid or expired", "Error", MessageBoxButton.OK);
+                UnicontaMessageBox.Show("Der DATEV Zugangstoken ist ungültig oder abgelaufen", "Fehler", MessageBoxButton.OK);
                 status = 1;
             }
             else
                 TestUpload(selectedItem);
-            InsDatevLog(selectedItem, DateTime.Now, "Login : to https://login.datev.de/openid", "", "", status, "");  //Anurag 25.05
+            InsDatevLog(selectedItem, DateTime.Now, "Anmeldung an https://login.datev.de/openid", "", "", status, "");
 
         }
         public async void Revoke(GLTransExportedClient selectedItem, string CompID)
         {
 
             string revokeEndpoint = "https://api.datev.de/revoke";
-            clientId = UtilDisplay.GetKey("DatevClientId"); //PG 10.05
-            clientSecret = UtilDisplay.GetKey("DatevClientSecret"); //PG 10.05
+            clientId = UtilDisplay.GetKey("DatevClientId");
+            clientSecret = UtilDisplay.GetKey("DatevClientSecret");
             string requestBody = $"token={DatevDetails.AccessToken}&token_type_hint=access_token";
 
             //Now, let's revoke the token
@@ -280,7 +312,7 @@ namespace UnicontaClient.Pages.CustomPage
             DatevDetails.RefreshToken = null;
             DatevDetails.Tokenvalidto = DateTime.MinValue;
         }
-        public async void RevokeToken(GLTransExportedClient selectedItem, string requestBody, string revokeEndpoint) //Anurag 25.05
+        public async void RevokeToken(GLTransExportedClient selectedItem, string requestBody, string revokeEndpoint)
         {
             byte status = 0;
             using (HttpClient client = new HttpClient())
@@ -297,19 +329,19 @@ namespace UnicontaClient.Pages.CustomPage
                     if (!response.IsSuccessStatusCode)
                     {
                         status = 3;
-                        UnicontaMessageBox.Show($"Error revoking access token: {response.StatusCode} - {response.ReasonPhrase}", "Error", MessageBoxButton.OK);
+                        UnicontaMessageBox.Show($"Fehler beim Widerruf des Zugangstokens: {response.StatusCode} - {response.ReasonPhrase}", "Fehler", MessageBoxButton.OK);
                     }
                     else
                         status = 1;
                 }
                 catch (Exception ex)
                 {
-                    UnicontaMessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButton.OK);
+                    UnicontaMessageBox.Show($"Fehler: {ex.Message}", "Fehler", MessageBoxButton.OK);
                     status = 3;
                     busyIndicator.IsBusy = false;
                 }
             }
-            InsDatevLog(selectedItem, DateTime.Now, revokeEndpoint, "X-DATEV-Client-Id " + clientId, requestBody, status, "");  //Anurag 25.05
+            InsDatevLog(selectedItem, DateTime.Now, revokeEndpoint, "X-DATEV-Client-Id " + clientId, "Encoding.UTF8 application/x-www-form-urlencoded", status, "");
         }
         private void setShowHideGreen(bool hideGreen)
         {
@@ -319,12 +351,12 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
             if (hideGreen)
             {
-                ibase.Caption = string.Concat(Uniconta.ClientTools.Localization.lookup("UnRegister"), " ", Uniconta.ClientTools.Localization.lookup("von Datev"));
+                ibase.Caption = string.Concat(Uniconta.ClientTools.Localization.lookup("UnRegister"), " ", Uniconta.ClientTools.Localization.lookup("von DATEV"));
                 ibase.LargeGlyph = Utilities.Utility.GetGlyph("datevconnectg");
             }
             else
             {
-                ibase.Caption = string.Concat(Uniconta.ClientTools.Localization.lookup("Register"), " ", Uniconta.ClientTools.Localization.lookup("an Datev"));
+                ibase.Caption = string.Concat(Uniconta.ClientTools.Localization.lookup("Register"), " ", Uniconta.ClientTools.Localization.lookup("an DATEV"));
                 ibase.LargeGlyph = Utilities.Utility.GetGlyph("datevconnectb");
             }
         }
@@ -371,7 +403,7 @@ namespace UnicontaClient.Pages.CustomPage
             { }
             catch (Exception ex)
             {
-                api.ReportException(ex, "Error while connecting login.datev.de");
+                api.ReportException(ex, "Fehler bei der Verbindung mit login.datev.de");
 
             }
             busyIndicator.IsBusy = false;
@@ -384,11 +416,11 @@ namespace UnicontaClient.Pages.CustomPage
             return dh;
         }
 
-        public async void TestUpload(GLTransExportedClient selectedItem) //PG
+        public async void TestUpload(GLTransExportedClient selectedItem)
         {
             busyIndicator.IsBusy = true;
             byte status = 0;
-            var statusText = "";       
+            var statusText = "";
             var datev = await CreateDatevHeader();
             var url = "https://accounting-clients.api.datev.de/platform/v2/clients/" + datev.Consultant + "-" + datev.Client;
 
@@ -403,14 +435,14 @@ namespace UnicontaClient.Pages.CustomPage
                 DatevDetails.AccessToken = DatevDetails.IdentityToken = DatevDetails.RefreshToken = null;
                 DatevDetails.Tokenvalidto = DateTime.MinValue;
                 status = 1;
-                UnicontaMessageBox.Show("You have successfully logged out of Datev", "Datev", MessageBoxButton.OK);
+                UnicontaMessageBox.Show("Sie sind erfolgreich von DATEV abgemeldet", "DATEV", MessageBoxButton.OK);
             }
             if (response.StatusCode == HttpStatusCode.NotFound)
             {
                 busyIndicator.IsBusy = false;
                 setShowHideGreen(false);
                 status = 3;
-                statusText = String.Format("Mandant {0} für Berater {1} ist nicht vorhanden beim Datev", datev.Client, datev.Consultant);
+                statusText = String.Format("Die Kombination Mandant {0} und Berater {1} ist bei DATEV nicht vorhanden ", datev.Client, datev.Consultant);
                 UnicontaMessageBox.Show(statusText, "Fehler", MessageBoxButton.OK);
                 return;
             }
@@ -419,7 +451,7 @@ namespace UnicontaClient.Pages.CustomPage
                 busyIndicator.IsBusy = false;
                 setShowHideGreen(false);
                 status = 3;
-                UnicontaMessageBox.Show("The Datev token is invalid or expired", "Error", MessageBoxButton.OK);
+                UnicontaMessageBox.Show("Der DATEV Zugriffstoken ist ungültig oder abgelaufen", "Fehler", MessageBoxButton.OK);
                 return;
             }
             var Output = response.Content.ReadAsStringAsync().Result;
@@ -435,7 +467,8 @@ namespace UnicontaClient.Pages.CustomPage
                 status = 3;
                 busyIndicator.IsBusy = false;
                 setShowHideGreen(false);
-                UnicontaMessageBox.Show(String.Format("{0} ", "401 Failed"), "Error", MessageBoxButton.OK);
+                statusText = String.Format("Die Kombination Mandant {0} und Berater {1} ist bei DATEV nicht vorhanden ", datev.Client, datev.Consultant);
+                UnicontaMessageBox.Show(statusText, "Fehler", MessageBoxButton.OK);
                 return;
             }
             var UCServiceText = "";
@@ -453,14 +486,13 @@ namespace UnicontaClient.Pages.CustomPage
                 }
 
             if (DatevDetails.UCService == 0)
-                UCServiceText = "None";
+                UCServiceText = Uniconta.ClientTools.Localization.lookup("NoOptions");
             if (DatevDetails.UCService == 1)
-                UCServiceText = "Booking Data Service";
+                UCServiceText = Uniconta.ClientTools.Localization.lookup("PostedTransactions");
             if (DatevDetails.UCService == 2)
-                UCServiceText = "Voucher Image Service";
+                UCServiceText = Uniconta.ClientTools.Localization.lookup("Vouchers");
             if (DatevDetails.UCService == 3)
-                UCServiceText = "Booking Data Service and Voucher Image Service";
-
+                UCServiceText = Uniconta.ClientTools.Localization.lookup("PostedTransactions") + " & " + Uniconta.ClientTools.Localization.lookup("Vouchers");
             DatevDetails.DatevServiceText = UCServiceText;
 
             var clientu = new HttpClient();
@@ -480,8 +512,9 @@ namespace UnicontaClient.Pages.CustomPage
             SetStatusText();
             setShowHideGreen(true);
             busyIndicator.IsBusy = false;
-            UnicontaMessageBox.Show("Login zu datev OK", "Datev", MessageBoxButton.OK);
-            InsDatevLog(selectedItem, DateTime.Now, url + " Method.Get", "X-DATEV-Client-Id " + clientId, Convert.ToString(Output), status, Output);
+            UnicontaMessageBox.Show("Anmelden an DATEV erfolgreich", "DATEV", MessageBoxButton.OK);
+            status = 1;
+            InsDatevLog(selectedItem, DateTime.Now, "https://api.datev.de/userinfo" + " Method.Get", "X-DATEV-Client-Id " + clientId + "Cookie", "DATEV_SECURE=1", status, Output);
 
         }
         async void DeleteRecord(GLTransExportedClient selectedItem)
@@ -498,182 +531,168 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
         int MaxJournalPostId;
-        public async void FilUpload(GLTransExportedClient selectedItem) //PG
+        public async void FilUpload(GLTransExportedClient selectedItem)
         {
             byte status = 0;
             var statusText = "";
-            if (UnicontaMessageBox.Show(String.Format("Möchten Sie {0} zu DATEV Hochladen ?", selectedItem.Comment), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+            if (DatevDetails.AccessToken != null)
             {
-
-                if (DatevDetails.AccessToken != null)
+                DatevDetails.Send = true;
+                SetStatusText();
+                if (selectedItem._SuppJournalPostedId != 0)
+                    MaxJournalPostId = selectedItem._SuppJournalPostedId;
+                else
+                    MaxJournalPostId = selectedItem._MaxJournalPostedId;
+                var UCServiceText = DatevDetails.DatevServiceText;
+                var services = new List<string>();
+                if (UCServiceText == Uniconta.ClientTools.Localization.lookup("NoOptions"))
+                    DatevDetails.UCService = 0;
+                if (UCServiceText == Uniconta.ClientTools.Localization.lookup("PostedTransactions") || (UCServiceText == Uniconta.ClientTools.Localization.lookup("PostedTransactions") + " & " + Uniconta.ClientTools.Localization.lookup("Vouchers")))
                 {
-                    DatevDetails.Send = true;
-                    SetStatusText();
-                    if (selectedItem._SuppJournalPostedId != 0)
-                        MaxJournalPostId = selectedItem._SuppJournalPostedId;
-                    else
-                        MaxJournalPostId = selectedItem._MaxJournalPostedId;
-                    var UCServiceText = DatevDetails.DatevServiceText;
-                    var services = new List<string>();
-                    if (UCServiceText == "None")
-                        DatevDetails.UCService = 0;
-                    if (UCServiceText == "Booking Data Service")
-                    {
-                        services.Add(UCServiceText);
-                        DatevDetails.UCService = 1;
-                    }
-                    if (UCServiceText == "Voucher Image Service")
-                    {
-                        services.Add(UCServiceText);
-                        DatevDetails.UCService = 2;
-                    }
-                    if (UCServiceText == "Booking Data Service and Voucher Image Service")
-                    {
-                        services = new List<string> { "Booking Data Service", "Voucher Image Service", "Booking Data Service and Voucher Image Service" };
-                        DatevDetails.UCService = 3;
-                    }
-                    if (DatevDetails.UCService > 0)
-                    {
-                        var cwComboBox = new CWComboBoxSelector(Uniconta.ClientTools.Localization.lookup("Upload"), services.ToArray());
-                        cwComboBox.Closed += async delegate
-                        {
-                            if (cwComboBox.DialogResult == true && DatevDetails.UCService == 3)
-                                DatevDetails.UCService = cwComboBox.SelectedItemIndex + 1;
-                            var datev = await CreateDatevHeader();
-                            var url = "Https://accounting-extf-files.api.datev.de/platform/v3/clients/" + Convert.ToInt32(datev.Consultant) + "-" + datev.Client + "/extf-files/import";
-                            var partname = "";
-                            var anz = 0;
-                            var err = "";
-                            string[] loc = new string[3];
-                            busyIndicator.IsBusy = true; //PG 06.05
-                            var client = new HttpClient();
-                            if (DatevDetails.UCService == 1 || DatevDetails.UCService == 3)
-                            {
-                                for (int i = 0; i < 3; i++)
-                                {
-                                    if (i == 0)
-                                        partname = "EXTF_Buchungstextkonstanten_" + selectedItem._ToDate.ToString("ddMMyyyy") + "_" + MaxJournalPostId;
-                                    if (i == 1)
-                                        partname = "EXTF_DebitorenKreditoren_" + selectedItem._ToDate.ToString("ddMMyyyy") + "_" + MaxJournalPostId;
-                                    if (i == 2)
-                                        partname = "EXTF_Buchungsstapel_" + selectedItem._ToDate.ToString("ddMMyyyy") + "_" + MaxJournalPostId;
+                    services.Add(Uniconta.ClientTools.Localization.lookup("PostedTransactions"));
+                    DatevDetails.UCService = 1;
+                }
+                if (UCServiceText == Uniconta.ClientTools.Localization.lookup("Vouchers") || (UCServiceText == Uniconta.ClientTools.Localization.lookup("PostedTransactions") + " & " + Uniconta.ClientTools.Localization.lookup("Vouchers")))
+                {
+                    services.Add(Uniconta.ClientTools.Localization.lookup("Vouchers"));
+                    DatevDetails.UCService = 2;
+                }
+                if (UCServiceText == Uniconta.ClientTools.Localization.lookup("PostedTransactions") + " & " + Uniconta.ClientTools.Localization.lookup("Vouchers"))
+                {
+                    services.Add(UCServiceText);
 
-                                    if (!File.Exists(datev.Path + "\\" + partname + ".csv"))
+                    DatevDetails.UCService = 3;
+                }
+
+                if (DatevDetails.UCService > 0)
+                {
+                    var cwComboBox = new CWComboBoxSelector(Uniconta.ClientTools.Localization.lookup("Upload"), services.ToArray());
+                    cwComboBox.Closed += async delegate
+                    {
+                        if (cwComboBox.DialogResult == true && DatevDetails.UCService == 3)
+                            DatevDetails.UCService = cwComboBox.SelectedItemIndex + 1;
+                        var datev = await CreateDatevHeader();
+                        var url = "Https://accounting-extf-files.api.datev.de/platform/v3/clients/" + Convert.ToInt32(datev.Consultant) + "-" + datev.Client + "/extf-files/import";
+                        var partname = "";
+                        var anz = 0;
+                        var err = "";
+                        string[] loc = new string[3];
+                        busyIndicator.IsBusy = true;
+                        var client = new HttpClient();
+                        if (DatevDetails.UCService == 1 || DatevDetails.UCService == 3)
+                        {
+                            for (int i = 0; i < 3; i++)
+                            {
+                                if (i == 0)
+                                    partname = "EXTF_Buchungstextkonstanten_" + selectedItem._ToDate.ToString("ddMMyyyy") + "_" + MaxJournalPostId;
+                                if (i == 1)
+                                    partname = "EXTF_DebitorenKreditoren_" + selectedItem._ToDate.ToString("ddMMyyyy") + "_" + MaxJournalPostId;
+                                if (i == 2)
+                                    partname = "EXTF_Buchungsstapel_" + selectedItem._ToDate.ToString("ddMMyyyy") + "_" + MaxJournalPostId;
+
+                                if (!File.Exists(datev.Path + "\\" + partname + ".csv"))
+                                {
+                                    status = 3;
+                                    InsDatevLog(selectedItem, DateTime.Now, url + "/extf-files/ import " + " Method.Post", "extf-file " + datev.Path + "\\" + partname + ".csv" + " Content-Type " + "application/octet-stream", "", status, "No files available");
+                                    UnicontaMessageBox.Show("No files available", "Error", MessageBoxButton.OK);
+                                    return;
+                                }
+
+                                try
+                                {
+                                    var request1 = new HttpRequestMessage(HttpMethod.Post, url);
+                                    request1.Headers.Add("X-DATEV-Client-Id", clientId);
+                                    request1.Headers.Add("Filename", partname + ".csv");
+                                    request1.Headers.Add("Authorization", "Bearer " + DatevDetails.AccessToken);
+                                    request1.Headers.Add("Cookie", "DATEV_SECURE=1");
+                                    request1.Content = new StreamContent(File.OpenRead(datev.Path + "\\" + partname + "." + "csv"));
+                                    var apiresult = await client.SendAsync(request1);
+
+                                    var Status = Convert.ToString(apiresult.StatusCode);
+                                    if (Status == "Accepted")
+                                    {
+                                        status = 2;
+                                        statusText = Convert.ToString(apiresult.Headers.Location);
+                                        var locID = Convert.ToString(apiresult.Headers.Location);
+                                        var len = locID.Length;
+                                        loc[anz] = locID.Substring(len - 36, 36);
+                                        anz = anz + 1;
+                                    }
+                                    else
                                     {
                                         status = 3;
-                                        InsDatevLog(selectedItem, DateTime.Now, url + "/extf-files/ import " + " Method.Post", "extf-file " + datev.Path + "\\" + partname + ".csv" + " Content-Type " + "application/octet-stream", "", status, "No files available");
-                                        UnicontaMessageBox.Show("No files available", "Error", MessageBoxButton.OK);
+                                        statusText = Convert.ToString(apiresult.Content);
+                                        setShowHideGreen(false);
+                                        DatevDetails.ToTime = "";
+                                        DatevDetails.ToService = "";
+                                        DatevDetails.User = "";
+                                        DatevDetails.Send = false;
+                                        SetStatusText();
+
+                                        DatevDetails.AccessToken = "";
+                                        DatevDetails.IdentityToken = "";
+                                        DatevDetails.RefreshToken = "";
+                                        DatevDetails.Tokenvalidto = DateTime.MinValue;
+                                        busyIndicator.IsBusy = false;
+                                        UnicontaMessageBox.Show("Der DATEV Zugriffstoken ist ungültig oder abgelaufen", "Fehler", MessageBoxButton.OK);
                                         return;
                                     }
-
-                                    try
-                                    {
-
-                                        var request1 = new HttpRequestMessage(HttpMethod.Post, url);
-                                        request1.Headers.Add("X-DATEV-Client-Id", clientId);
-                                        request1.Headers.Add("Filename", partname + ".csv");
-                                        request1.Headers.Add("Authorization", "Bearer " + DatevDetails.AccessToken);
-                                        request1.Headers.Add("Cookie", "DATEV_SECURE=1");
-                                        request1.Content = new StreamContent(File.OpenRead(datev.Path + "\\" + partname + "." + "csv"));
-                                        var apiresult = await client.SendAsync(request1);
-
-                                        //log.SetMaster(selectedItem);
-                                        //log.Date = DateTime.Now;
-                                        //log.DateSent = DateTime.Now;
-                                        //log.HTTPConnMethod = url + "/extf-files/import" + " Method.Post";
-                                        //log.HTTPHeader = "X-DATEV-Client-Id " + clientId + " Filename " + partname + ".csv";
-                                        //log.HTTPBody = "extf-file " + datev.Path + "\\" + partname + ".csv" + " Content-Type " + "application/octet-stream";
-
-                                        var Status = Convert.ToString(apiresult.StatusCode);
-                                        if (Status == "Accepted")
-                                        {
-                                            status = 2;
-                                            statusText = Convert.ToString(apiresult.Headers.Location);
-                                            //log.HTTPRESPONSEHTTPCode = "202 Processed";
-                                            //log.HTTPRESPONSEHTTPBody = Convert.ToString(apiresult.Headers.Location);
-                                            var locID = Convert.ToString(apiresult.Headers.Location);
-                                            var len = locID.Length;
-                                            loc[anz] = locID.Substring(len - 36, 36);
-                                            anz = anz + 1;
-
-                                        }
-                                        else
-                                        {
-                                            status = 3;
-                                            statusText = Convert.ToString(apiresult.Content);
-                                            //log.HTTPRESPONSEHTTPCode = "401 Failed";
-                                            //log.HTTPRESPONSEHTTPBody = Convert.ToString(apiresult.Content);
-                                            //await api.Insert(log);
-                                            setShowHideGreen(false);
-                                            DatevDetails.ToTime = "";
-                                            DatevDetails.ToService = "";
-                                            DatevDetails.User = "";
-                                            DatevDetails.Send = false;
-                                            SetStatusText();
-
-                                            DatevDetails.AccessToken = "";
-                                            DatevDetails.IdentityToken = "";
-                                            DatevDetails.RefreshToken = "";
-                                            DatevDetails.Tokenvalidto = DateTime.MinValue;
-                                            busyIndicator.IsBusy = false; // PG 10.05
-                                            UnicontaMessageBox.Show("The Datev token is invalid or expired", "Error", MessageBoxButton.OK);
-                                            return;
-                                        }
-                                        //await api.Insert(log);
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        UnicontaMessageBox.Show(String.Format("{0} error ", e), "Datev", MessageBoxButton.OK);
-                                    }
+                                    InsDatevLog(selectedItem, DateTime.Now, url + "/extf-files/import" + " Method.Post", "/extf-files/ import" + "X-DATEV-Client-Id " + clientId + " Filename " + partname + ".csv", "extf-file " + datev.Path + "\\" + partname + ".csv" + " Content-Type " + "application/octet-stream", status, statusText);
                                 }
-                                InsDatevLog(selectedItem, DateTime.Now, url + "/extf-files/ import " + " Method.Post", "extf-file " + datev.Path + "\\" + partname + ".csv" + " Content-Type " + "application/octet-stream", "", status, statusText);
-                                TestextF(selectedItem, loc, Convert.ToString(DatevDetails.AccessToken), datev.Consultant, datev.Client, clientId);  //Anurag 26.05
+                                catch (Exception e)
+                                {
+                                    UnicontaMessageBox.Show(String.Format("{0} Fehler ", e), "DATEV", MessageBoxButton.OK);
+                                }
                             }
 
-                            var UpText = "";
-                            var UpTextEXTF = "";
-                            if (DatevDetails.UCService == 2 || DatevDetails.UCService == 3)
-                            {
-                                UpText = "The document will be uploaded from the server";
-                            }
-                            else
-                            {
-                                UpTextEXTF = String.Format("{0} send files, and {1} it's ok {2} am {3}", anz, DatevDetails.SendOK, err, DateTime.Now); //Anurag 17.05
-                            }
-                            selectedItem._SendToDatevEXTF = UpTextEXTF;
-                            selectedItem._DatevService = Convert.ToByte(DatevDetails.UCService);
-                            await api.Update(selectedItem);
-                            gridRibbon_BaseActions("RefreshGrid");
-                            busyIndicator.IsBusy = false; // PG 06.05
-                            UnicontaMessageBox.Show(UpTextEXTF + " " + UpText, "Datev", MessageBoxButton.OK);
-                            if (DatevDetails.UCService == 2 || DatevDetails.UCService == 3)
-                            {
-                                // Server Call UploadDatevDoc(selectedItem, DatevDetails.AccessToken, DatevDetails.RefreshToken); //Aunrag 15.05
-                                //PG Call to test pdf upload
-                                var Cmp = api.CompanyEntity;
-                                Cmp.SetUserField("AccessToken", DatevDetails.AccessToken);
-                                Cmp.SetUserField("RefreshToken", DatevDetails.RefreshToken);
-                                Cmp.SetUserField("MaxJournalPostedId", selectedItem._MaxJournalPostedId);
-                                api.Update(Cmp);
-                            }
+                            TestextF(selectedItem, loc, Convert.ToString(DatevDetails.AccessToken), datev.Consultant, datev.Client, clientId);
+                        }
 
-                        };
-                        cwComboBox.Show();
-                    }
-                }
-                else
-                {
-                    setShowHideGreen(false);
-                    DatevDetails.ToTime = "";
-                    DatevDetails.ToService = "";
-                    DatevDetails.User = "";
-                    DatevDetails.Send = false;
-                    SetStatusText();
-                    UnicontaMessageBox.Show("The Datev token is invalid or expired", "Error", MessageBoxButton.OK);
+                        var UpText = "";
+                        var UpTextEXTF = "";
+                        if (DatevDetails.UCService == 2 || DatevDetails.UCService == 3)
+                        {
+                            UpText = "Die Belege werden vom Server hochgeladen";
+                        }
+                        if (DatevDetails.UCService == 1 || DatevDetails.UCService == 3)
+                        {
+                            UpTextEXTF = String.Format("{0} Dateien (Stammdaten und Buchungen) gesendet. {1} ohne Fehler. {2} - {3}", anz, DatevDetails.SendOK, err, DateTime.Now);
+                        }
+                        selectedItem._SendToDatevEXTF = UpTextEXTF;
+                        selectedItem._SendToDatevDOC = "";
+                        selectedItem._DatevService = Convert.ToByte(DatevDetails.UCService);
+                        await api.Update(selectedItem);
+                        busyIndicator.IsBusy = false;
+                        gridRibbon_BaseActions("RefreshGrid");
+                        busyIndicator.IsBusy = false;
+                        UnicontaMessageBox.Show(UpTextEXTF + " " + UpText, "DATEV", MessageBoxButton.OK);
+                        if (DatevDetails.UCService == 2 || DatevDetails.UCService == 3)
+                        {
+                            //Server Call UploadDatevDoc(selectedItem (or selectedItem._ToDate, selectedItem._SuppVersion) , DatevDetails.AccessToken, DatevDetails.RefreshToken); //Aunrag0 02.06
+                            //PG Call to test pdf upload                                
+                            var Cmp = api.CompanyEntity;
+                            Cmp.SetUserField("AccessToken", DatevDetails.AccessToken);
+                            Cmp.SetUserField("RefreshToken", DatevDetails.RefreshToken);
+                            Cmp.SetUserField("MaxJournalPostedId", selectedItem._MaxJournalPostedId);
+                            api.Update(Cmp);
+                        }
+
+                    };
+                    cwComboBox.Show();
                 }
             }
+            else
+            {
+                setShowHideGreen(false);
+                DatevDetails.ToTime = "";
+                DatevDetails.ToService = "";
+                DatevDetails.User = "";
+                DatevDetails.Send = false;
+                SetStatusText();
+                UnicontaMessageBox.Show("Der DATEV Zugriffstoken ist ungültig oder abgelaufen", "Fehler", MessageBoxButton.OK);
+            }
         }
-        public async void InsDatevLog(GLTransExportedClient selectedItem, DateTime lDate, String conMet, String head, String body, byte resp, string respb) //PG
+        public async void InsDatevLog(GLTransExportedClient selectedItem, DateTime lDate, String conMet, String head, String body, byte resp, string respb)
         {
             if (selectedItem != null)
             {
@@ -690,11 +709,11 @@ namespace UnicontaClient.Pages.CustomPage
 
         }
 
-        public void TestextF(GLTransExportedClient selectedItem, string[] loc, string token, string Consultant, string Client, string clientId) //PG
+        public void TestextF(GLTransExportedClient selectedItem, string[] loc, string token, string Consultant, string Client, string clientId)
         {
             byte status = 0;
             var statusText = "";
-            System.Threading.Thread.Sleep(60000); //PG 10.05 to give Datev time to procees....
+            System.Threading.Thread.Sleep(60000);
             DatevDetails.SendOK = 0;
             for (int i = 0; i < 3; i++)
             {
@@ -709,32 +728,22 @@ namespace UnicontaClient.Pages.CustomPage
 
                 var serializer = new JavaScriptSerializer();
 
-                var respfiles = serializer.Deserialize<Extf>(contentStream); // her skal en Test om Jason ok ist!
-                //Datevlog log = new Datevlog();                                             
-                //log.Date = DateTime.Now;
-                //log.DateSent = DateTime.Now;
-                //log.HTTPConnMethod = urlc + "/extf-files/job/" + loc[i] + " Method.Get";
-                //log.HTTPHeader = "X-DATEV-Client-Id " + clientId;
-                //log.HTTPBody = urlc + "/extf-files/jobs" + " Method.Get";
+                var respfiles = serializer.Deserialize<Extf>(contentStream);
+
                 var Status = Convert.ToString(response.StatusCode);
 
                 if (respfiles.result == "succeeded")
                 {
                     status = 1;
                     statusText = respfiles.client_application_display_name + " " + respfiles.client_application_vendor + " " + respfiles.filename + " " + respfiles.id + " " + respfiles.date_from + " " + respfiles.date_to + " " + respfiles.number_of_accounting_records;
-                    // log.HTTPRESPONSEHTTPCode = "200 Succeeded";
-                    // log.HTTPRESPONSEHTTPBody = respfiles.client_application_display_name + " " + respfiles.client_application_vendor + " " + respfiles.filename + " " + respfiles.id + " " + respfiles.date_from + " " + respfiles.date_to + " " + respfiles.number_of_accounting_records;
                     DatevDetails.SendOK = DatevDetails.SendOK + 1;
                 }
                 else
                 {
                     status = 3;
                     statusText = respfiles.client_application_display_name + " " + respfiles.client_application_vendor + " " + respfiles.filename + " " + respfiles.id + " " + respfiles.validation_details.detail;
-                    // log.HTTPRESPONSEHTTPCode = "401 Failed";
-                    // log.HTTPRESPONSEHTTPBody = respfiles.client_application_display_name + " " + respfiles.client_application_vendor + " " + respfiles.filename + " " + respfiles.id + " " + respfiles.validation_details.detail;
                 }
-                InsDatevLog(selectedItem, DateTime.Now, urlc + "/extf-files/job/" + loc[i] + " Method.Get", "", "", status, statusText);
-                //api.Insert(log).GetAwaiter().GetResult();
+                InsDatevLog(selectedItem, DateTime.Now, urlc + "/extf-files/job/" + loc[i] + " Method.Get", "X-DATEV-Client-Id " + clientId, contentStream, status, statusText);
             }
         }
         void SetStatusText()
@@ -744,28 +753,31 @@ namespace UnicontaClient.Pages.CustomPage
 
             foreach (var grp in groups)
             {
-                if (grp.StatusValue == "a" || grp.Caption == Uniconta.ClientTools.Localization.lookup("ToTime")) //PG 10.05
+                if (grp.StatusValue == "a" || grp.Caption == Uniconta.ClientTools.Localization.lookup("ToTime"))
                 {
                     grp.StatusValue = DatevDetails.ToTime;
                     continue;
                 }
                 else
-                if (grp.StatusValue == "b" || grp.Caption == Uniconta.ClientTools.Localization.lookup("ToService")) //PG 10.05
+                if (grp.StatusValue == "b" || grp.Caption == Uniconta.ClientTools.Localization.lookup("Service"))
                 {
                     grp.StatusValue = DatevDetails.ToService;
                     continue;
 
                 }
                 else
-                if (grp.StatusValue == "c" || grp.Caption == Uniconta.ClientTools.Localization.lookup("User")) //PG 10.05
+                if (grp.StatusValue == "c" || grp.Caption == Uniconta.ClientTools.Localization.lookup("User"))
                 {
                     grp.StatusValue = DatevDetails.User;
                     continue;
                 }
                 else
-                if (grp.StatusValue == "d" || grp.Caption == Uniconta.ClientTools.Localization.lookup("Send"))
+                if (grp.StatusValue == "d" || grp.Caption == Uniconta.ClientTools.Localization.lookup("DocSent"))
                 {
-                    grp.StatusValue = Convert.ToString(DatevDetails.Send);
+                    if (DatevDetails.Send == true)
+                        grp.StatusValue = "Ja";
+                    else
+                        grp.StatusValue = "Nein";
                 }
             }
         }

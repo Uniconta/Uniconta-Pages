@@ -416,7 +416,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem == null || selectedItem._DocumentGuid == Guid.Empty)
                         return;
                     var url = string.Concat("https://web.uniconta.com/document/ViewAttachment?", selectedItem._DocumentGuid);
-                    if (BasePage.session.Connection.Target == APITarget.Demo)
+                    if (BasePage.session.Connection.Target == APITarget.Demo || BasePage.session.Connection.Target == APITarget.Testing)
                         url = string.Concat("https://test.uniconta.com:8080/document/ViewAttachment?", selectedItem._DocumentGuid);
                     System.Diagnostics.Process.Start(url);
                     break;

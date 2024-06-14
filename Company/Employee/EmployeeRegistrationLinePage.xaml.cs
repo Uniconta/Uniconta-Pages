@@ -106,7 +106,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var stDate = GetCurrentWeekStartDate(DateTime.Now);
             stDate = stDate.AddDays(increaseWeek * 7);
-            var enDate = stDate.AddDays(6);
+            var enDate = stDate.AddDays(7).AddMinutes(-1);
             currentWeekStartDate = stDate;
 
             ResetChartData(stDate);
@@ -242,12 +242,18 @@ namespace UnicontaClient.Pages.CustomPage
 
                 updates.Add(row);
             }
+
+            if (isReopen)
+                selectedActionMenu.Caption = Uniconta.ClientTools.Localization.lookup("ApproveWeek");
+            else
+                selectedActionMenu.Caption = Uniconta.ClientTools.Localization.lookup("ReopenWeek");
+
             api.UpdateNoResponse(updates);
         }
 
         private void AddActivity()
         {
-            var cwAddActivity = new CWActivityDialog();
+            var cwAddActivity = new CWActivityDialog(currentWeekStartDate);
             cwAddActivity.Closed += async delegate
             {
                 if (cwAddActivity.DialogResult == false)

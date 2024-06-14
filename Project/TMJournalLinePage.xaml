@@ -420,14 +420,13 @@ x:Class="UnicontaClient.Pages.CustomPage.TMJournalLinePage"
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
-                                <localPage:CorasauDataGridTemplateColumnClient  x:Name="MileageVechicleRegNo" Width="100" >
+                                <localPage:CorasauDataGridTemplateColumnClient  x:Name="VechicleRegNo" Width="100" >
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>
-                                            <CorasauControls:TextEditor  x:Name="PART_Editor" IsReadOnly="True" HorizontalContentAlignment="Left"  EditValue="{Binding Path=DataContext.RowData.Row.MileageVechicleRegNo,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                            <CorasauControls:TextEditor  x:Name="PART_Editor" IsReadOnly="{Binding DataContext.RowData.Row.IsEditable,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}" HorizontalContentAlignment="Left"  EditValue="{Binding Path=DataContext.RowData.Row.VechicleRegNo,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
-
                                 <localPage:CorasauDataGridTemplateColumnClient   x:Name="MileageAddressFrom" Width="180"  >
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                         <DataTemplate>

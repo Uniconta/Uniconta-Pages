@@ -220,10 +220,12 @@ namespace UnicontaClient.Pages.CustomPage
             if (e.Key == Key.F8)
             {
                 ribbonControl.PerformRibbonAction("OpenTran");
+                e.Handled = true;
             }
             else if (e.Key == Key.F9)
             {
                 ribbonControl.PerformRibbonAction("VoidTransaction");
+                e.Handled = true;
             }
         }
 
@@ -953,6 +955,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null && voucher.RowId != 0)
                     {
                         dgBankStatementLine.SetLoadedRow(selectedItem);
+                        selectedItem.DocumentRef = voucher.RowId;
                         if (voucher._Invoice != null)
                             selectedItem.Invoice = voucher._Invoice;
                         if (voucher._Dim1 != null)

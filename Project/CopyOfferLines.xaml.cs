@@ -16,6 +16,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Uniconta.API.System;
 using Uniconta.ClientTools;
+using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
@@ -53,13 +54,28 @@ namespace UnicontaClient.Pages.CustomPage
             InitializeComponent();
             SetHeader(string.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), Uniconta.ClientTools.Localization.lookup("OfferLine")));
             crudApi = api;
-            InitPage();
+            InitPage(null);
         }
-
-        private void InitPage()
+        UnicontaBaseEntity order;
+        public CopyOfferLines(CrudAPI api, UnicontaBaseEntity order) : base(api, string.Empty)
         {
+            DataContext = this;
+            InitializeComponent();
+            SetHeader(string.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), Uniconta.ClientTools.Localization.lookup("OfferLine")));
+            crudApi = api;
+            InitPage(order);
+        }
+        bool fromReservation;
+        private void InitPage(UnicontaBaseEntity order)
+        {
+            this.order = order;
             this.DataContext = this;
             InitializeComponent();
+            if (order is ProjectReservation)
+            {
+                fromReservation = true;
+                chkDelete.Visibility = Visibility.Collapsed;
+            }
             ((TableView)dgOffersGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
             ((TableView)dgOfferLinesGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
             var comp = crudApi.CompanyEntity;
@@ -73,6 +89,18 @@ namespace UnicontaClient.Pages.CustomPage
             if (!comp.ItemVariants)
                 colVariant.Visible = false;
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
+
+        }
+        protected override Filter[] DefaultFilters()
+        {
+            if (fromReservation)
+            {
+                var projectFilter = new Filter();
+                projectFilter.name = "Account";
+                projectFilter.value = (order as ProjectReservation)?.ProjectRef?.Account;
+                return new Filter[] { projectFilter };
+            }
+            return base.DefaultFilters();
         }
         private void LocalMenu_OnItemClicked(string ActionType)
         {

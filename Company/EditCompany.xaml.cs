@@ -72,6 +72,7 @@ namespace UnicontaClient.Pages.CustomPage
             GetAccountant();
             accountantItem.ButtonClicked += AcItem_ButtonClicked;
             accountant2Item.ButtonClicked += Ac2Item_ButtonClicked;
+            accountant2Item.Label = $"{Uniconta.ClientTools.Localization.lookup("Accountant")} 2";
             txtCompanyRegNo.EditValueChanged += TxtCVR_EditValueChanged;
             var country = Comp._CountryId;
 

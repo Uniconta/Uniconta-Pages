@@ -212,12 +212,13 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (!company.Warehouse)
                 Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
-
-            Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
-           CostPrice.Visible = CostPrice.ShowInColumnChooser = CostValue.Visible = CostValue.ShowInColumnChooser = !api.CompanyEntity.HideCostPrice;
-            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+           RibbonBase rb = (RibbonBase)localMenu.DataContext;
             if (company.HideCostPrice)
+            {
+                Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
+           CostPrice.Visible = CostPrice.ShowInColumnChooser = CostValue.Visible = CostValue.ShowInColumnChooser = false;
                 UtilDisplay.RemoveMenuCommand(rb, new string[] { "CostValue", "DB" });
+            }
         }
 
         public bool DataChaged;

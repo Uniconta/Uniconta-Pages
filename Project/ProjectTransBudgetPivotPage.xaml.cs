@@ -384,15 +384,18 @@ namespace UnicontaClient.Pages.CustomPage
                 fieldProject.Visible = true;
                 fieldProjectName.Visible = true;
             }
-            fieldCost.Visible = fieldCost.ShowInCustomizationForm =
+            if (api.CompanyEntity.HideCostPrice)
+            {
+                fieldCost.Visible = fieldCost.ShowInCustomizationForm =
             fieldCostPrev.Visible = fieldCostPrev.ShowInCustomizationForm =
             fieldCostActualBudgetDiff.Visible = fieldCostActualBudgetDiff.ShowInCustomizationForm =
             fieldCostActualPrevBudgetDiff.Visible = fieldCostActualPrevBudgetDiff.ShowInCustomizationForm =
-            fieldAnchorBudgetCost.Visible= fieldAnchorBudgetCost.ShowInCustomizationForm =
+            fieldAnchorBudgetCost.Visible = fieldAnchorBudgetCost.ShowInCustomizationForm =
             fieldCostActualAnchorBudgetDiff.Visible = fieldCostActualAnchorBudgetDiff.ShowInCustomizationForm =
             fieldCostActualPrevAnchorBudgetDiff.Visible = fieldCostActualPrevAnchorBudgetDiff.ShowInCustomizationForm =
             fieldCostAnchorBudBudDiff.Visible = fieldCostAnchorBudBudDiff.ShowInCustomizationForm =
-            fieldCostDeviation.Visible = fieldCostDeviation.ShowInCustomizationForm = !api.CompanyEntity.HideCostPrice;
+            fieldCostDeviation.Visible = fieldCostDeviation.ShowInCustomizationForm = false;
+            }
             if (showBudget)
                 return;
             fieldBudgetQty.Visible = false;
