@@ -250,13 +250,13 @@ namespace UnicontaClient.Pages.CustomPage
             txtSatHrs.IsReadOnly = journalline.StatusDay6 == 1 || journalline.StatusDay6 == 2 ? true : false;
             txtSunHrs.IsReadOnly = journalline.StatusDay7 == 1 || journalline.StatusDay7 == 2 ? true : false;
 
-            txtMonHrs.Background = SetBackGroundColor(txtMonHrs, journalline.StatusDay1);
-            txtTueHrs.Background = SetBackGroundColor(txtTueHrs, journalline.StatusDay2);
-            txtWedHrs.Background = SetBackGroundColor(txtWedHrs, journalline.StatusDay3);
-            txtThuHrs.Background = SetBackGroundColor(txtThuHrs, journalline.StatusDay4);
-            txtFriHrs.Background = SetBackGroundColor(txtFriHrs, journalline.StatusDay5);
-            txtSatHrs.Background = SetBackGroundColor(txtSatHrs, journalline.StatusDay6);
-            txtSunHrs.Background = SetBackGroundColor(txtSunHrs, journalline.StatusDay7);
+            SetBackGroundColor(txtMonHrs, journalline.StatusDay1);
+            SetBackGroundColor(txtTueHrs, journalline.StatusDay2);
+            SetBackGroundColor(txtWedHrs, journalline.StatusDay3);
+            SetBackGroundColor(txtThuHrs, journalline.StatusDay4);
+            SetBackGroundColor(txtFriHrs, journalline.StatusDay5);
+            SetBackGroundColor(txtSatHrs, journalline.StatusDay6);
+            SetBackGroundColor(txtSunHrs, journalline.StatusDay7);
 
             doCalculate = true;
             CalulateMileage();
@@ -273,17 +273,12 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        SolidColorBrush SetBackGroundColor(NumericUpDownEditor txtHours, int dayStatus)
+        void SetBackGroundColor(NumericUpDownEditor txtHours, int dayStatus)
         {
-            var SolidColorBrush = new SolidColorBrush(Colors.White);
-
-            if (ApplicationThemeHelper.ApplicationThemeName == Theme.MetropolisDarkName)
-                SolidColorBrush = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FF6E6E6E"));
             if (dayStatus == 1)
-                SolidColorBrush = new SolidColorBrush(Colors.Yellow);
+                txtHours.Background = new SolidColorBrush((Color)Application.Current.Resources["YellowColor"]);
             else if (dayStatus == 2)
-                SolidColorBrush = new SolidColorBrush(Colors.Green);
-            return SolidColorBrush;
+                txtHours.Background = new SolidColorBrush((Color)Application.Current.Resources["GreenColor"]);
         }
 
         async void SetProjectTask()

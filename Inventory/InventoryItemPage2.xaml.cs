@@ -52,9 +52,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             InitializeComponent();
             InitPage(crudApi);
-#if !SILVERLIGHT
             FocusManager.SetFocusedElement(txtItem, txtItem);
-#endif
         }
         void InitPage(CrudAPI crudapi)
         {
@@ -173,7 +171,8 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else
                 grpBrand.Visibility = Visibility.Collapsed;
-
+            if (Comp.HideCostPrice)
+                liCostPrice.Visibility = Visibility.Collapsed;
             isLayoutCtrlLoaded = true;
         }
         public override bool BeforeSetUserField(ref CorasauLayoutGroup parentGroup)
@@ -294,11 +293,9 @@ namespace UnicontaClient.Pages.CustomPage
                 userDocsClient._RowId = editrow._URL;
                 await api.Read(userDocsClient);
 
-#if !SILVERLIGHT
                 if (session.User._UseDefaultBrowser)
                     Utility.OpenWebSite(userDocsClient.Url);
                 else
-#endif
                     ViewDocument(TabControls.UserDocsPage3, userDocsClient, string.Format(Uniconta.ClientTools.Localization.lookup("ViewOBJ"),
                         Uniconta.ClientTools.Localization.lookup("Url")), ViewerType.Url);
             }

@@ -1,43 +1,16 @@
 using UnicontaClient.Models;
-using UnicontaClient.Utilities;
-using Uniconta.ClientTools;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
-using Uniconta.DataModel;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-
-using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 using UnicontaClient.Pages.Maintenance;
 using Uniconta.API.GeneralLedger;
 using Uniconta.ClientTools.Util;
 using Uniconta.ClientTools.Controls;
 using Uniconta.API.Service;
-using System.Windows;
-using System.Text;
-using System.Text.RegularExpressions;
-using Uniconta.Common.Utility;
 using Localization = Uniconta.ClientTools.Localization;
-using DevExpress.XtraTreeList;
-using DevExpress.Xpf.WindowsUI.Navigation;
-
-
-#if !SILVERLIGHT
-using Bilagscan;
-using System.Net.Http;
-using System.Configuration;
-using System.Net.Http.Headers;
-#endif
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -51,8 +24,6 @@ namespace UnicontaClient.Pages.CustomPage
     }
     public partial class GLDailyJournal : GridBasePage
     {
-        private PaperFlowUtil paperFlowUtil;
-
         public override string NameOfControl
         {
             get { return TabControls.GL_DailyJournal.ToString(); }
@@ -77,8 +48,6 @@ namespace UnicontaClient.Pages.CustomPage
             dgGldailyJournal.RowDoubleClick += dgGldailyJournal_RowDoubleClick;
             // dgGldailyJournal.PreviewMouseDown += DgGldailyJournal_PreviewMouseDown;
             RemoveMenuItem();
-
-            paperFlowUtil = new PaperFlowUtil(api);
         }
 
         //private void DgGldailyJournal_PreviewMouseDown(object sender, MouseButtonEventArgs e)
@@ -95,8 +64,6 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var Comp = api.CompanyEntity;
             var rb = (RibbonBase)localMenu.DataContext;
-            if (Comp._CountryId != CountryCode.Denmark && Comp._CountryId != CountryCode.Iceland && Comp._CountryId != CountryCode.Netherlands && Comp._CountryId != CountryCode.Austria)
-                UtilDisplay.RemoveMenuCommand(rb, "BilagscanReadVouchers");
             if (Comp._CountryId != CountryCode.Iceland)
                 UtilDisplay.RemoveMenuCommand(rb, "Iceland_PSPSettlements");
         }
@@ -201,9 +168,6 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         AddDockItem(TabControls.GLTransLogPage, selectedItem, string.Format("{0}: {1}", Localization.lookup("GLTransLog"), selectedItem._Journal));
                     break;
-                case "BilagscanReadVouchers":
-                    BilagscanRead();
-                    break;
                 case "MoveJournalLines":
                     if (selectedItem != null)
                         MoveJournalLines(selectedItem);
@@ -249,23 +213,6 @@ namespace UnicontaClient.Pages.CustomPage
             var header = selectedItem._Journal;
             var baseEntityArray = new UnicontaBaseEntity[2] { api.CompanyEntity.CreateUserType<GLDailyJournalLineClient>(), selectedItem };
             AddDockItem(TabControls.ImportPage, new object[] { baseEntityArray, header }, string.Format("{0}: {1}", Localization.lookup("Import"), header));
-        }
-
-        private async void BilagscanRead()
-        {
-            var journal = dgGldailyJournal.SelectedItem as GLDailyJournalClient;
-
-            var noOfVouchers = await paperFlowUtil.ReadJournalLines(journal, busyIndicator);
-            if (noOfVouchers != 0)
-            {
-                var messageText = string.Concat(Localization.lookup("NumberOfImportedVouchers"), ": ", NumberConvert.ToString(noOfVouchers), Environment.NewLine, Environment.NewLine,
-                        string.Format(Localization.lookup("GoTo"), Localization.lookup("Journallines")), "?");
-
-                if (UnicontaMessageBox.Show(messageText, Localization.lookup("BilagscanRead"), MessageBoxButton.OKCancel, MessageBoxImage.Information) == MessageBoxResult.OK)
-                {
-                    AddDockItem(TabControls.GL_DailyJournalLine, journal, null, null, true);
-                }
-            }
         }
 
         private void TextBlock_PreviewMouseDown(object sender, MouseButtonEventArgs e)

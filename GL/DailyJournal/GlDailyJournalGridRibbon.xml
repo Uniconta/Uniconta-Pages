@@ -34,9 +34,6 @@
     <RibbonItem Action="ImportData" LocalizedNameKey="ImportFromFile" Parameter="" LargeGlyph="Import_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="BilagscanReadVouchers" LocalizedNameKey="BilagscanRead" Module="Bilagscan" LargeGlyph="Import_32x32" />
-  </RibbonItem>
-  <RibbonItem>
     <RibbonItem Action="DeleteAllJournalLines" LocalizedNameKey="DeleteAllJournalLines" Glyph="Delete_16x16" LargeGlyph="Delete_32x32" />
 	<RibbonItem Action="MoveJournalLines" LocalizedNameKey="MoveOBJ" Parameter="Journallines" LargeGlyph="Move_32x32" />
   </RibbonItem>

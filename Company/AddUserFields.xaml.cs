@@ -69,7 +69,7 @@ namespace UnicontaClient.Pages.CustomPage
                         {
                             master = row as UnicontaBaseEntity;
                             dgUserField.UpdateMaster(master);
-                            var header = string.Concat( Localization.lookup("UserFields"), ": ", Localization.lookup(rec.Value));
+                            var header = string.Concat(Localization.lookup("UserFields"), ": ", Localization.lookup(rec.Value));
                             SetHeader(header);
                         }
                     }
@@ -111,6 +111,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override void PageClosing()
         {
             Controls.MenuControl.ForceOpen = true;
+            globalEvents.OnRefresh(NameOfControl, dgUserField?.ItemsSource == null ? false : (dgUserField.ItemsSource as IList).Count != 0);
             base.PageClosing();
         }
         private void localMenu_OnItemClicked(string ActionType)

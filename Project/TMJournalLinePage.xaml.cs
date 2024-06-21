@@ -1521,22 +1521,30 @@ namespace UnicontaClient.Pages.CustomPage
 
         void GetGridColumnsSum()
         {
-            var lst = dgTMJournalLineGrid.ItemsSource as List<TMJournalLineClient>;
-            if (lst == null)
-                return;
-            day1Sum = lst.Select(x => x.Day1).Sum();
-            day2Sum = lst.Select(x => x.Day2).Sum();
-            day3Sum = lst.Select(x => x.Day3).Sum();
-            day4Sum = lst.Select(x => x.Day4).Sum();
-            day5Sum = lst.Select(x => x.Day5).Sum();
-            day6Sum = lst.Select(x => x.Day6).Sum();
-            day7Sum = lst.Select(x => x.Day7).Sum();
-            totalSum = lst.Select(x => x.Total).Sum();
-
-            if (lst.Count > 0)
-                cmbRegistration.SelectedItem = lst[0].RegistrationType;
-            else
-                cmbRegistration.SelectedIndex = 0;
+            var lst = dgTMJournalLineGrid.ItemsSource as IEnumerable<TMJournalLineClient>;
+            if (lst != null)
+            {
+                bool first = true;
+                day1Sum = day2Sum = day3Sum = day4Sum = day5Sum = day6Sum = day7Sum = 0;
+                foreach (var x in lst)
+                {
+                    day1Sum += x._Day1;
+                    day2Sum += x._Day2;
+                    day3Sum += x._Day3;
+                    day4Sum += x._Day4;
+                    day5Sum += x._Day5;
+                    day6Sum += x._Day6;
+                    day7Sum += x._Day7;
+                    if (first)
+                    {
+                        cmbRegistration.SelectedItem = x.RegistrationType;
+                        first = false;
+                    }
+                }
+                totalSum = Math.Round(day1Sum + day2Sum + day3Sum + day4Sum + day5Sum + day6Sum + day7Sum, 2);
+                if (first)
+                    cmbRegistration.SelectedIndex = 0;
+            }
         }
 
         CorasauGridLookupEditorClient prevProject, prevMilageProject;
@@ -2172,9 +2180,12 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
                                 else
                                 {
-                                    if (rec?._Mileage._VechicleRegNo != rec.VechicleRegNo)
-                                        rec._Mileage._VechicleRegNo = rec.VechicleRegNo;
-                                    lineclient._Mileage = rec._Mileage;
+                                    if (rec._Mileage != null)
+                                    {
+                                        rec._Mileage._VechicleRegNo = rec._Mileage._VechicleRegNo != rec.VechicleRegNo ? rec.VechicleRegNo : rec._Mileage._VechicleRegNo;
+                                        lineclient._Mileage = rec._Mileage;
+                                    }
+
                                     lineclient._Text = rec._Text;
                                     lineclient._Unit = Uniconta.DataModel.ItemUnit.km;
                                     lineclient._Qty = qty;

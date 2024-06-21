@@ -82,6 +82,11 @@ namespace UnicontaClient.Pages.CustomPage
                 ribbonControl.DisableButtons("Fields");
                 ribbonControl.DisableButtons("SharedToCompany");
             }
+
+            if (selectedItem.UserType == null)
+                ribbonControl.DisableButtons("Data");
+            else
+                ribbonControl.EnableButtons("Data");
         }
 
         public override void Utility_Refresh(string screenName, object argument = null)
@@ -93,6 +98,13 @@ namespace UnicontaClient.Pages.CustomPage
                 var items = (IList)dgUserTable.ItemsSource;
                 IEnumerable<TableHeader> castItem = items.Cast<TableHeader>();
                 api.CompanyEntity.UserTables = castItem.ToList();
+            }
+            else if (screenName == TabControls.AddUserFields)
+            {
+                if (argument != null && (bool)argument)
+                    ribbonControl.EnableButtons("Data");
+                else
+                    ribbonControl.DisableButtons("Data");
             }
         }
 

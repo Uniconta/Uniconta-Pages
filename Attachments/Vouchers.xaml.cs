@@ -1,14 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
-using System.Windows.Navigation;
 using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.Common;
@@ -16,7 +10,6 @@ using UnicontaClient.Utilities;
 using UnicontaClient.Models;
 using Uniconta.ClientTools;
 using Uniconta.ClientTools.Controls;
-using System.IO;
 using System.Threading.Tasks;
 using Uniconta.API.GeneralLedger;
 using System.Windows;
@@ -26,7 +19,6 @@ using System.Collections;
 using Uniconta.API.Service;
 using UnicontaClient.Controls.Dialogs;
 using Uniconta.Common.Utility;
-using System.Text.RegularExpressions;
 using UnicontaClient.Controls;
 using DevExpress.Xpf.Bars;
 using UnicontaClient.Pages.Attachments;
@@ -34,10 +26,6 @@ using Uniconta.API.DebtorCreditor;
 using DevExpress.Xpf.Grid;
 using Localization = Uniconta.ClientTools.Localization;
 using Bilagscan;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
-using Uniconta.API.System;
 using Uniconta.Common.User;
 using System.Diagnostics;
 
@@ -171,7 +159,6 @@ namespace UnicontaClient.Pages.CustomPage
         public static bool IsGridMode = false;
         ItemBase ibaseGridMode;
         RibbonBase rb;
-        private PaperFlowUtil paperFlowUtil;
 
         public Vouchers(BaseAPI API)
             : base(API, string.Empty)
@@ -232,7 +219,8 @@ namespace UnicontaClient.Pages.CustomPage
             }
             SetFooterDetailText();
 
-            paperFlowUtil = new PaperFlowUtil(api);
+            if (!api.CompanyEntity.Bilagscan)
+                UtilDisplay.RemoveMenuCommand(rb, "Bilagscan");
         }
 
         public async override Task InitQuery()
@@ -933,7 +921,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "BilagscanRead":
                     if (api.CompanyEntity.Bilagscan)
-                        BilagscanRead();
+                        PaperflowRead();
                     break;
                 case "BilagscanProfile":
                     if (api.CompanyEntity.Bilagscan)
@@ -1825,13 +1813,100 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        private async void BilagscanRead()
+        private bool readingFromPaperflow;
+        private async void PaperflowRead()
         {
-            var gridVouchers = (IEnumerable<VouchersClient>)dgVoucherGrid.ItemsSource;
+            if (readingFromPaperflow)
+            {
+                UnicontaMessageBox.Show(Localization.lookup("UpdateInBackground"), Localization.lookup("Bilagscan"), MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
 
-            var noOfVouchers = await paperFlowUtil.ReadVouchers(gridVouchers, busyIndicator);
-            if (noOfVouchers != 0)
-                UnicontaMessageBox.Show(string.Concat(Localization.lookup("NumberOfImportedVouchers"), ": ", NumberConvert.ToString(noOfVouchers)), Localization.lookup("Paperflow"), MessageBoxButton.OK, MessageBoxImage.Information);
+            readingFromPaperflow = true;
+            busyIndicator.IsBusy = true;
+
+            try
+            {
+                var companySettings = new CompanySettingsClient();
+                await api.Read(companySettings);
+                var orgNo = NumberConvert.ToStringNull(companySettings?._OrgNumber ?? 0) ??
+                    throw new UnicontaException(string.Format(Localization.lookup("CannotBeBlank"), Localization.lookup("OrgNumber")));
+
+                var paperflowVouchers = await VoucherService.GetVouchers(orgNo);
+                if (paperflowVouchers.Length == 0)
+                    throw new UnicontaException(string.Format(Localization.lookup("StillProcessingTryAgain"), Localization.lookup("Bilagscan")));
+
+                var createCreditor = api.CompanyEntity._PaperFlowSaveCreditors;
+                var credGrp = !createCreditor ? null :
+                    (await api.LoadCache(typeof(Uniconta.DataModel.CreditorGroup)))?
+                    .GetNotNullArray?
+                    .Select(grp => (Uniconta.DataModel.CreditorGroup)grp)?
+                    .Where(grp => grp._Default && !string.IsNullOrEmpty(grp._AutoNumber))?
+                    .FirstOrDefault() ?? null;
+
+                var creditorCache = await api.LoadCache(typeof(Uniconta.DataModel.Creditor));
+                var ledgerCache = await api.LoadCache(typeof(GLAccount));
+
+                var gridVouchers = (IEnumerable<VouchersClient>)dgVoucherGrid.ItemsSource;
+
+                var result = new List<VouchersClient>();
+                foreach (var paperflowVoucher in paperflowVouchers)
+                {
+                    var rowId = paperflowVoucher?.RowId ?? 0;
+                    var originalVoucher = gridVouchers?.Where(r => r.RowId == rowId)?.FirstOrDefault();
+                    if (originalVoucher == null)
+                    {
+                        var loadedVoucher = await api.Query<VouchersClient>(
+                            new DocumentNoRef() { _DocumentRef = rowId });
+
+                        if (loadedVoucher == null || loadedVoucher.Length == 0)
+                            continue;
+
+                        originalVoucher = loadedVoucher[0];
+                    }
+
+                    var creditor = await paperflowVoucher.GetCreditor(createCreditor, creditorCache, credGrp);
+                    if (creditor != null)
+                    {
+                        var errorCodeCre = ErrorCodes.Succes;
+                        if (creditor.RowId == 0)
+                        {
+                            errorCodeCre = await api.Insert(creditor);
+                            if (errorCodeCre == 0)
+                                creditorCache.Add(creditor);
+                        }
+                        else if (!string.IsNullOrEmpty(creditor._SWIFT) && paperflowVoucher.SwiftNo == creditor._SWIFT)
+                            errorCodeCre = await api.Update(creditor);
+
+                        if (errorCodeCre != 0)
+                            throw new UnicontaException(Localization.lookup(errorCodeCre.ToString()));
+                    }
+
+                    paperflowVoucher.SetValuesOnVoucher(originalVoucher, creditor, ledgerCache);
+                    result.Add(originalVoucher);
+                }
+
+                var errorCode = await api.Update(result);
+                if (errorCode != 0)
+                    throw new UnicontaException(Localization.lookup(errorCode.ToString()));
+
+                await VoucherService.MarkVouchersAsSeen(paperflowVouchers, orgNo);
+                var noOfVouchers = result.Count;
+                if (noOfVouchers != 0)
+                    UnicontaMessageBox.Show(string.Concat(Localization.lookup("NumberOfImportedVouchers"), ": ", NumberConvert.ToString(noOfVouchers)), Localization.lookup("Paperflow"), MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                if (!(ex is UnicontaException))
+                    api.ReportException(ex, "Paperflow");
+
+                UnicontaMessageBox.Show(ex.Message, Localization.lookup("Bilagscan"), MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            finally
+            {
+                readingFromPaperflow = false;
+                busyIndicator.IsBusy = false;
+            }
         }
 
         private void Save(bool saveGridData = true)

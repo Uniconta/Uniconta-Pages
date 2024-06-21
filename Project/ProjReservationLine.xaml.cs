@@ -47,7 +47,11 @@ namespace UnicontaClient.Pages.CustomPage
             var selectedItem = (DCOrderLine)this.SelectedItem;
             return (selectedItem != null) && (selectedItem._Item != null || selectedItem._Text != null);
         }
-
+        public override void SetDefaultValues(UnicontaBaseEntity dataEntity, int selectedIndex)
+        {
+            var pr = (ProjectReservationLineClient)dataEntity;
+            pr._Storage = StorageRegister.Register;
+        }
         public override IEnumerable<UnicontaBaseEntity> ConvertPastedRows(IEnumerable<UnicontaBaseEntity> copyFromRows)
         {
             var row = copyFromRows.FirstOrDefault();
@@ -60,7 +64,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     var it = (InvTrans)_it;
                     lst.Add(CreateNewReservationLine(it._Item, it.MovementTypeEnum == InvMovementType.Debtor ? -it._Qty : it._Qty, it._Text, it._Price, it.MovementTypeEnum == InvMovementType.Debtor ? -it._AmountEntered : it._AmountEntered,
-                        it._DiscountPct, it._Discount, it._Variant1, it._Variant2, it._Variant3, it._Variant4, it._Variant5, it._Unit, it._Date, it._Week, it._Note));
+                        it._DiscountPct, it._Discount, it._Variant1, it._Variant2, it._Variant3, it._Variant4, it._Variant5, it._Unit, it._Date, it._Week, it._Note, it._Task, it._WorkSpace));
                 }
             }
             else if (row is ProjectBudgetLineClient)
@@ -73,7 +77,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (it._Item == null || (itemCache?.Get(it._Item) as InvItem)?._ItemType != (byte)ItemType.Item || it._QtyPurchased != 0d || it._QtyTaken != 0d)
                         continue;
                     lst.Add(CreateNewReservationLine(it._Item, it._Qty, it._Text, 0d, 0d, 0d, 0d, it._Variant1, it._Variant2, it._Variant3, it._Variant4, it._Variant5, it._Unit,
-                    it._Date, 0, null));
+                    it._Date, 0, null, it._Task, it._WorkSpace));
                 }
             }
             else if (row is DCOrderLine)
@@ -83,7 +87,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     var it = (DCOrderLine)_it;
                     var line = CreateNewReservationLine(it._Item, it._Qty, it._Text, it._Price, it._AmountEntered, it._DiscountPct, it._Discount, it._Variant1, it._Variant2, it._Variant3, it._Variant4, it._Variant5, it._Unit,
-                        it._Date, it._Week, it._Note);
+                        it._Date, it._Week, it._Note, it._Task, it._WorkSpace);
                     TableField.SetUserFieldsFromRecord(it, line);
                     lst.Add(line);
                 }
@@ -95,14 +99,14 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     double qty = (double)_it.GetType().GetProperty("Qty").GetValue(_it, null);
                     var it = (InvItemClient)_it;
-                    lst.Add(CreateNewReservationLine(it._Item, qty, null, 0d, 0d, 0d, 0d, null, null, null, null, null, 0, DateTime.MinValue, 0, null));
+                    lst.Add(CreateNewReservationLine(it._Item, qty, null, 0d, 0d, 0d, 0d, null, null, null, null, null, 0, DateTime.MinValue, 0, null, null, null));
                 }
             }
             return lst;
         }
 
         private ProjectReservationLineClient CreateNewReservationLine(string item, double qty, string text, double price, double amountEntered, double discPct, double disc, string variant1, string variant2, string variant3, string variant4, string variant5,
-           ItemUnit unit, DateTime date, byte week, string note)
+           ItemUnit unit, DateTime date, byte week, string note, string task, string workspace)
         {
             var orderline = Activator.CreateInstance(this.TableTypeUser) as ProjectReservationLineClient;
             orderline._Qty = qty;
@@ -122,6 +126,8 @@ namespace UnicontaClient.Pages.CustomPage
             orderline._Week = week;
             orderline._Note = note;
             orderline._Storage = StorageRegister.Register;
+            orderline._Task = task;
+            orderline._WorkSpace= workspace;
             return orderline;
         }
 

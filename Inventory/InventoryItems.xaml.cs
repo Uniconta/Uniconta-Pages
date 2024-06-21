@@ -62,11 +62,7 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgInventoryItemsGrid.SelectedItemChanged += DgInventoryItemsGrid_SelectedItemChanged;
             ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
-#if SILVERLIGHT
-            Application.Current.RootVisual.KeyDown += RootVisual_KeyDown;
-#else
             this.PreviewKeyDown += RootVisual_KeyDown;
-#endif
             this.BeforeClose += DebtorAccount_BeforeClose;
         }
 
@@ -78,11 +74,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void DebtorAccount_BeforeClose()
         {
-#if SILVERLIGHT
-            Application.Current.RootVisual.KeyDown -= RootVisual_KeyDown;
-#else
             this.PreviewKeyDown -= RootVisual_KeyDown;
-#endif
         }
 
         private void DgInventoryItemsGrid_SelectedItemChanged(object sender, DevExpress.Xpf.Grid.SelectedItemChangedEventArgs e)
@@ -268,7 +260,13 @@ namespace UnicontaClient.Pages.CustomPage
             }
             setDim();
             dgInventoryItemsGrid.Readonly = true;
-         }
+            if (Comp.HideCostPrice)
+            {
+                CostPrice.Visible = CostPrice.ShowInColumnChooser = false;
+                AverageCost.Visible = AverageCost.ShowInColumnChooser = false;
+                CostValue.Visible = CostValue.ShowInColumnChooser = false;
+            }
+        }
 
         public override void Utility_Refresh(string screenName, object argument = null)
         {
@@ -545,11 +543,6 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (ibase == null)
                 return;
-#if SILVERLIGHT
-            var selectedItem = GetSelectedItem();
-            if (selectedItem != null)
-                ibase.isEditLayout = (selectedItem._ItemType >= (byte)Uniconta.DataModel.ItemType.BOM);
-#endif
         }
 
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

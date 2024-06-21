@@ -86,7 +86,13 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderLines"
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
-                                <localPage:ComboBoxColumnClient x:Name="Unit" Width="50" Visible="False" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Unit" Width="50" Visible="False" IsEditSettingSet="True">
+                                    <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                                        <DataTemplate>
+                                            <CorasauControls:ComboBoxEditor x:Name="PART_Editor" ScrollUnit="Item" AppEnumName="ItemUnit" EditValue="{Binding DataContext.RowData.Row.Unit,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent},UpdateSourceTrigger=LostFocus}" />
+                                        </DataTemplate>
+                                    </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                                </localPage:CorasauDataGridTemplateColumnClient>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="SerieBatch" Visible="False">
                                     <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                         <ControlTemplate>

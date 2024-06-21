@@ -174,18 +174,23 @@ namespace UnicontaClient.Pages.CustomPage
         protected override void OnLayoutLoaded()
         {
             base.OnLayoutLoaded();
-            var company = api.CompanyEntity;
-            if (!company.Location || !company.Warehouse)
+            var Comp = api.CompanyEntity;
+            if (!Comp.Location || !Comp.Warehouse)
                 Location.Visible = Location.ShowInColumnChooser = false;
             else
                 Location.ShowInColumnChooser = true;
-            if (!company.Warehouse)
+            if (!Comp.Warehouse)
                 Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
             else
                 Warehouse.ShowInColumnChooser = true;
             UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
-            if (!company.Project)
+            if (!Comp.Project)
                 PrCategory.Visible = PrCategory.ShowInColumnChooser = false;
+            if (Comp.HideCostPrice)
+            {
+                CostPrice.Visible = CostPrice.ShowInColumnChooser = false;
+                CostValue.Visible = CostValue.ShowInColumnChooser = false;
+            }
             Utilities.Utility.SetupVariants(api, colVariant, VariantName, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
         }
 

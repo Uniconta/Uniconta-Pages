@@ -216,6 +216,7 @@ namespace UnicontaClient.Pages.CustomPage
             var filter = new List<PropValuePair>()
             {
                 PropValuePair.GenereteWhereElements(nameof(DebtorNHR._LegalIdent), typeof(string), "!null"),
+                PropValuePair.GenereteWhereElements(nameof(DebtorNHR._Blocked), typeof(int), 0),
                 PropValuePair.GenereteWhereElements(nameof(DebtorNHR.Country), typeof(int), NumberConvert.ToString((int)CountryCode.Denmark)),
                 PropValuePair.GenereteWhereElements(nameof(DebtorNHR.Country), typeof(int), NumberConvert.ToString((int)CountryCode.Greenland)),
                 PropValuePair.GenereteWhereElements(nameof(DebtorNHR.Country), typeof(int), NumberConvert.ToString((int)CountryCode.FaroeIslands))

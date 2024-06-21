@@ -32,41 +32,45 @@ namespace UnicontaClient.Pages.CustomPage
             set
             {
                 _api = value;
-                if (_api.CompanyEntity.NumberOfDimensions == 0)
+                var comp = _api.CompanyEntity;
+                if (comp.NumberOfDimensions == 0)
                     usedim.Visibility = Visibility.Collapsed;
                 else
                     Utility.SetDimensions(api, lbldim1, lbldim2, lbldim3, lbldim4, lbldim5, cmbDim1, cmbDim2, cmbDim3, cmbDim4, cmbDim5, usedim);
                 setUserFields();
-                if (!api.CompanyEntity.ItemVariants)
+                if (!comp.ItemVariants)
                     useVariants.Visibility = Visibility.Collapsed;
-                if (!api.CompanyEntity.Project)
+                if (!comp.Project)
                     projectLayGrp.Visibility = Visibility.Collapsed;
-                if (!api.CompanyEntity.Location || !api.CompanyEntity.Warehouse)
+                if (!comp.Location || !comp.Warehouse)
                     itemLocation.Visibility = Visibility.Collapsed;
-                if (!api.CompanyEntity.Warehouse)
+                if (!comp.Warehouse)
                     itemWarehouse.Visibility = Visibility.Collapsed;
-                if (!api.CompanyEntity.SerialBatchNumbers)
+                if (!comp.SerialBatchNumbers)
                 {
                     itemUseSerialBatch.Visibility = Visibility.Collapsed;
                     itemMandatorySerialBatch.Visibility = Visibility.Collapsed;
                     itemMandatorySerialBatchMarkg.Visibility = Visibility.Collapsed;
                 }
-                if (!api.CompanyEntity.Storage || api.CompanyEntity.StorageOnAll)
+                if (!comp.Storage || comp.StorageOnAll)
                     itemUsestorage.Visibility = Visibility.Collapsed;
 
-                if (!api.CompanyEntity.InvBOM)
+                if (!comp.InvBOM)
                 {
                     itemBOMCostOfLines.Visibility = Visibility.Collapsed;
                     liItemIncludedInBOM.Visibility = Visibility.Collapsed;
                 }
-                if (!api.CompanyEntity.UnitConversion)
+                if (!comp.UnitConversion)
                 {
                     liPurchaseUnit.Visibility = Visibility.Collapsed;
                     liUSalesUnit.Visibility = Visibility.Collapsed;
                     liUnitGroup.Visibility = Visibility.Collapsed;
                 }
-                if (!api.CompanyEntity.Storage)
+                if (!comp.Storage)
                     grpQty.Visibility = Visibility.Collapsed;
+                if(comp.HideCostPrice)
+                    liCostPrice.Visibility = Visibility.Collapsed;
+
             }
         }
         public Visibility Visible { get { return this.Visibility; } set { this.Visibility = value; this.layoutItems.Visibility = value; } }

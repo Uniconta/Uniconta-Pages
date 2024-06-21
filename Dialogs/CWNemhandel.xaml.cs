@@ -136,7 +136,9 @@ namespace UnicontaClient.Controls.Dialogs
                 liReceiveStatementCVR.Visibility = Visibility.Collapsed;
 
                 var cvrNumber = Regex.Replace(Comp._Id, "[^0-9]", "");
-                var cvrUrl = string.Concat("https://registration", isLive ? null : "-demo", ".nemhandel.dk/v3-nhr-web/public/participant/info?keytype=DK%3ACVR&key=", cvrNumber);
+
+                var cvrUrl = string.Concat(isLive ? NHR.NHR_WEB : NHR.NHR_WEB_DEMO, "DK%3ACVR&key=", cvrNumber);
+               
                 lblEndPointCVR.Content = UtilDisplay.CreateHyperLinkTextControl(cvrUrl, string.Concat(Uniconta.ClientTools.Localization.lookup("CompanyRegNo"), ": ", cvrNumber));
 
                 txtHeader.Text = StringBuilderReuse.Create().Append("Registreringerne vedrørende CVR-nummer ").Append(cvrNumber).Append(" er tilknyttet en anden udbyder.").AppendLine().AppendLine().
@@ -175,7 +177,7 @@ namespace UnicontaClient.Controls.Dialogs
                     {
                         grpGLNHeader.Visibility = Visibility.Visible;
 
-                        var glnUrl = string.Concat("https://registration", isLive ? null : "-demo", ".nemhandel.dk/v3-nhr-web/public/participant/info?keytype=", endPoint.KeyType, "&key=",endPoint.Key);
+                        var glnUrl = string.Concat(isLive ? NHR.NHR_WEB : NHR.NHR_WEB_DEMO, endPoint.KeyType, "&key=", endPoint.Key);
 
                         lblEndPointGLN.Content = UtilDisplay.CreateHyperLinkTextControl(glnUrl, string.Concat(Uniconta.ClientTools.Localization.lookup("GLNnumber"), ": ", endPoint.Key));
 
@@ -246,7 +248,7 @@ namespace UnicontaClient.Controls.Dialogs
                     {
                         grpCVRHeader.Visibility = Visibility.Visible;
 
-                        var cvrUrl = string.Concat("https://registration", isLive ? null : "-demo", ".nemhandel.dk/v3-nhr-web/public/participant/info?keytype=DK%3ACVR&key=", endPoint.Key);
+                        var cvrUrl = string.Concat(isLive ? NHR.NHR_WEB : NHR.NHR_WEB_DEMO, "DK%3ACVR&key=", endPoint.Key);
 
                         lblEndPointCVR.Content = UtilDisplay.CreateHyperLinkTextControl(cvrUrl, string.Concat(Uniconta.ClientTools.Localization.lookup("CompanyRegNo"), ": ", endPoint.Key));
                         if (hasOtherProvider)

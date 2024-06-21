@@ -247,6 +247,8 @@ namespace UnicontaClient.Pages.CustomPage
                 Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
             else
                 Warehouse.ShowInColumnChooser = true;
+            if (Comp.HideCostPrice)
+                CostPrice.Visible = CostPrice.ShowInColumnChooser = false;
 
             Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
             Utility.SetupVariants(api, colVariant, VariantName, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);

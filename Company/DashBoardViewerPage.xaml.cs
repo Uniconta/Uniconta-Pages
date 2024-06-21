@@ -488,7 +488,7 @@ namespace UnicontaClient.Pages.CustomPage
                         if (!dataSourceLoadingParams.Contains(componentName))
                             dataSourceLoadingParams.Add(componentName);
 
-                        if (string.Compare(queryTable?.ToString(), source.Name) == 0)
+                        if (string.Equals(queryTable?.ToString(), source.Name))
                         {
                             selectedDataSourceName = componentName;
                             tableType = dataSourceAndTypeMap[selectedDataSourceName];

@@ -1251,9 +1251,11 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
                                 else
                                 {
-                                    if (line?._Mileage._VechicleRegNo != line.VechicleRegNo)
-                                        line._Mileage._VechicleRegNo = line.VechicleRegNo;
-                                    lineclient._Mileage = line._Mileage;
+                                    if (line._Mileage != null)
+                                    {
+                                        line._Mileage._VechicleRegNo = line._Mileage._VechicleRegNo != line.VechicleRegNo ? line.VechicleRegNo : line._Mileage._VechicleRegNo;
+                                        lineclient._Mileage = line._Mileage;
+                                    }
                                     lineclient._Text = line._Text;
                                     lineclient._Unit = Uniconta.DataModel.ItemUnit.km;
                                     lineclient._Qty = qty;

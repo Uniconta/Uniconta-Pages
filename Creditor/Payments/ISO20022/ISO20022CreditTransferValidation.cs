@@ -941,7 +941,7 @@ namespace ISO20022CreditTransfer
 
             sb.Append((10 - uebertrag) % 10);
 
-            return string.Compare(sb.ToStringAndRelease(), number) == 0;
+            return string.Equals(sb.ToStringAndRelease(), number);
         }
     }
 }

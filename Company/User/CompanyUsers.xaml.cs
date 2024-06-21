@@ -191,10 +191,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "UserOf":
                     if (selectedItem != null)
                     {
-                        object[] ob = new object[2];
-                        ob[0] = selectedItem;
-                        ob[1] = selectedItem.Userid;
-                        AddDockItem(TabControls.CompaniesPage, ob,
+                        AddDockItem(TabControls.CompaniesPage, new object[] { selectedItem, selectedItem.Userid },
                             string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("Companies"),
                                 Uniconta.ClientTools.Localization.lookup("Access")));
                     }
@@ -284,11 +281,8 @@ namespace UnicontaClient.Pages.CustomPage
                         UnicontaMessageBox.Show(string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("NoRightsToInsert"), Uniconta.ClientTools.Localization.lookup("User")), Uniconta.ClientTools.Localization.lookup("Warning"));
                     break;
                 case UserTypes.WorkAppUser:
-                    object[] par = new object[3];
-                    par[0] = api;
-                    par[1] = true;
-                    par[2] = dockCtrl.Activpanel;
-                    var page = dockCtrl.AddDockItem(TabControls.UsersPage2, ParentControl, par, Uniconta.ClientTools.Localization.lookup("User"), "Add_16x16") as UsersPage2;
+                    var page = dockCtrl.AddDockItem(TabControls.UsersPage2, ParentControl, new object[] { api, true, dockCtrl.Activpanel },
+                        Uniconta.ClientTools.Localization.lookup("User"), "Add_16x16") as UsersPage2;
                     page.UserType = userType;
                     break;
             }
@@ -324,7 +318,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (screenName == TabControls.EditCompanyUser || screenName == TabControls.UsersPage2)
                 dgCompanyUsersGrid.UpdateItemSource(argument);
             else if (screenName == TabControls.EmployeePage2 && dgCompanyUsersGrid.SelectedItem != null)
-                (dgCompanyUsersGrid.SelectedItem as CompanyUserAccessClient)._Employee = ((argument as object[])?[1] as EmployeeClient).KeyStr;
+                (dgCompanyUsersGrid.SelectedItem as CompanyUserAccessClient)._Employee = ((argument as object[])?[1] as Uniconta.DataModel.Employee)?._Number;
         }
 
         async void SetFixedProfile(UserTypes userType, string LoginId)   
@@ -341,7 +335,7 @@ namespace UnicontaClient.Pages.CustomPage
                 var rights = AccessLevel.SetFixedProfile(userAccess._Rights, fixedProfile);
                 userAccess._Rights = rights;
                 userAccess.NotifyPropertyChanged("FixedProfile");
-                var err = await companyAPI.GiveCompanyAccess(userAccess._Uid, rights);
+                companyAPI.GiveCompanyAccess(userAccess._Uid, rights);
             }
         }
         public async override Task InitQuery()
@@ -416,13 +410,12 @@ namespace UnicontaClient.Pages.CustomPage
         }
         void CreateEmployee(CompanyUserAccessClient userAccess)
         {
-            bool isEdit = false;
-            var emp = new EmployeeClient();
+            var emp = api.CompanyEntity.CreateUserType<EmployeeClient>();
             emp._Uid = userAccess._Uid;
             emp._Name = userAccess._Name;
             emp._UserLogidId = userAccess._LoginId;
             emp._UserName = userAccess._Name;
-            AddDockItem(TabControls.EmployeePage2, new object[2] { emp, isEdit }, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Add"), emp._UserName));
+            AddDockItem(TabControls.EmployeePage2, new object[2] { emp, false }, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Add"), emp._UserName));
         }
     }
 }
