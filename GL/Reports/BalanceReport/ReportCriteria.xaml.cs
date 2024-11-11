@@ -831,6 +831,7 @@ namespace UnicontaClient.Pages.CustomPage
             updaterow.LineSpace = (byte)NumberConvert.ToInt(txtLineSpace.Text);
             updaterow.FontSize = (byte)NumberConvert.ToInt(txtFontSize.Text);
             updaterow.LeftMargin = (byte)NumberConvert.ToInt(txtLeftMargin.Text);
+            updaterow._ShowZero = (bool)chkShowZero.IsChecked.GetValueOrDefault();
 
             return updaterow;
         }
@@ -903,6 +904,7 @@ namespace UnicontaClient.Pages.CustomPage
                 txtLeftMargin.Text = Convert.ToString(objBalance.LeftMargin);
                 chk0Account.IsChecked = objBalance._Skip0Accounts;
                 cmbAccountType.SelectedIndex = objBalance._ShowType;
+                chkShowZero.IsChecked = objBalance._ShowZero;
 
                 if (!objBalance._SkipSumAccounts && !objBalance._OnlySumAccounts)
                     cmbSumAccount.SelectedIndex = 0; // Show

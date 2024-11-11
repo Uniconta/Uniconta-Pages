@@ -272,7 +272,13 @@ namespace UnicontaClient.Pages.CustomPage
             GenrateInvoiceDialog.DialogTableId = 2000000011;
             GenrateInvoiceDialog.HideOutlookOption(true);
             GenrateInvoiceDialog.SetInvPrintPreview(printPreview);
-            GenrateInvoiceDialog.SetOIOUBLLabelText(api.CompanyEntity._OIOUBLSendOnServer);
+
+            if (!api.CompanyEntity._DeactivateSendNemhandel)
+            {
+                GenrateInvoiceDialog.SetOIOUBLLabelText(true);
+                GenrateInvoiceDialog.EnableSentEinvoice(api.CompanyEntity._OIOUBLSendOnServer);
+            }
+
             GenrateInvoiceDialog.Closed += async delegate
             {
                 if (GenrateInvoiceDialog.DialogResult == true)
@@ -398,7 +404,13 @@ namespace UnicontaClient.Pages.CustomPage
 
             UnicontaClient.Pages.CWGenerateInvoice GenrateInvoiceDialog = new UnicontaClient.Pages.CWGenerateInvoice(true, string.Empty, false, true, true, showNoEmailMsg: !showSendByMail, debtorName: debtorName, isDebtorOrder: true, isOrderOrQuickInv: true, InvoiceInXML: invoiceInXML);
             GenrateInvoiceDialog.DialogTableId = 2000000013;
-            GenrateInvoiceDialog.SetOIOUBLLabelText(api.CompanyEntity._OIOUBLSendOnServer);
+
+            if (!api.CompanyEntity._DeactivateSendNemhandel)
+            {
+                GenrateInvoiceDialog.SetOIOUBLLabelText(true);
+                GenrateInvoiceDialog.EnableSentEinvoice(api.CompanyEntity._OIOUBLSendOnServer && invoiceInXML);
+            }
+
             GenrateInvoiceDialog.Closed += async delegate
             {
                 if (GenrateInvoiceDialog.DialogResult == true)

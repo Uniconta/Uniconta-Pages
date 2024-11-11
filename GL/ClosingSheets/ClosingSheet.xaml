@@ -50,18 +50,18 @@ x:Class="UnicontaClient.Pages.CustomPage.ClosingSheet"
                         </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Width="200">
-                        <localPage:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
-                            <DataTemplate>
+                        <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Name,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" PreviewMouseDown="Name_PreviewMouseDown"></TextBlock>
-                                    <TextBlock Grid.Column="1"></TextBlock>
+                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding Value}" PreviewMouseDown="Name_PreviewMouseDown" />
+                                    <TextBlock Grid.Column="1" />
                                 </Grid>
-                            </DataTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                            </ControlTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="FromDate" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ToDate"/>

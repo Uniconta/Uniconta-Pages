@@ -33,6 +33,7 @@ using UnicontaClient.Pages;
 using Uniconta.Common.Utility;
 using Uniconta.API.Service;
 using Localization = Uniconta.ClientTools.Localization;
+using DevExpress.Xpf.Core.Native;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -757,6 +758,10 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Adjustment":
                     Adjustment();
                     break;
+                case "SendVoucherReminder":
+                    if (selectedItem != null)
+                        Utility.SendVoucherReminder(api, selectedItem._Date, selectedItem._AmountCur != 0 ? selectedItem._AmountCur : selectedItem._Amount, selectedItem._Currency, selectedItem._Text);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -1076,16 +1081,14 @@ namespace UnicontaClient.Pages.CustomPage
         void TransferBankStatementToJournal()
         {
             CWTransferBankStatement winTransfer = new CWTransferBankStatement(fromDate, toDate, api, master);
-#if !SILVERLIGHT
             winTransfer.DialogTableId = 2000000016;
-#endif
             winTransfer.Closed += async delegate
             {
                 if (winTransfer.DialogResult == true)
                 {
                     master._Journal = winTransfer.Journal;
                     PostingAPI pApi = new PostingAPI(api);
-                    var res = await pApi.TransferBankStatementToJournal(master, winTransfer.FromDate, winTransfer.ToDate, winTransfer.BankAsOffset, winTransfer.isMarkLine, winTransfer.AddVoucherNumber);
+                    var res = await pApi.TransferBankStatementToJournal(master, winTransfer.FromDate, winTransfer.ToDate, winTransfer.BankAsOffset, winTransfer.isMarkLine, winTransfer.HasPhysicalVoucher, winTransfer.AddVoucherNumber);
                     if (res == ErrorCodes.Succes)
                     {
                         string strmsg = string.Format("{0}; {1}! {2} ?", Localization.lookup("GenerateJournalLines"), Localization.lookup("Completed"),
@@ -1148,7 +1151,10 @@ namespace UnicontaClient.Pages.CustomPage
         int AutoMatchOne2One(List<BankStatementLineGridClient> bstList, List<GLTransClientTotalBank> actList, int slip)
         {
             int cnt = 0;
-
+            bool MatchText = true;
+            bool FoundMatch = false;
+            
+            Rerun:
             for (int OffsetDays = 0; (OffsetDays <= slip); OffsetDays++)
             {
                 for (var b = 0; (b < bstList.Count); b++)
@@ -1162,6 +1168,7 @@ namespace UnicontaClient.Pages.CustomPage
                         MaxDate = MaxDate.AddDays(OffsetDays);
                     }
                     var Amount = bst._AmountCent;
+                    string Text = MatchText ? bst.Text : null;
                     for (var a = 0; (a < actList.Count); a++)
                     {
                         var act = actList[a];
@@ -1173,6 +1180,12 @@ namespace UnicontaClient.Pages.CustomPage
                         {
                             if (bst._AccountType > 0 && bst.Account != null && act.DCAccount != null && bst.Account != act.DCAccount) // we have a different DC. we cannot match
                                 continue;
+
+                            if (Text != null && Text != act._Text)
+                            {
+                                FoundMatch = true;
+                                continue;
+                            }
 
                             Join(bst, act);
                             bst.Trans = new List<GLTransClientTotalBank>(1) { act };
@@ -1189,6 +1202,12 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                     }
                 }
+            }
+            if (FoundMatch && MatchText) // we found a match, but not on Text, lets run without text match
+            {
+                MatchText = false;
+                FoundMatch = false;
+                goto Rerun;
             }
             return cnt;
         }

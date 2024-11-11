@@ -48,6 +48,9 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorInvoicenumberseries"
                     <CorasauControls:CorasauLayoutItem FieldName="OneTimeDebtor" x:Name="liOneTimeDebtor">
                         <CorasauControls:LookupEditor x:Name="leOneTimeDebtor" Text="{Binding OneTimeDebtor,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="PaymentForCollection" x:Name="liPaymentForCollection">
+                        <CorasauControls:LookupEditor x:Name="lePaymentForCollection" Text="{Binding PaymentForCollection,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutGroup>
         </CorasauControls:CorasauLayoutControl>       

@@ -44,9 +44,12 @@ namespace UnicontaClient.Pages.CustomPage
             if (simulatedTransactions != null && simulatedTransactions.Length > 0)
             {
                 var lst = new ProjectJournalLineClient[simulatedTransactions.Length];
-                int i = 0;
+                int i = 0, CompanyId = api.CompanyId;
                 foreach (var t in (IEnumerable<ProjectJournalLineClient>)simulatedTransactions)
+                {
+                    t.CompanyId = CompanyId;
                     lst[i++] = t;
+                }
                 dgSimulatedPrjJrnllLinePageGrid.ClearSorting();
                 dgSimulatedPrjJrnllLinePageGrid.SetSource(lst);
             }

@@ -75,7 +75,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
             if (danishFields.FormType == BankFormatBase.FIK73 || danishFields.FormType == BankFormatBase.FIK75 || danishFields.FormType == BankFormatBase.FIK04)
             {
                 //Message to Beneficiary >>
-                var externalAdvText = StandardPaymentFunctions.ExternalMessage(paymentFormat._Message, tran, company, creditor);
+                var externalAdvText = StandardPaymentFunctions.ExternalMessage(paymentFormat, tran, company, creditor);
 
                 danishFields.ReceiverAccountStatement = NETSNorge.processString(externalAdvText, 35, false);
 

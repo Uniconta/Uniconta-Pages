@@ -289,7 +289,6 @@ namespace UnicontaClient.Pages.CustomPage
                             var debtorNHR = debtor;
                             debtorNHR.StatusInfo = nhrInfo.StatusInfo;
                             debtorNHR.NewGLN = nhrInfo.GLNNew;
-                            debtorNHR.OnlyOIORASP = nhrInfo.OnlyOIORASP;
                             debtorNHR._Status = (byte)nhrInfo.Status;
                             debtorNHR.EndPointURL = nhrInfo.EndPointURL;
                             debtorNHR.EndPointRegisterName = nhrInfo.EndPointRegisterName;
@@ -376,9 +375,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 var err = await t;
                 ClearBusy();
-                if (err == ErrorCodes.Succes && !api.CompanyEntity._OIOUBLSendOnServer)
-                    UnicontaMessageBox.Show("For at kunne sende via Nemhandel skal 'Send e-faktura fra serveren' aktiveres under Firmaoplysninger", Uniconta.ClientTools.Localization.lookup("Information"));
-                else
+                if (err != ErrorCodes.Succes)
                     UtilDisplay.ShowErrorCode(err);
                 dgDebtorNHRLookup.ItemsSource = null;
             }
@@ -515,7 +512,6 @@ namespace UnicontaClient.Pages.CustomPage
         private string _StatusInfo;
         private string _EndPointURL;
         private string _EndPointRegisterName;
-        private bool _OnlyOIORASP;
         private object _glnSource;
         public byte _Status;
 
@@ -533,9 +529,6 @@ namespace UnicontaClient.Pages.CustomPage
         [AppEnumAttribute(EnumName = "NemhandelStatus")]
         [Display(Name = "Status", ResourceType = typeof(DCAccountText))]
         public string Status { get { return AppEnums.NemhandelStatus.ToString(_Status); } }
-
-        [Display(Name = "OIORASP", ResourceType = typeof(DCAccountText))]
-        public bool OnlyOIORASP { get { return _OnlyOIORASP; } set { _OnlyOIORASP = value; NotifyPropertyChanged("OnlyOIORASP"); } }
 
         [StringLength(150)]
         [Display(Name = "EndPointRegisterName", ResourceType = typeof(DCAccountText))]

@@ -33,8 +33,8 @@ x:Class="UnicontaClient.Pages.CustomPage.PaymentTermsPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="PaymentMethod" x:Name="liPaymentMethod">
                         <CorasauControls:ComboBoxEditor x:Name="cbPaymentmethod" SelectedItem="{Binding PaymentMethod,Mode=TwoWay}" SelectedIndexChanged="ComboBoxEditor_SelectedIndexChanged" />
                     </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="UseForCollection" x:Name="liUseForCollection">
-                        <CheckBox IsChecked="{Binding UseForCollection,Mode=TwoWay}" />
+                    <CorasauControls:CorasauLayoutItem FieldName="Weekend2Monday" x:Name="liWeekend2Monday">
+                        <CheckBox IsChecked="{Binding Weekend2Monday,Mode=TwoWay}" />
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
 

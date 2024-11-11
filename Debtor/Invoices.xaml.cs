@@ -332,22 +332,14 @@ namespace UnicontaClient.Pages.CustomPage
                         cwOrderInvoice.Show();
                     }
                     break;
-                case "eDeliverySettings":
+                case "EDeliveryMapping":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.EDeliverySettingsPage, selectedItem);
-
+                        AddDockItem(TabControls.EDeliveryMappingPage, selectedItem);
                     break;
-                case "GenerateOioXml":
-                    if (selectedItem != null)
-                        GenerateOIOXmlForAll(new[] { selectedItem });
-                    break;
-                case "GenerateMarkedOioXml":
+                case "ExportUBL":
                     selectedInvoiceUBL = dgInvoicesGrid.SelectedItems?.Cast<DebtorInvoiceClient>();
                     if (selectedInvoiceUBL != null)
-                        GenerateOIOXmlForAll(selectedInvoiceUBL, true);
-                    break;
-                case "GenerateAllOioXml":
-                    GenerateOIOXmlForAll(dgInvoicesGrid.GetVisibleRows() as IEnumerable<DebtorInvoiceClient>);
+                        ExportUBL(selectedInvoiceUBL);
                     break;
                 case "SendUBL":
                     selectedInvoiceUBL = dgInvoicesGrid.SelectedItems?.Cast<DebtorInvoiceClient>();
@@ -369,6 +361,10 @@ namespace UnicontaClient.Pages.CustomPage
                 case "DocSendLog":
                     if (selectedItem != null)
                         AddDockItem(TabControls.DocsSendLogGridPage, dgInvoicesGrid.syncEntity);
+                    break;
+                case "InvPackagingTrans":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.DebtorPackagingTransPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("PackagingTrans"), selectedItem.InvoiceNum));
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -623,9 +619,80 @@ namespace UnicontaClient.Pages.CustomPage
             layoutPrint.SetLookUpForPreviousAddressClients(previousAddressLookup);
         }
 
-        private async void GenerateOIOXmlForAll(IEnumerable<DebtorInvoiceClient> lst, bool selectedrows = false)
+        private void ShowOrderLines(DCOrder order)
         {
-            IEnumerable<DebtorInvoiceClient> lstInvClient = (lst is Array) ? lst : lst.ToList();
+            var confrimationText = string.Format(" {0}. {1}:{2},{3}:{4}\r\n{5}", Uniconta.ClientTools.Localization.lookup("SalesOrderCreated"), Uniconta.ClientTools.Localization.lookup("OrderNumber"), order._OrderNumber,
+                Uniconta.ClientTools.Localization.lookup("Account"), order._DCAccount, string.Concat(string.Format(Uniconta.ClientTools.Localization.lookup("GoTo"), Uniconta.ClientTools.Localization.lookup("Orderline")), " ?"));
+
+            var confirmationBox = new CWConfirmationBox(confrimationText, string.Empty, false);
+            confirmationBox.Closing += delegate
+            {
+                if (confirmationBox.DialogResult == null)
+                    return;
+
+                switch (confirmationBox.ConfirmationResult)
+                {
+                    case CWConfirmationBox.ConfirmationResultEnum.Yes:
+                        AddDockItem(order.__DCType() == 1 ? TabControls.DebtorOrderLines : TabControls.DebtorOfferLines, order, string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("OrdersLine"), order._OrderNumber, order._DCAccount));
+                        break;
+
+                    case CWConfirmationBox.ConfirmationResultEnum.No:
+                        break;
+                }
+            };
+            confirmationBox.Show();
+
+        }
+        void SendInvoice(IEnumerable<DebtorInvoiceClient> invoiceEmails)
+        {
+            int icount = invoiceEmails.Count();
+            UnicontaClient.Pages.CWSendInvoice cwSendInvoice = new UnicontaClient.Pages.CWSendInvoice();
+            cwSendInvoice.DialogTableId = 2000000028;
+            cwSendInvoice.Closed += async delegate
+            {
+                 if (cwSendInvoice.DialogResult == true)
+                 {
+                     busyIndicator.IsBusy = true;
+                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
+                     InvoiceAPI Invapi = new InvoiceAPI(api);
+                     List<string> errors = new List<string>();
+
+                     var sendInBackgroundOnly = CWSendInvoice.sendInBackgroundOnly;
+                     foreach (var inv in invoiceEmails.ToList()) // we take a copy, since user could do a refresh
+                     {
+                         var errorCode = await Invapi.SendInvoice(inv, cwSendInvoice.Emails, cwSendInvoice.sendOnlyToThisEmail, sendInBackgroundOnly);
+                         sendInBackgroundOnly = true;
+                         if (errorCode != ErrorCodes.Succes)
+                         {
+                             var standardError = await api.session.GetErrors(errorCode);
+                             var stformattedErr = UtilDisplay.GetFormattedErrorCode(errorCode, standardError);
+                             var errorStr = string.Format("{0}({1}): \n{2}", Uniconta.ClientTools.Localization.lookup("InvoiceNumber"), inv.InvoiceNum,
+                                 Uniconta.ClientTools.Localization.lookup(stformattedErr));
+                             errors.Add(errorStr);
+                         }
+                     }
+
+                     busyIndicator.IsBusy = false;
+                     if (errors.Count == 0)
+                         UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("SendEmailMsgOBJ"), icount == 1 ? Uniconta.ClientTools.Localization.lookup("Invoice") :
+                             Uniconta.ClientTools.Localization.lookup("Invoices")), Uniconta.ClientTools.Localization.lookup("Message"));
+                     else
+                     {
+                         CWErrorBox errorDialog = new CWErrorBox(errors.ToArray(), true);
+                         errorDialog.Show();
+                     }
+                 }
+            };
+            cwSendInvoice.Show();
+        }
+
+        private async void ExportUBL(IEnumerable<DebtorInvoiceClient> invoiceUBL)
+        {
+            int cnt = invoiceUBL.Count();
+            if (UnicontaMessageBox.Show(string.Concat(Uniconta.ClientTools.Localization.lookup("QtyMarked"), " ", cnt),
+                    string.Format(Uniconta.ClientTools.Localization.lookup("ExportOBJ"), Uniconta.ClientTools.Localization.lookup("einvoice")), MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                return;
+
             var api = this.api;
             var Comp = api.CompanyEntity;
 
@@ -643,14 +710,11 @@ namespace UnicontaClient.Pages.CustomPage
             Microsoft.Win32.SaveFileDialog saveDialog = null;
             DevExpress.Xpf.Dialogs.DXFolderBrowserDialog folderBrowserDialog = null;
             InvoiceAPI Invapi = new InvoiceAPI(api);
-            var cnt = lstInvClient.Count();
-            foreach (var invClient in lstInvClient)
+
+            foreach (var invClient in invoiceUBL.ToList())
             {
                 var debtor = (Debtor)Debcache.Get(invClient._DCAccount);
                 if (debtor == null)
-                    continue;
-
-                if (!selectedrows && cnt > 1 && (!debtor._einvoice || invClient._SendTimeOIO != DateTime.MinValue))
                     continue;
 
                 var InvTransInvoiceLines = (DebtorInvoiceLines[])await Invapi.GetInvoiceLines(invClient, new DebtorInvoiceLines());
@@ -778,73 +842,6 @@ namespace UnicontaClient.Pages.CustomPage
                 UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("SaveFileMsgOBJ"), listOfXmlPath.Count, listOfXmlPath.Count == 1 ?
                     Uniconta.ClientTools.Localization.lookup("Invoice") : Uniconta.ClientTools.Localization.lookup("Invoices"), applFilePath), Uniconta.ClientTools.Localization.lookup("Message"), MessageBoxButton.OK);
             }
-        }
-
-        private void ShowOrderLines(DCOrder order)
-        {
-            var confrimationText = string.Format(" {0}. {1}:{2},{3}:{4}\r\n{5}", Uniconta.ClientTools.Localization.lookup("SalesOrderCreated"), Uniconta.ClientTools.Localization.lookup("OrderNumber"), order._OrderNumber,
-                Uniconta.ClientTools.Localization.lookup("Account"), order._DCAccount, string.Concat(string.Format(Uniconta.ClientTools.Localization.lookup("GoTo"), Uniconta.ClientTools.Localization.lookup("Orderline")), " ?"));
-
-            var confirmationBox = new CWConfirmationBox(confrimationText, string.Empty, false);
-            confirmationBox.Closing += delegate
-            {
-                if (confirmationBox.DialogResult == null)
-                    return;
-
-                switch (confirmationBox.ConfirmationResult)
-                {
-                    case CWConfirmationBox.ConfirmationResultEnum.Yes:
-                        AddDockItem(order.__DCType() == 1 ? TabControls.DebtorOrderLines : TabControls.DebtorOfferLines, order, string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("OrdersLine"), order._OrderNumber, order._DCAccount));
-                        break;
-
-                    case CWConfirmationBox.ConfirmationResultEnum.No:
-                        break;
-                }
-            };
-            confirmationBox.Show();
-
-        }
-        void SendInvoice(IEnumerable<DebtorInvoiceClient> invoiceEmails)
-        {
-            int icount = invoiceEmails.Count();
-            UnicontaClient.Pages.CWSendInvoice cwSendInvoice = new UnicontaClient.Pages.CWSendInvoice();
-            cwSendInvoice.DialogTableId = 2000000028;
-            cwSendInvoice.Closed += async delegate
-             {
-                 if (cwSendInvoice.DialogResult == true)
-                 {
-                     busyIndicator.IsBusy = true;
-                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
-                     InvoiceAPI Invapi = new InvoiceAPI(api);
-                     List<string> errors = new List<string>();
-
-                     var sendInBackgroundOnly = CWSendInvoice.sendInBackgroundOnly;
-                     foreach (var inv in invoiceEmails.ToList()) // we take a copy, since user could do a refresh
-                     {
-                         var errorCode = await Invapi.SendInvoice(inv, cwSendInvoice.Emails, cwSendInvoice.sendOnlyToThisEmail, sendInBackgroundOnly);
-                         sendInBackgroundOnly = true;
-                         if (errorCode != ErrorCodes.Succes)
-                         {
-                             var standardError = await api.session.GetErrors(errorCode);
-                             var stformattedErr = UtilDisplay.GetFormattedErrorCode(errorCode, standardError);
-                             var errorStr = string.Format("{0}({1}): \n{2}", Uniconta.ClientTools.Localization.lookup("InvoiceNumber"), inv.InvoiceNum,
-                                 Uniconta.ClientTools.Localization.lookup(stformattedErr));
-                             errors.Add(errorStr);
-                         }
-                     }
-
-                     busyIndicator.IsBusy = false;
-                     if (errors.Count == 0)
-                         UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("SendEmailMsgOBJ"), icount == 1 ? Uniconta.ClientTools.Localization.lookup("Invoice") :
-                             Uniconta.ClientTools.Localization.lookup("Invoices")), Uniconta.ClientTools.Localization.lookup("Message"));
-                     else
-                     {
-                         CWErrorBox errorDialog = new CWErrorBox(errors.ToArray(), true);
-                         errorDialog.Show();
-                     }
-                 }
-             };
-            cwSendInvoice.Show();
         }
 
         void SendUBL(IEnumerable<DebtorInvoiceClient> invoiceUBL)

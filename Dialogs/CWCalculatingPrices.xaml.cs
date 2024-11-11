@@ -36,12 +36,17 @@ namespace UnicontaClient.Controls.Dialogs
         [InputFieldData]
         [Display(Name = "PostingPer", ResourceType = typeof(InputFieldDataText))]
         public bool AllJournal { get; set; }
+
+        static bool KeepCostprices;
+        [InputFieldData]
+        [Display(Name = "UpdateCost", ResourceType = typeof(InputFieldDataText))]
+        public bool UpdateCost { get { return !KeepCostprices; } set { KeepCostprices = !value; } }
         CrudAPI _api;
-#if !SILVERLIGHT
+
         protected override int DialogId { get { return DialogTableId; } }
         public int DialogTableId { get; set; }
         protected override bool ShowTableValueButton { get { return true; } }
-#endif
+
         public CWCalculatingPrices(CrudAPI api)
         {
             InitializeComponent();
@@ -51,9 +56,6 @@ namespace UnicontaClient.Controls.Dialogs
             txtPostingPer.Text = $"{Uniconta.ClientTools.Localization.lookup("PostingPer")} ({Uniconta.ClientTools.Localization.lookup("UseOnlyInvoice")})";
             this.DataContext = this;
             cmbPostingPer.ItemsSource = new string[] { Uniconta.ClientTools.Localization.lookup("Invoice"), Uniconta.ClientTools.Localization.lookup("Journal") };
-#if SILVERLIGHT
-            UnicontaClient.Utilities.Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             this.Loaded += CWCalculatingPrices_Loaded;
         }
 
@@ -105,8 +107,8 @@ namespace UnicontaClient.Controls.Dialogs
 
         private void cmbPostingPer_SelectedIndexChanged(object sender, RoutedEventArgs e)
         {
-            if (cmbPostingPer.SelectedIndex == -1) return;
-            AllJournal = cmbPostingPer.SelectedIndex == 0 ? false : true;
+            if (cmbPostingPer.SelectedIndex >= 0)
+                AllJournal = cmbPostingPer.SelectedIndex != 0;
         }
     }
 }

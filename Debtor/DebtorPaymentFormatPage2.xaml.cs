@@ -61,15 +61,14 @@ namespace UnicontaClient.Pages.CustomPage
         {
             InitializeComponent();
             InitPage(crudApi);
-#if !SILVERLIGHT
             FocusManager.SetFocusedElement(txtFormat, txtFormat);
-#endif
         }
 
         void InitPage(CrudAPI crudapi)
         {
             layoutControl = layoutItems;
-            cmbPaymentMethod.ItemsSource = Enum.GetValues(typeof(DebtorPaymFormatType)); 
+            cmbPaymentMethod.ItemsSource = AppEnums.DebtorPaymFormatType.Values;
+
             leBankAccount.api = crudapi;
             leJournal.api = crudapi;
 
@@ -99,9 +98,9 @@ namespace UnicontaClient.Pages.CustomPage
         }
         private void btnOptions_Click(object sender, RoutedEventArgs e)
         {
-            switch (editrow.PaymentMethod)
+            switch (editrow._ExportFormat)
             {
-                case DebtorPaymFormatType.Iceland:
+                case (byte)DebtorPaymFormatType.Iceland:
                     CWDebtorPaymentSetupIceland dialogIceland = new CWDebtorPaymentSetupIceland(this.api, editrow);
                     dialogIceland.Closing += delegate
                     {
@@ -110,8 +109,7 @@ namespace UnicontaClient.Pages.CustomPage
                     };
                     dialogIceland.Show();
                     break;
-#if !SILVERLIGHT
-                case DebtorPaymFormatType.NetsBS:
+                case (byte)DebtorPaymFormatType.NetsBS:
                     CWDebtorPaymentSetupNets dialogNets = new CWDebtorPaymentSetupNets(this.api, editrow);
                     dialogNets.Closing += delegate
                     {
@@ -121,7 +119,7 @@ namespace UnicontaClient.Pages.CustomPage
                     dialogNets.Show();
                     break;
 
-                case DebtorPaymFormatType.SEPA:
+                case (byte)DebtorPaymFormatType.SEPA:
                     CWDebtorPaymentSetupSEPA dialogSEPA = new CWDebtorPaymentSetupSEPA(this.api, editrow);
                     dialogSEPA.Closing += delegate
                     {
@@ -130,7 +128,6 @@ namespace UnicontaClient.Pages.CustomPage
                     };
                     dialogSEPA.Show();
                     break;
-#endif
                 default:
                     UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NoOptions"), Uniconta.ClientTools.Localization.lookup("Warning"));
                     break;

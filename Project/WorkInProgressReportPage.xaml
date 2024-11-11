@@ -70,18 +70,18 @@ x:Class="UnicontaClient.Pages.CustomPage.WorkInProgressReportPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="DebtorName" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Project" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="ProjectName">
-                        <local:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
-                            <DataTemplate>
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.ProjectName,RelativeSource={RelativeSource TemplatedParent}}" PreviewMouseDown="ProjectName_PreviewMouseDown"></TextBlock>
-                                    <TextBlock Grid.Column="1"></TextBlock>
+                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding Value}" PreviewMouseDown="ProjectName_PreviewMouseDown"></TextBlock>
+                                    <TextBlock Grid.Column="1"/>
                                 </Grid>
-                            </DataTemplate>
-                        </local:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Workspace" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Task" Visible="False"/>

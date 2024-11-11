@@ -42,7 +42,10 @@ namespace UnicontaClient.Pages.CustomPage
         private bool compressed;
         static DateTime DefaultFromDate, DefaultToDate;
         static bool DefaultImp, DefaultExp;
+        static bool DefaultVIES;
         static int DefaultExpGrp;
+        SQLTableCache<Debtor> debtorCache;
+        SQLTableCache<WorkInstallation> installationCache;
 
         public override string NameOfControl
         {
@@ -63,13 +66,15 @@ namespace UnicontaClient.Pages.CustomPage
             dgIntraStatGrid.api = api;
             dgIntraStatGrid.BusyIndicator = busyIndicator;
             dgIntraStatGrid.ShowTotalSummary();
-            intraHelper = new IntraHelper(api, DefaultExpGrp);
+
+            intraHelper = new IntraHelper(api, DefaultExpGrp, DefaultVIES);
 
             txtDateFrm.DateTime = DefaultFromDate == DateTime.MinValue ? new DateTime(DateTime.Now.Year, DateTime.Now.Month, 01): DefaultFromDate;
             txtDateTo.DateTime = DefaultToDate == DateTime.MinValue ? new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month)) : DefaultToDate;
 
             checkImport.IsChecked = DefaultImp;
             checkExport.IsChecked = DefaultExp;
+            checkVIES.IsChecked = DefaultVIES;
 
             cmbExportGroup.ItemsSource = new string[] 
             {
@@ -77,6 +82,12 @@ namespace UnicontaClient.Pages.CustomPage
                  string.Concat(Localization.lookup("Export"), " ", Localization.lookup("Group"), " 2")
             };
             cmbExportGroup.SelectedIndex = DefaultExpGrp;
+
+            debtorCache = api.GetCache<Uniconta.DataModel.Debtor>();
+            if (api.CompanyEntity.DeliveryAddress)
+                installationCache = api.GetCache<Uniconta.DataModel.WorkInstallation>(); ;
+
+            StartLoadCache();
         }
 
         public override Task InitQuery()
@@ -86,7 +97,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
-            LoadType(new Type[] { typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.Creditor), typeof(Uniconta.DataModel.InvGroup) });
+            if (debtorCache == null)
+                debtorCache = await api.LoadCache<Uniconta.DataModel.Debtor>().ConfigureAwait(false);
+            if (installationCache == null)
+                installationCache = await api.LoadCache<Uniconta.DataModel.WorkInstallation>().ConfigureAwait(false);
+
+            LoadType(new Type[] { typeof(Uniconta.DataModel.Creditor), typeof(Uniconta.DataModel.InvGroup) });
         }
 
         private void localMenu_OnItemClicked(string ActionType)
@@ -366,7 +382,7 @@ namespace UnicontaClient.Pages.CustomPage
                 prop = PropValuePair.GenereteWhereElements("MovementType", typeof(int), "1");
                 propValPair.Add(prop);
                 var listIntraStatDeb = await api.Query<IntrastatClient>(propValPair);
-                var listDeb = UpdateValues(listIntraStatDeb, ImportOrExportIntrastat.Export, -1);
+               var listDeb = UpdateValues(listIntraStatDeb, ImportOrExportIntrastat.Export, -1);
 
                 if (listDeb != null || listDeb?.Count > 0)
                     intraList.AddRange(listDeb);
@@ -402,12 +418,49 @@ namespace UnicontaClient.Pages.CustomPage
                 if (item?._ItemType == (byte)ItemType.Service)
                     continue;
 
+                string fdebtorCVRExport = null;
                 if (importOrExport == ImportOrExportIntrastat.Import)
                     intraStat.Country = intraStat.Creditor.Country;
                 else // export
                 {
                     var deb = intraStat.Debtor;
-                    intraStat.Country = deb._DeliveryCountry == 0 ? deb._Country : deb._DeliveryCountry;
+                    DebtorInvoiceClient debtorinv = intraStat.DebtorInvoiceRef;
+                    fdebtorCVRExport = deb._LegalIdent;
+                    if (debtorinv != null)
+                    {
+                        if (debtorinv._DeliveryAccount != null || debtorinv.Installation != null || (deb.DeliveryAddress1 != null && deb.DeliveryCountry != null))
+                        {
+                            if (debtorinv._DeliveryAccount != null)
+                            {
+                                var deliveryAccount = debtorCache.Get(debtorinv._DeliveryAccount);
+                                if (deliveryAccount != null && deliveryAccount._Country != CountryCode.Unknown && deliveryAccount._Country != deb.Country)
+                                {
+                                    fdebtorCVRExport = deliveryAccount._LegalIdent ?? IntraHelper.UNKNOWN_CVRNO;
+                                    intraStat.Country = deliveryAccount._Country;
+                                    intraStat.IsTriangularTrade = true;
+                                }
+                            }
+                            else if (debtorinv.Installation != null)
+                            {
+                                var installation = installationCache.Get(debtorinv._Installation);
+                                if (installation != null && installation._Country != CountryCode.Unknown && installation._Country != deb.Country)
+                                {
+                                    fdebtorCVRExport = installation._LegalIdent ?? IntraHelper.UNKNOWN_CVRNO;
+                                    intraStat.Country = installation._Country;
+                                    intraStat.IsTriangularTrade = true;
+                                }
+                            }
+                            else if (deb.DeliveryCountry != CountryCode.Unknown && deb.DeliveryCountry != deb.Country)
+                            {
+                                fdebtorCVRExport = IntraHelper.UNKNOWN_CVRNO;
+                                intraStat.Country = deb._DeliveryCountry;
+                                intraStat.IsTriangularTrade = true;
+                            }
+                        }
+                    }
+
+                    if (intraStat.Country == 0)
+                        intraStat.Country = deb._Country;
                 }
 
                 if (intraStat.Country == companyCountry)
@@ -420,24 +473,22 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     intraStat.DebtorRegNo = intraStat?.Debtor?._LegalIdent;
 
-                    var fdebtorCVR = intraStat.DebtorRegNo;
-
-                    if (!string.IsNullOrWhiteSpace(fdebtorCVR))
+                    if (!string.IsNullOrWhiteSpace(fdebtorCVRExport) && fdebtorCVRExport != IntraHelper.UNKNOWN_CVRNO)
                     {
-                        fdebtorCVR = Regex.Replace(fdebtorCVR, "[^0-9]", "");
-                        switch (intraStat.Debtor._Country)
+                        var cvrCheck = Regex.Replace(fdebtorCVRExport, "[^0-9]", "");
+                        switch (intraStat.Country)
                         {
                             case CountryCode.Sweden:
-                                if (fdebtorCVR.Length == 10)
-                                    fdebtorCVR = string.Concat(fdebtorCVR, IntraHelper.SWEDEN_POSTFIX_01);
+                                if (cvrCheck.Length == 10)
+                                    fdebtorCVRExport = string.Concat(fdebtorCVRExport, IntraHelper.SWEDEN_POSTFIX_01);
                                 break;
                         }
-                        intraStat.fDebtorRegNo = string.Concat(intraStat.PartnerCountry, fdebtorCVR);
-                        intraStat.DebtorRegNoVIES = PrepareVIES(intraStat.Debtor);
+                        intraStat.DebtorRegNoVIES = PrepareVIES(fdebtorCVRExport, intraStat.Country);
+                        intraStat.fDebtorRegNo = string.Concat(intraStat.PartnerCountry, intraStat.DebtorRegNoVIES);
                     }
                     else
                     {
-                        intraStat.DebtorRegNo = IntraHelper.UNKNOWN_CVRNO;
+                        intraStat.DebtorRegNo = intraStat.DebtorRegNo ?? IntraHelper.UNKNOWN_CVRNO;
                         intraStat.fDebtorRegNo = IntraHelper.UNKNOWN_CVRNO;
                         intraStat.DebtorRegNoVIES = IntraHelper.UNKNOWN_CVRNO;
                     }
@@ -452,7 +503,7 @@ namespace UnicontaClient.Pages.CustomPage
                 intraStat.CountryOfOrigin = intraStat.ImportOrExport == ImportOrExportIntrastat.Import ? CountryCode.Unknown : item._CountryOfOrigin == CountryCode.Unknown ? item.InventoryGroup._CountryOfOrigin : item._CountryOfOrigin;
 
                 intraStat.IntraUnitPerPCS = Math.Abs(item._IntraUnit);
-                intraStat.WeightPerPCS = Math.Abs(item.Weight);
+                intraStat.WeightPerPCS = item.NetWeight != 0 ? Math.Abs(item.NetWeight) : Math.Abs(item.Weight);
                 intraStat.NetWeight = intraStat.WeightPerPCS * intraStat.InvoiceQuantity;
                 intraStat.IntraUnit = item._IntraUnit * (int)Math.Round(intraStat.InvoiceQuantity,0);
 
@@ -483,24 +534,33 @@ namespace UnicontaClient.Pages.CustomPage
             return intraList;
         }
 
-        private string PrepareVIES(DebtorClient debtor)
+        private string PrepareVIES(string legalIdent, CountryCode country)
         {
             string twolettercode = null;
-            var debtorCVR = debtor._LegalIdent;
+            var debtorCVR = legalIdent;
             if (!string.IsNullOrWhiteSpace(debtorCVR))
             {
+                debtorCVR = Regex.Replace(debtorCVR, "[^a-zA-Z0-9]", string.Empty);
                 var cvr = debtorCVR;
-                if (Char.IsLetter(cvr.FirstOrDefault()) && cvr.Length > 3)
+                if (cvr.Length > 3)
                 {
-                    var cCode = cvr.Substring(0, 2);
-                    cvr = cvr.Substring(2, cvr.Length - 2);
-                    if (Enum.TryParse(cCode, out CountryISOCode isoCode))
-                        twolettercode = cCode;
+                    if (Char.IsLetter(cvr.FirstOrDefault()))
+                    {
+                        var cCode = cvr.Substring(0, 2);
+                        cvr = cvr.Substring(2, cvr.Length - 2);
 
-                    if (twolettercode != null && Country2Language.IsEU(debtor._Country))
-                        debtorCVR = cvr;
+                        if (cCode == IntraHelper.CTRYCODE_EXTENDED_UK ||
+                           cCode == IntraHelper.CTRYCODE_EXTENDED_GREECE ||
+                           cCode == IntraHelper.CTRYCODE_EXTENDED_SERBIA)
+                            twolettercode = cCode;
+                        else if (Enum.TryParse(cCode, out CountryISOCode isoCode))
+                            twolettercode = cCode;
 
-                    switch (debtor._Country)
+                        if (twolettercode != null && Country2Language.IsEU(country))
+                            debtorCVR = cvr;
+                    }
+
+                    switch (country)
                     {
                         case CountryCode.Sweden:
                             if (debtorCVR.Length == 10)
@@ -571,6 +631,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             DefaultImp = checkImport.IsChecked.GetValueOrDefault();
             DefaultExp = checkExport.IsChecked.GetValueOrDefault();
+            DefaultVIES = checkVIES.IsChecked.GetValueOrDefault();
 
             var ws = spreadSheet.Document.Worksheets[0];
             ws.Clear(ws.GetUsedRange());
@@ -582,6 +643,13 @@ namespace UnicontaClient.Pages.CustomPage
         {
             DefaultExpGrp = cmbExportGroup.SelectedIndex;
             intraHelper.exportGroup = DefaultExpGrp;
+        }
+
+        private void CheckVIES_Reaction(object sender, RoutedEventArgs e)
+        {
+            intraHelper.ClearVIESCache();
+            DefaultVIES = checkVIES.IsChecked.GetValueOrDefault();
+            intraHelper.validateVIES = DefaultVIES;
         }
 
         public override bool HandledOnClearFilter()
@@ -625,6 +693,7 @@ namespace UnicontaClient.Pages.CustomPage
         public static string IsTriangularTrade { get { return Localization.lookup("TriangleTrade"); } }
         public static string SystemInfo { get { return Localization.lookup("SystemInfo"); } }
         public static string Compressed { get { return Uniconta.ClientTools.Localization.lookup("Compressed"); } }
+        public static string DebtorRegNoVIES { get { return string.Concat(Localization.lookup("CompanyRegNo"), " (VIES)"); } }
     }
 
     [ClientTableAttribute(LabelKey = "Intrastat")]
@@ -726,7 +795,11 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        public string DebtorRegNoVIES;
+        private string _debtorRegNoVIES;
+        [Display(Name = "DebtorRegNoVIES", ResourceType = typeof(IntrastatClassText))]
+        public string DebtorRegNoVIES { get { return _debtorRegNoVIES; } set { _debtorRegNoVIES = value; NotifyPropertyChanged("DebtorRegNoVIES"); } }
+
+
         private string _DebtorRegNo;
         [Display(Name = "DebtorRegNo", ResourceType = typeof(IntrastatClassText))]
         public string DebtorRegNo { get { return _DebtorRegNo; } set { _DebtorRegNo = value; NotifyPropertyChanged("DebtorRegNo"); } }
@@ -797,6 +870,28 @@ namespace UnicontaClient.Pages.CustomPage
         private bool _Compressed;
         [Display(Name = "Compressed", ResourceType = typeof(IntrastatClassText))]
         public bool Compressed { get { return _Compressed; } set { _Compressed = value; NotifyPropertyChanged("Compressed"); } }
+
+        [ReportingAttribute]
+        public DebtorInvoiceClient DebtorInvoiceRef
+        {
+            get
+            {
+                if (_InvoiceRowId != 0 && _MovementType == 1)
+                {
+                    var Comp = Company.Get(_CompanyId);
+                    if (Comp != null)
+                    {
+                        if (Comp.DebtorInvoices == null)
+                        {
+                            Comp.DebtorInvoices = new IRowIdCache<DebtorInvoiceClient>();
+                            Comp.DebtorInvoices.Load(new Uniconta.API.System.QueryAPI(BasePage.session, Comp));
+                        }
+                        return Comp.DebtorInvoices.Get(_InvoiceRowId);
+                    }
+                }
+                return null;
+            }
+        }
     }
 
     public enum IntraUnknownCountry : byte

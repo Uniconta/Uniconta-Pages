@@ -29,6 +29,7 @@ using System.Text;
 using UnicontaClient.Controls.Dialogs;
 using Uniconta.Common.Enums;
 using DevExpress.Xpf.Editors;
+using DevExpress.Mvvm.Native;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -265,6 +266,8 @@ namespace UnicontaClient.Pages.CustomPage
                 liPaymentFee.Visibility = Visibility.Collapsed;
             if (DoNotSave)
                 txtAccount.IsReadOnly = true;
+            if (!Comp.InvPackaging)
+                ESGGroup.Visibility = Visibility.Collapsed;
         }
 
         public override bool BeforeSetUserField(ref CorasauLayoutGroup parentGroup)
@@ -278,8 +281,9 @@ namespace UnicontaClient.Pages.CustomPage
             var api = this.api;
             var Comp = api.CompanyEntity;
 
-            var Cache = Comp.GetCache(typeof(Uniconta.DataModel.GLVat)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.GLVat), api).ConfigureAwait(false);
-            Vatlookupeditior.cacheFilter = new VatCacheFilter(Cache, GLVatSaleBuy.Sales);
+            var Cache = Comp.GetCache(typeof(Uniconta.DataModel.GLVat)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLVat)).ConfigureAwait(false);
+            if (!Comp._AllowPurchaseVatOnSales)
+                Vatlookupeditior.cacheFilter = new VatCacheFilter(Cache, GLVatSaleBuy.Sales);
 
             if (Comp._UseVatOperation)
             {
@@ -385,6 +389,12 @@ namespace UnicontaClient.Pages.CustomPage
                             editrow.Phone = contact.phone;
                             editrow.ContactEmail = contact.email;
                             editrow.Www = contact.www;
+                        }
+                        var state = ci.companystatus;
+                        if (state != null)
+                        {
+                            editrow._StateOfCompany = state.StatusCode();
+                            editrow.NotifyPropertyChanged("CompanyState");
                         }
                         if (!string.IsNullOrEmpty(ci.vat) && editrow.Country == CountryCode.Denmark)
                             editrow.VatNumber = ci.vat;

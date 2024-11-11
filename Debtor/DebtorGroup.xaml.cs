@@ -125,7 +125,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (selectedItem == null)
                 return;
             var debtorGrp = Activator.CreateInstance(selectedItem.GetType()) as DebtorGroupClient;
-            CorasauDataGrid.CopyAndClearRowId(selectedItem, debtorGrp);
+            CorasauDataGrid.CopyAndClearRowId(selectedItem, debtorGrp, api);
             var parms = new object[2] { debtorGrp, false };
             AddDockItem(TabControls.DebtorGroupPage2, parms, Uniconta.ClientTools.Localization.lookup("Debtorgroup"), "Add_16x16");
         }

@@ -52,6 +52,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorGroup"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="MandatoryItem" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DiscountAccount" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DiscountAccountOffset" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="BankMessage" Visible="False"/>
                 </localPage:CreditorGroupGrid.Columns>
             </localPage:CreditorGroupGrid>
         </CorasauControls:BusyIndicator>

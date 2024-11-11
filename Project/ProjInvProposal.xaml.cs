@@ -201,6 +201,8 @@ namespace UnicontaClient.Pages.CustomPage
                 Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
             CostValue.Visible = CostValue.ShowInColumnChooser = false;
             }
+            if (Comp.InvPackaging)
+                Consumer.Visible = Consumer.ShowInColumnChooser = false;
         }
         void dgProjInvProposalGrid_RowDoubleClick()
         {
@@ -530,7 +532,11 @@ namespace UnicontaClient.Pages.CustomPage
             var additionalOrdersList = Utility.GetAdditionalOrders(api, projInvProp);
             if (additionalOrdersList != null)
                 GenrateInvoiceDialog.SetAdditionalOrders(additionalOrdersList);
-            GenrateInvoiceDialog.SetOIOUBLLabelText(api.CompanyEntity._OIOUBLSendOnServer);
+            if (!api.CompanyEntity._DeactivateSendNemhandel)
+            {
+                GenrateInvoiceDialog.SetOIOUBLLabelText(true);
+                GenrateInvoiceDialog.EnableSentEinvoice(api.CompanyEntity._OIOUBLSendOnServer);
+            }
 
             GenrateInvoiceDialog.Closed += async delegate
             {

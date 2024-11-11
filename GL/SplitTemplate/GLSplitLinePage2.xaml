@@ -37,7 +37,7 @@ x:Class="UnicontaClient.Pages.CustomPage.GLSplitLinePage2"
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup x:Name="grpAccrual" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Accruals}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem FieldName="Periods" x:Name="liPeriods">
-                        <CorasauControls:NumericUpDownEditor Value="{Binding Periods,Mode=TwoWay}" MaxValue="36" MinWidth="170"/>
+                        <CorasauControls:NumericUpDownEditor Value="{Binding Periods,Mode=TwoWay}" MaxValue="120" MinWidth="170"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="EneryNthMonth" x:Name="liEneryNthMonth">
                         <CorasauControls:ComboBoxEditor SelectedItem="{Binding EneryNthMonth,Mode=TwoWay}" />

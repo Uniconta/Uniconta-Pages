@@ -124,7 +124,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void ViewFile(DCDocSendLogClient selectedItem)
         {
-            if (selectedItem._LogType == Uniconta.DataModel.DCDocType.eDelivery)
+            if (selectedItem._LogType == Uniconta.DataModel.DCDocType.eDelivery || selectedItem._LogType == Uniconta.DataModel.DCDocType.peppol)
             {
                 var xmlLst = await new InvoiceAPI(api).GetEdeliveryDoc(selectedItem);
                 if (xmlLst != null)

@@ -46,11 +46,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             this.DataContext = this;
             InitializeComponent();
-#if SILVERLIGHT
-            Utility.SetThemeBehaviorOnChildWindow(this);
-#else
             this.Title = Uniconta.ClientTools.Localization.lookup("UserFields");
-#endif
             API = api;
             this.master = StreamingManager.Clone(sourcedata);
             this.masterWithCompanyId = sourcedata;
@@ -66,10 +62,6 @@ namespace UnicontaClient.Pages.CustomPage
         public CWCopyUserFields(CrudAPI api)
         {
             this.DataContext = this;
-#if SILVERLIGHT
-           
-            Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             InitializeComponent();
             API = api;
             IsCreateTable = true;
@@ -192,9 +184,9 @@ namespace UnicontaClient.Pages.CustomPage
             if (masterList.Count == 0)
                 return;
             if (cbtable.SelectedItem == null && !copyUserFields)
-                return; 
+                return;
             var list = await newapi.Query<CustomTableFieldsClient>(masterList, null);
-            if (list != null)
+            if (list?.Length > 0)
             {
                 foreach (var item in list)
                 {

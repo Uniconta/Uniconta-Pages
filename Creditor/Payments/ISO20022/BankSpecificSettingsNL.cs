@@ -340,6 +340,19 @@ namespace UnicontaISO20022CreditTransfer
             }
         }
 
+        /// <summary>
+        /// CdtrAgt - Creditor Bank CountryId
+        /// </summary>
+        public override string CdtrAgtCountryId(string countryId)
+        {
+            switch (companyBankEnum)
+            {
+                case CompanyBankENUM.ABN_Amro_bank:
+                    return string.Empty;
+                default:
+                    return countryId;
+            }
+        }
 
         /// <summary>
         /// Unstructured Remittance Information

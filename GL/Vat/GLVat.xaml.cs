@@ -97,7 +97,7 @@ namespace UnicontaClient.Pages.CustomPage
         void CopyRecord(GLVatClient selectedItem)
         {
             var vat = Activator.CreateInstance(selectedItem.GetType()) as GLVatClient;
-            CorasauDataGrid.CopyAndClearRowId(selectedItem, vat);
+            CorasauDataGrid.CopyAndClearRowId(selectedItem, vat, api);
             AddDockItem(TabControls.GLVatPage2, new object[2] { vat, false }, Uniconta.ClientTools.Localization.lookup("Vat"), "Add_16x16");
         }
     }

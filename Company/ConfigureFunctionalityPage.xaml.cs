@@ -26,6 +26,8 @@ using Uniconta.DataModel;
 using Uniconta.ClientTools.Controls;
 using Uniconta.Common.User;
 using Uniconta.API.Service;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -55,7 +57,9 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (BasePage.GetSystemDefaultDate() < new DateTime(2022, 8, 15))
                 grpOnlyPosting.Visibility = Visibility.Collapsed;
-            
+
+            cmbDocumentScanner.ItemsSource = AppEnums.DocumentScanner.Values;
+            cmbDocumentScanner.SelectedIndex = (int)editrow.DocumentScanner;
         }
 
         private void ConfigureFunctionalityPage_Loaded(object sender, RoutedEventArgs e)
@@ -107,5 +111,8 @@ namespace UnicontaClient.Pages.CustomPage
         {
             cbStorageOnAll.IsEnabled = HasStorage;
         }
+
+        private void cmbDocumentScanner_SelectedIndexChanged(object sender, RoutedEventArgs e) =>
+            editrow.DocumentScanner = (PayableDocumentScanners)cmbDocumentScanner.SelectedIndex;
     }
 }

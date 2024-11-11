@@ -57,6 +57,9 @@ x:Class="UnicontaClient.Pages.CustomPage.BankStatementPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="KeepOriginalText" x:Name="liKeepOriginalText">
                         <CorasauControls:CheckEditor x:Name="chkKeepOriginalText" IsChecked="{Binding KeepOriginalText,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="FindDC" x:Name="liFindDC">
+                        <CorasauControls:CheckEditor x:Name="chkFindDC" IsChecked="{Binding FindDC,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpBank" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Bank}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem FieldName="BankAccountPart1" x:Name="liBankAccountPart1">

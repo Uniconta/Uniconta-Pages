@@ -58,65 +58,52 @@ namespace UnicontaClient.Pages.CustomPage
 
         public Company Company { get; set; }
         public static int Type { get; set; }
-        public static int BankService { get; set; }
-        public string BankServiceName
-        {
-            get
-            {
-                if (BankService == 1) return BANKCONNECT;
-                else if (BankService == 2) return NORDEA;
-                else return AIIA;
-            }
-        }
+        private int BankService;
+        public string BankServiceName;
 
         #region Variables
         private string[] BankServiceLst;
+        bool isAiia;
         #endregion
 
         #region Constants
         private const string BANKCONNECT = "Bank Connect";
         private const string NORDEA = "Nordea";
-        private const string AIIA = "Aiia";
+        private const string AIIA = "AutoBanking";
         #endregion
 
 
         CrudAPI api;
 
-        public CWBankAPI(CrudAPI api, BankStatementClient bankStatement)
+        public CWBankAPI(CrudAPI api, BankStatementClient bankStatement, int bankService)
         {
             InitializeComponent();
             this.api = api;
             ServiceId = bankStatement.ServiceId;
+           
+            BankServiceLst = new string[] { AIIA, BANKCONNECT, NORDEA };
+            BankService = bankService;
+            BankServiceName = BankServiceLst[BankService];
 
-            leBankAccount.api = api;
+            string accountText = null;
+            isAiia = bankService == 0;
+            if (isAiia)
+                accountText = string.Concat(" ", Uniconta.ClientTools.Localization.lookup("Account"), ": ", bankStatement.Account," - ",bankStatement.Name);
+
             BankAccount = bankStatement._Account;
             cmbBank.ItemsSource = AppEnums.Bank.Values;
+           
+            cmbBankAPIFunction.ItemsSource = new string[] { Uniconta.ClientTools.Localization.lookup("Register"), Uniconta.ClientTools.Localization.lookup("Connect"), Uniconta.ClientTools.Localization.lookup("Unregister"), Uniconta.ClientTools.Localization.lookup("WebServiceInfo") };
 
-            BankServiceLst = new string[] { AIIA, BANKCONNECT, NORDEA };
-            cmbBankService.ItemsSource = BankServiceLst;
-
-            cmbBankService.SelectedIndex = BankService;
-            cmbBankAPIFunction.ItemsSource = new string[] { Uniconta.ClientTools.Localization.lookup("Register"), Uniconta.ClientTools.Localization.lookup("Connect"), Uniconta.ClientTools.Localization.lookup("Unregister"),
-                                                            Uniconta.ClientTools.Localization.lookup("Sync"), string.Concat(Uniconta.ClientTools.Localization.lookup("Download"), " ", Uniconta.ClientTools.Localization.lookup("Transactions").ToLower()),
-                                                            Uniconta.ClientTools.Localization.lookup("WebServiceInfo"), Uniconta.ClientTools.Localization.lookup("Settings") };
-
-            if (bankStatement._Status == 2)
-            {
-                BankService = 0;
-                Type = 3;
-            }
-            else
-            {
-                cmbBankAPIFunction.SelectedIndex = Type;
-                cmbBank.SelectedIndex = 0;
-            }
+            cmbBankAPIFunction.SelectedIndex = Type;
+            cmbBank.SelectedIndex = 0;
 
             FromDate = FromDate != DateTime.MinValue ? FromDate : BasePage.GetSystemDefaultDate();
             ToDate = ToDate != DateTime.MinValue ? ToDate : BasePage.GetSystemDefaultDate();
 
             this.DataContext = this;
 
-            this.Title = Uniconta.ClientTools.Localization.lookup("FinancialInstitution");
+            this.Title = string.Concat(Uniconta.ClientTools.Localization.lookup("FinancialInstitution")," (", BankServiceName,")", accountText);
             this.Loaded += CW_Loaded;
             SetFields();
             this.Loaded += CWSelectCompany_Loaded;
@@ -155,37 +142,12 @@ namespace UnicontaClient.Pages.CustomPage
                                                           "Bankdata: ", Uniconta.ClientTools.Localization.lookup("ServiceId"), " = 13 ", Uniconta.ClientTools.Localization.lookup("Digits").ToLower(), Environment.NewLine,
                                                           "BEC: ", Uniconta.ClientTools.Localization.lookup("ServiceId"), " = 11 ", Uniconta.ClientTools.Localization.lookup("Digits").ToLower(), Environment.NewLine,
                                                           "SDC: ", Uniconta.ClientTools.Localization.lookup("ServiceId"), " = 26 ", Uniconta.ClientTools.Localization.lookup("Digits").ToLower(), Environment.NewLine);
-                    else if (BankService == 2)
-                        txtDescription.Text = String.Concat(string.Format(Uniconta.ClientTools.Localization.lookup("RegisterCompanyTo"), NORDEA), Environment.NewLine, NORDEA, ": ", Uniconta.ClientTools.Localization.lookup("ServiceId"), " = 10 ", Uniconta.ClientTools.Localization.lookup("Digits").ToLower());
                     else
-                    {
-                        txtDescription.Text = StringBuilderReuse.Create().Append(string.Format(Uniconta.ClientTools.Localization.lookup("RegisterCompanyTo"), AIIA)).AppendLine().AppendLine()
-                            .Append(Uniconta.ClientTools.Localization.lookup("AiiaDialogRegister1")).AppendLine(":")
-                            .Append("- ").AppendLine(Uniconta.ClientTools.Localization.lookup("AiiaDialogRegister2"))
-                            .Append("- ").AppendLine(Uniconta.ClientTools.Localization.lookup("AiiaDialogRegister3")).ToStringAndRelease();
-                    }
+                        txtDescription.Text = String.Concat(string.Format(Uniconta.ClientTools.Localization.lookup("RegisterCompanyTo"), NORDEA), Environment.NewLine, NORDEA, ": ", Uniconta.ClientTools.Localization.lookup("ServiceId"), " = 10 ", Uniconta.ClientTools.Localization.lookup("Digits").ToLower());
                     break;
-                case 1: //Connect
-                    txtDescription.Text = BankService == 0 ? Uniconta.ClientTools.Localization.lookup("FunctionNotSupported") : Uniconta.ClientTools.Localization.lookup("AddCompanyToConnection");
-                    break;
-                case 2: //Unregister
-                    txtDescription.Text = string.Concat(Uniconta.ClientTools.Localization.lookup("Unregister"), " ", Uniconta.ClientTools.Localization.lookup("Connection").ToLower());
-                    break;
-                case 3: //Sync
-                    txtDescription.Text = BankService == 0 ?
-                        StringBuilderReuse.Create().Append(Uniconta.ClientTools.Localization.lookup("SynchronizeAiiaWithBank")).AppendLine().AppendLine()
-                            .Append(Uniconta.ClientTools.Localization.lookup("AiiaDialogSync1")).AppendLine(":")
-                            .Append("- ").AppendLine(Uniconta.ClientTools.Localization.lookup("AiiaDialogSync2")).ToStringAndRelease() : Uniconta.ClientTools.Localization.lookup("FunctionNotSupported");
-                    break;
-                case 4: //OnDemand
-                    txtDescription.Text = BankService == 0 ? Uniconta.ClientTools.Localization.lookup("RetrieveBankTransPeriod") : Uniconta.ClientTools.Localization.lookup("FunctionNotSupported");
-                    break;
-                case 5: //Service Info
-                    txtDescription.Text = string.Format(Uniconta.ClientTools.Localization.lookup("InfoAgreement"), BankServiceLst[BankService]);
-                    break;
-                case 6: //Settings
-                    txtDescription.Text = BankService == 0 ? string.Concat("Aiia Hub", Environment.NewLine, Uniconta.ClientTools.Localization.lookup("AiiaConsentOverview")) : Uniconta.ClientTools.Localization.lookup("FunctionNotSupported");
-                    break;
+                case 1: txtDescription.Text = Uniconta.ClientTools.Localization.lookup("AddCompanyToConnection"); break;//Connect
+                case 2: txtDescription.Text = string.Concat(Uniconta.ClientTools.Localization.lookup("Unregister"), " ", Uniconta.ClientTools.Localization.lookup("Connection").ToLower()); break;//Unregister
+                case 3: txtDescription.Text = string.Format(Uniconta.ClientTools.Localization.lookup("InfoAgreement"), BankServiceLst[BankService]); break;//Service Info
             }
         }
 
@@ -205,28 +167,25 @@ namespace UnicontaClient.Pages.CustomPage
             string errText = null;
             Bank = cmbBank.SelectedIndex > 0 ? (Bank)cmbBank.SelectedIndex : Bank.None;
 
-            if (Type == 0)
-            {
-                if (BankService != 0)
-                {
-                    if (Bank == Bank.None)
-                        errText = fieldCannotBeEmpty("FinancialInstitution");
-                    else if (string.IsNullOrEmpty(ServiceId))
-                        errText = fieldCannotBeEmpty("ServiceId");
-                    else if (Bank != Bank.Nordea && string.IsNullOrEmpty(ActivationCode))
-                        errText = fieldCannotBeEmpty("ActivationCode");
-                }
-            }
-            else if (Type == 4)
+            if (isAiia)
             {
                 if (ToDate > DateTime.Now.Date)
                     errText = string.Format(Uniconta.ClientTools.Localization.lookup("ValueMayNoBeGreater"), Uniconta.ClientTools.Localization.lookup("ToDate"), Uniconta.ClientTools.Localization.lookup("TodaysDate").ToLower());
                 if (FromDate < DateTime.Now.Date.AddYears(-2))
                     errText = string.Format(Uniconta.ClientTools.Localization.lookup("PleaseNotOBJ"), string.Concat(Uniconta.ClientTools.Localization.lookup("ToDate"), " >= ", DateTime.Now.Date.AddYears(-2).ToString("dd.MM.yyyy")));
             }
+            else if (Type == 0)
+            {
+                if (Bank == Bank.None)
+                    errText = fieldCannotBeEmpty("FinancialInstitution");
+                else if (string.IsNullOrEmpty(ServiceId))
+                    errText = fieldCannotBeEmpty("ServiceId");
+                else if (Bank != Bank.Nordea && string.IsNullOrEmpty(ActivationCode))
+                    errText = fieldCannotBeEmpty("ActivationCode");
+            }
             else
             {
-                if (Type != 6 && Type != 3 && BankService != 0 && string.IsNullOrEmpty(ServiceId))
+                if (string.IsNullOrEmpty(ServiceId))
                     errText = fieldCannotBeEmpty("ServiceId");
             }
 
@@ -259,19 +218,33 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void SetFields()
         {
+            if (BankService == 0)
+            {
+                lgParm.Visibility = Visibility.Visible;
+                lgType.Visibility = Visibility.Collapsed;
+                lgCustomer.Visibility = Visibility.Collapsed;
+                liBank.Visibility = Visibility.Collapsed;
+                liCompany.Visibility = Visibility.Collapsed;
+                lgConnect.Visibility = Visibility.Collapsed;
+
+                txtDescription.Text = Uniconta.ClientTools.Localization.lookup("RetrieveBankTransPeriod");
+                return;
+            }
+            
             SetDescription();
+
             lgParm.Visibility = Visibility.Visible;
             lgCustomer.Visibility = Visibility.Visible;
             lgConnect.Visibility = Visibility.Visible;
 
-            //Tilmeld=0, Tilknyt=1, Afmeld=2, Sync=3, Transactions=4, Info=5, Settings=6
+            //Tilmeld=0, Tilknyt=1, Afmeld=2, Info=3
             if (Type == 0)
             {
                 liBank.Visibility = Visibility.Visible;
                 liActivationCode.Visibility = Visibility.Visible;
                 liCompany.Visibility = Visibility.Collapsed;
             }
-            else if (Type == 2 || Type == 5)
+            else if (Type == 2 || Type == 3)
             {
                 lgConnect.Visibility = Visibility.Collapsed;
             }
@@ -280,18 +253,6 @@ namespace UnicontaClient.Pages.CustomPage
                 liBank.Visibility = Visibility.Collapsed;
                 liCompany.Visibility = Visibility.Visible;
                 liActivationCode.Visibility = Visibility.Collapsed;
-            }
-            else if (Type == 4)
-            {
-                lgCustomer.Visibility = Visibility.Collapsed;
-                liBank.Visibility = Visibility.Collapsed;
-                liCompany.Visibility = Visibility.Collapsed;
-                lgConnect.Visibility = Visibility.Collapsed;
-            }
-            else if (Type == 6 || Type == 3)
-            {
-                lgConnect.Visibility = Visibility.Collapsed;
-                lgCustomer.Visibility = Visibility.Collapsed;
             }
 
             if (BankService == 1)
@@ -306,15 +267,6 @@ namespace UnicontaClient.Pages.CustomPage
                 cmbBank.SelectedIndex = (int)Bank.Nordea;
                 liBank.Visibility = Visibility.Collapsed;
                 liActivationCode.Visibility = Visibility.Collapsed;
-                lgConnect.Visibility = Type == 1 ? Visibility.Visible : Visibility.Collapsed;
-                liCompany.Visibility = Type == 1 ? Visibility.Visible : Visibility.Collapsed;
-            }
-            else if (BankService == 0)
-            {
-                liBank.Visibility = Visibility.Collapsed;
-                liActivationCode.Visibility = Visibility.Collapsed;
-                lgParm.Visibility = Type == 4 ? Visibility.Visible : Visibility.Collapsed;
-                lgCustomer.Visibility = Visibility.Collapsed;
                 lgConnect.Visibility = Type == 1 ? Visibility.Visible : Visibility.Collapsed;
                 liCompany.Visibility = Type == 1 ? Visibility.Visible : Visibility.Collapsed;
             }

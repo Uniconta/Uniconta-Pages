@@ -149,6 +149,7 @@ namespace UnicontaClient.Controls.Dialogs
                         voucher._Currency = vouchersClient._Currency;
                         voucher._CreditorAccount = vouchersClient._CreditorAccount;
                         voucher._PurchaseNumber = vouchersClient._PurchaseNumber;
+                        voucher._ScanDoc = true;
                         multiVouchersClient[iCtr] = voucher;
                     }
 

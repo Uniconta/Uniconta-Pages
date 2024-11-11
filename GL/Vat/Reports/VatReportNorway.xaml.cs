@@ -96,7 +96,7 @@ namespace UnicontaClient.Pages.CustomPage
                             break;
                     case 3: s = "Innenlands omsetning og uttak, og beregnet avgift 25 %"; break;
                     case 4: s = "Innenlands omsetning og uttak, og beregnet avgift 15 %"; break;
-                    case 5: s = "Innenlands omsetning og uttak, og beregnet avgift 10 %"; break;
+                    case 5: s = "Innenlands omsetning og uttak, og beregnet avgift 12 %"; break;
                     case 6: s = "Innenlands omsetning og uttak fritatt for merverdiavgift"; break;
                     case 7: s = "Innenlands omsetning med omvendt avgiftsplikt"; break;
                     case 8: s = "Utførsel av varer og tjenester fritatt for merverdiavgift"; break;
@@ -107,7 +107,7 @@ namespace UnicontaClient.Pages.CustomPage
                     case 13: s = "Innenlands kjøp av varer og tjenester, og beregnet avgift 25 %"; break;
                     case 14: s = "Fradragsberettiget innenlands inngående avgift 25 %"; break;
                     case 15: s = "Fradragsberettiget innenlands inngående avgift 15 %"; break;
-                    case 16: s = "Fradragsberettiget innenlands inngående avgift 10 %"; break;
+                    case 16: s = "Fradragsberettiget innenlands inngående avgift 12 %"; break;
                     case 17: s = "Fradragsberettiget innførselsmerverdiavgift 25 %"; break;
                     case 18: s = "Fradragsberettiget innførselsmerverdiavgift 15 %"; break;
                     case 19: s = "Avgift å betale / Avgift til gode";

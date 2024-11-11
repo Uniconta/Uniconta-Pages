@@ -34,8 +34,10 @@ x:Class="UnicontaClient.Pages.CustomPage.ChangeNotificationPage"
                         </local:CorasauDataGridTemplateColumnClient.EditSettings>
                     </local:CorasauDataGridTemplateColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Argument" Width="150"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="UsePost" Width="80"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="HasError" Width="80"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="ErrorMessage" Width="300"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="LastEvent" Width="300" ShowSec="True"/>
                 </local:ChangeNotificationDataGrid.Columns>
             </local:ChangeNotificationDataGrid>
         </Grid>

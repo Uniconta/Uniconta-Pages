@@ -71,6 +71,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryHierarchicalBOMStatement"
                     <local:CorasauDataGridTemplateColumnClient x:Name="ShowOnInvoice" AllowEditing="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="ShowOnPacknote" AllowEditing="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="ShowOnPicklist" AllowEditing="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ShowOnConfirmation" AllowEditing="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="InclValueOnInvoice" AllowEditing="False"/>
                 </local:InventoryHierarchicalBOMGrid.Columns>
             </local:InventoryHierarchicalBOMGrid>

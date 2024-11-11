@@ -166,19 +166,26 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         if (row.Paid && row.AmountPaid > 0)
                         {
-                            glLines.Add(new GLDailyJournalLineClient()
+                            var rec = new GLDailyJournalLineClient()
                             {
                                 _Account = row.Account,
                                 _AccountType = (byte)GLJournalAccountType.Debtor,
                                 _Credit = row.AmountPaid,
-                                _Date = row.DatePaid,
+                                _Date = row.DatePaid != DateTime.MinValue ? row.DatePaid : postingDialog.PayDate,
                                 _OffsetAccount = postingDialog.Bank,
                                 _Invoice = row.InvoiceAN,
                                 _Settlements = NumberConvert.ToString(row.Trans.RowId),
                                 _SettleValue = SettleValueType.RowId,
                                 _UsedCachDiscount = row.CashDiscountGiven,
                                 _Approved = true
-                            });
+                            };
+                            if (row.Currency != null && row.AmountOpenCur != null)
+                            {
+                                rec._Currency = (byte)row.Currency.GetValueOrDefault();
+                                rec._CreditCur = row.AmountOpenCur.GetValueOrDefault();
+                                rec._Credit = 0;
+                            }
+                            glLines.Add(rec);
                         }
                     }
 
@@ -186,7 +193,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (postingDialog.IsSimulation)
                         task = new PostingAPI(api).CheckDailyJournal(masterRecord, postingDialog.PayDate, true, new GLTransClientTotal(), 0, false, glLines);
                     else
-                        task = new PostingAPI(api).PostDailyJournal(masterRecord, postingDialog.PayDate, postingDialog.comments, 0, false, glLines);
+                        task = new PostingAPI(api).PostDailyJournal(masterRecord, postingDialog.PayDate, postingDialog.Comments, 0, false, glLines);
 
                     var postingResult = await task;
 

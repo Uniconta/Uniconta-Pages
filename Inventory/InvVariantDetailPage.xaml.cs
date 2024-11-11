@@ -210,6 +210,10 @@ namespace UnicontaClient.Pages.CustomPage
                         AddDockItem(TabControls.InvBOMExplodePage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ExplodedBOM"), selectedItem._Item));
                     }
                     break;
+                case "Packaging":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.InvPackagingProductPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Packaging"), selectedItem._Item));
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;

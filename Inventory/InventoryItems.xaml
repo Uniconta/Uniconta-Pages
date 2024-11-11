@@ -193,6 +193,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryItems"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PurchaseMin" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryTime" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="UNSPSC" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LastMovement" Visible="False" />
                 </localPage:InventoryItemsGrid.Columns>
             </localPage:InventoryItemsGrid>
         </CorasauControls:BusyIndicator>

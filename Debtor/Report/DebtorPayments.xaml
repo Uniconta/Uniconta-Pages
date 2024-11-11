@@ -3,12 +3,9 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorPayments"
         xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
-        mc:Ignorable="d"   xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
-        xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
-        d:DesignHeight="300" d:DesignWidth="400">
+        xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+        xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools">
 
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
@@ -98,6 +95,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorPayments"
                     <local:CorasauDataGridTemplateColumnClient x:Name="DocumentRef" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="FromCreditor" Visible="False" ShowCheckBoxInHeader="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="GraceDate" Visible="False" />
                 </local:DebtorPaymentsGrid.Columns>
                 <local:DebtorPaymentsGrid.TotalSummary>
                     <local:SumColumn FieldName="Debit" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>

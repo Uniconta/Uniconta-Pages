@@ -56,7 +56,7 @@ namespace UnicontaClient.Pages.CustomPage
         private double sumOfAmount;
         private bool compressed;
         static DateTime DefaultFromDate, DefaultToDate;
-
+        static bool DefaultVIES;
 
         private void InitPage()
         {
@@ -73,7 +73,7 @@ namespace UnicontaClient.Pages.CustomPage
             companyRegNo = Regex.Replace(api.CompanyEntity._Id ?? string.Empty, "[^0-9]", "");
             companyCountryId = api.CompanyEntity._CountryId;
 
-            euSalesHelper = new CreateEUSaleWithoutVATFile(api, companyRegNo, companyCountryId);
+            euSalesHelper = new CreateEUSaleWithoutVATFile(api, companyRegNo, companyCountryId, DefaultVIES);
 
             if (DefaultFromDate == DateTime.MinValue)
             {
@@ -89,6 +89,7 @@ namespace UnicontaClient.Pages.CustomPage
             txtDateTo.DateTime = DefaultToDate;
             txtDateFrm.DateTime = DefaultFromDate;
             SetDateTime(txtDateFrm, txtDateTo);
+            checkVIES.IsChecked = DefaultVIES;
 
             glVatCache = api.GetCache<Uniconta.DataModel.GLVat>();
             glVatTypeCache = api.GetCache<Uniconta.DataModel.GLVatType>();
@@ -239,7 +240,8 @@ namespace UnicontaClient.Pages.CustomPage
             ItemOrServiceType itemOrService = ItemOrServiceType.None;
             string lastVat = null;
             DebtorClient debtor = null;
-            string debtorCVR = null;
+            string debtorFileCVR = null;
+
             bool DebtorOk = false;
 
             foreach (var invLine in listOfDebInvLines)
@@ -258,7 +260,7 @@ namespace UnicontaClient.Pages.CustomPage
                     }
 
                     DebtorOk = true;
-                    debtorCVR = PrepareVIES(debtor);
+                    debtorFileCVR = PrepareVIES(debtor);
                 }
 
                 if (! DebtorOk)
@@ -270,6 +272,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var type = glVatCache.Get(lastVat)?._TypeSales;
                     var vatType = glVatTypeCache.Get(type);
 
+                    triangularTrade = false;
                     if (companyCountryId == CountryCode.Denmark && type == "s7")
                         triangularTrade = true;
                     else if (vatType != null)
@@ -294,7 +297,7 @@ namespace UnicontaClient.Pages.CustomPage
                 invoice._Vat = invLine._Vat;
                 invoice._Amount = -netAmount;
                 invoice._IsTriangularTrade = triangularTrade;
-                invoice._DebtorRegNoFile = debtorCVR;
+                invoice._DebtorRegNoFile = debtorFileCVR;
                 invoice._ItemOrService = itemOrService;
 
                 sumOfAmount += invoice._Amount;
@@ -311,16 +314,25 @@ namespace UnicontaClient.Pages.CustomPage
             var debtorCVR = debtor._LegalIdent;
             if (!string.IsNullOrWhiteSpace(debtorCVR))
             {
+                debtorCVR = Regex.Replace(debtorCVR, "[^a-zA-Z0-9]", string.Empty);
                 var cvr = debtorCVR;
-                if (Char.IsLetter(cvr.FirstOrDefault()) && cvr.Length > 3)
+                if (cvr.Length > 3)
                 {
-                    var cCode = cvr.Substring(0, 2);
-                    cvr = cvr.Substring(2, cvr.Length - 2);
-                    if (Enum.TryParse(cCode, out CountryISOCode isoCode))
-                        twolettercode = cCode;
+                    if (Char.IsLetter(cvr.FirstOrDefault()))
+                    {
+                        var cCode = cvr.Substring(0, 2);
+                        cvr = cvr.Substring(2, cvr.Length - 2);
 
-                    if (twolettercode != null && Country2Language.IsEU(debtor._Country))
-                        debtorCVR = cvr;
+                        if (cCode == IntraHelper.CTRYCODE_EXTENDED_UK ||
+                           cCode == IntraHelper.CTRYCODE_EXTENDED_GREECE ||
+                           cCode == IntraHelper.CTRYCODE_EXTENDED_SERBIA)
+                            twolettercode = cCode;
+                        else if (Enum.TryParse(cCode, out CountryISOCode isoCode))
+                            twolettercode = cCode;
+
+                        if (twolettercode != null && Country2Language.IsEU(debtor._Country))
+                            debtorCVR = cvr;
+                    }
 
                     switch (debtor._Country)
                     {
@@ -333,7 +345,6 @@ namespace UnicontaClient.Pages.CustomPage
             }
             return debtorCVR;
         }
-
 
         private bool CallPrevalidate()
         {
@@ -467,6 +478,13 @@ namespace UnicontaClient.Pages.CustomPage
         {
             btnSearch();
             return true;
+        }
+
+        private void CheckVIES_Reaction(object sender, RoutedEventArgs e)
+        {
+            euSalesHelper.ClearVIESCache();
+            DefaultVIES = checkVIES.IsChecked.GetValueOrDefault();
+            euSalesHelper.validateVIES = DefaultVIES;
         }
     }
 }

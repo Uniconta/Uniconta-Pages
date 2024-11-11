@@ -133,6 +133,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CrmProspectPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="ItemNameGroup" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="LayoutGroup" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="IndustryCode" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="CompanyState" Visible="False"/>
                     <local:ComboBoxColumnClient x:Name="UserLanguage" Visible="False"/>
                     <local:ComboBoxColumnClient x:Name="VatZone" Width="60" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Blocked" Visible="False"/>

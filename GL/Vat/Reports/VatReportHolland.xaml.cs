@@ -161,12 +161,12 @@ namespace UnicontaClient.Pages.CustomPage
                     case 18: s = "Voorbelasting"; opr = "5b";
                         sum19 -= rec._Amount;
                         break; 
-                    case 19: s = "Subtotal: bereken 5a min 5b.";
+                    case 19: s = "Subtotaal berekenen 5a min 5b";
                         sum = sum19;
                         rec._Amount = sum;
                         SumIsneg = (sum < 0d);
                         opr = "5c"; break;
-                    case 20: s = "Vermindering volges de kleindondernemersregeling"; opr = "5d"; break;
+                    case 20: s = "Vermindering volgens de kleinondernemersregeling"; opr = "5d"; break;
                     case 21: s = "Schatting vorige aangifte(n)"; opr = "5e"; break;
                     case 22: s = "Schatting deze aangifte"; opr = "5f"; break;
                     case 23:

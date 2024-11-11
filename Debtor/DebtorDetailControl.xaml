@@ -177,8 +177,8 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorDetailControl"
                         <CorasauControls:TextEditor x:Name="leShipment" Text="{Binding Shipment}" IsReadOnly="True" />
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="DeliveryTerm" x:Name="liDeliveryTerm" Visibility="{Binding ElementName=shipmentItem, Path=Visibility}">
-                        <CorasauControls:LookupEditor x:Name="leDeliveryTerm" Text="{Binding DeliveryTerm}" IsReadOnly="True">
-                        </CorasauControls:LookupEditor>
+                        <CorasauControls:TextEditor x:Name="leDeliveryTerm" Text="{Binding DeliveryTerm}" IsReadOnly="True">
+                        </CorasauControls:TextEditor>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="LayoutGroup">
                         <CorasauControls:TextEditor x:Name="LayoutGrouplookupeditior" Text="{Binding LayoutGroup}" IsReadOnly="True" />

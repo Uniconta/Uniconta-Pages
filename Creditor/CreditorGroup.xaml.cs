@@ -116,7 +116,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (selectedItem == null)
                 return;
             var creditorGrp = Activator.CreateInstance(selectedItem.GetType()) as CreditorGroupClient;
-            CorasauDataGrid.CopyAndClearRowId(selectedItem, creditorGrp);
+            CorasauDataGrid.CopyAndClearRowId(selectedItem, creditorGrp, api);
             var parms = new object[2] { creditorGrp, false };
             AddDockItem(TabControls.CreditorGroupPage2, parms, Uniconta.ClientTools.Localization.lookup("CreditorGroup"), "Add_16x16");
         }

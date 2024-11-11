@@ -72,7 +72,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrdersPage2"
                         </CorasauControls:LookupEditor>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="OrderNumber" x:Name="liOrderNumber">
-                        <CorasauControls:IntegerEditor EditValue="{Binding OrderNumber,Mode=TwoWay}" SetMask="false"/>
+                        <CorasauControls:IntegerEditor EditValue="{Binding OrderNumber,Mode=TwoWay}" SetMask="false" LostFocus="OrderNumber_LostFocus"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="DeliveryDate" x:Name="liDeliveryDate">
                         <CorasauControls:DateEditor x:Name="deDeLiveryDate" EditValue="{Binding DeliveryDate,Mode=TwoWay}"/>
@@ -132,7 +132,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrdersPage2"
                         </CorasauControls:LookupEditor>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="Offer" x:Name="liOffer">
-                        <CorasauControls:IntegerEditor x:Name="txtOffer" EditValue="{Binding Offer,Mode=TwoWay}">
+                        <CorasauControls:IntegerEditor x:Name="txtOffer" EditValue="{Binding Offer,Mode=TwoWay}" SetMask="False">
                         </CorasauControls:IntegerEditor>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
@@ -203,6 +203,11 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrdersPage2"
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="DeliveryIsInvoiceAddress" x:Name="liDeliveryIsInvoiceAddress">
                         <CorasauControls:CheckEditor x:Name="chkDeliveryIsInvoiceAddress" IsChecked="{Binding DeliveryIsInvoiceAddress, Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="ESGGroup"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ESG}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="450" >
+                    <CorasauControls:CorasauLayoutItem FieldName="PackagingConsumer" x:Name="liPackagingConsumer">
+                        <CorasauControls:ComboBoxEditor SelectedItem="{Binding PackagingConsumer,Mode=TwoWay}" x:Name="cmbPackagingConsumer"/>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="usedim"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Dimensions}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="450" >
@@ -282,7 +287,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrdersPage2"
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpApproval"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Approval}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="450" >
                     <CorasauControls:CorasauLayoutItem x:Name="liApprover" FieldName="Approver">
-                        <CorasauControls:LookupEditor x:Name="leApprover" EditValue="{Binding Approver,Mode=TwoWay}" />
+                        <CorasauControls:LookupEditor x:Name="leApprover" EditValue="{Binding Approver,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="Approved" x:Name="liApproved">
                         <CorasauControls:CheckEditor  IsChecked="{Binding Approved,Mode=TwoWay}"/>

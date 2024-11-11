@@ -84,12 +84,6 @@ namespace UnicontaClient.Pages.CustomPage
 
             RemoveMenuItem();
 
-            if (!Enum.IsDefined(typeof(PeppolSupportedCountries), (byte)country))
-            {
-                liPymtCodeOpt.Visibility = Visibility.Collapsed;
-                liOIOUBLSendOnServer.Visibility = Visibility.Collapsed;
-            }
-
             cmbSendAppRemdr.ItemsSource = AppEnums.Weekdays.Values.ToList();
             SetOwnerName();
         }

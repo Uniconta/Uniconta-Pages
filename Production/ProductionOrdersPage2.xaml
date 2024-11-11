@@ -81,7 +81,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrdersPage2"
                         </CorasauControls:LookupEditor>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="ProductionNumber" x:Name="liProductionNumber">
-                        <CorasauControls:IntegerEditor EditValue="{Binding ProductionNumber,Mode=TwoWay}" SetMask="false"/>
+                        <CorasauControls:IntegerEditor EditValue="{Binding ProductionNumber,Mode=TwoWay}" SetMask="false" LostFocus="OrderNumber_LostFocus"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="DeliveryDate" x:Name="liDeliveryDate">
                         <CorasauControls:DateEditor x:Name="deDeLiveryDate" EditValue="{Binding DeliveryDate,Mode=TwoWay}"/>

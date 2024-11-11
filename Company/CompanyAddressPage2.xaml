@@ -53,6 +53,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CompanyAddressPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="ContactEmail" x:Name="liContactEmail" Style="{StaticResource LayoutItemsstyle}" ButtonClicked="Email_ButtonClicked" ButtonContent="&#x2709;" Padding="0">
                         <CorasauControls:TextEditor x:Name="txtEmail" Text="{Binding ContactEmail,Mode=TwoWay}" MaskType="RegEx" Mask="{StaticResource EmailValidationRegx}"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Default" x:Name="liDefault">
+                        <CorasauControls:CheckEditor  IsChecked="{Binding Default,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutGroup>
         </CorasauControls:CorasauLayoutControl>

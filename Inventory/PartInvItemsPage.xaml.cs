@@ -215,11 +215,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             bool showFields = (Invitem != null && Invitem._ItemType == (byte)Uniconta.DataModel.ItemType.BOM);
 
-            ShowOnInvoice.Visible = showFields;
-            ShowOnPacknote.Visible = showFields;
-            InclValueOnInvoice.Visible = showFields;
-            ShowOnPicklist.Visible = showFields;
-
+            ShowOnInvoice.Visible = ShowOnPacknote.Visible = InclValueOnInvoice.Visible = ShowOnPicklist.Visible = ShowOnConfirmation.Visible = showFields;
             Utility.SetupVariants(api, colVariant, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
         }
 

@@ -25,7 +25,7 @@ using Uniconta.DataModel;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
-    
+
     public partial class CreditorPaymentFormatPage2 : FormBasePage
     {
         CreditorPaymentFormatClient editrow;
@@ -60,22 +60,19 @@ namespace UnicontaClient.Pages.CustomPage
         {
             InitializeComponent();
             InitPage(crudApi);
-#if !SILVERLIGHT
             FocusManager.SetFocusedElement(txtFormat, txtFormat);
-#endif
         }
 
         void InitPage(CrudAPI crudapi)
         {
             layoutControl = layoutItems;
-            cmbPaymentMethod.ItemsSource = Enum.GetValues(typeof(ExportFormatType));
             cmbPaymentGrpg.ItemsSource = AppEnums.PaymentGroupingType.Values;
             leBankAccount.api = crudapi;
             leJournal.api = crudapi;
             if (LoadedRow == null && editrow == null)
             {
                 frmRibbon.DisableButtons(new string[] { "Delete" });
-                editrow =CreateNew() as CreditorPaymentFormatClient;
+                editrow = CreateNew() as CreditorPaymentFormatClient;
             }
             layoutItems.DataContext = editrow;
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
@@ -85,14 +82,15 @@ namespace UnicontaClient.Pages.CustomPage
         {
             frmRibbon_BaseActions(ActionType);
         }
-         
+
         protected override void LoadCacheInBackGround()
         {
             LoadType(typeof(Uniconta.DataModel.GLAccount));
         }
         private void btnOptions_Click(object sender, RoutedEventArgs e)
         {
-            switch (editrow.PaymentMethod)
+            var paymentMethod = (ExportFormatType)editrow._ExportFormat;
+            switch (paymentMethod)
             {
                 case ExportFormatType.NETS_Norge:
                     CWNets_NorgePaymentSetup dialogNets_Norg = new CWNets_NorgePaymentSetup(this.api, editrow);
@@ -103,7 +101,6 @@ namespace UnicontaClient.Pages.CustomPage
                     };
                     dialogNets_Norg.Show();
                     break;
-#if !SILVERLIGHT
                 case ExportFormatType.ISO20022_DK:
                     CWISODK_PaymentSetup dialogISODK = new CWISODK_PaymentSetup(this.api, editrow);
                     dialogISODK.Closing += delegate
@@ -133,7 +130,7 @@ namespace UnicontaClient.Pages.CustomPage
                     };
                     dialogISONL.Show();
                     break;
-                
+
                 case ExportFormatType.ISO20022_DE:
                     CWISODE_PaymentSetup dialogISODE = new CWISODE_PaymentSetup(this.api, editrow);
                     dialogISODE.Closing += delegate
@@ -190,7 +187,6 @@ namespace UnicontaClient.Pages.CustomPage
                     };
                     dialogISOCH.Show();
                     break;
-#endif
                 default:
                     UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NoOptions"), Uniconta.ClientTools.Localization.lookup("Information"));
                     break;

@@ -40,7 +40,6 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorNHRLookup"
                     </local:CorasauDataGridTemplateColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Status" ReadOnly="True" Width="150"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="StatusInfo" ReadOnly="True" Width="650"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="OnlyOIORASP" Visible="False" ReadOnly="True" Width="70"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="EndPointRegisterName" Visible="False" ReadOnly="True" Width="150"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="EndPointURL" Visible="False" ReadOnly="True" Width="300"/>
                 </local:DebtorNHRLookupGrid.Columns>

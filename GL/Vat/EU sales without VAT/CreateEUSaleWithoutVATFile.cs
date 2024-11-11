@@ -36,14 +36,16 @@ namespace UnicontaClient.Pages.CustomPage
         private CrudAPI api;
         private string companyRegNo;
         private CountryCode companyCountryId;
+        public bool validateVIES;
         private Dictionary<string, bool> dictVatNumber;
         #endregion
 
-        public CreateEUSaleWithoutVATFile(CrudAPI api, string companyRegNo, CountryCode companyCountryId)
+        public CreateEUSaleWithoutVATFile(CrudAPI api, string companyRegNo, CountryCode companyCountryId, bool validateVIES)
         {
             this.api = api;
             this.companyRegNo = companyRegNo;
             this.companyCountryId = companyCountryId;
+            this.validateVIES = validateVIES;
             dictVatNumber = new Dictionary<string, bool>();
         }
 
@@ -242,7 +244,7 @@ namespace UnicontaClient.Pages.CustomPage
                         euSale.SystemInfo += Environment.NewLine + string.Format(Localization.lookup("FieldTooLongOBJ"), Localization.lookup("CompanyRegNo"));
                 }
 
-                if (!hasErrors)
+                if (!hasErrors && validateVIES && euSale._DebtorRegNoFile != null)
                 {
                     bool validVatNumber = false;
                     if (!dictVatNumber.TryGetValue(euSale._DebtorRegNoFile, out validVatNumber))
@@ -468,6 +470,10 @@ namespace UnicontaClient.Pages.CustomPage
             return String.Format("{0} : {1}",
                     Uniconta.ClientTools.Localization.lookup("FieldCannotBeEmpty"),
                     Uniconta.ClientTools.Localization.lookup(field));
+        }
+        public void ClearVIESCache()
+        {
+            dictVatNumber.Clear();
         }
     }
 

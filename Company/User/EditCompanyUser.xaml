@@ -51,6 +51,9 @@ x:Class="UnicontaClient.Pages.CustomPage.EditCompanyUser"
                     <CorasauControls:CorasauLayoutItem FieldName="HideCostPrice" x:Name="liHideCostPrice">
                         <CorasauControls:CheckEditor IsChecked="{Binding HideCostPrice,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="HideInternalProject" x:Name="liHideInternalProject">
+                        <CorasauControls:CheckEditor IsChecked="{Binding HideInternalProject,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="BlockLayout" x:Name="liBlockLayout">
                         <CorasauControls:CheckEditor IsChecked="{Binding BlockLayout,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>

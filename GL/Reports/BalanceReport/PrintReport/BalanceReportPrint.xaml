@@ -4,17 +4,16 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReportPrint"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" 
     xmlns:dxp="http://schemas.devexpress.com/winfx/2008/xaml/printing" 
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-     xmlns:ClientTools="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
+    xmlns:ClientTools="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
-                xmlns:sd="http://schemas.devexpress.com/winfx/2008/xaml/printing"
-                xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
-    mc:Ignorable="d"
-    d:DesignHeight="300" d:DesignWidth="400">
+    xmlns:sd="http://schemas.devexpress.com/winfx/2008/xaml/printing"
+    xmlns:converter="clr-namespace:UnicontaClient.Utilities"
+    xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage">
     <UserControl.Resources>
+        <converter:VisualSpaceTextConverter x:Key="VisualSpaceConverter" />
         <DataTemplate x:Key="pageHeaderTemplate">
             <Grid Width="{Binding Path=UsablePageWidth, Mode=OneWay}"  HorizontalAlignment="Stretch" dxp:ExportSettings.TargetType="Panel">
                 <Grid.Resources>
@@ -33,7 +32,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReportPrint"
                 <dxe:ImageEdit Grid.Row="1" Width="{Binding Path=UsablePageWidth, Mode=OneWay}"  Height="2" dxp:ExportSettings.TargetType="Image" Source="{Binding Path=Content.Lines.Line,Mode=OneWay,Converter={StaticResource imageDataConverter}}"  />
                 <Grid Grid.Row="2" VerticalAlignment="Center" Width="{Binding Path=UsablePageWidth, Mode=OneWay}" HorizontalAlignment="Stretch" dxp:ExportSettings.TargetType="Panel">
                     <StackPanel Orientation="Horizontal"  HorizontalAlignment="Left">
-                        <dxe:TextEdit HorizontalContentAlignment="Left" Text="{Binding Content.Company.CompanyName, Mode=OneWay}"  FontSize="14" FontWeight="Bold" IsPrintingMode="True"/>
+                        <dxe:TextEdit Text="{Binding Content.Company.CompanyName, Mode=OneWay,Converter={StaticResource VisualSpaceConverter}}" FontSize="14" FontWeight="Bold" IsPrintingMode="True"/>
                         <dxe:TextEdit Margin="10,0,0,0" Text="{Binding Content.Company.Id, Mode=OneWay}"  FontSize="14" IsPrintingMode="True"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal"  HorizontalAlignment="Right" Margin="{Binding Content.HeaderMargins, Mode=OneWay}">

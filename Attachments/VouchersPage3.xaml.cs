@@ -193,20 +193,19 @@ namespace UnicontaClient.Pages.CustomPage
             this.voucherClient = vc;
             if (vc != null)
             {
-                metaInfoCtrl.ContentInfo = vc.Content;
-                metaInfoCtrl.Comment = vc._Text;
-                metaInfoCtrl.PostingNote = vc.PostingInstruction;
-                var approver1Name = !string.IsNullOrEmpty(vc.Approver1Name) ? string.Format("{0} ({1})", vc.Approver1Name, vc.Approver1) : vc.Approver1;
-                var approver1 = vc.Approved1Date != DateTime.MinValue ? string.Concat(approver1Name, " ", vc.Approved1Date) : approver1Name;
-                metaInfoCtrl.Approver1 = approver1;
-                var approver2Name = !string.IsNullOrEmpty(vc.Approver2Name) ? string.Format("{0} ({1})", vc.Approver2Name, vc.Approver2) : vc.Approver2;
-                var approver2 = vc.Approved2Date != DateTime.MinValue ? string.Concat(approver2Name, " ", vc.Approved2Date) : approver2Name;
-                metaInfoCtrl.Approver2 = approver2;
-                metaInfoCtrl.CreateDateNUser = string.Concat(vc.Created.ToString("g"), " ", string.Format(Uniconta.ClientTools.Localization.lookup("ByUserOBJ"), vc._UserName));
-                metaInfoCtrl.DocumentType = vc._Fileextension.ToString();
-                metaInfoCtrl.UniqueId = vc.RowId;
-                metaInfoCtrl.Visibility = Visibility.Visible;
-                metaInfoCtrl.NotifyPropertyChange();
+                var _metaInfoCtrl = metaInfoCtrl;
+                _metaInfoCtrl.ContentInfo = vc.Content;
+                _metaInfoCtrl.Comment = vc._Text;
+                _metaInfoCtrl.PostingNote = vc.PostingInstruction;
+                var Name = Uniconta.Common.Utility.Util.ConcatParenthesis(vc.Approver1Name, vc.Approver1);
+                _metaInfoCtrl.Approver1 = vc.Approved1Date != DateTime.MinValue ? string.Concat(Name, " ", vc.Approved1Date) : Name;
+                Name = Uniconta.Common.Utility.Util.ConcatParenthesis(vc.Approver2Name, vc.Approver2);
+                _metaInfoCtrl.Approver2 = vc.Approved2Date != DateTime.MinValue ? string.Concat(Name, " ", vc.Approved2Date) : Name;
+                _metaInfoCtrl.CreateDateNUser = string.Concat(vc.Created.ToString("g"), " ", string.Format(Uniconta.ClientTools.Localization.lookup("ByUserOBJ"), vc._UserName));
+                _metaInfoCtrl.DocumentType = vc._Fileextension.ToString();
+                _metaInfoCtrl.UniqueId = vc.RowId;
+                _metaInfoCtrl.Visibility = Visibility.Visible;
+                _metaInfoCtrl.NotifyPropertyChange();
             }
         }
 
@@ -216,7 +215,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override void OnClosePage(object[] refreshParams) { globalEvents.OnRefresh(NameOfControl, refreshParams); }
 
-        public override string NameOfControl { get { return TabControls.VouchersPage3.ToString(); } }
+        public override string NameOfControl { get { return TabControls.VouchersPage3; } }
 
         private void saveImage_Click(object sender, RoutedEventArgs e)
         {

@@ -106,7 +106,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (selectedItem == null)
                 return;
             var projectGrp = Activator.CreateInstance(selectedItem.GetType()) as ProjectGroupClient;
-            CorasauDataGrid.CopyAndClearRowId(selectedItem, projectGrp);
+            CorasauDataGrid.CopyAndClearRowId(selectedItem, projectGrp, api);
             var parms = new object[2] { projectGrp, false };
             AddDockItem(TabControls.ProjectGroupPage2, parms, string.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), selectedItem.Group));
         }

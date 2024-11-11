@@ -58,7 +58,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
             danishFields.OwnVoucherNumber = NETSNorge.processString(internalAdvText, 35, false);
 
             //Message to Beneficiary >>
-            var externalAdvText = StandardPaymentFunctions.ExternalMessage(paymentFormat._Message, tran, company, creditor);
+            var externalAdvText = StandardPaymentFunctions.ExternalMessage(paymentFormat, tran, company, creditor);
             var message = externalAdvText;
 
             danishFields.ReceiverAccountStatement = NETSNorge.processString(externalAdvText, 35, false);

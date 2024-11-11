@@ -27,6 +27,7 @@ using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using Uniconta.DataModel;
 using Uniconta.DirectDebitPayment;
+using Uniconta.Common.Utility;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -254,11 +255,6 @@ namespace UnicontaClient.Pages.CustomPage
                 else
                     mandateHelper.ValidateChange(api.CompanyEntity, queryDebMandate, DebtorCache, debPaymFormat, out valErrors);
 
-                foreach (var rec in queryDebMandate)
-                {
-                    rec.ErrorInfo = Common.VALIDATE_OK;
-                }
-
                 foreach (MandateError error in valErrors)
                 {
                     var recErr = queryDebMandate.First(s => s.RowId == error.RowId);
@@ -267,19 +263,6 @@ namespace UnicontaClient.Pages.CustomPage
                         recErr.ErrorInfo = error.Message;
                     else
                         recErr.ErrorInfo += Environment.NewLine + error.Message;
-                }
-
-                if (queryDebMandate.Any(s => s.ErrorInfo == Common.VALIDATE_OK) == false && validateOnly == false)
-                {
-                    UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NoRecordSelected"), Uniconta.ClientTools.Localization.lookup("Warning"));
-                    return false;
-                }
-
-                if (validateOnly)
-                {
-                    var countErr = queryDebMandate.Where(s => (s.ErrorInfo != Common.VALIDATE_OK) && (s.ErrorInfo != null)).Count();
-                    var infoTxt = countErr != 0 ? string.Format(Uniconta.ClientTools.Localization.lookup("ValidateFailInLines"), countErr) : Uniconta.ClientTools.Localization.lookup("ValidateNoError");
-                    UnicontaMessageBox.Show(infoTxt, Uniconta.ClientTools.Localization.lookup("Warning"));
                 }
             }
             catch (Exception ex)
@@ -301,34 +284,12 @@ namespace UnicontaClient.Pages.CustomPage
                     var debPaymentFormat = cwwin.PaymentFormat;
                     var schemeType = cwwin.directDebitScheme;
 
-                    if (debPaymentFormat._ExportFormat ==  (byte)Uniconta.DataModel.DebtorPaymFormatType.NetsBS)
-                    {
-                        UnicontaMessageBox.Show("Denne funktion understøttes ikke af Uniconta", Uniconta.ClientTools.Localization.lookup("Register"));
-                        return;
-                    }
-
-                    List<DebtorMandateDirectDebit> LstDebMandate = new List<DebtorMandateDirectDebit>();
-                    foreach (var s in lstMandates)
-                    {
-                        if ((s._Status == Uniconta.DataModel.MandateStatus.None ||
-                             s._Status == Uniconta.DataModel.MandateStatus.Unregistered ||
-                             s._Status == Uniconta.DataModel.MandateStatus.Unregister ||
-                             s._Status == Uniconta.DataModel.MandateStatus.Error) && s.PaymentFormat == debPaymentFormat._Format)
-                            LstDebMandate.Add(s);
-                    }
-
-                    if (LstDebMandate.Count == 0)
-                    {
-                        UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NoRecordSelected"), Uniconta.ClientTools.Localization.lookup("Error"));
-                        return;
-                    }
-
-                    IEnumerable<DebtorMandateDirectDebit> queryDebMandate = LstDebMandate.AsEnumerable();
-                    if (ValidateMandate(queryDebMandate, debPaymentFormat, Uniconta.DataModel.MandateStatus.Register))
+                    if (ValidateMandate(lstMandates, debPaymentFormat, Uniconta.DataModel.MandateStatus.Register))
                     {
                         try
                         {
-                            Common.CreateMandateFile(api, queryDebMandate.Where(s => s.ErrorInfo == Common.VALIDATE_OK), DebtorCache, debPaymentFormat, Uniconta.DataModel.MandateStatus.Register, schemeType);
+                            Common.CreateMandateFile(api, lstMandates.Where(s => s.ErrorInfo == Common.VALIDATE_OK), DebtorCache, debPaymentFormat, Uniconta.DataModel.MandateStatus.Register, schemeType);
+                            ShowMandateDialog(lstMandates, Uniconta.DataModel.MandateStatus.Register);
                         }
                         catch (Exception ex)
                         {
@@ -350,24 +311,12 @@ namespace UnicontaClient.Pages.CustomPage
                 if (cwwin.DialogResult == true)
                 {
                     var debPaymentFormat = cwwin.PaymentFormat;
-                    List<DebtorMandateDirectDebit> LstDebMandate = new List<DebtorMandateDirectDebit>();
-                    foreach (var s in lstMandates)
-                    {
-                        if (s._Status == Uniconta.DataModel.MandateStatus.Registered && s.PaymentFormat == debPaymentFormat._Format)
-                            LstDebMandate.Add(s);
-                    }
-                    if (LstDebMandate.Count == 0)
-                    {
-                        UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NoRecordSelected"), Uniconta.ClientTools.Localization.lookup("Error"));
-                        return;
-                    }
-
-                    IEnumerable<DebtorMandateDirectDebit> queryDebMandate = LstDebMandate.AsEnumerable();
-                    if (ValidateMandate(queryDebMandate, debPaymentFormat, Uniconta.DataModel.MandateStatus.Unregister))
+                    if (ValidateMandate(lstMandates, debPaymentFormat, Uniconta.DataModel.MandateStatus.Unregister))
                     {
                         try
                         {
-                            Common.CreateMandateFile(api, queryDebMandate.Where(s => s.ErrorInfo == Common.VALIDATE_OK), DebtorCache, debPaymentFormat, Uniconta.DataModel.MandateStatus.Unregister);
+                            Common.CreateMandateFile(api, lstMandates.Where(s => s.ErrorInfo == Common.VALIDATE_OK), DebtorCache, debPaymentFormat, Uniconta.DataModel.MandateStatus.Unregister);
+                            ShowMandateDialog(lstMandates, Uniconta.DataModel.MandateStatus.Unregister);
                         }
                         catch (Exception ex)
                         {
@@ -378,6 +327,8 @@ namespace UnicontaClient.Pages.CustomPage
             };
             cwwin.Show();
         }
+
+       
 
         private void ChangeMandateId(IEnumerable<DebtorMandateDirectDebit> lstMandates)
         {
@@ -396,24 +347,13 @@ namespace UnicontaClient.Pages.CustomPage
 
                     dgDebtorPaymentMandate.Columns.GetColumnByName("OldMandateId").Visible = true;
 
-                    List<DebtorMandateDirectDebit> LstDebMandate = new List<DebtorMandateDirectDebit>();
-                    foreach (var s in lstMandates)
-                    {
-                        if (s.PaymentFormat == debPaymentFormat._Format)
-                            LstDebMandate.Add(s);
-                    }
-                    if (LstDebMandate.Count == 0)
-                    {
-                        UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NoRecordSelected"), Uniconta.ClientTools.Localization.lookup("Error"));
-                        return;
-                    }
-
-                    IEnumerable<DebtorMandateDirectDebit> queryDebMandate = LstDebMandate.AsEnumerable();
-                    if (ValidateMandate(queryDebMandate, debPaymentFormat, Uniconta.DataModel.MandateStatus.Change))
+                    if (ValidateMandate(lstMandates, debPaymentFormat, Uniconta.DataModel.MandateStatus.Change))
                     {
                         try
                         {
-                            Uniconta.DirectDebitPayment.Common.CreateMandateFile(api, queryDebMandate.Where(s => s.ErrorInfo == Common.VALIDATE_OK), DebtorCache, debPaymentFormat, Uniconta.DataModel.MandateStatus.Change);
+                            Uniconta.DirectDebitPayment.Common.CreateMandateFile(api, lstMandates.Where(s => s.ErrorInfo == Common.VALIDATE_OK), DebtorCache, debPaymentFormat, Uniconta.DataModel.MandateStatus.Change);
+                            ShowMandateDialog(lstMandates, Uniconta.DataModel.MandateStatus.Change);
+
                         }
                         catch (Exception ex)
                         {
@@ -436,36 +376,23 @@ namespace UnicontaClient.Pages.CustomPage
                     var debPaymentFormat = cwwin.PaymentFormat;
                     if (debPaymentFormat._ExportFormat != (byte)Uniconta.DataModel.DebtorPaymFormatType.NetsLS && debPaymentFormat._ExportFormat != (byte)Uniconta.DataModel.DebtorPaymFormatType.NetsBS)
                     {
-                        UnicontaMessageBox.Show(string.Format("{0} '{1}'", Uniconta.ClientTools.Localization.lookup("NonSupportSEPA"), (Uniconta.DataModel.DebtorPaymFormatType)debPaymentFormat._ExportFormat), Uniconta.ClientTools.Localization.lookup("Activate")); //TODO:Test denne
+                        UnicontaMessageBox.Show(string.Format("{0} '{1}'", Uniconta.ClientTools.Localization.lookup("NonSupportSEPA"), (Uniconta.DataModel.DebtorPaymFormatType)debPaymentFormat._ExportFormat), Uniconta.ClientTools.Localization.lookup("Activate"));
                         return;
                     }
 
-                    List<DebtorMandateDirectDebit> LstDebMandate = new List<DebtorMandateDirectDebit>();
-                    foreach (var s in lstMandates)
-                    {
-                        if (s.PaymentFormat == debPaymentFormat._Format)
-                            LstDebMandate.Add(s);
-                    }
-                    if (LstDebMandate.Count == 0)
-                    {
-                        UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NoRecordSelected"), Uniconta.ClientTools.Localization.lookup("Error"));
-                        return;
-                    }
-
-                    IEnumerable<DebtorMandateDirectDebit> queryDebMandate = LstDebMandate.AsEnumerable();
-                    if (ValidateMandate(queryDebMandate, debPaymentFormat, Uniconta.DataModel.MandateStatus.Registered))
+                    if (ValidateMandate(lstMandates, debPaymentFormat, Uniconta.DataModel.MandateStatus.Registered))
                     {
                         try
                         {
                             var lstUpdate = new List<DebtorMandateDirectDebit>();
-                            foreach (var rec in queryDebMandate)
+                            foreach (var rec in lstMandates)
                             {
-                                if (rec == null)
+                                if (rec == null || rec.ErrorInfo != Common.VALIDATE_OK)
                                     continue;
 
                                 var statusInfoTxt = rec._StatusInfo;
                                 
-                                statusInfoTxt = string.Format("({0}) Mandate registered manually\n{1}", Common.GetTimeStamp(), statusInfoTxt);
+                                statusInfoTxt = string.Format("({0}) Mandat er registreret manuelt i Uniconta\n{1}", Common.GetTimeStamp(), statusInfoTxt);
                                 rec.MandateStatus = AppEnums.MandateStatus.ToString((int)Uniconta.DataModel.MandateStatus.Registered);
                                 rec.CancellationDate = DateTime.MinValue;
                                 rec.ActivationDate = DateTime.Today;
@@ -475,6 +402,8 @@ namespace UnicontaClient.Pages.CustomPage
                                 lstUpdate.Add(rec);
                             }
                             api.UpdateNoResponse(lstUpdate);
+
+                            ShowMandateDialog(lstMandates, Uniconta.DataModel.MandateStatus.Registered);
                         }
                         catch (Exception ex)
                         {
@@ -542,7 +471,7 @@ namespace UnicontaClient.Pages.CustomPage
                                     debtor._PaymentFormat = debtorPaymentFormat.Format;
                                     updateRecords.Add(debtor);
 
-                                    var statusInfoText = string.Format("({0}) Mandate agreement id set to {1}\n{2}", Uniconta.DirectDebitPayment.Common.GetTimeStamp(), agreementId, mandate.StatusInfo);
+                                    var statusInfoText = string.Format("({0}) Mandat aftalenummer er sat til {1}\n{2}", Uniconta.DirectDebitPayment.Common.GetTimeStamp(), agreementId, mandate.StatusInfo);
 
                                     mandate.OldMandateId = oldMandateValue;
                                     mandate._AgreementId = agreementId;
@@ -577,12 +506,14 @@ namespace UnicontaClient.Pages.CustomPage
 
                         if (cnt == 0)
                         {
+                            var sb = StringBuilderReuse.Create("Kunne ikke finde noget match i filen").AppendLine().AppendLine("Note:").AppendLine("Kolonne 1 = Debitorkonto")
+                            .AppendLine("Kolonne 2 = Tidligere MandatID");
                             if (debtorPaymentFormat._ExportFormat == (byte)DebtorPaymFormatType.NetsBS)
-                                UnicontaMessageBox.Show(string.Format("Couldn't find any match in the file.\n" +
-                                    "Note:\nColumn 1 = Customer account\nColumn 2 = Old MandateId\nColumn 3 = AgreementId\nUse a semicolon as field delimiter"), Uniconta.ClientTools.Localization.lookup("Error"));
-                            else
-                                UnicontaMessageBox.Show(string.Format("Couldn't find any match in the file.\n" +
-                                    "Note:\nColumn 1 = Customer account\nColumn 2 = Old MandateId\nUse a semicolon as field delimiter"), Uniconta.ClientTools.Localization.lookup("Error"));
+                                sb.AppendLine("Kolonne 3 = Aftalenummer");
+
+                            sb.AppendLine().AppendLine("Husk at bruge semikolon som feltafgrænser");
+
+                            UnicontaMessageBox.Show(sb.ToStringAndRelease(), Uniconta.ClientTools.Localization.lookup("Error"));
                         }
                         else
                         {
@@ -625,6 +556,23 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 ibase.Caption = string.Format(Uniconta.ClientTools.Localization.lookup("HideOBJ"), Uniconta.ClientTools.Localization.lookup("StatusInfo"));
             }
+        }
+
+        private void ShowMandateDialog(IEnumerable<DebtorMandateDirectDebit> lstMandates, Uniconta.DataModel.MandateStatus mandateStatus)
+        {
+            var countTotal = lstMandates.Count();
+            var countOk = lstMandates.Where(s => s.ErrorInfo == Common.VALIDATE_OK).Count();
+            var countErr = countTotal - countOk;
+
+            var sb = StringBuilderReuse.Create();
+
+            var okText = mandateStatus == Uniconta.DataModel.MandateStatus.Registered ? "Aktiveret" : "FileSent";
+            if (countOk > 0)
+                sb.Append(countOk).Append(" ").Append(Uniconta.ClientTools.Localization.lookup("Mandates").ToLower()).Append(" ").AppendLine(Uniconta.ClientTools.Localization.lookup(okText).ToLower());
+            if (countErr > 0)
+                sb.Append(countErr).Append(" ").Append(Uniconta.ClientTools.Localization.lookup("Mandates").ToLower()).Append(" ").AppendLine(Uniconta.ClientTools.Localization.lookup("NoSucces").ToLower());
+
+            UnicontaMessageBox.Show(sb.ToStringAndRelease(), Uniconta.ClientTools.Localization.lookup(mandateStatus.ToString()), MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 }

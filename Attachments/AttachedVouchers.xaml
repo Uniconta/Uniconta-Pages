@@ -21,18 +21,18 @@ x:Class="UnicontaClient.Pages.CustomPage.AttachedVouchers"
             <localPage:AttachedVouchersGrid x:Name="dgAttachedVoucherGrid" AutoGenerateColumns="None">
                 <localPage:AttachedVouchersGrid.Columns>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PrimaryKeyId" Width="70">
-                        <localPage:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
-                            <DataTemplate>
+                        <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.PrimaryKeyId,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" PreviewMouseDown="PrimaryKeyId_PreviewMouseDown"></TextBlock>
-                                    <TextBlock Grid.Column="1"></TextBlock>
+                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding Value}" PreviewMouseDown="PrimaryKeyId_PreviewMouseDown" />
+                                    <TextBlock Grid.Column="1" />
                                 </Grid>
-                            </DataTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                            </ControlTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
 
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Created" ShowTime="True" Width="120" SortOrder="Descending" Visible="False">

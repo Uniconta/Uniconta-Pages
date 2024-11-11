@@ -23,7 +23,7 @@ namespace UnicontaClient.Pages.CustomPage
             : base(sourceData, true)
         {
             InitializeComponent();
-            cmbDebtorVoucherSerie.api = leOneTimeDebtor.api = api;
+            cmbDebtorVoucherSerie.api = leOneTimeDebtor.api = lePaymentForCollection.api = api;
             layoutControl = layoutItems;
 
             layoutItems.DataContext = editrow;

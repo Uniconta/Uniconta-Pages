@@ -162,7 +162,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (selectedItem == null)
                 return;
             var prospect = Activator.CreateInstance(selectedItem.GetType()) as CrmProspectClient;
-            CorasauDataGrid.CopyAndClearRowId(selectedItem, prospect);
+            CorasauDataGrid.CopyAndClearRowId(selectedItem, prospect, api);
             var parms = new object[2] { prospect, false };
             AddDockItem(TabControls.CrmProspectPage2, parms, Uniconta.ClientTools.Localization.lookup("Prospects"), "Add_16x16");
         }

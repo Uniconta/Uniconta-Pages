@@ -23,10 +23,15 @@
 		</RibbonItem>
 	</RibbonItem>	
 	<RibbonItem>
-		<RibbonItem Action="PrTransaction" LocalizedNameKey="Transactions" ControlName="ProjectTransactionPage" LargeGlyph="Transactions_32x32" ShortcutKey="CTRL+T"/>
+    <RibbonItem Action="PrTransaction" LocalizedNameKey="Transactions" ControlName="ProjectTransactionPage" LargeGlyph="Transactions_32x32" ShortcutKey="CTRL+T"/>
 	</RibbonItem>
 	<RibbonItem>
 		<RibbonItem Action="ApproveAdmin" LocalizedNameKey="ApproveWeek" LargeGlyph="Approve_ByAdmin_32x32" />
 		<RibbonItem Action="ApproveEmployee" LocalizedNameKey="ApproveWeek" LargeGlyph="Approve_ByEmployee_32x32" />
 	</RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="Reports" LocalizedNameKey="Reports" LargeGlyph="Item_Number_32x32">
+      <RibbonItem Action="TransactionsReport" LocalizedNameKey="Transactions" Glyph="Item_Number_16x16" />
+    </RibbonItem>
+  </RibbonItem>
 </root>

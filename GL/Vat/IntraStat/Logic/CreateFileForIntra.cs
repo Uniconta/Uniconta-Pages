@@ -29,6 +29,9 @@ namespace UnicontaClient.Pages.CustomPage
         public const string VALIDATE_OK = "Ok";
         public const string UNKNOWN_CVRNO = "QV999999999999";
         public const string SWEDEN_POSTFIX_01 = "01";
+        public const string CTRYCODE_EXTENDED_GREECE = "EL";
+        public const string CTRYCODE_EXTENDED_UK = "XU";
+        public const string CTRYCODE_EXTENDED_SERBIA = "XS";
         #endregion
 
         #region Variables
@@ -37,14 +40,16 @@ namespace UnicontaClient.Pages.CustomPage
         private CountryCode companyCountryId;
         private Dictionary<string, bool> dictVatNumber;
         public int exportGroup;
+        public bool validateVIES;
         #endregion
 
-        public IntraHelper(CrudAPI api, int exportGroup)
+        public IntraHelper(CrudAPI api, int exportGroup, bool validateVIES)
         {
             companyRegNo = Regex.Replace(api.CompanyEntity._Id ?? string.Empty, "[^0-9]", "");
             companyCountryId = api.CompanyEntity._CountryId;
             this.exportGroup = exportGroup;
             dictVatNumber = new Dictionary<string, bool>();
+            this.validateVIES = validateVIES;
         }
 
         public bool PreValidate()
@@ -62,6 +67,11 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             return true;
+        }
+
+        public void ClearVIESCache()
+        {
+            dictVatNumber.Clear(); 
         }
 
         public void Validate(IEnumerable<IntrastatClient> intralst, bool compressed, bool onlyValidate)
@@ -82,11 +92,6 @@ namespace UnicontaClient.Pages.CustomPage
                         intra.SystemInfo += Environment.NewLine + Localization.lookup("CompressPosting");
                 }
 
-                if (intra.IsTriangularTrade)
-                {
-                    intra.SystemInfo = Localization.lookup("TriangleTrade"); 
-                    continue;
-                }
 
                 if (string.IsNullOrEmpty(intra.ItemCode) && exportGroup == 0)
                 {
@@ -167,12 +172,12 @@ namespace UnicontaClient.Pages.CustomPage
                         intra.SystemInfo += string.Format(Localization.lookup("MissingOBJ"), Localization.lookup("DebtorRegNo"));
                     }
 
-                    if (!hasErrors && intra.DebtorRegNoVIES != UNKNOWN_CVRNO)
+                    if (!hasErrors && validateVIES && intra.DebtorRegNoVIES != null && intra.DebtorRegNoVIES != UNKNOWN_CVRNO)
                     {
                         bool validVatNumber = false;
                         if (!dictVatNumber.TryGetValue(intra.DebtorRegNoVIES, out validVatNumber))
                         {
-                            validVatNumber = CheckEuropeanVatInformation(intra.DebtorRegNoVIES, intra.Country);
+                            validVatNumber = CheckEuropeanVatInformation(intra.DebtorRegNoVIES, intra.PartnerCountry);
                             dictVatNumber.Add(intra.DebtorRegNoVIES, validVatNumber);
                         }
 
@@ -191,17 +196,14 @@ namespace UnicontaClient.Pages.CustomPage
                     intra.SystemInfo = VALIDATE_OK;
             }
         }
-        private bool CheckEuropeanVatInformation(string cvr, CountryCode country)
+        private bool CheckEuropeanVatInformation(string cvr, string ctryCode)
         {
             if (string.IsNullOrEmpty(cvr))
                 return false;
 
-            int countryCode = (int)country;
-            var twolettercode = Enum.GetName(typeof(CountryISOCode), countryCode);
-
-            if (twolettercode != null)
+            if (ctryCode != null)
             {
-                var vatInfo = EuropeanVatInformation.Get(twolettercode, cvr);
+                var vatInfo = EuropeanVatInformation.Get(ctryCode, cvr);
                 if (vatInfo == null || vatInfo.VatNumber != null)
                     return true;
             }
@@ -236,13 +238,11 @@ namespace UnicontaClient.Pages.CustomPage
                 c = string.Compare(x.TransType, y.TransType);
                 if (c != 0)
                     return false;
-                if (x.IsTriangularTrade != y.IsTriangularTrade)
-                    return false;
                 return true;
             }
             public int GetHashCode(IntrastatClient x)
             {
-                return (int)(x.Country + 1) * ((int)x.CountryOfOrigin + 1) * Util.GetHashCode(x.CountryOfOriginUNK) * Util.GetHashCode(x.Period) * Util.GetHashCode(x.fDebtorRegNo) * ((int)x.ImportExport + 1) * Util.GetHashCode(x.ItemCode) * Util.GetHashCode(x.TransType) * (x.IsTriangularTrade ? 1 : 2);
+                return (int)(x.Country + 1) * ((int)x.CountryOfOrigin + 1) * Util.GetHashCode(x.CountryOfOriginUNK) * Util.GetHashCode(x.Period) * Util.GetHashCode(x.fDebtorRegNo) * ((int)x.ImportExport + 1) * Util.GetHashCode(x.ItemCode) * Util.GetHashCode(x.TransType);
             }
         }
 

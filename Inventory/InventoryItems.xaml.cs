@@ -411,6 +411,10 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         ViewDocument(UnicontaTabs.UserDocsPage3, dgInventoryItemsGrid.syncEntity, string.Format(Uniconta.ClientTools.Localization.lookup("ViewOBJ"), Uniconta.ClientTools.Localization.lookup("Url")), ViewerType.Url);
                     break;
+                case "Packaging":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.InvPackagingProductPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Packaging"), selectedItem._Item));
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;

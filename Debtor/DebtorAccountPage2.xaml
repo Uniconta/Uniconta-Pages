@@ -73,6 +73,9 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccountPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="IndustryCode" x:Name="liIndustryCode">
                         <CorasauControls:LookupEditor x:Name="leIndustryCode" Text="{Binding IndustryCode ,Mode=TwoWay}" />
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="CompanyState" x:Name="liCompanyState">
+                        <CorasauControls:ComboBoxEditor SelectedItem="{Binding CompanyState,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
 
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpGroup" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Group}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left"  Width="400">
@@ -250,6 +253,12 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccountPage2"
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="DeliveryContactEmail" x:Name="liDeliveryContactEmail" Style="{StaticResource LayoutItemsstyle}" ButtonClicked="DeliveryContactEmail_ButtonClicked" ButtonContent="&#x2709;" Padding="0">
                         <CorasauControls:TextEditor x:Name="txtEmail" Text="{Binding DeliveryContactEmail,Mode=TwoWay}" MaskType="RegEx" Mask="{StaticResource EmailValidationRegx}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="ESGGroup" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ESG}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
+                    <CorasauControls:CorasauLayoutItem FieldName="PackagingConsumer" x:Name="liPackagingConsumer">
+                        <CorasauControls:ComboBoxEditor SelectedItem="{Binding PackagingConsumer,Mode=TwoWay}" x:Name="cmbPackagingConsumer"/>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
 

@@ -20,6 +20,7 @@ using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using Uniconta.DataModel;
 using Uniconta.ClientTools;
+using UnicontaClient.Utilities;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -620,7 +621,7 @@ namespace UnicontaClient.Pages.CustomPage
         void localMenu_OnItemClicked(string ActionType)
         {
             var selectedVoucher = dgvoucherGrid.SelectedItem as VouchersClientLocal;
-            var selectedJournalLine = dgGldailyJournalLinesGrid.SelectedItem as GLDailyJournalLineClient;
+            var selectedLine = dgGldailyJournalLinesGrid.SelectedItem as GLDailyJournalLineClient;
 
             switch (ActionType)
             {
@@ -630,22 +631,22 @@ namespace UnicontaClient.Pages.CustomPage
                         ViewVoucher(selectedVoucher);
                     break;
                 case "ViewAttachedVoucher":
-                    if (selectedJournalLine != null)
-                        ViewVoucher(selectedJournalLine);
+                    if (selectedLine != null)
+                        ViewVoucher(selectedLine);
                     break;
                 case "Attach":
-                    if (selectedVoucher != null && selectedJournalLine != null)
-                        Attach(selectedVoucher, selectedJournalLine, false);
+                    if (selectedVoucher != null && selectedLine != null)
+                        Attach(selectedVoucher, selectedLine, false);
                     break;
                 case "Detach":
-                    if (selectedJournalLine == null)
+                    if (selectedLine == null)
                         return;
-                    if (selectedJournalLine._DocumentRef != 0)
+                    if (selectedLine._DocumentRef != 0)
                     {
-                        dgGldailyJournalLinesGrid.SetLoadedRow(selectedJournalLine);
-                        selectedJournalLine.DocumentRef = 0;
-                        dgGldailyJournalLinesGrid.SetModifiedRow(selectedJournalLine);
-                        SaveAndRefresh(false, selectedJournalLine, selectedVoucher);
+                        dgGldailyJournalLinesGrid.SetLoadedRow(selectedLine);
+                        selectedLine.DocumentRef = 0;
+                        dgGldailyJournalLinesGrid.SetModifiedRow(selectedLine);
+                        SaveAndRefresh(false, selectedLine, selectedVoucher);
                     }
                     else
                         UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NoVoucherExist"), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OK);
@@ -664,6 +665,10 @@ namespace UnicontaClient.Pages.CustomPage
                     lGroup.Orientation = orient;
                     api.session.Preference.BankStatementHorisontal = (orient == Orientation.Horizontal);
                     break;
+                case "SendVoucherReminder":
+                    if (selectedLine != null)
+                        Utility.SendVoucherReminder(api, selectedLine._Date, selectedLine.AmountCur != 0 ? selectedLine.AmountCur : selectedLine.Amount, (Currencies)selectedLine._Currency, selectedLine._Text);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -673,19 +678,35 @@ namespace UnicontaClient.Pages.CustomPage
         {
             dgGldailyJournalLinesGrid.SaveData();
         }
-        private void Attach(VouchersClientLocal selectedVoucher, GLDailyJournalLineClient selectedJournalLine, bool isAuto, IEnumerable<VouchersClientLocal> visibleRows = null)
+        private void Attach(VouchersClientLocal selectedVoucher, GLDailyJournalLineClient selectedLine, bool isAuto, IEnumerable<VouchersClientLocal> visibleRows = null)
         {
             var selectedRowId = selectedVoucher.RowId;
-            if (selectedRowId != 0 && selectedJournalLine._DocumentRef == 0)
+            if (selectedRowId != 0 && selectedLine._DocumentRef == 0)
             {
-                dgGldailyJournalLinesGrid.SetLoadedRow(selectedJournalLine);
-                selectedJournalLine.DocumentRef = selectedRowId;
-                selectedJournalLine.DocumentDate = selectedVoucher._DocumentDate;
-                if (AssignText)
-                    selectedJournalLine.Text = selectedJournalLine._Text ?? selectedVoucher._Text;
-                var amount = selectedJournalLine.Amount;
-                selectedJournalLine.Amount = amount != 0d ? amount : selectedVoucher._Amount;
-                //dgGldailyJournalLinesGrid.SetModifiedRow(selectedJournalLine);
+                dgGldailyJournalLinesGrid.SetLoadedRow(selectedLine);
+                selectedLine.DocumentRef = selectedRowId;
+                selectedLine.DocumentDate = selectedVoucher._DocumentDate;
+                if (AssignText && selectedVoucher._Text != null)
+                    selectedLine.Text = selectedVoucher._Text;
+                var amount = selectedLine.Amount;
+                selectedLine.Amount = amount != 0d ? amount : selectedVoucher._Amount;
+                if (selectedVoucher._Dim1 != null)
+                    selectedLine.Dimension1 = selectedVoucher._Dim1;
+                if (selectedVoucher._Dim2 != null)
+                    selectedLine.Dimension2 = selectedVoucher._Dim2;
+                if (selectedVoucher._Dim3 != null)
+                    selectedLine.Dimension3 = selectedVoucher._Dim3;
+                if (selectedVoucher._Dim4 != null)
+                    selectedLine.Dimension4 = selectedVoucher._Dim4;
+                if (selectedVoucher._Dim5 != null)
+                    selectedLine.Dimension5 = selectedVoucher._Dim5;
+                if (selectedVoucher._CostAccount != null && selectedLine._OffsetAccount == null)
+                {
+                    selectedLine._OffsetAccountType = 0;
+                    selectedLine.OffsetAccount = selectedVoucher._CostAccount;
+                }
+
+                //dgGldailyJournalLinesGrid.SetModifiedRow(selectedLine);
                 if (visibleRows == null)
                     visibleRows = dgvoucherGrid.GetVisibleRows() as IEnumerable<VouchersClientLocal>;
                 var voucher = visibleRows.Where(v => v.PrimaryKeyId == selectedRowId).FirstOrDefault();
@@ -693,7 +714,7 @@ namespace UnicontaClient.Pages.CustomPage
                     voucher.IsAttached = true;
 
                 if (!isAuto)
-                    SaveAndRefresh(true, selectedJournalLine, selectedVoucher);
+                    SaveAndRefresh(true, selectedLine, selectedVoucher);
             }
         }
 

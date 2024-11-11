@@ -505,12 +505,35 @@ namespace UnicontaClient.Pages.CustomPage
                     };
                     currencyDialog.Show();
                     break;
+                case "ChangeProject":
+                    ChangeProject();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
 
+        void ChangeProject()
+        {
+            var trans = dgAccountsTransGrid.SelectedItem as GLTrans;
+            var projdialog = new CWProjects(api, string.Format(Uniconta.ClientTools.Localization.lookup("ChangeOBJ"), Uniconta.ClientTools.Localization.lookup("Project")));
+            projdialog.ShowAllLines = true;
+            projdialog.Closing += async delegate
+            {
+                if (projdialog.DialogResult == true)
+                {
+                    busyIndicator.IsBusy = true;
+                    var papi = new PostingAPI(api);
+                    var err = await papi.UpdateTransProject(trans, projdialog.Project, projdialog.AllLines);
+                    busyIndicator.IsBusy = false;
+                    UtilDisplay.ShowErrorCode(err);
+                    if (err == ErrorCodes.Succes)
+                        BindGrid();
+                }
+            };
+            projdialog.Show();
+        }
         async void SetConvertAmount(Currencies to)
         {
             GLTransClient.Rates = await new CurrencyAPI(api).ExchangeRates(0, to);

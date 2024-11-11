@@ -265,7 +265,7 @@ namespace ISO20022CreditTransfer
 
                 var OCRPaymentType = bankSpecific.OCRPaymentType(creditorOCRPaymentId);
 
-                var externalAdvText = UnicontaClient.Pages.Creditor.Payments.StandardPaymentFunctions.ExternalMessage(credPaymFormat._Message, rec, company, creditor);
+                var externalAdvText = UnicontaClient.Pages.Creditor.Payments.StandardPaymentFunctions.ExternalMessage(credPaymFormat, rec, company, creditor);
 
                 string remittanceInfo = bankSpecific.RemittanceInfo(externalAdvText, doc.ISOPaymentType, rec._PaymentMethod);
 

@@ -10,6 +10,7 @@ using System.Web;
 using System.Windows;
 using System.Windows.Input;
 using Uniconta.ClientTools;
+using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using static ImportingTool.Model.Dinero;
@@ -59,14 +60,19 @@ namespace UnicontaClient.Controls.Dialogs
             {
                 CLIENT_ID = s[0];
                 CLIENT_SECRET_CODE = s[1];
+                Connect();
+            }
+        }
 
-                var consentUrl = $"https://connect.visma.com/consent?returnUrl=" + $"{HttpUtility.UrlEncode("/connect/authorize/callback?")}" +
+        private void Connect()
+        {
+            var consentUrl = $"https://connect.visma.com/consent?returnUrl=" + $"{HttpUtility.UrlEncode("/connect/authorize/callback?")}" +
                 $"{HttpUtility.UrlEncode("response_type=code&")}" + $"{HttpUtility.UrlEncode($"client_id={CLIENT_ID}&")}" +
                 $"{HttpUtility.UrlEncode("scope=dineropublicapi:read dineropublicapi:write offline_access&")}" +
                 $"{HttpUtility.UrlEncode($"redirect_uri={REDIRECT_URI}")}";
 
-                webViewer.UriSource = new Uri(consentUrl);
-            }
+            webViewer.UriSource = new Uri(consentUrl);
+            webViewer.Visibility = Visibility.Visible;
         }
 
         async private Task LoadCompanies(string authorizeCode)
@@ -100,16 +106,15 @@ namespace UnicontaClient.Controls.Dialogs
                         lbCompanies.ItemsSource = companies;
                         lbCompanies.Visibility = Visibility.Visible;
                     }
-                    ClientHelper.Dispose();
+                    //ERIK, do not dispose it
+                    //ClientHelper.Dispose();
                 }
                 else
-                    MessageBox.Show(Uniconta.ClientTools.Localization.lookup("Invalid"));
-
-                client.Dispose();
+                    UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("Invalid"), Uniconta.ClientTools.Localization.lookup("Error"));
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                UnicontaMessageBox.Show(ex);
             }
         }
 
@@ -122,7 +127,8 @@ namespace UnicontaClient.Controls.Dialogs
         {
             if (lbCompanies.SelectedItem == null)
             {
-                MessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("PleaseSelectOBJ"), Uniconta.ClientTools.Localization.lookup("Company")));
+                UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("PleaseSelectOBJ"), Uniconta.ClientTools.Localization.lookup("Company")),
+                    Uniconta.ClientTools.Localization.lookup("Warning"));
                 e.Handled = false;
             }
 

@@ -24,11 +24,11 @@ x:Class="UnicontaClient.Pages.CustomPage.TMJournalLinePage"
         </Style>
         <Style x:Name="StyleRow" TargetType="dxg:RowControl">
             <Setter Property="Height" Value="Auto"/>
-            <Style.Triggers>
+            <!--<Style.Triggers>
                 <DataTrigger Binding="{Binding Path=Row.IsMatched}" Value="True">
                     <Setter Property="Background" Value="{StaticResource RowMatchColor}" />
                 </DataTrigger>
-            </Style.Triggers>
+            </Style.Triggers>-->
         </Style>
         <Style TargetType="{x:Type dxe:DateEdit}" x:Key="CustomColorDateEdit">
             <Style.Resources>

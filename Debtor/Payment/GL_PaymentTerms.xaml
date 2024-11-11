@@ -40,7 +40,7 @@ x:Class="UnicontaClient.Pages.CustomPage.GL_PaymentTerms"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CashDiscountDays"  Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CashdiscountMethod"  Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ReverseVatOnCachdiscount"  Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="UseForCollection" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Weekend2Monday" Width="70" />
                 </localPage:PaymentGrid.Columns>
             </localPage:PaymentGrid>
         </CorasauControls:BusyIndicator>

@@ -1,0 +1,25 @@
+<Pages:GridBasePage xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.DebtorPackingShipmentPage"
+             xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+             xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
+             xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Assets/EditableGridRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <local:DebtorPackingShipmentGrid x:Name="dgDebtorPackingShipmentGrid" AutoGenerateColumns="None">
+                <local:DebtorPackingShipmentGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Model"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Qty" AllowThousandMask="True" Mask="N2"/>
+                </local:DebtorPackingShipmentGrid.Columns>
+            </local:DebtorPackingShipmentGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

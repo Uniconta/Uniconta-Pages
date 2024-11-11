@@ -6,7 +6,6 @@ x:Class="UnicontaClient.Pages.CustomPage.GLSplitTemplatePage"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
      xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"
-    xmlns:toolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit"
     mc:Ignorable="d"   xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
     d:DesignHeight="300" d:DesignWidth="400">
 
@@ -21,18 +20,18 @@ x:Class="UnicontaClient.Pages.CustomPage.GLSplitTemplatePage"
             <localPage:SplittemplateGrid  x:Name="dgSplittemplateGrid" AutoGenerateColumns="None">
                 <localPage:SplittemplateGrid.Columns>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Name">
-                        <localPage:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
-                            <DataTemplate>
+                        <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Name,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" PreviewMouseDown="Name_PreviewMouseDown"></TextBlock>
-                                    <TextBlock Grid.Column="1"></TextBlock>
+                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding Value}" PreviewMouseDown="Name_PreviewMouseDown" />
+                                    <TextBlock Grid.Column="1" />
                                 </Grid>
-                            </DataTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                            </ControlTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>                 
                 </localPage:SplittemplateGrid.Columns>
             </localPage:SplittemplateGrid>

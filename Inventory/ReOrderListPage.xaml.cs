@@ -447,7 +447,7 @@ namespace UnicontaClient.Pages.CustomPage
                 Reserved = await ReservedTask;
                 if (Reserved != null)
                 {
-                    reservedSort = new InvItemStorageClientSort(ReorderPrWarehouse, ReorderPrLocation);
+                    reservedSort = new InvItemStorageClientSort(api.CompanyEntity.Warehouse, api.CompanyEntity.Location);
                     Array.Sort(Reserved, reservedSort);
                     searchrec = new Uniconta.DataModel.InvItemStorage();
                     if (! ReOrderListPage.ReorderPrWarehouse)
@@ -458,7 +458,11 @@ namespace UnicontaClient.Pages.CustomPage
 
                     if (ExclOrders != null && ExclOrders.Length > 0)
                     {
-                        for(int i = 0; (i < ExclOrders.Length); i++)
+                        InvItemStorageClientSort Wh = null;
+                        if (api.CompanyEntity.Warehouse)
+                            Wh = new InvItemStorageClientSort(ReorderPrWarehouse, ReorderPrLocation);
+
+                        for (int i = 0; (i < ExclOrders.Length); i++)
                         {
                             var ord = ExclOrders[i];
                             if (ord._MoveType > 0)
@@ -479,6 +483,8 @@ namespace UnicontaClient.Pages.CustomPage
                                 searchrec._Warehouse = ord._Warehouse;
                                 searchrec._Location = ord._Location;
                                 var pos = Array.BinarySearch(Reserved, searchrec, reservedSort);
+                                if (!(pos >= 0 && pos < Reserved.Length) && Wh != null)
+                                    pos = Array.BinarySearch(Reserved, searchrec, Wh);
                                 if (pos >= 0 && pos < Reserved.Length)
                                 {
                                     var r = Reserved[pos];

@@ -14,10 +14,7 @@ using Uniconta.API.Service;
 using Uniconta.Client.Pages;
 using Uniconta.Common.Utility;
 using UnicontaClient.Utilities;
-
-#if !SILVERLIGHT
 using UnicontaClient.Pages;
-#endif
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -213,116 +210,58 @@ namespace UnicontaClient.Pages.CustomPage
 
             try
             {
-                int documentId = 0;
-                int postType = 0;
-                long invoiceNumber = 0;
-                byte dcType = 0;
-                DCTransOpen debtorTransopen = null;
+                var post = UtilDisplay.CheckPostType(Row);
+                if (post.postType == 0)
+                    return;
 
-                if (Row is DCTrans dcTrans)
-                {
-                    documentId = dcTrans._DocumentRef;
-                    postType = dcTrans._PostType;
-                    invoiceNumber = dcTrans._Invoice;
-                    dcType = dcTrans.__DCType();
-                    debtorTransopen = new DebtorTransOpenClient();
-                    debtorTransopen.Trans = dcTrans;
-                }
-                else if (Row is DCTransOpen dcTransOpen)
-                {
-                    debtorTransopen = dcTransOpen;
-                    documentId = debtorTransopen.Trans._DocumentRef;
-                    postType = debtorTransopen.Trans._PostType;
-                    invoiceNumber = debtorTransopen.Trans._Invoice;
-                    dcType = debtorTransopen.__DCType();
-                }
-                else
-                {
-                    var glTrans = Row as GLTrans;
-                    if (glTrans != null)
-                    {
-                        documentId = glTrans._DocumentRef;
-                        postType = (byte)DCPostType.Invoice;
-                        invoiceNumber = glTrans._Invoice;
-                        dcType = (byte)glTrans._DCType;
-                    }
-                    else
-                    {
-                        var projectTrans = Row as ProjectTrans;
-                        if (projectTrans != null)
-                        {
-                            documentId = projectTrans._DocumentRef;
-                            postType = (byte)DCPostType.Invoice;
-                            invoiceNumber = projectTrans._Invoice;
-                            if (projectTrans._CreditorAccount != null)
-                                dcType = 2;
-                            else
-                                dcType = 1;
-                        }
-                        else
-                        {
-                            var iTrans = Row as InvTrans;
-                            if (iTrans != null && (iTrans._InvoiceRowId != 0 || iTrans._InvoiceNumber != 0))
-                            {
-                                postType = (byte)DCPostType.Invoice;
-                                dcType = iTrans._MovementType;
-                                invoiceNumber = iTrans._InvoiceNumber;
-                                if (invoiceNumber == 0)
-                                    invoiceNumber = iTrans._InvoiceRowId;
-                            }
-                            else
-                                return;
-                        }
-                    }
-                }
                 voucherBusyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LoadingMsg");
 
-                if (documentId != 0)
+                if (post.documentId != 0)
                 {
                     voucherBusyIndicator.IsBusy = true;
                     ShowInvoiceVoucher(TabControls.VouchersPage3, selectedRow);
                 }
-                else if (postType == (byte)DCPostType.InterestFee)
+                else if (post.postType == (byte)DCPostType.InterestFee)
                 {
                     IPrintReport printReport = null;
                     var debtorCache = crudapi.GetCache(typeof(Debtor)) ?? await crudapi.LoadCache(typeof(Debtor));
                     var reportName = Uniconta.ClientTools.Localization.lookup("InterestNote");
 
-                    var debtor = debtorCache.Get(debtorTransopen.Trans._Account) as DebtorClient;
+                    var debtor = debtorCache.Get(post.debtorTransopen.Trans._Account) as DebtorClient;
                     var showOnlySelectedRec = UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("ShowOBJ"), Uniconta.ClientTools.Localization.lookup("Message")),
                        Uniconta.ClientTools.Localization.lookup("AllTransactions"), System.Windows.MessageBoxButton.YesNo) == System.Windows.MessageBoxResult.Yes ? false : true;
-                    printReport = await Utility.GenerateStandardCollectionReport(debtorTransopen, debtor, debtorTransopen.Trans._Date, DebtorEmailType.InterestNote, crudapi, showOnlySelectedRec);
+                    printReport = await Utility.GenerateStandardCollectionReport(post.debtorTransopen, debtor, post.debtorTransopen.Trans._Date, DebtorEmailType.InterestNote, crudapi, showOnlySelectedRec);
                     DockInvoiceVoucher(UnicontaTabs.StandardPrintReportPage, new object[] { new IPrintReport[] { printReport }, reportName },
                         string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Preview"), reportName));
 
                     return;
                 }
-                else if (postType == (byte)DCPostType.CollectionLetter || postType == (byte)DCPostType.Collection)
+                else if (post.postType == (byte)DCPostType.CollectionLetter || post.postType == (byte)DCPostType.Collection)
                 {
                     IPrintReport printReport = null;
                     var debtorCache = crudapi.GetCache(typeof(Debtor)) ?? await crudapi.LoadCache(typeof(Debtor));
                     var reportName = Uniconta.ClientTools.Localization.lookup("CollectionLetter");
 
-                    var debtor = debtorCache.Get(debtorTransopen.Trans._Account) as DebtorClient;
+                    var debtor = debtorCache.Get(post.debtorTransopen.Trans._Account) as DebtorClient;
                     var showOnlySelectedRec = UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("ShowOBJ"), Uniconta.ClientTools.Localization.lookup("AllTransactions")), 
                         Uniconta.ClientTools.Localization.lookup("Message"), System.Windows.MessageBoxButton.YesNo) == System.Windows.MessageBoxResult.Yes ? false : true;
-                    printReport = await Utility.GenerateStandardCollectionReport(debtorTransopen, debtor, debtorTransopen.Trans._Date, DebtorEmailType.Collection, crudapi, showOnlySelectedRec);
+                    printReport = await Utility.GenerateStandardCollectionReport(post.debtorTransopen, debtor, post.debtorTransopen.Trans._Date, DebtorEmailType.Collection, crudapi, showOnlySelectedRec);
                     DockInvoiceVoucher(UnicontaTabs.StandardPrintReportPage, new object[] { new IPrintReport[] { printReport }, reportName },
                         string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Preview"), reportName));
                     return;
                 }
-                else if (postType != (byte)DCPostType.Payment)
+                else if (post.postType != (byte)DCPostType.Payment)
                 {
-                    if (invoiceNumber != 0)
+                    if (post.invoiceNumber != 0)
                     {
                         string reportName;
                         voucherBusyIndicator.IsBusy = true;
-                        if (dcType != 2)
+                        if (post.dcType != 2)
                         {
-                            var invoicePdf = await new InvoiceAPI(crudapi).GetDebtorInvoicePdf(null, DateTime.MinValue, (int)invoiceNumber, false);
+                            var invoicePdf = await new InvoiceAPI(crudapi).GetDebtorInvoicePdf(null, DateTime.MinValue, (int)post.invoiceNumber, false);
                             if (invoicePdf != null)
                             {
-                                new CWDocumentViewer(invoicePdf, FileextensionsTypes.PDF).Show();
+                                ViewDocument(invoicePdf, FileextensionsTypes.PDF, string.Concat(Uniconta.ClientTools.Localization.lookup("Invoice"), ": ", NumberConvert.ToString(post.invoiceNumber)), selectedRow);
                                 return;
                             }
                             var arr = await crudapi.Query<DebtorInvoiceClient>(Row);
@@ -335,7 +274,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 return;
                             }
                         }
-                        if (dcType != 1)
+                        if (post.dcType != 1)
                         {
                             var arr = await crudapi.Query<CreditorInvoiceClient>(Row);
                             if (arr != null && arr.Length > 0)

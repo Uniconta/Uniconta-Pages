@@ -21,6 +21,8 @@ using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using Uniconta.DataModel;
+using Uniconta.ClientTools.Controls;
+using UnicontaClient.Controls.Dialogs;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -90,6 +92,10 @@ namespace UnicontaClient.Pages.CustomPage
                         AddDockItem(TabControls.CompanyAddressPage2,para, selectedItem.Name, null,true);
                     }
                     break;
+                case "RegisterEdelivery":
+                    if (selectedItem != null)
+                        Nemhandel(selectedItem);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -101,6 +107,41 @@ namespace UnicontaClient.Pages.CustomPage
             isReadOnly = false;
             useBinding = true;
             return true;
+        }
+
+        private async void Nemhandel(CompanyAddressClient companyAddress)
+        {
+            var res = await NHR.ValidateEndPoints(api, companyAddress);
+            if (res != null)
+            {
+                UnicontaMessageBox.Show(res, Uniconta.ClientTools.Localization.lookup("Warning"));
+                return;
+            }
+
+            CWNemhandel cwNemhandel = new CWNemhandel(api, companyAddress);
+            cwNemhandel.DialogTableId = 2000000090;
+            cwNemhandel.Closed += async delegate
+            {
+                if (cwNemhandel.DialogResult == true)
+                {
+                    busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
+                    busyIndicator.IsBusy = true;
+                    ErrorCodes result;
+                    if (cwNemhandel.HasChanges)
+                    {
+                        var nhrAPI = new Uniconta.API.DebtorCreditor.NHRAPI(api);
+                        result = await nhrAPI.NHROperation(cwNemhandel.EndPointLst);
+                    }
+                    else
+                    {
+                        result = ErrorCodes.NoChange;
+                    }
+
+                    busyIndicator.IsBusy = false;
+                    UtilDisplay.ShowErrorCode(result);
+                }
+            };
+            cwNemhandel.Show();
         }
     }
 }

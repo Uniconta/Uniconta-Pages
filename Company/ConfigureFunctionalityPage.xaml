@@ -115,6 +115,9 @@ x:Class="UnicontaClient.Pages.CustomPage.ConfigureFunctionalityPage"
                     <CorasauControls:CorasauLayoutItem  Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DebtorBudget}">
                         <CorasauControls:CheckEditor IsChecked="{Binding DebtorBudget,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem  Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Packaging}">
+                        <CorasauControls:CheckEditor IsChecked="{Binding InvPackaging,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
 
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" Orientation="Vertical" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Purchase}"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
@@ -178,14 +181,14 @@ x:Class="UnicontaClient.Pages.CustomPage.ConfigureFunctionalityPage"
                     <CorasauControls:CorasauLayoutItem x:Name="cbTraceFieldChanges" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FieldChangeLog}">
                         <CorasauControls:CheckEditor IsChecked="{Binding TraceFieldChanges, Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="cbBilagscan" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Bilagscan}">
-                        <CorasauControls:CheckEditor IsChecked="{Binding Bilagscan, Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                  <CorasauControls:CorasauLayoutItem x:Name="cbIntegrationPack" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=IntegrationPack}">
+                    <CorasauControls:CorasauLayoutItem x:Name="cbIntegrationPack" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=IntegrationPack}">
                     <CorasauControls:CheckEditor IsChecked="{Binding IntegrationPack, Mode=TwoWay}"/>
                   </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem x:Name="cbDatev" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DATEV}">
                         <CorasauControls:CheckEditor IsChecked="{Binding DATEV, Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="cbBilagscan" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DocumentScannersPay}">
+                        <CorasauControls:ComboBoxEditor x:Name="cmbDocumentScanner" SelectedIndexChanged="cmbDocumentScanner_SelectedIndexChanged"/>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup x:Name="grpBoxAddins" View="GroupBox" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">

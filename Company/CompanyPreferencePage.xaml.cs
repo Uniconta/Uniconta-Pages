@@ -49,6 +49,8 @@ namespace UnicontaClient.Pages.CustomPage
             cmbAccOnInvTrans.SelectedIndex = (editrow.InvoiceAccountOnInvTrans) ? 1 : 0;
             if (!api.CompanyEntity.Warehouse)
                 liChkWarehouse.Visibility = Visibility.Collapsed;
+            if (api.CompanyEntity.DocumentScanner == 0)
+                clgDocumentScanner.Visibility = Visibility.Collapsed;
         }
 
         private void frmRibbon_OnItemClicked(string ActionType)

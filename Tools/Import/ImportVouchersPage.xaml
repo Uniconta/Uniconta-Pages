@@ -2,48 +2,68 @@
 x:Class="UnicontaClient.Pages.CustomPage.ImportVouchersPage"
          xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
          xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+         xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+         xmlns:util="clr-namespace:UnicontaClient.Utilities"
+         xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
     <UserControl.Resources>
-        <Style TargetType="TextBox">
-            <Setter Property="Height" Value="25" />
-            <Setter Property="MinWidth" Value="170" />
-        </Style>
-        <Style TargetType="Button">
-            <Setter Property="Height" Value="25"></Setter>
-        </Style>
-        <Style TargetType="ComboBox">
-            <Setter Property="Height" Value="25" />
-        </Style>
-        <Style TargetType="TextBlock">
-            <Setter Property="VerticalAlignment" Value="Center"/>
-        </Style>
+        <util:GreaterThanValueConverter x:Key="GreaterThanValueConverter" />
     </UserControl.Resources>
-    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="40"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="5"/>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-
-        <TextBlock x:Name="txtSelectDirectory" Text="{Binding Converter={StaticResource LocalizationConverter},ConverterParameter=SelectDirectory,StringFormat=\{0\}:}" Grid.Row="0" Grid.Column="0" Margin="0 0 0 10"></TextBlock>
-        <StackPanel x:Name="dirStackprogress" Orientation="Horizontal" Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="3" HorizontalAlignment="Left">
-            <TextBox x:Name="txtImportFromDirectory" HorizontalAlignment="Center"/>
-            <Button x:Name="btnImportFromDir" Content="{Binding Converter={StaticResource LocalizationConverter},ConverterParameter=Browse}" Height="25" Click="btnImportFromDir_Click" HorizontalAlignment="Center" Margin="5 0 0 0" Width="150"></Button>
-            <Button x:Name="btnImport" Content="{Binding Converter={StaticResource LocalizationConverter},ConverterParameter=Import}" Click="btnImport_Click" HorizontalAlignment="Center" Margin="5 0 0 0" Width="150"></Button>
-        </StackPanel>
-        <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding Converter={StaticResource LocalizationConverter},ConverterParameter=LoadingMsg}" Margin="0,0,0,10" x:Name="leReading" />
-        <TextBox Grid.Row="1" Grid.Column="2" x:Name="txtReading" Grid.ColumnSpan="3"  Text="{Binding ReadMsg,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0 0 5 10"></TextBox>
-        <TextBlock Grid.Row="2" Grid.Column="0" Text="{Binding Converter={StaticResource LocalizationConverter},ConverterParameter=Saving}" Margin="0,0,0,10" x:Name="leWriting" />
-        <TextBox Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="3" x:Name="txtWriting" Text="{Binding WriteMsg,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0 0 5 10"></TextBox>
-        <TextBlock Grid.Row="3" Grid.Column="0" x:Name="leLog" Text="{Binding Converter={StaticResource LocalizationConverter},ConverterParameter=Log}" Margin="0,0,0,10" VerticalAlignment="Top"/>
-        <TextBox Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="3" x:Name="txtLogs" Text="{Binding LogMsg,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="450" VerticalAlignment="Top" VerticalContentAlignment="Top" IsReadOnly="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Margin="0 0 5 0" />
-    </Grid>
+    <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="0" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
+        <Grid  x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <CorasauControls:CorasauRibbonControl x:Name="localMenu" XMLSourcePath=";component/Pages/Tools/Conversion/ImportPhysicalVouchersPageRibbon.xml"/>
+            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Vertical" VerticalAlignment="Stretch" Grid.Row="2" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="640">
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpDocument" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Document}" Orientation="Vertical"  
+                                                    CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="610">
+                    <CorasauControls:CorasauLayoutItem FieldName="VoucherAttachment" x:Name="browseCtrlColumn" VerticalAlignment="Top" Style="{StaticResource LayoutItemsstyle}" VerticalContentAlignment="Top" ButtonContent="&#x1F50D;"
+                                                           ButtonClicked="browseCtrlColumn_ButtonClicked" LabelVerticalAlignment="Center">
+                        <TextBox x:Name="txtImportFromDirectory" HorizontalAlignment="Stretch" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem LabelVerticalAlignment="Center"  x:Name="leReading" >
+                        <Grid>
+                            <dxe:ProgressBarEdit x:Name="progressBarLoad" Height="23" HorizontalAlignment="Stretch" ContentDisplayMode="None" IsPercent="True" />
+                            <TextBlock x:Name="txtReading" Text="{Binding ReadMsg,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="{StaticResource EditorForeGroundTextColor}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Path=Value,ElementName=progressBarLoad,Converter={StaticResource GreaterThanValueConverter},ConverterParameter=50.0}" Value="True">
+                                                <Setter Property="Foreground" Value="{StaticResource HoverForegroundBrush}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Grid>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem LabelVerticalAlignment="Center"  x:Name="leWriting">
+                        <Grid>
+                            <dxe:ProgressBarEdit x:Name="progressBarSave" Height="23" HorizontalAlignment="Stretch" ContentDisplayMode="None" IsPercent="True" />
+                            <TextBlock x:Name="txtWriting" Text="{Binding WriteMsg,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="{StaticResource EditorForeGroundTextColor}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Path=Value,ElementName=progressBarSave,Converter={StaticResource GreaterThanValueConverter},ConverterParameter=50.0}" Value="True">
+                                                <Setter Property="Foreground" Value="{StaticResource HoverForegroundBrush}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Grid>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="leLog" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Log}" LabelVerticalAlignment="Top" >
+                        <CorasauControls:TextEditor x:Name="txtLogs" Text="{Binding LogMsg,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" MaxHeight="320" MinHeight="150" TextWrapping="Wrap" AcceptsReturn="True" VerticalContentAlignment="Top"
+                                                        IsReadOnly="true" ScrollViewer.VerticalScrollBarVisibility="Auto" />
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+            </CorasauControls:CorasauLayoutControl>
+        </Grid>
+    </CorasauControls:BusyIndicator>
 </Pages:ControlBasePage>

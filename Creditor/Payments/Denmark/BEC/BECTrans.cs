@@ -136,7 +136,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
 
             danishFields.Blanks = string.Empty;
 
-            var externalAdvText = StandardPaymentFunctions.ExternalMessage(paymentFormat._Message, tran, company, creditor);
+            var externalAdvText = StandardPaymentFunctions.ExternalMessage(paymentFormat, tran, company, creditor);
             var message = externalAdvText;
 
             if (tran._PaymentMethod == PaymentTypes.VendorBankAccount && danishFields.TransTypeCommand != BECPayFormat.TRANSTYPE_ERH400)

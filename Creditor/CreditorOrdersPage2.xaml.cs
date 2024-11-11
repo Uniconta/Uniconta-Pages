@@ -12,7 +12,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-
+using DevExpress.Xpf.Editors;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -24,6 +24,7 @@ using Uniconta.ClientTools.Util;
 using UnicontaClient.Controls.Dialogs;
 using Uniconta.ClientTools.Controls;
 using Uniconta.Common.Utility;
+using DevExpress.Data.TreeList;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -390,8 +391,26 @@ namespace UnicontaClient.Pages.CustomPage
         {
             string id = Convert.ToString(e.NewValue);
             var creditors = api.GetCache(typeof(Uniconta.DataModel.Creditor));
+            SetDefaultCompanyAddress();
             SetValuesFromMaster((Uniconta.DataModel.Creditor)creditors?.Get(id));
+            
         }
+        async void SetDefaultCompanyAddress()
+        {
+            if (editrow._CompanyAddress == null)
+            {
+                var cache = api.GetCache(typeof(CompanyAddress)) ?? await api.LoadCache(typeof(CompanyAddress));
+                foreach (var ca in (CompanyAddress[])cache.GetNotNullArray)
+                {
+                    if (ca._Default)
+                    {
+                        editrow.CompanyAddress = ca.KeyStr;
+                        break;
+                    }
+                }
+            }
+        }
+
         async void SetValuesFromMaster(Uniconta.DataModel.Creditor creditor)
         {
             if (creditor == null)
@@ -506,6 +525,12 @@ namespace UnicontaClient.Pages.CustomPage
                 row.DeliveryZipCode = zipCode;
             }
             row.DeliveryCountry = country;
+        }
+
+        private void OrderNumber_LostFocus(object sender, RoutedEventArgs e)
+        {
+            string originalOrderNumber = Convert.ToString((this.LoadedRow as DCOrder)?._OrderNumber);
+            DebtorOrdersPage2.CheckOrderNo(sender as TextEdit, typeof(CreditorOrder), api, originalOrderNumber);
         }
     }
 }

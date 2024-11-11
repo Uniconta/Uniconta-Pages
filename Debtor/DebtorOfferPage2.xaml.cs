@@ -318,6 +318,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override async void saveFormAndOpenControl(string Control, string header = null)
         {
+            if (!Utility.IsExecuteWithBlockedAccount(editrow.Debtor))
+                return;
             closePageOnSave = false;
             var res = await saveForm(false);
             closePageOnSave = true;
@@ -634,6 +636,28 @@ namespace UnicontaClient.Pages.CustomPage
                 row.DeliveryZipCode = zipCode;
             }
             row.DeliveryCountry = country;
+        }
+
+        private void liDeliveryname_LookupButtonClicked(object sender)
+        {
+            var lookupEditor = sender as LookupEditor;
+            lookupEditor.ItemsSource = api.GetCache(typeof(Uniconta.DataModel.Debtor));
+            lookupEditor.SelectedIndexChanged += LookupEditor_SelectedIndexChanged;
+        }
+
+        private void LookupEditor_SelectedIndexChanged(object sender, RoutedEventArgs e)
+        {
+            var lookup = sender as LookupEditor;
+            var selectedDebt = lookup.SelectedItem as DebtorClient;
+
+            if (selectedDebt != null)
+                CopyAddressToRow(selectedDebt._Name, selectedDebt._Address1, selectedDebt._Address2, selectedDebt._Address3, selectedDebt._ZipCode, selectedDebt._City, selectedDebt._Country);
+            lookup.SelectedIndexChanged -= LookupEditor_SelectedIndexChanged;
+        }
+        private void OrderNumber_LostFocus(object sender, RoutedEventArgs e)
+        {
+            string originalOrderNumber = Convert.ToString((this.LoadedRow as DCOrder)?._OrderNumber);
+            DebtorOrdersPage2.CheckOrderNo(sender as TextEdit, typeof(DebtorOffer), api, originalOrderNumber);
         }
     }
 }

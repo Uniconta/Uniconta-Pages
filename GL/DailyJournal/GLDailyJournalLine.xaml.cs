@@ -53,7 +53,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-           // tableView.RowStyle = Application.Current.Resources["MatchingRowStyle"] as Style;
+            // tableView.RowStyle = Application.Current.Resources["MatchingRowStyle"] as Style;
         }
 
         public override bool AddRowOnPageDown()
@@ -182,8 +182,10 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override IEnumerable<UnicontaBaseEntity> ConvertPastedRows(IEnumerable<UnicontaBaseEntity> copyFromRows)
         {
-            if (copyFromRows.FirstOrDefault() is GLTrans)
+            var first = copyFromRows.FirstOrDefault();
+            if (first is GLTrans)
             {
+                var isFam = first is FAMTransClient;
                 var lst = new List<UnicontaBaseEntity>();
                 foreach (var _tr in copyFromRows)
                 {
@@ -210,10 +212,19 @@ namespace UnicontaClient.Pages.CustomPage
                     };
                     TableField.SetUserFieldsFromRecord(tr, rec);
                     lst.Add(rec);
+
+                    if (tr._DCType == GLTransRefType.Asset || isFam)
+                    {
+                        rec._AccountType = (byte)GLTransRefType.Asset;
+                        rec._Account = tr._DCAccount;
+                        var pst = _tr as FAMTransClient;
+                        if (pst != null)
+                            rec._AssetPostType = pst._AssetPostType;
+                    }
                 }
                 return lst;
             }
-            if (copyFromRows.FirstOrDefault() is Document)
+            if (first is Document)
             {
                 var lst = new List<UnicontaBaseEntity>();
                 foreach (var _tr in copyFromRows)
@@ -881,6 +892,10 @@ namespace UnicontaClient.Pages.CustomPage
                 case "RefreshGrid":
                     RefreshGrid();
                     return;
+                case "SendVoucherReminder":
+                    if (selectedItem != null)
+                        Utility.SendVoucherReminder(api, selectedItem._Date, selectedItem.AmountCur != 0 ? selectedItem.AmountCur : selectedItem.Amount, (Currencies)selectedItem._Currency, selectedItem._Text);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -2764,6 +2779,11 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 rec.NotifyPropertyChanged("TaskSource");
             }
+        }
+
+        public override void RowPasted(UnicontaBaseEntity insertedEntity)
+        {
+            (insertedEntity as GLDailyJournalLineClient)?.PostImport(new DefaultValuesFiller(api));
         }
     }
 

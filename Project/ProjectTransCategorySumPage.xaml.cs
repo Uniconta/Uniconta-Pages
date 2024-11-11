@@ -215,15 +215,22 @@ namespace UnicontaClient.Pages.CustomPage
             base.OnLayoutLoaded();
             if (master == null)
                 Project.Visible = true;
-            if (showBudget) // this is default and if user has removed in layout, we do not want to set it
-                return;
-            BudgetQty.Visible = false;
-            BudgetCost.Visible = false;
-            BudgetSales.Visible = false;
-            BudgetInvoiced.Visible = false;
-            QtyDiff.Visible = false;
-            CostDiff.Visible = false;
-            SalesDiff.Visible = false;
+            if (!showBudget) // this is default and if user has removed in layout, we do not want to set it
+            {
+                BudgetQty.Visible = false;
+                BudgetCost.Visible = false;
+                BudgetSales.Visible = false;
+                BudgetInvoiced.Visible = false;
+                QtyDiff.Visible = false;
+                CostDiff.Visible = false;
+                SalesDiff.Visible = false;
+            }
+            if (api.CompanyEntity.HideCostPrice)
+            {
+                CostDiff.Visible = CostDiff.ShowInColumnChooser = 
+                Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
+                BudgetCost.Visible = BudgetCost.ShowInColumnChooser = Cost.Visible = Cost.ShowInColumnChooser = false;
+            }
         }
 
         string[] invoicedTrans;

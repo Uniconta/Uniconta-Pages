@@ -94,19 +94,20 @@ namespace UnicontaClient.Pages.CustomPage
         protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
+            var Comp = api.CompanyEntity;
 
-            var Cache = api.GetCache(typeof(Uniconta.DataModel.GLVat)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLVat)).ConfigureAwait(false);
-            var vatbuy = new VatCacheFilter(Cache, GLVatSaleBuy.Buy);
-            lePurchaseVat.cacheFilter = lePurchaseVat1.cacheFilter = lePurchaseVat2.cacheFilter = lePurchaseVat3.cacheFilter = lePurchaseVat4.cacheFilter = vatbuy;
+            var Cache = Comp.GetCache(typeof(Uniconta.DataModel.GLVat)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLVat)).ConfigureAwait(false);
+            if (!Comp._AllowPurchaseVatOnSales)
+                lePurchaseVat.cacheFilter = lePurchaseVat1.cacheFilter = lePurchaseVat2.cacheFilter = lePurchaseVat3.cacheFilter = lePurchaseVat4.cacheFilter = new VatCacheFilter(Cache, GLVatSaleBuy.Buy);
 
-            if (api.CompanyEntity._UseVatOperation)
+            if (Comp._UseVatOperation)
             {
-                Cache = api.GetCache(typeof(Uniconta.DataModel.GLVatType)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLVatType)).ConfigureAwait(false);
-                var vatbuyOpr = new VatTypeSQLCacheFilter(Cache, GLVatSaleBuy.Buy);
-                lePurchaseVatOpr.cacheFilter = lePurchaseVatOpr1.cacheFilter = lePurchaseVatOpr2.cacheFilter = lePurchaseVatOpr3.cacheFilter = lePurchaseVatOpr4.cacheFilter = vatbuyOpr;
+                Cache = Comp.GetCache(typeof(Uniconta.DataModel.GLVatType)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLVatType)).ConfigureAwait(false);
+                lePurchaseVatOpr.cacheFilter = lePurchaseVatOpr1.cacheFilter = lePurchaseVatOpr2.cacheFilter = lePurchaseVatOpr3.cacheFilter = lePurchaseVatOpr4.cacheFilter
+                    = new VatTypeSQLCacheFilter(Cache, GLVatSaleBuy.Buy);
             }
 
-            Cache = api.GetCache(typeof(Uniconta.DataModel.NumberSerie)) ?? await api.LoadCache(typeof(Uniconta.DataModel.NumberSerie)).ConfigureAwait(false);
+            Cache = Comp.GetCache(typeof(Uniconta.DataModel.NumberSerie)) ?? await api.LoadCache(typeof(Uniconta.DataModel.NumberSerie)).ConfigureAwait(false);
             leAutoNumber.cacheFilter = new NumberSerieSQLCacheFilter(Cache, true);
 
             LoadType(typeof(Uniconta.DataModel.GLAccount));

@@ -19,7 +19,7 @@ x:Class="UnicontaClient.Pages.CustomPage.EmailSetupWizard"
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Host}" HorizontalAlignment="Center" Height="23" Grid.Column="0"/>
-            <Controls:ComboBoxEditor x:Name="cmbSMTPServer" HorizontalAlignment="Left" DisplayMember="Host" Width="150" Height="23" Grid.Column="2" Margin="5,0,0,0"  EditValueChanged="cmbSMTPServer_EditValueChanged" />
+            <Controls:ComboBoxEditor x:Name="cmbSMTPServer" HorizontalAlignment="Stretch" DisplayMember="Host"  Height="23" Grid.Column="2" Margin="5,0,0,0"  EditValueChanged="cmbSMTPServer_EditValueChanged" />
         <TextBlock Grid.Row="2" x:Name="hlgmail" Visibility="Collapsed" Grid.Column="0" Grid.ColumnSpan="3">
             <Hyperlink NavigateUri="https://www.uniconta.com/unipedia-global/gmail-settings-to-send-mail-in-uniconta/" RequestNavigate="Hyperlink_RequestNavigate">
                 <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=GmailEmailSetting}"/></Hyperlink>

@@ -70,7 +70,8 @@ namespace UnicontaClient.Controls.Dialogs
         [Display(Name = "ChangeRegistrationCompany", ResourceType = typeof(InputFieldDataText))]
         public bool ChangeCompany { get; set; }
 
-        readonly Company Comp;
+        Company Comp;
+        readonly CompanyAddressClient companyAddress;
         CrudAPI api;
         public List<eDeliveryNHR> EndPointLst;
         public bool HasChanges;
@@ -85,11 +86,23 @@ namespace UnicontaClient.Controls.Dialogs
         public int DialogTableId { get; set; }
         protected override bool ShowTableValueButton { get { return true; } }
 
+        public CWNemhandel(CrudAPI api, CompanyAddressClient companyAddress)
+        {
+            this.api = api;
+            this.companyAddress = companyAddress;
+            InitPage();
+        }
+
         public CWNemhandel(CrudAPI api)
+        {
+            this.api = api;
+            InitPage();
+        }
+
+        void InitPage()
         {
             this.DataContext = this;
             InitializeComponent();
-            this.api = api;
             Comp = api.CompanyEntity;
             Title = Uniconta.ClientTools.Localization.lookup("NHR");
             OKButton.IsEnabled = false;
@@ -101,7 +114,7 @@ namespace UnicontaClient.Controls.Dialogs
         private async void CWNemhandel_Loaded(object sender, RoutedEventArgs e)
         {
             busyIndicator.IsBusy = true;
-            EndPointLst = await NHR.Lookup(api);
+            EndPointLst = await NHR.Lookup(api, companyAddress);
             busyIndicator.IsBusy = false;
 
             if (EndPointLst == null)
@@ -116,6 +129,7 @@ namespace UnicontaClient.Controls.Dialogs
             bool CVRFuture = false;
 
             int otherCompanyId = 0;
+            StringBuilderReuse sbCompanyAddr = null;
 
             grpFooter.Visibility = grpHeader.Visibility = Visibility.Visible;
             lblUnipedia.Content = UtilDisplay.CreateHyperLinkTextControl(GetLinkForUnipedia(), Uniconta.ClientTools.Localization.lookup("AlwaysCheckUnipedia"));
@@ -173,7 +187,13 @@ namespace UnicontaClient.Controls.Dialogs
                         chkUnregisterCVR.IsEnabled = false;
                     }
 
-                    if (endPoint.KeyType == NHREndPointType.GLN)
+                    if (endPoint.KeyType == NHREndPointType.GLN && endPoint.IsCompanyAddress)
+                    {
+                        if (sbCompanyAddr == null)
+                            sbCompanyAddr = StringBuilderReuse.Create().AppendLine().AppendLine().Append("Registreringer under Firmaadresser:").AppendLine();
+                        sbCompanyAddr.Append("GLN: ").Append(endPoint.Key).Append(" ").Append(endPoint.Comment).AppendLine();
+                    }
+                    else if (endPoint.KeyType == NHREndPointType.GLN)
                     {
                         grpGLNHeader.Visibility = Visibility.Visible;
 
@@ -327,9 +347,9 @@ namespace UnicontaClient.Controls.Dialogs
                     if (GLNnotRegistered)
                         sb.AppendLine().AppendLine().Append("Nedenstående GLN-nummer er ikke registreret i Nemhandelsregisteret. Tryk OK for at registrere det.");
                     else if (GLNFuture)
-                        sb.AppendLine().AppendLine().Append("GLN-nummer er sat til en fremtidig tilmeldingsdato.");
+                        sb.AppendLine().AppendLine().Append("BEMÆRK: GLN-nummer er sat til en fremtidig tilmeldingsdato.");
                     else if (CVRFuture)
-                        sb.AppendLine().AppendLine().Append("CVR-nummer er sat til en fremtidig tilmeldingsdato.");
+                        sb.AppendLine().AppendLine().Append("BEMÆRK: CVR-nummer er sat til en fremtidig tilmeldingsdato.");
                     txtHeader.Text = sb.ToStringAndRelease();
                 }
                 else
@@ -354,17 +374,20 @@ namespace UnicontaClient.Controls.Dialogs
 
                         if (GLNFuture)
                         {
-                            sb.AppendLine().AppendLine().Append("GLN-nummer er sat til en fremtidig tilmeldingsdato.");
+                            sb.AppendLine().AppendLine().Append("BEMÆRK: GLN-nummer er sat til en fremtidig tilmeldingsdato.");
                             if (CVRFuture)
-                                sb.AppendLine().Append("CVR-nummer er sat til en fremtidig tilmeldingsdato.");
+                                sb.AppendLine().Append("BEMÆRK: CVR-nummer er sat til en fremtidig tilmeldingsdato.");
                         }
                         else if (CVRFuture)
                         {
-                            sb.AppendLine().AppendLine().Append("CVR-nummer er sat til en fremtidig tilmeldingsdato.");
+                            sb.AppendLine().AppendLine().Append("BEMÆRK: CVR-nummer er sat til en fremtidig tilmeldingsdato.");
                         }
                     }
                     txtHeader.Text = sb.ToStringAndRelease();
                 }
+
+                if (sbCompanyAddr != null)
+                    txtHeader.Text += sbCompanyAddr.ToStringAndRelease();
             }
         }
 

@@ -42,7 +42,7 @@ namespace UnicontaClient.Pages.CustomPage
         public bool IsSimulation { get { return simulation; } set { simulation = value; } }
         [InputFieldData]
         [Display(Name = "Comment", ResourceType = typeof(InputFieldDataText))]
-        public string comments { get { return _comment; } set { _comment = value; } }
+        public string Comments { get { return _comment; } set { _comment = value; } }
 
         bool simulation;
         static string _Journal, _Bank, _comment;

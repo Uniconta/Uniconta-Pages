@@ -212,7 +212,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Orders":
                     if (dgCrmDebtorProspect.syncEntity == null || selectedItem == null || !selectedItem.IsDebtor)
                         return;
-                    AddDockItem(TabControls.DebtorOrdersMultiple, dgCrmDebtorProspect.syncEntity);
+                    AddDockItem(TabControls.DebtorOrders, dgCrmDebtorProspect.syncEntity,string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Orders"), selectedItem.Name));
                     break;
                 case "Offers":
                     if (selectedItem is CrmProspectView)

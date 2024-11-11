@@ -1,15 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
-using System.Windows.Navigation;
 using Uniconta.ClientTools.Page;
 using UnicontaClient.Models;
 using Uniconta.ClientTools.DataModel;
@@ -17,14 +9,12 @@ using System.Threading.Tasks;
 using Uniconta.Common;
 using UnicontaClient.Utilities;
 using Uniconta.ClientTools;
-using System.IO;
 using Uniconta.ClientTools.Controls;
 using System.Collections;
 using System.Windows;
 using Uniconta.API.System;
 using Uniconta.ClientTools.Util;
 using Uniconta.API.Service;
-using System.Text;
 using Uniconta.Common.Utility;
 using UnicontaClient.Controls.Dialogs;
 
@@ -159,7 +149,6 @@ namespace UnicontaClient.Pages.CustomPage
 
                 }, TaskContinuationOptions.None);
 
-#if !SILVERLIGHT
                 var tskw = Task.Delay(60000);
                 tskw.ContinueWith((e) =>
                 {
@@ -175,7 +164,6 @@ namespace UnicontaClient.Pages.CustomPage
                     }
 
                 }, TaskContinuationOptions.None);
-#endif
             }
             catch (Exception ex)
             {
@@ -221,20 +209,10 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgDocsGrid);
 
             localMenu.OnItemClicked += localMenu_OnItemClicked;
-
-#if SILVERLIGHT
-            RibbonBase rb = (RibbonBase)localMenu.DataContext;
-            if (rb != null)
-            {
-                Uniconta.ClientTools.Util.UtilDisplay.RemoveMenuCommand(rb, new string[] { "Save" });
-                Uniconta.ClientTools.Util.UtilDisplay.RemoveMenuCommand(rb, "JoinPDF");
-            }
-#else
             dgDocsGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
             dgDocsGrid.tableView.AllowDragDrop = isDragDropAllowed;
             dgDocsGrid.tableView.DropRecord += dgDocsGrid_DropRecord;
             dgDocsGrid.tableView.DragRecordOver += dgDocsGrid_DragRecordOver;
-#endif
             if (!(masterRecord is Uniconta.DataModel.DCOrder || masterRecord is Uniconta.DataModel.DCInvoice || masterRecord is Uniconta.DataModel.CompanySMTP))
             {
                 Invoice.Visible = Invoice.ShowInColumnChooser = false;
@@ -242,6 +220,7 @@ namespace UnicontaClient.Pages.CustomPage
                 Confirmation.Visible = Confirmation.ShowInColumnChooser = false;
                 PackNote.Visible = PackNote.ShowInColumnChooser = false;
                 Requisition.Visible = Requisition.ShowInColumnChooser = false;
+                PurchaseOrder.Visible = PurchaseOrder.ShowInColumnChooser = false;
             }
             if (!api.CompanyEntity._AllowDocumentGuid)
             {
@@ -270,8 +249,6 @@ namespace UnicontaClient.Pages.CustomPage
                 dgDocsGrid._syncEntity.RowChaged();
             }
         }
-
-#if !SILVERLIGHT
 
         private void dgDocsGrid_DropRecord(object sender, DevExpress.Xpf.Core.DropRecordEventArgs e)
         {
@@ -307,7 +284,6 @@ namespace UnicontaClient.Pages.CustomPage
 
             e.Handled = true;
         }
-#endif
         void SetColumn()
         {
             if (dgDocsGrid.ItemsSource != null)
@@ -403,11 +379,9 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Save":
                     dgDocsGrid.SaveData();
                     break;
-#if !SILVERLIGHT
                 case "JoinPDF":
                     JoinPDFAttachments();
                     break;
-#endif
                 case "ConvertToPDF":
                     if (selectedItem != null)
                         ImageToPdfConverter(selectedItem);
@@ -533,8 +507,6 @@ namespace UnicontaClient.Pages.CustomPage
                 UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("ConversionNotSupport"), Uniconta.ClientTools.Localization.lookup("Warning"));
         }
 
-#if !SILVERLIGHT
-
         async void JoinPDFAttachments()
         {
             UserDocsClient attachement1 = null, attachement2 = null;
@@ -624,7 +596,6 @@ namespace UnicontaClient.Pages.CustomPage
             await dgDocsGrid.Filter(null);
             busyIndicator.IsBusy = false;
         }
-#endif
 
         public override void Utility_Refresh(string screenName, object argument = null)
         {
@@ -678,6 +649,7 @@ namespace UnicontaClient.Pages.CustomPage
                         selectedItem._Data = buffer;
                         selectedItem._Url = url;
                         selectedItem._NoCompression = cwUpdateFile.Compress;
+                        selectedItem._DocumentType = cwUpdateFile.fileExtensionType;
                         busyIndicator.IsBusy = true;
                         await api.Update(org, selectedItem);
                         busyIndicator.IsBusy = false;

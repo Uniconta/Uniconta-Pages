@@ -543,8 +543,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (savetask != null)
                 await savetask;
             await dgProductionOrderLineGrid.RefreshTask();
-            if (this.items.CacheAge.TotalMinutes > 10d)
-                this.items = await api.LoadCache(typeof(Uniconta.DataModel.InvItem), true);
+            api.UpdateCache();
         }
         async void AddAttachment(string actionType, ProductionOrderLineClient productionOrderLineClient)
         {

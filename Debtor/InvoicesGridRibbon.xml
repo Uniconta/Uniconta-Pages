@@ -31,24 +31,23 @@
     <RibbonItem Action="ShowInvoice" LocalizedNameKey="ShowInvoice" LargeGlyph="Show_Invoice_32x32" />
     <RibbonItem Action="ShowPackNote" LocalizedNameKey="ShowOBJ" Parameter="Packnote" LargeGlyph="Pack_Note_32x32" />
   </RibbonItem>
-  <RibbonItem>
+  <RibbonItem LocalizedNameKey="email">
     <RibbonItem Action="SendInvoice" LocalizedNameKey="Sendinvoicebyemail" LargeGlyph="SendInvoiceMail_32x32" />
     <RibbonItem Action="SendAsOutlook" LocalizedNameKey="SendInvoiceInOutLook" LargeGlyph="Posted_Journal_32x32" />
   </RibbonItem>
-  <RibbonItem>
-	  <!--<RibbonItem Action="eDeliverySettings" LocalizedNameKey="eDeliverySettings" LargeGlyph="Settings_32x32"/>-->
-	  <RibbonItem Action="SendUBL" LocalizedNameKey="SendInvoicebyUBL" Module="_OIOUBLSendOnServer" LargeGlyph="SendInvoiceMail_32x32" />
-    <RibbonItem LocalizedNameKey="GenerateOBJ" Parameter="einvoice" LargeGlyph="Account-statement_32x32">
-      <RibbonItem Action="GenerateOioXml" LocalizedNameKey="CurrentRecord" Glyph="Attachments_16x16"/>
-      <RibbonItem Action="GenerateMarkedOioXml" LocalizedNameKey="SelectedRows" Glyph="Item_Number_16x16"/>
-      <RibbonItem Action="GenerateAllOioXml" LocalizedNameKey="All" Glyph="Reseller_16x16"/>
-    </RibbonItem>
-    <RibbonItem Action="DocSendLog" LocalizedNameKey="Log" ControlName="DocsSendLogGridPage" LargeGlyph="Server_Count_32x32" />
+  <RibbonItem  LocalizedNameKey="eInvoice">
+	  <!--<RibbonItem Action="EDeliveryMapping" LocalizedNameKey="EDeliveryMapping" LargeGlyph="Settings_32x32"/>-->
+	  <RibbonItem Action="SendUBL" LocalizedNameKey="SendInvoicebyUBL"  Module="_OIOUBLSendOnServer" LargeGlyph="SendInvoiceMail_32x32" />
+	  <RibbonItem Action="DocSendLog" LocalizedNameKey="Log" ControlName="DocsSendLogGridPage" LargeGlyph="Server_Count_32x32" />
+      <RibbonItem Action="ExportUBL" LocalizedNameKey="ExportOBJ" Parameter="einvoice" LargeGlyph="Import_32x32"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="CreateOrder" LocalizedNameKey="CreateOBJ" Parameter="Order" LargeGlyph="Orders_32x32"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="PreviousAddresses" LocalizedNameKey="PreviousAddresses" LargeGlyph="CopyUserTable_32x32"/>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="InvPackagingTrans" LocalizedNameKey="PackagingTrans" LargeGlyph="Transactions_32x32"/>
   </RibbonItem>
 </root>

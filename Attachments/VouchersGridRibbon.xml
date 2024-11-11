@@ -44,10 +44,12 @@
   </RibbonItem>
 	<RibbonItem>
 		<RibbonItem Action="Bilagscan" LocalizedNameKey="Bilagscan" LargeGlyph="Transfer_32x32">
-			<RibbonItem Action="BilagscanSend" LocalizedNameKey="BilagscanSend" Glyph="Export_16x16" />
-			<RibbonItem Action="BilagscanRead" LocalizedNameKey="BilagscanRead" Glyph="Import_16x16" />
+			<RibbonItem Action="DocumentScanUpload" LocalizedNameKey="BilagscanSend" Glyph="Export_16x16" />
 			<RibbonItem Action="BilagscanProfile" LocalizedNameKey="BilagscanProfile" Glyph="View_16x16" />
 			<RibbonItem Action="BilagscanCreateUser" LocalizedNameKey="CreateOBJ" Parameter="User" Glyph="save-16x16" />
+		</RibbonItem>
+		<RibbonItem Action="UnicontaScan" LocalizedNameKey="UnicontaScan" LargeGlyph="Transfer_32x32">
+			<RibbonItem Action="DocumentScanUpload" LocalizedNameKey="Upload" Glyph="Export_16x16" />
 		</RibbonItem>
 	</RibbonItem>
 	<RibbonItem>

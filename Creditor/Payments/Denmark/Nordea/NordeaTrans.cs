@@ -111,7 +111,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
             var invoiceNumber = tran.invoiceNumbers == null ? tran.Invoice.ToString() : tran.invoiceNumbers.ToString();
             invoiceNumber = invoiceNumber == "0" ? string.Empty : string.Format("Faknr:{0}", invoiceNumber);
 
-            var externalAdvText = StandardPaymentFunctions.ExternalMessage(paymentFormat._Message, tran, company, creditor);
+            var externalAdvText = StandardPaymentFunctions.ExternalMessage(paymentFormat, tran, company, creditor);
             var message = externalAdvText;
 
             //Extended notification

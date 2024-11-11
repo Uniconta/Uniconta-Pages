@@ -173,7 +173,8 @@ namespace UnicontaClient.Pages.CustomPage
             var Comp = api.CompanyEntity;
 
             var Cache = Comp.GetCache(typeof(Uniconta.DataModel.GLVat)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLVat)).ConfigureAwait(false);
-            Vatlookupeditior.cacheFilter = new VatCacheFilter(Cache, GLVatSaleBuy.Buy);
+            if (!Comp._AllowPurchaseVatOnSales)
+                Vatlookupeditior.cacheFilter = new VatCacheFilter(Cache, GLVatSaleBuy.Buy);
 
             if (Comp._UseVatOperation)
             {
@@ -321,6 +322,12 @@ namespace UnicontaClient.Pages.CustomPage
                         {
                             editrow.Phone = contact.phone;
                             editrow.ContactEmail = contact.email;
+                        }
+                        var state = ci.companystatus;
+                        if (state != null)
+                        {
+                            editrow._StateOfCompany = state.StatusCode();
+                            editrow.NotifyPropertyChanged("CompanyState");
                         }
                         if (!string.IsNullOrEmpty(ci.vat) && editrow.Country == CountryCode.Denmark)
                             editrow.VatNumber = ci.vat;

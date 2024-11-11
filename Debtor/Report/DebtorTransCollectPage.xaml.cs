@@ -16,7 +16,6 @@ namespace UnicontaClient.Pages.CustomPage
     public class DebtorTransCollectGrid : CorasauDataGridClient
     {
         public override Type TableType { get { return typeof(DebtorTransCollectClient); } }
-
         public override bool Readonly { get { return true; } }
         public override IComparer GridSorting => new DCTransCollectSort();
     }
@@ -98,12 +97,9 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     break;
                 case "SendAsOutlook":
-                    if (selectedItem?.OpenTran != null)
-                        OpenOutlook(selectedItem);
-                    break;
                 case "Print":
                     if (selectedItem?.OpenTran != null)
-                        PrintData(selectedItem);
+                        GenerateCollectionLetter(selectedItem, ActionType);
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -111,54 +107,35 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        async private void OpenOutlook(DebtorTransCollectClient selectedItem)
+        async private void GenerateCollectionLetter(DebtorTransCollectClient selectedItem, string ActionType)
         {
             try
             {
                 busyIndicator.IsBusy = true;
-                busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LaunchingWaitMsg");
+                busyIndicator.BusyContent = ActionType == "Print" ? Uniconta.ClientTools.Localization.lookup("GeneratingPage") : Uniconta.ClientTools.Localization.lookup("LaunchingWaitMsg");
+                
                 var debtor = accountCache.Get(selectedItem.Trans._Account) as DebtorClient;
-
                 selectedItem.OpenTran._Code = selectedItem._Code;
-                var paymentStandardReport = await Utility.GenerateStandardCollectionReport(selectedItem.OpenTran, debtor, selectedItem._Date, selectedItem._Code, api);
+                var paymentStandardReport = await Utility.GenerateStandardCollectionReport(selectedItem.OpenTran, debtor, selectedItem._SendTime, selectedItem._Code, api, false);
+
                 if (paymentStandardReport != null)
                 {
-                    InvoicePostingPrintGenerator.OpenReportInOutlook(api, paymentStandardReport, debtor, selectedItem._Code);
+                    if (ActionType == "Print")
+                    {
+                        var reportName = selectedItem._Code == DebtorEmailType.InterestNote ? Uniconta.ClientTools.Localization.lookup("InterestNote") : Uniconta.ClientTools.Localization.lookup("CollectionLetter");
+                        var dockName = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Preview"), reportName);
+                        AddDockItem(UnicontaTabs.StandardPrintReportPage, new object[] { paymentStandardReport, reportName }, dockName);
+                    }
+                    else if (ActionType == "SendAsOutlook")
+                        InvoicePostingPrintGenerator.OpenReportInOutlook(api, paymentStandardReport, debtor, selectedItem._Code);
                 }
+
             }
             catch (Exception ex)
             {
+                if (ActionType == "Print")
+                    api.ReportException(ex, string.Format("DebtorPayment.PrintData(), CompanyId={0}", api.CompanyId));
                 UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"));
-            }
-            finally { busyIndicator.IsBusy = false; }
-        }
-
-        async private void PrintData(DebtorTransCollectClient selectedItem)
-        {
-            busyIndicator.IsBusy = true;
-            busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
-
-            try
-            {
-                byte[] logo = await UtilCommon.GetLogo(api);
-                var Comp = api.CompanyEntity;
-
-                var companyClient = Comp.CreateUserType<CompanyClient>();
-                StreamingManager.Copy(Comp, companyClient);
-
-                selectedItem.OpenTran._Code = selectedItem._Code;
-                var debtor = accountCache.Get(selectedItem.Trans._Account) as DebtorClient;
-
-                var paymentStandardReport = await Utility.GenerateStandardCollectionReport(selectedItem.OpenTran, debtor, selectedItem._SendTime, selectedItem._Code, api);
-                var reportName = selectedItem._Code == DebtorEmailType.InterestNote ? Uniconta.ClientTools.Localization.lookup("InterestNote") : Uniconta.ClientTools.Localization.lookup("CollectionLetter");
-                var dockName = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Preview"), reportName);
-                AddDockItem(UnicontaTabs.StandardPrintReportPage, new object[] { paymentStandardReport, reportName }, dockName);
-            }
-            catch (Exception ex)
-            {
-                busyIndicator.IsBusy = false;
-                api.ReportException(ex, string.Format("DebtorPayment.PrintData(), CompanyId={0}", api.CompanyId));
-                UnicontaMessageBox.Show(ex);
             }
             finally
             {

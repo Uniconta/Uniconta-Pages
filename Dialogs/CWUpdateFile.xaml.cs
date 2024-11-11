@@ -1,20 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Uniconta.ClientTools;
 using Uniconta.ClientTools.Controls;
-using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 
 namespace UnicontaClient.Controls.Dialogs
@@ -26,7 +14,7 @@ namespace UnicontaClient.Controls.Dialogs
     {
         public byte[] Contents;
         public string Url;
-        FileextensionsTypes fileExtensionType;
+        public FileextensionsTypes fileExtensionType;
         public bool Compress;
 
         public CWUpdateFile(FileextensionsTypes fileExtension, string title = null)
@@ -41,7 +29,6 @@ namespace UnicontaClient.Controls.Dialogs
                 txtFileType.Text = Uniconta.ClientTools.Localization.lookup("Upload") + ":";
 
             fileExtensionType = fileExtension;
-            fileBrowseCtrl.Filter = UtilFunctions.GetFilteredExtensions(fileExtensionType);
             fileBrowseCtrl.CompressVisibility = Visibility.Visible;
         }
 
@@ -57,6 +44,7 @@ namespace UnicontaClient.Controls.Dialogs
                 Contents = fileBrowseCtrl.FileBytes;
                 Compress = fileBrowseCtrl.Compress;
                 Url = browseUrl;
+                fileExtensionType = DocumentConvert.GetDocumentType(fileBrowseCtrl.FileExtension);
 
                 if (chkIncludeOnlyReference.IsChecked.GetValueOrDefault())
                     Contents = null;
@@ -68,7 +56,7 @@ namespace UnicontaClient.Controls.Dialogs
             else if (!string.IsNullOrEmpty(txtUrl.Text))
             {
                 var url = txtUrl.Text;
-                FileextensionsTypes fileExt = FileextensionsTypes.UNK;
+                FileextensionsTypes fileExt = FileextensionsTypes.UNK; 
                 string fileName = null;
 
                 if (url.StartsWith("http", StringComparison.OrdinalIgnoreCase) || url.StartsWith("www", StringComparison.OrdinalIgnoreCase))
@@ -89,6 +77,7 @@ namespace UnicontaClient.Controls.Dialogs
                     return;
                 }
 
+                fileExtensionType = fileExt;
                 Url = url;
                 SetDialogResult(true);
             }

@@ -94,6 +94,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CrmProspectPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="IndustryCode" x:Name="liIndustryCode">
                         <CorasauControls:LookupEditor x:Name="leIndustryCode" Text="{Binding IndustryCode ,Mode=TwoWay}" />
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="CompanyState" x:Name="liCompanyState">
+                        <CorasauControls:ComboBoxEditor SelectedItem="{Binding CompanyState,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
 
             </CorasauControls:CorasauLayoutGroup>

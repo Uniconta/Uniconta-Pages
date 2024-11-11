@@ -1,19 +1,11 @@
 using System;
-using System.Text;
-using System.Windows;
 using Uniconta.Common;
 using Uniconta.DataModel;
-using System.ComponentModel;
 using System.IO;
-using System.Windows.Shapes;
-using System.Linq;
 using Uniconta.API.System;
 using Uniconta.Common.Utility;
 using System.Collections.Generic;
-using System.Windows.Controls;
-using System.Windows.Forms;
 using Uniconta.ClientTools.Page;
-using UnicontaClient.Controls;
 using Uniconta.API.Service;
 using Uniconta.ClientTools.Util;
 using Uniconta.ClientTools.Controls;
@@ -30,70 +22,73 @@ namespace UnicontaClient.Pages.CustomPage
             : base(API, string.Empty)
         {
             _logs = new ImportLogVoucher();
-            _logs.logTarget = txtLogs;
-            this.DataContext = _logs;
+            this.DataContext = this;
             InitializeComponent();
-            btnImport.IsEnabled = false;
-            txtImportFromDirectory.TextChanged += TxtImportFromDirectory_TextChanged;
-        }
-
-        private void TxtImportFromDirectory_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-            btnImport.IsEnabled = true;
-            txtImportFromDirectory.TextChanged -= TxtImportFromDirectory_TextChanged;
-
-        }
-
-
-        DevExpress.Xpf.Dialogs.DXFolderBrowserDialog openFolderDialog;
-        string path;
-        private void btnImportFromDir_Click(object sender, RoutedEventArgs e)
-        {
-            openFolderDialog = UtilDisplay.LoadFolderBrowserDialog;
-            if (openFolderDialog.ShowDialog() == true)
-            {
-                txtImportFromDirectory.Text = openFolderDialog.SelectedPath;
-                btnImport.IsEnabled = true;
-            }
-        }
-        private async void btnImport_Click(object sender, RoutedEventArgs e)
-        {
-            path = txtImportFromDirectory.Text;
             company = api.CompanyEntity;
-            if (company == null)
-                return;
-            if (string.IsNullOrEmpty(path))
-            {
-                System.Windows.MessageBox.Show("Select directory");
-                return;
-            }
-            company = await BasePage.session.OpenCompany(company.RowId, false, company).ConfigureAwait(false);
-            ReadDirectory(new DirectoryInfo(path));
+            leReading.Label = string.Format(Uniconta.ClientTools.Localization.lookup("LoadOBJ"), Uniconta.ClientTools.Localization.lookup("Status"));
+            leWriting.Label = string.Format(Uniconta.ClientTools.Localization.lookup("SaveOBJ"), Uniconta.ClientTools.Localization.lookup("Status"));
+            txtLogs.DataContext = txtReading.DataContext = txtWriting.DataContext = _logs;
+            progressBarSave.Minimum = progressBarLoad.Minimum = 0;
+            localMenu.OnItemClicked += LocalMenu_OnItemClicked;
+            UtilDisplay.RemoveMenuCommand((RibbonBase)localMenu.DataContext, new string[] { "Terminate" });
+            localMenu.DisableButtons(new string[] { "ImportData", "CopyData" });
         }
+
+        private void LocalMenu_OnItemClicked(string ActionType)
+        {
+            switch (ActionType)
+            {
+                case "ImportData":
+                    Import();
+                    break;
+                case "CopyData":
+                    if (!string.IsNullOrEmpty(txtLogs.Text))
+                    {
+                        System.Windows.Forms.Clipboard.SetText(txtLogs.Text);
+                        if (api.CompanyEntity._CountryId == CountryCode.Denmark)
+                            UnicontaMessageBox.Show("Du kan nu Ctrl+V i dit ønskede textprogram", Uniconta.ClientTools.Localization.lookup("Message"));
+                        else
+                            UnicontaMessageBox.Show("You can now Ctrl+V in your choosen texteditor", Uniconta.ClientTools.Localization.lookup("Message"));
+                    }
+                    break;
+            }
+        }
+
+        List<FileInfo> filesToCopy;
+
+        void Import()
+        {
+            var path = txtImportFromDirectory.Text;
+            filesToCopy = new List<FileInfo>();
+            ReadDirectory(new DirectoryInfo(path));
+
+            if (filesToCopy.Count != 0)
+                CopyFiles();
+        }
+
         void ReadDirectory(DirectoryInfo dirFrom)
         {
             foreach (var subDFrom in dirFrom.GetDirectories())
-            {
                 ReadDirectory(subDFrom);
-            }
-            CopyFiles(dirFrom);
+
+            filesToCopy.AddRange(dirFrom.GetFiles());
         }
 
-        async void CopyFiles(DirectoryInfo dirFrom)
+        async void CopyFiles()
         {
             var imp = new ImportVoucher(new CrudAPI(BasePage.session, company), _logs);
             int fileCount = 0;
             var sp = new StringSplit('_');
             var lst = new List<string>();
             var st = UnistreamReuse.Create();
-            var files = dirFrom.GetFiles();
 
-            foreach (var file in files)
+            foreach (var file in filesToCopy)
             {
                 try
                 {
                     fileCount++;
                     _logs.ReadMsg = string.Concat("File: ", file.Name, " ", NumberConvert.ToString(fileCount));
+                    Dispatcher.Invoke(new Action(() => { progressBarLoad.Value = fileCount; }));
 
                     sp.Split(file.Name, lst);
                     if (lst.Count < 2)
@@ -151,6 +146,11 @@ namespace UnicontaClient.Pages.CustomPage
                             buf = null;
 
                         await imp.Import(Voucher, date, _ext, Text, buf ?? st.ToArray());
+                        _logs.WriteMsg = string.Format("{0} / {1}", fileCount, filesToCopy.Count);
+                        Dispatcher.Invoke(new Action(() =>
+                        {
+                            progressBarSave.Value = fileCount;
+                        }));
                     }
                 }
                 catch (Exception ex)
@@ -160,6 +160,16 @@ namespace UnicontaClient.Pages.CustomPage
             }
             st.Release();
             _logs.AppendLogLine(Uniconta.ClientTools.Localization.lookup("Done"));
+        }
+
+        private void browseCtrlColumn_ButtonClicked(object sender)
+        {
+            var openFolderDialog = UtilDisplay.LoadFolderBrowserDialog;
+            if (openFolderDialog.ShowDialog() == true)
+            {
+                txtImportFromDirectory.Text = openFolderDialog.SelectedPath;
+                localMenu.EnableButtons(new string[] { "ImportData", "CopyData" });
+            }
         }
     }
 }

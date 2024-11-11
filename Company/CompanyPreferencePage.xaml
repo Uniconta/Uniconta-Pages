@@ -66,9 +66,12 @@ x:Class="UnicontaClient.Pages.CustomPage.CompanyPreferencePage"
                             <CorasauControls:CheckEditor IsChecked="{Binding AprvePurchaseOrders,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
-                    <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Bilagscan}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" MinWidth="420">
+                    <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DocumentScannersPay}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" MinWidth="420" x:Name="clgDocumentScanner">
                         <CorasauControls:CorasauLayoutItem FieldName="PaperFlowSaveCreditors">
                             <CorasauControls:CheckEditor IsChecked="{Binding PaperFlowSaveCreditors,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="AutoScanVoucher">
+                            <CorasauControls:CheckEditor IsChecked="{Binding AutoScanVoucher,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>
@@ -100,6 +103,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CompanyPreferencePage"
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="InvGroups">
                             <CorasauControls:CheckEditor IsChecked="{Binding InvGroups,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="InvLastMovement">
+                            <CorasauControls:CheckEditor IsChecked="{Binding InvLastMovement,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="BrandGroup">
                             <CorasauControls:TextEditor Text="{Binding BrandGroup,Mode=TwoWay}" />
@@ -134,6 +140,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CompanyPreferencePage"
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=NemHandel}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" MinWidth="420">
                         <CorasauControls:CorasauLayoutItem FieldName="OIOUBLIncludes">
                             <CorasauControls:ComboBoxEditor x:Name="cmbOIOUBLIncludes" SelectedItem="{Binding OIOUBLIncludes,Mode=TwoWay}"  />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="DeactivateSendNemhandel">
+                            <CorasauControls:CheckEditor IsChecked="{Binding DeactivateSendNemhandel,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>

@@ -24,7 +24,7 @@ namespace UnicontaClient.Pages
         {
             InitializeComponent();
             this.DataContext = this;
-
+            
             Title = title ?? Uniconta.ClientTools.Localization.lookup("Viewer");
             _dataContent = UtilDisplay.GetXMLAttachments(xmlData);
             currentIndex = 0;
@@ -206,11 +206,12 @@ namespace UnicontaClient.Pages
         private void ClearGrid(bool isCloseBrowser = false)
         {
             if (contentViewerGrid.Children.Count != 0)
-                contentViewerGrid.Children.Clear();
+            {
+                if (contentViewerGrid.Children[0] is UnicontaWebViewer webViewer)
+                    webViewer.CloseUnicontaWebViewer();
 
-            //Handling for Browser closing
-            if (isCloseBrowser)
-                UtilDisplay.CloseUnicontaWebViewer();
+                contentViewerGrid.Children.Clear();
+            }
         }
     }
 }

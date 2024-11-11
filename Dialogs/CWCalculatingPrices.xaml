@@ -19,6 +19,7 @@
                     <RowDefinition Height="30"/>
                     <RowDefinition Height="30"/>
                     <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="180" />
@@ -40,6 +41,8 @@
                 <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=NoCorrectionsBefore}" Grid.Column="0" Grid.Row="4" VerticalAlignment="Center" />
                 <CorasauControls:DateEditor   x:Name="dteNoCorrBefore" EditValue="{Binding NoCorrectionsBefore,Mode=TwoWay}" Grid.Column="2" Grid.Row="4"  Height="25" />
 
+                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=UpdateOBJ;Cost}" Grid.Column="0" Grid.Row="5" VerticalAlignment="Center" />
+                <CorasauControls:CheckEditor   x:Name="ceUpdateCost" IsChecked="{Binding UpdateCost,Mode=TwoWay}" Grid.Column="2" Grid.Row="5"  Height="25" />
             </Grid>
             <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="1" Orientation="Horizontal" Margin="0 10 0 0">
                 <Button x:Name="OKButton" IsEnabled="{Binding ElementName=leJournal,Path=Text.Length}" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OK}" IsDefault="True"  

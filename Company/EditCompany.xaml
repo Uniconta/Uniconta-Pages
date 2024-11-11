@@ -181,11 +181,11 @@ x:Class="UnicontaClient.Pages.CustomPage.EditCompany"
                         <CorasauControls:CorasauLayoutItem FieldName="UseUnrealizedVat" x:Name="liUseUnrealizedVat">
                             <CorasauControls:CheckEditor IsChecked="{Binding UseUnrealizedVat,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="AllowPurchaseVatOnSales" x:Name="liAllowPurchaseVatOnSales">
+                            <CorasauControls:CheckEditor IsChecked="{Binding AllowPurchaseVatOnSales,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="UseVatOperation" x:Name="liUseVatOperation">
                             <CorasauControls:CheckEditor IsChecked="{Binding UseVatOperation,Mode=TwoWay}" />
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="OIOUBLSendOnServer" x:Name="liOIOUBLSendOnServer">
-                            <CorasauControls:CheckEditor IsChecked="{Binding OIOUBLSendOnServer,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="FullPrimo" x:Name="liFullPrimo">
                             <CorasauControls:CheckEditor IsChecked="{Binding FullPrimo,Mode=TwoWay}" />

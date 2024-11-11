@@ -31,7 +31,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override string NameOfControl { get { return TabControls.AttachedVouchersPage2; } }
 
         public override Type TableType { get { return typeof(VouchersClient); } }
-        public override UnicontaBaseEntity ModifiedRow { get { return editrow; } set { editrow = (VouchersClient)value; } }
+        public override UnicontaBaseEntity ModifiedRow { get { return editrow; } set { editrow = (VouchersClient)value; editrow._ScanDoc = true; } }
         SQLCache FolderCache;
         public override bool BeforeSetUserField(ref CorasauLayoutGroup parentGroup)
         {

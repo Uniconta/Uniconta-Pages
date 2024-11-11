@@ -80,6 +80,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InvBOMExplodePage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ShowOnPacknote" Visible="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="InclValueOnInvoice" Visible="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ShowOnPicklist" Visible="false"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ShowOnConfirmation" Visible="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Cartons" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Weight" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Volume" Visible="False"/>

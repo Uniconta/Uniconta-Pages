@@ -81,7 +81,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (line._Hide)
                     AnyHidden = true;
 
-                var newBalanceCol = new BalanceClient(amounts);
+                var newBalanceCol = new BalanceClient(amounts, ShowZero);
                 newBalanceCol.Acc._Name = line._Text;
                 newBalance.Add(newBalanceCol);
                 TemplateReportlist.Add(new TemplateDataItems(newBalanceCol, hdrData, line) { Masterfontsize = template._FontSize });

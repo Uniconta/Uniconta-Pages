@@ -48,15 +48,11 @@ namespace UnicontaClient.Pages.CustomPage
             lePaymentFormat.api = api;
             //leBankAccount.api = api;
             SetExportFormat();
-#if SILVERLIGHT
-            Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             this.Loaded += CW_Loaded;
         }
         void SetExportFormat()
         {
             List<string> formatOption = Enum.GetNames(typeof(ExportFormatType)).ToList();
-#if !SILVERLIGHT
             plugins = Plugin.pluginList as Uniconta.DataModel.UserPlugin[];
             if (plugins != null)
             {
@@ -68,7 +64,6 @@ namespace UnicontaClient.Pages.CustomPage
                     formatOption.Add(item._Prompt);
                 }
             }
-#endif
             //cmbExportFormat.ItemsSource = formatOption;
         }
 
@@ -126,17 +121,15 @@ namespace UnicontaClient.Pages.CustomPage
                     return;
                 }
 
-                FormatType = PaymentFormat.PaymentMethod;
+                FormatType = (ExportFormatType)PaymentFormat._ExportFormat;
             }
             else
             {
                 UnicontaMessageBox.Show("Please Select a format for your file", Uniconta.ClientTools.Localization.lookup("Warning"));
                 return;
-           }
-#if !SILVERLIGHT
-                if (plugins != null && FileOption != null)
+            }
+            if (plugins != null && FileOption != null)
                 userPlugin = plugins.FirstOrDefault(p => p._Prompt == FileOption);
-#endif
             SetDialogResult(true);
         }
 

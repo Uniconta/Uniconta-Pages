@@ -15,7 +15,8 @@
 	<RibbonItem>
 		<RibbonItem Action="ViewPhysicalVoucher" LocalizedNameKey="ViewOBJ" Parameter="PhysicalVoucher" LargeGlyph="View_Voucher_32x32"/>
 		<RibbonItem Action="ViewAttachedVoucher" LocalizedNameKey="ViewOBJ" Parameter="Attachment" LargeGlyph="View_32x32"/>
-	</RibbonItem>
+    <RibbonItem Action="SendVoucherReminder" LocalizedNameKey="SendReminder" LargeGlyph="Interval_32x32" />
+  </RibbonItem>
 	<RibbonItem>
 		<!---If we want to create a new group in same PageTab-->
 		<RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32">

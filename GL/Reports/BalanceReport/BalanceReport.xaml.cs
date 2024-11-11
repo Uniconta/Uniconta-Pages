@@ -118,43 +118,54 @@ namespace UnicontaClient.Pages.CustomPage
     {
         int NumberOfCol;
         public bool _UseExternal;
-        public BalanceClient(GLAccount Acc, bool useexternal, int numberOfCol)
+        public bool ShowZero;
+
+        public BalanceClient(GLAccount Acc, bool useexternal, int numberOfCol, bool showZero)
         {
             _UseExternal = useexternal;
             this.NumberOfCol = numberOfCol;
             amount = new long[numberOfCol];
             this.AccountRowId = Acc.RowId;
             this.Acc = Acc;
+            this.ShowZero = showZero;
             init();
         }
-        public BalanceClient(long[] amount)
+        public BalanceClient(GLAccount Acc, bool useexternal, int numberOfCol) : this(Acc, useexternal, numberOfCol, false)
+        {
+        }
+        public BalanceClient(long[] amount, bool showZero)
         {
             this.NumberOfCol = amount.Length;
             this.amount = amount;
             this.Acc = new GLAccount(); // dummy
+            this.ShowZero = showZero;
             init();
+        }
+        public BalanceClient(long[] amount) : this(amount, false)
+        {
+
         }
 
         private void init()
         {
             var header = (Acc == null || Acc.AccountTypeEnum == GLAccountTypes.Header);
-            this.Col1 = new CustomColumn(amount, 00, header);
-            this.Col2 = new CustomColumn(amount, 01, header);
-            this.Col3 = new CustomColumn(amount, 02, header);
-            this.Col4 = new CustomColumn(amount, 03, header);
-            this.Col5 = new CustomColumn(amount, 04, header);
-            this.Col6 = new CustomColumn(amount, 05, header);
-            this.Col7 = new CustomColumn(amount, 06, header);
-            this.Col8 = new CustomColumn(amount, 07, header);
-            this.Col9 = new CustomColumn(amount, 08, header);
-            this.Col10 = new CustomColumn(amount, 09, header);
-            this.Col11 = new CustomColumn(amount, 10, header);
-            this.Col12 = new CustomColumn(amount, 11, header);
-            this.Col13 = new CustomColumn(amount, 12, header);
+            this.Col1 = new CustomColumn(amount, 00, header) { showZero = ShowZero };
+            this.Col2 = new CustomColumn(amount, 01, header) { showZero = ShowZero };
+            this.Col3 = new CustomColumn(amount, 02, header) { showZero = ShowZero };
+            this.Col4 = new CustomColumn(amount, 03, header) { showZero = ShowZero };
+            this.Col5 = new CustomColumn(amount, 04, header) { showZero = ShowZero };
+            this.Col6 = new CustomColumn(amount, 05, header) { showZero = ShowZero };
+            this.Col7 = new CustomColumn(amount, 06, header) { showZero = ShowZero };
+            this.Col8 = new CustomColumn(amount, 07, header) { showZero = ShowZero };
+            this.Col9 = new CustomColumn(amount, 08, header) { showZero = ShowZero };
+            this.Col10 = new CustomColumn(amount, 09, header) { showZero = ShowZero };
+            this.Col11 = new CustomColumn(amount, 10, header) { showZero = ShowZero };
+            this.Col12 = new CustomColumn(amount, 11, header) { showZero = ShowZero };
+            this.Col13 = new CustomColumn(amount, 12, header) { showZero = ShowZero };
             Columns = new List<CustomColumn>();
             for (int c = 0; c < NumberOfCol; c++)
             {
-                Columns.Add(new CustomColumn(amount, c, header));
+                Columns.Add(new CustomColumn(amount, c, header) { showZero = ShowZero });
             }
         }
 
@@ -1062,7 +1073,7 @@ namespace UnicontaClient.Pages.CustomPage
                             continue;
                     }
 
-                    client = new BalanceClient(finbal.Account, this.UseExternal, colCount);
+                    client = new BalanceClient(finbal.Account, this.UseExternal, colCount, ShowZero);
                     client.amount[ColNo] = dimValue._Debit - dimValue._Credit;
                     client.DimArry = dimValue.Dimensions;
                     SetDimKeystr(client);
@@ -1071,7 +1082,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else if (FirstTime)
             {
-                client = new BalanceClient(finbal.Account, this.UseExternal, colCount);
+                client = new BalanceClient(finbal.Account, this.UseExternal, colCount, ShowZero);
                 balanceClient.Add(client);
             }
         }
@@ -1098,7 +1109,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (dimArr[4] > 0)
                 client.Dim5 = FormatKey(dim5?.Get(dimArr[4]));
         }
-
+        public bool ShowZero { get { return this.PassedCriteria.ObjBalance._ShowZero; } }
         async void PrintData()
         {
             if (balanceClient == null || balanceClient.Count == 0)
@@ -1111,10 +1122,10 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 var arr = balanceClient.ToArray();
                 Array.Sort(arr, new BalanceClientSort(SortExtern));
-                for(int i = 0; i < arr.Length; i++)
+                for (int i = 0; i < arr.Length; i++)
                 {
                     var blc = arr[i];
-                    BalanceReportdata data = new BalanceReportdata(blc, hdrData);
+                    BalanceReportdata data = new BalanceReportdata(blc, hdrData, ShowZero);
                     var AcType = blc.AccountTypeEnum;
                     data.isBold = (AcType <= GLAccountTypes.CalculationExpression) ? FontWeights.Bold : FontWeights.Normal;
                     data.IsVisible = (AcType == GLAccountTypes.Header) ? Visibility.Collapsed : Visibility.Visible;

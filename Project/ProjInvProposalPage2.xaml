@@ -109,6 +109,9 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjInvProposalPage2"
                         <CorasauControls:CorasauLayoutItem FieldName="Vat" x:Name="liVat">
                             <CorasauControls:LookupEditor x:Name="leVat" Text="{Binding Vat,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="Consumer" x:Name="liConsumer">
+                            <CorasauControls:CheckEditor x:Name="leConsumer" IsChecked="{Binding Consumer,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="lastGroup">

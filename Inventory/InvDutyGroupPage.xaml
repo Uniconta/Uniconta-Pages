@@ -49,18 +49,18 @@ x:Class="UnicontaClient.Pages.CustomPage.InvDutyGroupPage"
                     </local:CorasauDataGridTemplateColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="DutyGroup" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Name" Width="200">
-                        <local:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
-                            <DataTemplate>
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Name,RelativeSource={RelativeSource TemplatedParent}}" PreviewMouseDown="Name_PreviewMouseDown"></TextBlock>
-                                    <TextBlock Grid.Column="1"></TextBlock>
+                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding Value}" PreviewMouseDown="Name_PreviewMouseDown" />
+                                    <TextBlock Grid.Column="1" />
                                 </Grid>
-                            </DataTemplate>
-                        </local:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
                 </local:InvDutyGroupPageGrid.Columns>
             </local:InvDutyGroupPageGrid>

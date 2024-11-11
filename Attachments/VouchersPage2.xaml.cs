@@ -220,6 +220,7 @@ namespace UnicontaClient.Pages.CustomPage
                             }
                             buffers[i] = voucher._Data;
                             voucher._Data = null;
+                            voucher._ScanDoc = true;
                         }
                     }
                     var err = await api.Insert(multiVouchers);
@@ -249,6 +250,7 @@ namespace UnicontaClient.Pages.CustomPage
             byte[] buf = null;
             if (LoadedRow == null && voucherClientRow != null)
             {
+                voucherClientRow._ScanDoc = true;
                 buf = voucherClientRow._Data;
                 if (buf != null && buf.Length > 110000 && !voucherClientRow._NoCompress &&
                        (voucherClientRow._Fileextension == FileextensionsTypes.JPEG ||

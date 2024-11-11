@@ -175,6 +175,8 @@ x:Class="UnicontaClient.Pages.CustomPage.ReportCriteria"
                                                 <RowDefinition Height="Auto"/>
                                                 <RowDefinition Height="5"/>
                                                 <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="5"/>
+                                                <RowDefinition Height="Auto"/>
                                             </Grid.RowDefinitions>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="Auto"/>
@@ -193,6 +195,8 @@ x:Class="UnicontaClient.Pages.CustomPage.ReportCriteria"
                                             <CorasauControls:IntegerEditor SetMask="False" x:Name="txtColoumnSizeAmount" SetMinWidth="False" MinWidth="80" Grid.Row="8" Grid.Column="1"   Margin="5,0,5,5" />
                                             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PrintFrontPage}" HorizontalAlignment="Right" Grid.Column="0" Grid.Row="10" VerticalAlignment="Center" Margin="0,0,10,0"/>
                                             <CorasauControls:CheckEditor x:Name="chkPrintFrtPage"  Grid.Row="10" Grid.Column="1"  Margin="5,0,5,0"/>
+                                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PrintOBJ;Zero}" HorizontalAlignment="Right" Grid.Column="0" Grid.Row="12" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                            <CorasauControls:CheckEditor x:Name="chkShowZero"  Grid.Row="12" Grid.Column="1"  Margin="5,0,5,0"/>
 
                                             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LineSpacing}" HorizontalAlignment="Right" Grid.Column="2" Grid.Row="2" VerticalAlignment="Center" Margin="0,0,10,0"/>
                                             <CorasauControls:IntegerEditor SetMask="False" x:Name="txtLineSpace" SetMinWidth="False" MinWidth="80"  Grid.Row="2" Grid.Column="3"  Margin="5,0,5,0" />

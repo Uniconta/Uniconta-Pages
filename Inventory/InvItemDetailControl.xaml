@@ -88,6 +88,9 @@ x:Class="UnicontaClient.Pages.CustomPage.InvItemDetailControl"
                     <CorasauControls:CorasauLayoutItem FieldName="DiscountGroup" x:Name="liDiscountGroup">
                         <CorasauControls:TextEditor x:Name="leDiscountGroup" Text="{Binding DiscountGroup}" IsReadOnly="True" />
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DutyGroup" x:Name="liDutyGroup">
+                        <CorasauControls:TextEditor x:Name="leDutyGroup" Text="{Binding DutyGroup}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="Unit" x:Name="liUnit">
                         <CorasauControls:TextEditor Text="{Binding Unit,Mode=TwoWay}" IsReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>
@@ -100,11 +103,17 @@ x:Class="UnicontaClient.Pages.CustomPage.InvItemDetailControl"
                     <CorasauControls:CorasauLayoutItem FieldName="PurchaseAccount" x:Name="liPurchaseAccount">
                         <CorasauControls:TextEditor Text="{Binding PurchaseAccount,Mode=TwoWay}" IsReadOnly="True" />
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="SupplierItemId" x:Name="liSupplierItemId">
+                        <CorasauControls:TextEditor Text="{Binding SupplierItemId,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="EAN" x:Name="liEAN">
                         <CorasauControls:TextEditor Text="{Binding EAN}" IsReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="StockPosition" x:Name="liStockPosition">
                         <CorasauControls:TextEditor Text="{Binding StockPosition}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="UNSPSC" x:Name="liUNSPSC">
+                        <CorasauControls:TextEditor Text="{Binding UNSPSC,Mode=TwoWay}" IsReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="Warehouse" x:Name="itemWarehouse">
                         <CorasauControls:TextEditor x:Name="cmbWarehouse" Text="{Binding Warehouse}" IsReadOnly="True"/>
@@ -138,6 +147,12 @@ x:Class="UnicontaClient.Pages.CustomPage.InvItemDetailControl"
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="ItemIncludedInBOM" x:Name="liItemIncludedInBOM">
                         <CorasauControls:CheckEditor IsChecked="{Binding ItemIncludedInBOM}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="HideInSales" x:Name="liHideInSales">
+                        <CorasauControls:CheckEditor IsChecked="{Binding HideInSales,Mode=TwoWay}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="HideInPurchase" x:Name="liHideInPurchase">
+                        <CorasauControls:CheckEditor IsChecked="{Binding HideInPurchase,Mode=TwoWay}" IsReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutGroup>
@@ -191,6 +206,9 @@ x:Class="UnicontaClient.Pages.CustomPage.InvItemDetailControl"
                     <CorasauControls:CorasauLayoutItem FieldName="Weight" x:Name="liWeigt">
                         <CorasauControls:DoubleEditor FieldName="Weight" ApplyMask="false" IsReadOnly="True" />
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="NetWeight" x:Name="liNetWeight">
+                        <CorasauControls:DoubleEditor FieldName="NetWeight" ApplyMask="false" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="Volume" x:Name="liVolume">
                         <CorasauControls:DoubleEditor FieldName="Volume" ApplyMask="false" IsReadOnly="True" />
                     </CorasauControls:CorasauLayoutItem>
@@ -205,6 +223,9 @@ x:Class="UnicontaClient.Pages.CustomPage.InvItemDetailControl"
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="CategoryGroup" x:Name="liCategoryGroup">
                         <CorasauControls:TextEditor Text="{Binding CategoryGroup}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="StatisticsGroup" x:Name="liStatisticsGroup">
+                        <CorasauControls:TextEditor Text="{Binding StatisticsGroup}" IsReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
 
@@ -269,7 +290,9 @@ x:Class="UnicontaClient.Pages.CustomPage.InvItemDetailControl"
                     <CorasauControls:CorasauLayoutItem FieldName="CountryOfOrigin" x:Name="liCountryOfOrigin">
                         <CorasauControls:TextEditor  Text="{Binding CountryOfOrigin}" IsReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>
-
+                    <CorasauControls:CorasauLayoutItem FieldName="IntraUnit" x:Name="liIntraUnit">
+                        <CorasauControls:TextEditor Text="{Binding IntraUnit,Mode=TwoWay}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
                 
                 <CorasauControls:CorasauLayoutGroup x:Name="projectLayGrp" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Project}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">

@@ -1,101 +1,29 @@
-using DevExpress.Utils;
-using DevExpress.Utils.Extensions;
 using DevExpress.Xpf.Grid;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using Uniconta.API.DebtorCreditor;
 using Uniconta.API.Service;
 using Uniconta.ClientTools;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
 using Uniconta.DataModel;
-using Uniconta.WindowsAPI.ClientTools.DataModel.DC;
 using UnicontaClient.Models;
+using Localization = Uniconta.ClientTools.Localization;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
-    public class EDeliverySettingWithValueClient : EDeliverySettingClient
+    public class EDeliveryMappingGrid : CorasauDataGridClient
     {
-        private string _value;
-
-        [Display(Name = "Value", ResourceType = typeof(TableFieldsText))]
-        public string Value
-        {
-            get => _value ?? _DefaultValue;
-            set
-            {
-                _value = value;
-                NotifyPropertyChanged("Value");
-            }
-        }
-
-        private static List<EDeliverySettingWithValueClient> testList;
-        private static int idTags = 0;
-        public static EDeliverySettingWithValueClient[] Test()
-        {
-            testList = new List<EDeliverySettingWithValueClient>();
-            CreateProperty(typeof(Invoice), null);
-            var arrayResult = testList.ToArray();
-            Array.Sort(arrayResult, new EDeliverySettingSort(arrayResult));
-            var idList = arrayResult.Select(x => x.Id);
-            return arrayResult;
-        }
-
-        private static void CreateProperty(Type type,
-            EDeliverySettingWithValueClient parent)
-        {
-            if (type?.FullName == null || !type.FullName.Contains("Uniconta.WindowsAPI.ClientTools.DataModel.DC"))
-                return;
-
-            var properties = type.GetProperties();
-            if (properties == null || properties.Length == 0)
-                return;
-
-            foreach (var prop in properties)
-            {
-                var propertyInfo = prop.PropertyType;
-                var isArrayType = propertyInfo?.BaseType == typeof(Array);
-                propertyInfo = isArrayType ? propertyInfo?.GetElementType() : propertyInfo;
-
-                var tagName = isArrayType ? propertyInfo?.Name : prop.Name;
-                if (tagName == parent?.TagName)
-                    continue;
-
-                var documentSettings = new EDeliverySettingWithValueClient
-                {
-                    _Id = ++idTags,
-                    _ParentId = parent?.Id ?? 0,
-                    _TagName = tagName,
-                    _TypeVersion = XmlTypeVersion.OIOUBL_21,
-                    _DocumentType = XmlTypeDocument.Invoice,
-                    _IsArrayType = isArrayType,
-                    _DefaultProperty = "Test",
-                    _DefaultValue = "Test",
-                    _IsEditable = true
-                };
-
-                testList.Add(documentSettings);
-
-                var baseType = propertyInfo?.BaseType;
-                if (baseType != null && baseType == typeof(System.Object))
-                    CreateProperty(propertyInfo, documentSettings);
-            }
-        }
-    }
-
-    public class EDeliverySettingsGrid : CorasauDataGridClient
-    {
-        public override Type TableType { get { return typeof(EDeliverySettingWithValueClient); } }
-        public override IComparer GridSorting { get { return new EDeliverySettingSort(); } }
+        public override Type TableType { get { return typeof(EDeliveryMappingClient); } }
+        public override IComparer GridSorting { get { return new EDeliveryMappingSort(); } }
         public override bool AllowSort { get { return false; } }
         public override bool Readonly { get { return true; } }
         public override bool IsAutoSave { get { return true; } }
@@ -106,9 +34,9 @@ namespace UnicontaClient.Pages.CustomPage
             get
             {
                 var tv = base.SetTreeListViewFromPage;
-                tv.KeyFieldName = "Id";
+                tv.KeyFieldName = "RowId";
                 tv.ShowIndicator = false;
-                tv.ParentFieldName = "ParentId";
+                tv.ParentFieldName = "ParentRowId";
                 tv.TreeDerivationMode = TreeDerivationMode.Selfreference;
                 tv.ShowTotalSummary = false;
                 return tv;
@@ -116,22 +44,25 @@ namespace UnicontaClient.Pages.CustomPage
         }
     }
 
-    public partial class EDeliverySettingsPage : GridBasePage
+    public partial class EDeliveryMappingPage : GridBasePage
     {
-        public override string NameOfControl { get { return TabControls.EDeliverySettingsPage; } }
+        public override string NameOfControl { get { return TabControls.EDeliveryMappingPage; } }
         UnicontaBaseEntity master;
 
-        public EDeliverySettingsPage(BaseAPI api) : base(api, string.Empty) => Init();
-        public EDeliverySettingsPage(UnicontaBaseEntity entity) : base(null)
+        public EDeliveryMappingPage(BaseAPI api) : base(api, string.Empty) => Init();
+        public EDeliveryMappingPage(UnicontaBaseEntity entity) : base(null)
         {
+            master = entity;
             Init();
 
-            master = entity;
-            if (master != null)
+            if (entity != null)
             {
                 // TODO: This need to change when we have support to generate documents for other than OIOUBL
                 if (master is DCInvoice invoice)
+                {
                     txtInvoice.Text = invoice.InvoiceNum;
+                    cmbDocumentType.SelectedItem = AppEnums.EDeliveryDocumentType.ToString((int)XmlTypeDocument.Invoice);
+                }
 
                 SetHeader();
             }
@@ -144,13 +75,13 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 // TODO: This need to change when we have support to generate documents for other than OIOUBL
                 if (master is DCInvoice invoice)
-                    key = string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("Invoice"), invoice.InvoiceNum);
+                    key = string.Format("{0} : {1}", Localization.lookup("Invoice"), invoice.InvoiceNum);
             }
 
             if (string.IsNullOrEmpty(key))
                 return;
 
-            var header = string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("eDeliverySettings"), key);
+            var header = string.Format("{0} : {1}", Localization.lookup("EDeliveryMapping"), key);
             SetHeader(header);
         }
 
@@ -166,8 +97,9 @@ namespace UnicontaClient.Pages.CustomPage
             cmbTypeVersion.ItemsSource = AppEnums.EDeliveryTypeVersion.Values;
             cmbDocumentType.ItemsSource = AppEnums.EDeliveryDocumentType.Values;
 
+            cmbTypeVersion.SelectedIndex = 0;
+
             dgEdelivery.Loaded += DgEdelivery_Loaded;
-            RefreshGrid();
         }
 
         bool firstLoad;
@@ -175,7 +107,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (!firstLoad)
             {
-                dgEdelivery.treeListView.ExpandAllNodes();
+                dgEdelivery.treeListView.CollapseAllNodes();
                 firstLoad = true;
             }
         }
@@ -206,34 +138,25 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         public override async Task InitQuery() => RefreshGrid();
+
         private void RefreshGrid()
         {
-            var mappingData = dgEdelivery.ItemsSource as EDeliverySettingWithValueClient[];
-            if (mappingData == null || mappingData.Length == 0)
-            {
-                mappingData = EDeliverySettingWithValueClient.Test();
-            }
+            UpdateMaster();
+            if (master == null || !(master is DebtorInvoiceClient masterInvoice))
+                masterInvoice = new DebtorInvoiceClient();
+
+            var mappingData = new NHRAPI(api).GetInvoiceOIOUBL(masterInvoice).Result;
+            if (mappingData?.Length == 0)
+                return;
 
             busyIndicator.IsBusy = true;
             dgEdelivery.Visibility = Visibility.Hidden;
-
             dgEdelivery.ItemsSource = null;
 
-            UpdateMaster();
-            SetMasterDataOnSettings(mappingData);
+            Array.Sort(mappingData, new EDeliveryMappingSort(mappingData));
 
-            if (mappingData?.Length > 0)
-            {
-                Array.Sort(mappingData, new EDeliverySettingSort(mappingData));
-                var maxId = mappingData.Select(s => s.Id).Max();
-                foreach (var mapping in mappingData)
-                {
-                    if (mapping.Id == 0)
-                        mapping.Id = ++maxId;
-                }
-                dgEdelivery.MaxId = maxId;
-                dgEdelivery.SetSource(mappingData);
-            }
+            dgEdelivery.MaxId = mappingData.Select(s => s.RowId).Max();
+            dgEdelivery.SetSource(mappingData);
 
             dgEdelivery.Visibility = Visibility.Visible;
             busyIndicator.IsBusy = false;
@@ -246,7 +169,7 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
 
             var invoiceNumber = Convert.ToInt64(invoiceText);
-            if (master == null || (master is DebtorInvoice invoice && invoice._InvoiceNumber != invoiceNumber))
+            if (master == null || !(master is DebtorInvoiceClient invoice) || invoice._InvoiceNumber != invoiceNumber)
             {
                 var propValPair = new List<PropValuePair>
                 {
@@ -257,7 +180,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        private void SetMasterDataOnSettings(EDeliverySettingWithValueClient[] settings)
+        /*private void SetMasterDataOnSettings(EDeliverySettingWithValueClient[] settings)
         {
             if (master == null)
                 return;
@@ -284,17 +207,17 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (setting.Value != null && setting.Format != null)
                 setting.Value = string.Format(setting.Format, setting.Value);
-        }
+        }*/
 
         private void Value_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            var selectedItem = dgEdelivery.SelectedItem as EDeliverySettingWithValueClient;
+            var selectedItem = dgEdelivery.SelectedItem as EDeliveryMappingClient;
             var txtblock = sender as TextBlock;
             if (selectedItem != null && !selectedItem.IsEditable)
             {
                 var tip = new ToolTip
                 {
-                    Content = Uniconta.ClientTools.Localization.lookup("CannotChangeFieldOBJ"),
+                    Content = Localization.lookup("CannotChangeFieldOBJ"),
                     IsOpen = true,
                     PlacementTarget = txtblock,
                     Placement = System.Windows.Controls.Primitives.PlacementMode.Right

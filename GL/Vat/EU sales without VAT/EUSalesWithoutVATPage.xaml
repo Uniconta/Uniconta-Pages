@@ -29,12 +29,14 @@ x:Class="UnicontaClient.Pages.CustomPage.EUSalesWithoutVATPage"
                 <ColumnDefinition Width="170"/>
                 <ColumnDefinition Width="80"/>
                 <ColumnDefinition Width="170"/>
-                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="170"/>
             </Grid.ColumnDefinitions>
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FromDate}" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center"/>
             <CorasauControls:DateEditor x:Name="txtDateFrm" Grid.Column="1" Grid.Row="0" Height="23"/>
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ToDate}" Grid.Column="2" Grid.Row="0" Margin="5,0,0,0" VerticalAlignment="Center"/>
             <CorasauControls:DateEditor x:Name="txtDateTo" Grid.Column="3" Grid.Row="0" Height="23"/>
+            <TextBlock x:Name="lbVIESCheck" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CheckVIES}" Margin="10,0,5,0" Grid.Row="0" Grid.Column="4" Grid.ColumnSpan="2" VerticalAlignment="Center"></TextBlock>
+            <CorasauControls:CheckEditor Grid.Row="0" x:Name="checkVIES" Grid.Column="5" Height="23" HorizontalAlignment="Right" VerticalAlignment="Center" Checked="CheckVIES_Reaction" Unchecked="CheckVIES_Reaction"></CorasauControls:CheckEditor>
         </Grid>
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="2" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <localPage:EUSalesWithoutVATGrid x:Name="dgEUSalesWithoutVATGrid" AutoGenerateColumns="None" HorizontalAlignment="Stretch">

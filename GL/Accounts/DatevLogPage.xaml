@@ -18,7 +18,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DatevLogPage"
             <local:DatevLogGridClient x:Name="dgDatevLogGridClient" AutoGenerateColumns="None">
                 <local:DatevLogGridClient.Columns>
                     <local:CorasauDataGridTemplateColumnClient x:Name="UserName" Width="100" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="LogTime" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="LogTime" ShowTime="True"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="HTTPBody" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="HTTPHeader"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="HTTPRESPONSEBody"/>

@@ -96,7 +96,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
             danishFields.DebtorId = string.Empty;
             danishFields.OwnVoucherNumber = danishFields.TextToSender;
 
-            var externalAdvText = StandardPaymentFunctions.ExternalMessage(paymentFormat._Message, tran, company, creditor);
+            var externalAdvText = StandardPaymentFunctions.ExternalMessage(paymentFormat, tran, company, creditor);
             var message = externalAdvText;
 
             danishFields.TextToBeneficiary = message.Length > 20 ? message.Substring(0, 20) : message;

@@ -186,9 +186,11 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorAccount"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="EORI" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="TransType" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="IndustryCode" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CompanyState" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryContactPerson" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryPhone" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryContactEmail" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="BankMessage" Visible="False"/>
                 </localPage:CreditorAccountGrid.Columns>
                 <localPage:CreditorAccountGrid.TotalSummary>
                     <localPage:SumColumn FieldName="CurBalance" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>

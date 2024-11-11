@@ -21,6 +21,7 @@ using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using Uniconta.DataModel;
 using Uniconta.ClientTools.Controls;
+using DevExpress.Xpf.Editors;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -364,6 +365,12 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var selectedItem = leProject.SelectedItem as ProjectClient;
             setTask(selectedItem);
+        }
+
+        private void OrderNumber_LostFocus(object sender, RoutedEventArgs e)
+        {
+            string originalOrderNumber = Convert.ToString((this.LoadedRow as DCOrder)?._OrderNumber);
+            DebtorOrdersPage2.CheckOrderNo(sender as TextEdit, typeof(ProductionOrder), api, originalOrderNumber);
         }
     }
 }

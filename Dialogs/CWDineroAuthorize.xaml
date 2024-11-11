@@ -13,7 +13,7 @@
                 <RowDefinition Height="2" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <CorasauControls:UnicontaWebViewer x:Name="webViewer" Grid.Row="0" HorizontalAlignment="Stretch" ShowNavigationError="False"/>
+            <CorasauControls:UnicontaWebViewer x:Name="webViewer" Grid.Row="0" HorizontalAlignment="Stretch" ShowNavigationError="False" Visibility="Collapsed"/>
             <CorasauControls:ListBoxEditor x:Name="lbCompanies" Grid.Row="2" HorizontalAlignment="Stretch" SelectedIndexChanged="lbCompanies_SelectedIndexChanged" Visibility="Collapsed" MinHeight="150" 
                                            ScrollViewer.VerticalScrollBarVisibility="Visible" AllowItemHighlighting="True">
                 <CorasauControls:ListBoxEditor.ItemTemplate>
@@ -31,7 +31,7 @@
                     </DataTemplate>
                 </CorasauControls:ListBoxEditor.ItemTemplate>
             </CorasauControls:ListBoxEditor>
-            <Button x:Name="CancelBtn" IsDefault="True" Grid.Row="4" HorizontalAlignment="Center"  Content="{Binding Converter={StaticResource LocalizationConverter},ConverterParameter=Cancel}" Click="Cancel_Click" MinWidth="75" Height="23"/>
+            <Button x:Name="CancelBtn" IsCancel="True" Grid.Row="4" HorizontalAlignment="Center"  Content="{Binding Converter={StaticResource LocalizationConverter},ConverterParameter=Cancel}" Click="Cancel_Click" MinWidth="75" Height="23"/>
         </Grid>
     </CorasauControls:BusyIndicator>
 </ClientTools:ChildWindow>

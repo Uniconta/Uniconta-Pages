@@ -216,6 +216,12 @@ namespace UnicontaClient.Pages.CustomPage
                             editrow.ContactEmail = contact.email;
                             editrow.Www = contact.www;
                         }
+                        var state = ci.companystatus;
+                        if (state != null)
+                        {
+                            editrow._StateOfCompany = state.StatusCode();
+                            editrow.NotifyPropertyChanged("CompanyState");
+                        }
                     }
                 }
                 else

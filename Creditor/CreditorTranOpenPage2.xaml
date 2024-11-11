@@ -18,6 +18,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorTranOpenPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="DueDate" x:Name="liDueDate">
                         <CorasauControls:DateEditor EditValue="{Binding DueDate,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="GraceDate" x:Name="liGraceDate">
+                        <CorasauControls:DateEditor EditValue="{Binding GraceDate,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="PaymentDate" x:Name="liPaymentDate">
                         <CorasauControls:DateEditor EditValue="{Binding PaymentDate,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>

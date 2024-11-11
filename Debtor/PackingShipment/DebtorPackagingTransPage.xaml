@@ -1,0 +1,32 @@
+<Pages:GridBasePage xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.DebtorPackagingTransPage"
+             xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+             xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
+             xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Debtor/PackingShipment/DebtorPackagingTransPageRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <local:DebtorPackagingTransGrid x:Name="dgDebtorPackagingTransGrid" AutoGenerateColumns="None">
+                <local:DebtorPackagingTransGrid.Columns>
+                    <!--<local:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" />-->
+                    <local:ComboBoxColumnClient x:Name="Category" />
+                    <local:ComboBoxColumnClient x:Name="PackagingType" />
+                    <local:ComboBoxColumnClient x:Name="WasteSorting" />
+                    <local:ComboBoxColumnClient x:Name="PackagingRateLevel" />
+                    <local:ComboBoxColumnClient x:Name="PackagingConsumer" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Weight" AllowThousandMask="True" Mask="N3"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Country" AllowEditing="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Date" AllowEditing="False"/>
+                </local:DebtorPackagingTransGrid.Columns>
+            </local:DebtorPackagingTransGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

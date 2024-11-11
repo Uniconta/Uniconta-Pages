@@ -59,6 +59,9 @@ namespace UnicontaClient.Controls.Dialogs
                 StartTime = new TimeSpan(8, 0, 0);
             if (_endTime == TimeSpan.Zero)
                 EndTime = new TimeSpan(16, 0, 0);
+
+            Category = AppEnums.InternalType.Values[0];
+            NotifyPropertyChanged(nameof(Category));
         }
 
         public CWActivityDialog(UnicontaBaseEntity entity) : this()

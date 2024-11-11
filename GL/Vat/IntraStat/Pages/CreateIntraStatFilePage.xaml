@@ -29,20 +29,27 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateIntraStatFilePage"
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="70"/>
                 <ColumnDefinition Width="170"/>
-                <ColumnDefinition Width="80"/>
-                <ColumnDefinition Width="60"/>
+                <ColumnDefinition Width="90"/>
+                <ColumnDefinition Width="70"/>
                 <ColumnDefinition Width="170"/>
             </Grid.ColumnDefinitions>
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FromDate}" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center"/>
             <CorasauControls:DateEditor x:Name="txtDateFrm" Grid.Column="1" Grid.Row="0" Height="23" />
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ToDate}" Margin="0,5,0,0" Grid.Column="0" Grid.Row="10" VerticalAlignment="Center"/>
             <CorasauControls:DateEditor x:Name="txtDateTo" Grid.Column="1" Grid.Row="1" Height="23" Margin="0,5,0,0"/>
-            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ImportItem}" Grid.Row="0" Grid.Column="2" x:Name="lblimportCheck" VerticalAlignment="Center" Margin="10,0,5,0" Grid.ColumnSpan="2" ></TextBlock>
-            <CorasauControls:CheckEditor Grid.Row="0" x:Name="checkImport" Grid.Column="2" Height="23" HorizontalAlignment="Right" Margin="10,0,0,0" VerticalAlignment="Center"></CorasauControls:CheckEditor>
-            <TextBlock x:Name="lbExportCheck" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ExportItem}"  Margin="10,0,5,0" Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" VerticalAlignment="Center"></TextBlock>
+
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ImportItem}" Margin="20,0,5,0" Grid.Row="0" Grid.Column="2" x:Name="lblimportCheck" VerticalAlignment="Center" Grid.ColumnSpan="2" ></TextBlock>
+            <CorasauControls:CheckEditor Grid.Row="0" x:Name="checkImport" Grid.Column="2" Height="23" HorizontalAlignment="Right" VerticalAlignment="Center"></CorasauControls:CheckEditor>
+           
+            <TextBlock x:Name="lbExportCheck" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ExportItem}" Margin="20,0,5,0" Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" VerticalAlignment="Center"></TextBlock>
             <CorasauControls:CheckEditor Grid.Row="1" x:Name="checkExport" Grid.Column="2" Height="23" HorizontalAlignment="Right" VerticalAlignment="Center"></CorasauControls:CheckEditor>
-            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Group}" Grid.Column="3" Grid.Row="0" VerticalAlignment="Center"/>
+
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Group}" Margin="10,0,5,0" Grid.Column="3" Grid.Row="0" VerticalAlignment="Center"/>
             <CorasauControls:DimComboBoxEditor x:Name="cmbExportGroup" Grid.Column="4" Grid.Row="0" IsTextEditable="False" SelectedIndexChanged="cmbExportGroup_SelectedIndexChanged" />
+
+            <TextBlock x:Name="lbVIESCheck" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CheckVIES}" Margin="10,0,5,0" Grid.Row="1" Grid.Column="3" Grid.ColumnSpan="2" VerticalAlignment="Center"></TextBlock>
+            <CorasauControls:CheckEditor Grid.Row="1" x:Name="checkVIES" Grid.Column="4" Height="23" HorizontalAlignment="Right" VerticalAlignment="Center" Checked="CheckVIES_Reaction" Unchecked="CheckVIES_Reaction"></CorasauControls:CheckEditor>
+
         </Grid>
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="2" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <localPage:CreateIntraStatFilePageGrid  x:Name="dgIntraStatGrid" AutoGenerateColumns="None">
@@ -54,8 +61,10 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateIntraStatFilePage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DCAccount" FieldName="DCAccount" Width="90" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AccountName" FieldName="AccountName" Width="90" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DebtorRegNo" Width="150" Visible="False" ReadOnly="True"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="fDebtorRegNo" Width="150" Visible="False" ReadOnly="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="IsTriangularTrade" FieldName="IsTriangularTrade" Width="50" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Country" FieldName="Country" Width="80" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="fDebtorRegNo" Width="150" Visible="False" ReadOnly="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DebtorRegNoVIES" Width="150" Visible="False" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Item" Width="90" ReadOnly="True" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ItemName" Width="200" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ItemCode" FieldName="ItemCode" Width="80" />
@@ -68,7 +77,6 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateIntraStatFilePage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="IntraUnit" FieldName="IntraUnit" Width="80" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceNumber" FieldName="InvoiceNumber" Width="50" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="InvAmount" FieldName="InvAmount" Width="80" ReadOnly="True"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="IsTriangularTrade" FieldName="IsTriangularTrade" Width="50"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Compressed" Width="60" ReadOnly="True" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SystemInfo" FieldName="SystemInfo" Width="200" ReadOnly="True"/>
                 </localPage:CreateIntraStatFilePageGrid.Columns>

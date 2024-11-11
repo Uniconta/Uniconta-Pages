@@ -37,21 +37,6 @@ namespace UnicontaClient.Pages.CustomPage
         public bool IsProject;
     }
 
-    public class SubTotalRowStyleConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            bool val = (bool)value;
-            if (val)
-                return FontWeights.Bold;
-            else
-                return FontWeights.Normal;
-        }
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            return value;
-        }
-    }
     public partial class InventoryTransactions : GridBasePage
     {
         private SynchronizeEntity syncEntity;
@@ -183,7 +168,7 @@ namespace UnicontaClient.Pages.CustomPage
             base.SetParameter(Parameters);
         }
 
-        double sumMargin, sumSales, sumMarginRatio;
+        double sumMargin, sumSales;
         private void DgInvTransGrid_CustomSummary(object sender, DevExpress.Data.CustomSummaryEventArgs e)
         {
             var fieldName = ((GridSummaryItem)e.Item).FieldName;
@@ -199,10 +184,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case CustomSummaryProcess.Finalize:
                     if (fieldName == "MarginRatio" && sumSales > 0)
-                    {
-                        sumMarginRatio = 100 * sumMargin / sumSales;
-                        e.TotalValue = sumMarginRatio;
-                    }
+                        e.TotalValue = 100 * sumMargin / sumSales;
                     break;
             }
         }

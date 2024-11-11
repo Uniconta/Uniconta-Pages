@@ -206,7 +206,8 @@ namespace UnicontaClient.Pages.CustomPage
                 cmbContactName.Visibility = Visibility.Collapsed;
             if (!Comp.ApproveSalesOrders)
                 grpApproval.Visibility = Visibility.Collapsed;
-
+            if (!Comp.InvPackaging)
+                liConsumer.Visibility = Visibility.Collapsed;
             if (!Comp.ProjectTask)
                 projectTask.Visibility = Visibility.Collapsed;
             else if (editrow?._Project != null)

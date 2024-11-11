@@ -1,0 +1,38 @@
+<Pages:GridBasePage xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.DebtorPackingShipmentModelPage"
+             xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+             xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
+             xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Debtor/PackingShipment/DebtorPackingShipmentModel.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <local:DebtorPackingShipmentModelGrid x:Name="dgDebtorPackingShipmentModelGrid" AutoGenerateColumns="None">
+                <local:DebtorPackingShipmentModelGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Code"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Name" Width="300">
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding Value}" PreviewMouseDown="Name_PreviewMouseDown"></TextBlock>
+                                    <TextBlock Grid.Column="1"></TextBlock>
+                                </Grid>
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                </local:DebtorPackingShipmentModelGrid.Columns>
+            </local:DebtorPackingShipmentModelGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

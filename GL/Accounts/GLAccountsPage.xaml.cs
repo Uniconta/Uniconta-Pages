@@ -29,6 +29,7 @@ using DevExpress.Xpf.Grid;
 using Uniconta.API.Service;
 using DevExpress.Xpf.Core;
 using DevExpress.Data.Filtering;
+using UnicontaClient.Controls.Dialogs;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -92,7 +93,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             ribbonControl.PerformRibbonAction("GLTran");
         }
-        
+
         void localMenu_OnItemClicked(string ActionType)
         {
             GLAccountClient selectedItem = dgGLTable.SelectedItem as GLAccountClient;
@@ -175,13 +176,13 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
             }
         }
-
+       
         void CopyRecord(GLAccountClient selectedItem)
         {
             if (selectedItem == null)
                 return;
             var glAccount = Activator.CreateInstance(selectedItem.GetType()) as GLAccountClient;
-            CorasauDataGrid.CopyAndClearRowId(selectedItem, glAccount);
+            CorasauDataGrid.CopyAndClearRowId(selectedItem, glAccount, api);
             var parms = new object[2] { glAccount, false };
             AddDockItem(TabControls.GLAccountPage2, parms, Uniconta.ClientTools.Localization.lookup("Accounts"), "Add_16x16");
         }

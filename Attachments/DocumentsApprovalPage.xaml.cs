@@ -140,6 +140,10 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Archived":
                     ShowArchivedRecords();
                     break;
+                case "ViewTransactions":
+                    if (selectedItem?._JournalPostedId != 0)
+                        AddDockItem(TabControls.AccountsTransaction, dgVoucherApproveGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("VoucherTransactions"), selectedItem.RowId));
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -291,7 +295,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "PurchaseNumber":
                     if (rec._PurchaseNumber != 0 && api.CompanyEntity.Purchase)
-                        SetPurchaseNumber(rec);
+                        rec.SetPurchaseNumber(api);
                     break;
                 case "Project":
                     if (rec._Project != null)
@@ -351,18 +355,6 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        async void SetPurchaseNumber(VouchersClient rec)
-        {
-            var cache = api.GetCache(typeof(Uniconta.DataModel.CreditorOrder)) ?? await api.LoadCache(typeof(Uniconta.DataModel.CreditorOrder));
-            var order = (DCOrder)cache?.Get(NumberConvert.ToStringNull(rec._PurchaseNumber));
-            if (order != null)
-            {
-                rec.CreditorAccount = order._InvoiceAccount ?? order._DCAccount;
-                if (order._Employee != null)
-                    rec.Approver1 = order._Employee;
-            }
-        }
-
         private void PrimaryKeyId_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             ribbonControl.PerformRibbonAction("ViewVoucher");
@@ -375,6 +367,20 @@ namespace UnicontaClient.Pages.CustomPage
                 lookup.TableType = typeof(Uniconta.DataModel.CreditorOrder);
             }
             return lookup;
+        }
+
+        private void Offeset_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            CallOffsetAccount((sender as Image).Tag as VouchersClient);
+        }
+        private void CallOffsetAccount(VouchersClient vouchersClientLine)
+        {
+            if (vouchersClientLine != null)
+            {
+                dgVoucherApproveGrid.SetLoadedRow(vouchersClientLine);
+                var header = string.Format("{0}:{1} {2}", Uniconta.ClientTools.Localization.lookup("OffsetAccountTemplate"), Uniconta.ClientTools.Localization.lookup("Voucher"), vouchersClientLine.RowId);
+                AddDockItem(TabControls.GLOffsetAccountTemplate, vouchersClientLine, header: header);
+            }
         }
     }
 }

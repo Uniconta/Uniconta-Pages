@@ -453,6 +453,10 @@ namespace UnicontaClient.Pages.CustomPage
         [ForeignKeyAttribute(ForeignKeyTable = typeof(IndustryCode))]
         [Display(Name = "NewIndustryCode", ResourceType = typeof(DCAccountText))]
         public string NewIndustryCode { get { return _industryCode; } set { _industryCode = value; NotifyPropertyChanged("NewIndustryCode"); } }
+      
+        [AppEnum(EnumName = "CompanyState")]
+        [Display(Name = "NewCompanyState", ResourceType = typeof(DCAccountText))]
+        public string NewCompanyState { get { return AppEnums.CompanyState.ToString((int)_StateOfCompany); } set { if (value == null) return; _StateOfCompany = (byte)AppEnums.CompanyState.IndexOf(value); NotifyPropertyChanged("NewCompanyState"); } }
     }
 
     public class CreditorClientLocal : CreditorClient
@@ -480,6 +484,9 @@ namespace UnicontaClient.Pages.CustomPage
         [ForeignKeyAttribute(ForeignKeyTable = typeof(IndustryCode))]
         [Display(Name = "NewIndustryCode", ResourceType = typeof(DCAccountText))]
         public string NewIndustryCode { get { return _industryCode; } set { _industryCode = value; NotifyPropertyChanged("NewIndustryCode"); } }
+        [AppEnum(EnumName = "CompanyState")]
+        [Display(Name = "NewCompanyState", ResourceType = typeof(DCAccountText))]
+        public string NewCompanyState { get { return AppEnums.CompanyState.ToString((int)_StateOfCompany); } set { if (value == null) return; _StateOfCompany = (byte)AppEnums.CompanyState.IndexOf(value); NotifyPropertyChanged("CompanyState"); } }
     }
 
     public class CrmProspectClientLocal : CrmProspectClient
@@ -507,6 +514,10 @@ namespace UnicontaClient.Pages.CustomPage
         [ForeignKeyAttribute(ForeignKeyTable = typeof(IndustryCode))]
         [Display(Name = "NewIndustryCode", ResourceType = typeof(DCAccountText))]
         public string NewIndustryCode { get { return _industryCode; } set { _industryCode = value; NotifyPropertyChanged("NewIndustryCode"); } }
+     
+        [AppEnum(EnumName = "CompanyState")]
+        [Display(Name = "NewCompanyState", ResourceType = typeof(DCAccountText))]
+        public string NewCompanyState { get { return AppEnums.CompanyState.ToString((int)_StateOfCompany); } set { if (value == null) return; _StateOfCompany = (byte)AppEnums.CompanyState.IndexOf(value); NotifyPropertyChanged("CompanyState"); } }
     }
 }
 

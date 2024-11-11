@@ -54,12 +54,12 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class GLTransDeletedReport : GridBasePage
     {
         public override string NameOfControl { get { return TabControls.GLTransDeletedReport; } }
-        List<UnicontaBaseEntity> masterlist;
+        UnicontaBaseEntity master;
         DateTime filterDate;
 
         protected override Filter[] DefaultFilters()
         {
-            if (masterlist == null && filterDate != DateTime.MinValue)
+            if (master == null && filterDate != DateTime.MinValue)
                 return new Filter[] { new Filter() { name = "Time", value = String.Format("{0:d}..", filterDate) } };
             return base.DefaultFilters();
         }
@@ -72,16 +72,14 @@ namespace UnicontaClient.Pages.CustomPage
         public GLTransDeletedReport(UnicontaBaseEntity master)
             : base(null)
         {
-            var mlist = new List<UnicontaBaseEntity>() { master };
-            InitializePage(mlist);
+            InitializePage(master);
         }
 
         public GLTransDeletedReport(SynchronizeEntity syncEntity)
             : base(syncEntity, true)
         {
             this.syncEntity = syncEntity;
-            var mlist = new List<UnicontaBaseEntity>() { syncEntity.Row };
-            InitializePage(mlist);
+            InitializePage(syncEntity.Row);
             SetPageHeader();
         }
 
@@ -126,16 +124,16 @@ namespace UnicontaClient.Pages.CustomPage
             SetPageHeader();
             BindGrid();
         }
-        private void InitializePage(List<UnicontaBaseEntity> masters = null)
+        private void InitializePage(UnicontaBaseEntity master = null)
         {
             this.DataContext = this;
             InitializeComponent();
-            if (masters != null)
+            if (master != null)
                 filterDate = BasePage.GetSystemDefaultDate().AddYears(-2);
             localMenu.dataGrid = dgDeletedTransGrid;
             SetRibbonControl(localMenu, dgDeletedTransGrid);
-            masterlist = masters;
-            gridControl.masterRecords = masters;
+            this.master = master;
+            gridControl.UpdateMaster(master);
             dgDeletedTransGrid.api = api;
             var Comp = this.api.CompanyEntity;
             if (!Comp.HasDecimals)

@@ -1,6 +1,7 @@
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh" LargeGlyph="refresh"/>
+    <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" LargeGlyph="save-32x32"/>
     <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32">
       <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
       <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16" ShortcutKey="" />
@@ -21,7 +22,7 @@
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="ViewVoucher" ShortcutKey="F7" LocalizedNameKey="View" LargeGlyph="View_Highlighted_32x32" />
-  </RibbonItem>
+    <RibbonItem Action="ViewTransactions" LocalizedNameKey="Transactions" LargeGlyph="Account-statement_32x32" /> </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="Archived" LocalizedNameKey="Archive" LargeGlyph="Expense_32x32" />
   </RibbonItem>

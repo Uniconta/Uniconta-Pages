@@ -130,9 +130,11 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
         }
 
       
-        public static string ExternalMessage(string messageFormat, CreditorTransPayment rec, Company company, Uniconta.DataModel.Creditor creditor, bool UIMessage = false)
+        public static string ExternalMessage(CreditorPaymentFormat credPaymFormat, CreditorTransPayment rec, Company company, Uniconta.DataModel.Creditor cred, bool UIMessage = false)
         {
             var sbAdvText = StringBuilderReuse.Create();
+
+            var creditor = (CreditorClient)cred;
 
             string advText;
             var country = creditor == null || creditor._Country == CountryCode.Unknown ? company._CountryId : creditor._Country;
@@ -157,6 +159,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
                     return rec._Message;
                 }
 
+                var messageFormat = creditor.BankMessage ?? creditor.CreditorGroup?.BankMessage ?? credPaymFormat?._Message ?? null;
                 if (messageFormat != null)
                 {
                     sbAdvText.Append(messageFormat);

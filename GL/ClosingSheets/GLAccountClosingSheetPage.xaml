@@ -59,18 +59,18 @@ x:Class="UnicontaClient.Pages.CustomPage.GLAccountClosingSheetPage"
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Account" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Width="300">
-                        <localPage:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
-                            <DataTemplate>
+                        <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Name,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" PreviewMouseDown="Name_PreviewMouseDown"></TextBlock>
-                                    <TextBlock Grid.Column="1"></TextBlock>
+                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding Value}" PreviewMouseDown="Name_PreviewMouseDown" />
+                                    <TextBlock Grid.Column="1" />
                                 </Grid>
-                            </DataTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                            </ControlTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AccountType" Width="150"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="60"/>

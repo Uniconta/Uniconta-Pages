@@ -73,7 +73,7 @@ namespace UnicontaClient.Pages.CustomPage
             layoutItems.DataContext = editrow;
             PrimoAccountLookupEditor.api = leVat.api = Withholdinglookupeditior.api = VatOprlookupeditior.api = OffsetAccountLookupEditor.api =
             lbPrCategory.api = dim1lookupeditior.api = dim2lookupeditior.api = dim3lookupeditior.api = dim4lookupeditior.api =
-            dim5lookupeditior.api = StandardAccountLookupEditor.api = crudapi;
+            dim5lookupeditior.api = StandardAccountLookupEditor.api = leInterest.api = crudapi;
             UseVatOperation = Comp._UseVatOperation;
             if (!UseVatOperation)
                 VatOprlookupeditiorItem.Visibility = Visibility.Collapsed;

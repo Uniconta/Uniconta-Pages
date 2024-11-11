@@ -1,22 +1,11 @@
 using Uniconta.API.Service;
 using UnicontaClient.Models;
-using UnicontaClient.Utilities;
 using Uniconta.ClientTools;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.Util;
 using Uniconta.DataModel;

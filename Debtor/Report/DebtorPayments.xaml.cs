@@ -141,7 +141,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgDebtorTranOpenGrid.OnPrintClick += DgDebtorTranOpenGrid_OnPrintClick;
             statementList = new List<DebtorPaymentStatementList>();
             if (toDate == DateTime.MinValue)
-                toDate = txtDateTo.DateTime.Date;
+                toDate = GetSystemDefaultDate();
             txtDateTo.DateTime = toDate;
             txtDateFrm.DateTime = fromDate;
             neDunningDays.Text = NumberConvert.ToStringNull(noDaysSinceLastDunning);
@@ -398,8 +398,9 @@ namespace UnicontaClient.Pages.CustomPage
                                 NumberSerieAPI numberserieApi = new NumberSerieAPI(posApi);
                                 int nextVoucherNumber = 0;
 
-                                SQLCache payments = api.GetCache(typeof(Uniconta.DataModel.PaymentTerm));
-                                string payment = (from pay in (IEnumerable<Uniconta.DataModel.PaymentTerm>)payments.GetNotNullArray where pay._UseForCollection select pay._Payment).FirstOrDefault();
+                                CompanySettingsClient companySettings = new CompanySettingsClient();
+                                await api.Read(companySettings);
+                                string payment = companySettings._PaymentForCollection;
 
                                 SQLCache journalCache = api.GetCache(typeof(Uniconta.DataModel.GLDailyJournal));
                                 var DJclient = (Uniconta.DataModel.GLDailyJournal)journalCache.Get(cwLine.Journal);
@@ -666,7 +667,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var factor = interestValue;
                     if (prDay)
                     {
-                        var dt = rec._LastInterest != DateTime.MinValue ? rec._LastInterest : (rec._DueDate != DateTime.MinValue ? rec._DueDate : rec.Date);
+                        var dt = rec._LastInterest != DateTime.MinValue ? rec._LastInterest : (rec._GraceDate != DateTime.MinValue ? rec._GraceDate : (rec._DueDate != DateTime.MinValue ? rec._DueDate : rec.Date));
                         factor = Math.Max(interestValue * Math.Min((prDate - dt).TotalDays, 360d) / 30d, 0d);
                     }
                     rec.FeeAmount = Math.Round((rec._AmountOpenCur != 0 ? rec._AmountOpenCur : rec._AmountOpen) * factor / 100d, desm);

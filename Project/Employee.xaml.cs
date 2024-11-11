@@ -186,7 +186,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void CopyRecord(EmployeeClient selectedItem)
         {
             var emp = Activator.CreateInstance(selectedItem.GetType()) as EmployeeClient;
-            CorasauDataGrid.CopyAndClearRowId(selectedItem, emp);
+            CorasauDataGrid.CopyAndClearRowId(selectedItem, emp, api);
             string header = string.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), selectedItem._Name);
             AddDockItem(TabControls.EmployeePage2, new object[] { emp, false }, header);
         }

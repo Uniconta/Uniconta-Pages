@@ -76,7 +76,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrdersPage2"
                         </CorasauControls:LookupEditor>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="OrderNumber" x:Name="liOrderNumber">
-                        <CorasauControls:IntegerEditor EditValue="{Binding OrderNumber,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SetMask="false"/>
+                        <CorasauControls:IntegerEditor EditValue="{Binding OrderNumber,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SetMask="false" LostFocus="OrderNumber_LostFocus"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="DeliveryDate" x:Name="liDeliveryDate">
                         <CorasauControls:DateEditor x:Name="deDeLiveryDate" EditValue="{Binding DeliveryDate,Mode=TwoWay}"/>

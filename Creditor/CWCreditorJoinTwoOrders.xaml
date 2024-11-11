@@ -6,7 +6,6 @@ x:Class="UnicontaClient.Pages.CustomPage.CWCreditorJoinTwoOrders"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
          xmlns:cw="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
-        xmlns:controls="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls"          
         xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
         xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
         Width="{StaticResource Width8}" Height="{StaticResource Height8}" KeyDown="ChildWindow_KeyDown" SizeToContent="WidthAndHeight">

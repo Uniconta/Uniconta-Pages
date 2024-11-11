@@ -36,7 +36,7 @@ namespace UnicontaClient.Pages.CustomPage
         readonly long[] amount;
         readonly int index;
         readonly bool header;
-
+        public bool showZero;
         public CustomColumn(CustomColumn org, Visibility showDebitCredit, bool hide, int aWidth, bool header) : this(org, showDebitCredit, header)
         {
             AmountWidth = (aWidth * 2);
@@ -78,7 +78,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         [Display(Name = "Amount", ResourceType = typeof(GLDailyJournalText))]
-        public double? Amount { get { var d = GetAmountValue(this.amount, index); return (d != 0) ? d / 100d : (header ? (double?)null : (double?)0d); } }
+        public double? Amount { get { var d = GetAmountValue(this.amount, index); return (d != 0) ? d / 100d : (header  ? (double?)null :( showZero ? (double?)0d: (double?)null)) ; } }
 
         [Display(Name = "Debit", ResourceType = typeof(GLDailyJournalText))]
         public double? Debit { get { var d = GetAmountValue(this.amount, index); return (d > 0) ? d / 100d : (double?)null; } }
@@ -111,23 +111,23 @@ namespace UnicontaClient.Pages.CustomPage
             var asize = hdrData.AmountSize;
             var header = (blc.Acc == null || blc.AccountTypeEnum == GLAccountTypes.Header);
 
-            this.Col1 = new CustomColumn(blc.Col1, hdrData.ShowDCCol1, hide, asize, header);
-            this.Col2 = new CustomColumn(blc.Col2, hdrData.ShowDCCol2, hide, asize, header);
-            this.Col3 = new CustomColumn(blc.Col3, hdrData.ShowDCCol3, hide, asize, header);
-            this.Col4 = new CustomColumn(blc.Col4, hdrData.ShowDCCol4, hide, asize, header);
-            this.Col5 = new CustomColumn(blc.Col5, hdrData.ShowDCCol5, hide, asize, header);
-            this.Col6 = new CustomColumn(blc.Col6, hdrData.ShowDCCol6, hide, asize, header);
-            this.Col7 = new CustomColumn(blc.Col7, hdrData.ShowDCCol7, hide, asize, header);
-            this.Col8 = new CustomColumn(blc.Col8, hdrData.ShowDCCol8, hide, asize, header);
-            this.Col9 = new CustomColumn(blc.Col9, hdrData.ShowDCCol9, hide, asize, header);
-            this.Col10 = new CustomColumn(blc.Col10, hdrData.ShowDCCol10, hide, asize, header);
-            this.Col11 = new CustomColumn(blc.Col11, hdrData.ShowDCCol11, hide, asize, header);
-            this.Col12 = new CustomColumn(blc.Col12, hdrData.ShowDCCol12, hide, asize, header);
-            this.Col13 = new CustomColumn(blc.Col13, hdrData.ShowDCCol13, hide, asize, header);
+            this.Col1 = new CustomColumn(blc.Col1, hdrData.ShowDCCol1, hide, asize, header) { showZero = blc.ShowZero };
+            this.Col2 = new CustomColumn(blc.Col2, hdrData.ShowDCCol2, hide, asize, header) { showZero = blc.ShowZero };
+            this.Col3 = new CustomColumn(blc.Col3, hdrData.ShowDCCol3, hide, asize, header) { showZero = blc.ShowZero };
+            this.Col4 = new CustomColumn(blc.Col4, hdrData.ShowDCCol4, hide, asize, header) { showZero = blc.ShowZero };
+            this.Col5 = new CustomColumn(blc.Col5, hdrData.ShowDCCol5, hide, asize, header) { showZero = blc.ShowZero };
+            this.Col6 = new CustomColumn(blc.Col6, hdrData.ShowDCCol6, hide, asize, header) { showZero = blc.ShowZero };
+            this.Col7 = new CustomColumn(blc.Col7, hdrData.ShowDCCol7, hide, asize, header) { showZero = blc.ShowZero };
+            this.Col8 = new CustomColumn(blc.Col8, hdrData.ShowDCCol8, hide, asize, header) { showZero = blc.ShowZero };
+            this.Col9 = new CustomColumn(blc.Col9, hdrData.ShowDCCol9, hide, asize, header) { showZero = blc.ShowZero };
+            this.Col10 = new CustomColumn(blc.Col10, hdrData.ShowDCCol10, hide, asize, header) { showZero = blc.ShowZero };
+            this.Col11 = new CustomColumn(blc.Col11, hdrData.ShowDCCol11, hide, asize, header) { showZero = blc.ShowZero };
+            this.Col12 = new CustomColumn(blc.Col12, hdrData.ShowDCCol12, hide, asize, header) { showZero = blc.ShowZero };
+            this.Col13 = new CustomColumn(blc.Col13, hdrData.ShowDCCol13, hide, asize, header) { showZero = blc.ShowZero };
             Columns = new List<CustomColumn>();
             foreach (var col in blc.Columns)
             {
-                Columns.Add(new CustomColumn(col, col.ShowDebitCredit, hide, asize, header));
+                Columns.Add(new CustomColumn(col, col.ShowDebitCredit, hide, asize, header) { showZero = blc.ShowZero });
             }
             this.hdrData = hdrData;
             this.line = line;

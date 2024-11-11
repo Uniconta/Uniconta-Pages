@@ -1,19 +1,7 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using DevExpress.Xpf.WindowsUI;
 using Uniconta.ClientTools.Controls;
-using Uniconta.DataModel;
 using System.Diagnostics;
 
 using UnicontaClient.Pages;
@@ -26,11 +14,12 @@ namespace UnicontaClient.Pages.CustomPage
         {
             InitializeComponent();
             DataContext = this;
-            List<ServerInformation> servers = new List<ServerInformation>();
-            servers.Add(new ServerInformation { Host = "smtp.office365.com", Port = 587, SSL = true });
-            servers.Add(new ServerInformation { Host = "asmtp.yousee.dk", Port = 587, SSL = true });
-            servers.Add(new ServerInformation { Host = "smtp.gmail.com", Port = 587, SSL = true, User = "@gmail.com" });
-            cmbSMTPServer.ItemsSource = servers;
+            cmbSMTPServer.ItemsSource = new List<ServerInformation>
+            {
+                new ServerInformation { Host = "smtp.office365.com", Port = 587, SSL = true },
+                new ServerInformation { Host = "asmtp.yousee.dk", Port = 587, SSL = true },
+                new ServerInformation { Host = "smtp.gmail.com", Port = 587, SSL = true, User = "@gmail.com" }
+            }; ;
         }
 
         public override string Header
@@ -55,7 +44,6 @@ namespace UnicontaClient.Pages.CustomPage
                 UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NoServerSelected"), Uniconta.ClientTools.Localization.lookup("Warning"),
                     MessageBoxButton.OK);
         }
-#if !SILVERLIGHT
         private void cmbSMTPServer_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
         {
             if (cmbSMTPServer.SelectedIndex == 2)
@@ -69,7 +57,6 @@ namespace UnicontaClient.Pages.CustomPage
             Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
             e.Handled = true;
         }
-#endif
     }
 
     public class ServerInformation

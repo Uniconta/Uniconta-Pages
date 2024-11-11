@@ -359,18 +359,25 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var paymFormatClient = (DebtorPaymentFormat)PaymentFormatCache.Get(trans.PaymentFormat);
 
-            if (paymFormatClient != null && paymFormatClient._ExportFormat == (byte)DebtorPaymFormatType.NetsBS && trans.Invoice != 0)
+            if (paymFormatClient != null && paymFormatClient._ExportFormat == (byte)DebtorPaymFormatType.NetsBS)
             {
-                TransactionAPI tranApi = new TransactionAPI(api);
-                var lstInvoiceTxt = await tranApi.CreatePaymentMessage(new List<DebtorTransDirectDebit> { trans });
+                var paymentFormatNets = new DebtorPaymentFormatClientNets();
+                StreamingManager.Copy(paymFormatClient, paymentFormatNets);
 
-                if (lstInvoiceTxt != null)
+                if (trans.Invoice != 0 || paymentFormatNets._AllowEmptyInvoiceNo)
                 {
-                    var invText = lstInvoiceTxt[0];
-                    if (invText == "InvoiceNumberMissing")
-                        invText = Uniconta.ClientTools.Localization.lookup("InvoiceNumberMissing");
 
-                    trans.TransactionText = invText;
+                    TransactionAPI tranApi = new TransactionAPI(api);
+                    var lstInvoiceTxt = await tranApi.CreatePaymentMessage(new List<DebtorTransDirectDebit> { trans });
+
+                    if (lstInvoiceTxt != null)
+                    {
+                        var invText = lstInvoiceTxt[0];
+                        if (invText == "InvoiceNumberMissing")
+                            invText = Uniconta.ClientTools.Localization.lookup("InvoiceNumberMissing");
+
+                        trans.TransactionText = invText;
+                    }
                 }
             }
 
@@ -929,7 +936,7 @@ namespace UnicontaClient.Pages.CustomPage
                         lineclient.SetMaster(DJclient);
                         lineclient._DCPostType = DCPostType.Payment;
                         lineclient._LineNumber = ++LineNumber;
-                        lineclient._Date = cTOpenClient._PaymentDate != DateTime.MinValue ? cTOpenClient._PaymentDate : cTOpenClient._DueDate;
+                        lineclient._Date = cTOpenClient.GetPayDate();
                         lineclient._TransType = cwwin.TransType;
                         lineclient._AccountType = (byte)GLJournalAccountType.Debtor;
                         lineclient._Account = cTOpenClient.Account;
@@ -1021,7 +1028,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 if (rec.PaymentDate < today && rec._PaymentStatus == PaymentStatusLevel.None)
                 {
-                    var paymDate = rec._PaymentDate == DateTime.MinValue ? rec._DueDate : rec._PaymentDate;
+                    var paymDate = rec.GetPayDate();
                     rec.PaymentDate = today > paymDate ? today : paymDate;
 
                     if (paymFormatClient != null && paymFormatClient._PaymentAction != NoneBankDayAction.None)

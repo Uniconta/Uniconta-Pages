@@ -57,6 +57,9 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectJournalPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="UseApproved" x:Name="liUseApproved">
                         <CorasauControls:CheckEditor  IsChecked="{Binding UseApproved,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="AllowNegativStock" x:Name="liAllowNegativStock">
+                        <CorasauControls:CheckEditor  IsChecked="{Binding AllowNegativStock,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="usedim"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Dimensions}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" MinWidth="550">
                     <CorasauControls:CorasauLayoutItem x:Name="lbldim1">

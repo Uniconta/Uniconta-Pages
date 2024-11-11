@@ -39,7 +39,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
             var internalAdvText = StandardPaymentFunctions.InternalMessage(paymentFormat._OurMessage, tran, company, creditor);
             danishFields.OwnVoucherNumber = NETSNorge.processString(internalAdvText, 20, false);
 
-            var externalAdvText = StandardPaymentFunctions.ExternalMessage(paymentFormat._Message, tran, company, creditor);
+            var externalAdvText = StandardPaymentFunctions.ExternalMessage(paymentFormat, tran, company, creditor);
 
             danishFields.Blanks = NETSNorge.processString(string.Empty, 4, false);
 

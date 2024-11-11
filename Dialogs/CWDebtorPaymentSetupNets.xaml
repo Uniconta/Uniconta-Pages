@@ -6,7 +6,7 @@
            xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
            xmlns:ClientToolsControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
            xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
-           Width="650" Height="700" KeyDown="ChildWindow_KeyDown">
+           Width="650" Height="720" KeyDown="ChildWindow_KeyDown">
   
     <Grid x:Name="LayoutRoot" Margin="2" >
         <Grid.RowDefinitions>
@@ -20,12 +20,14 @@
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="30"/>
-                <RowDefinition Height="30"/>                
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
                 <RowDefinition Height="260"/>
                 <RowDefinition Height="140"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="170"/>
+                <ColumnDefinition Width="230"/>
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
@@ -47,10 +49,13 @@
             <TextBlock x:Name="lblExpandDeadline" Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=ExtendedDeliveryDeadline,Mode=OneWay}" Margin="5,0,0,0" Grid.Column="0" Grid.Row="5"  VerticalAlignment="Center"/>
             <CorasauControls:CheckEditor x:Name="ceExpandDeadline" IsChecked="{Binding ExpandDeadline,Mode=TwoWay}" Grid.Column="2" Grid.Row="5"  />
 
-            <TextBlock Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=InvoiceTextTemplate,Mode=OneWay}" Margin="5,0,0,0" Grid.Column="0" Grid.Row="6" />
-            <CorasauControls:TextEditor HandleKeyDown="False" Text="{Binding InvoiceTextTemplate,Mode=TwoWay}" AcceptsReturn="True" VerticalContentAlignment="Top" TextWrapping="Wrap" HorizontalContentAlignment="Left" Grid.Column="2"  Grid.Row="6" Height="250"  x:Name="txtInvoiceTextTemplate"/>
-            <TextBlock Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=InvoiceTextTemplateNoLines,Mode=OneWay}" Margin="5,0,0,0" Grid.Column="0" Grid.Row="7" />
-            <CorasauControls:TextEditor HandleKeyDown="False" Text="{Binding InvoiceTextTemplateNoLines,Mode=TwoWay}" AcceptsReturn="True" VerticalContentAlignment="Top" TextWrapping="Wrap" HorizontalContentAlignment="Left" Grid.Column="2"  Grid.Row="7" Height="140"  x:Name="txtInvoiceTextTemplateNoLines"/>
+            <TextBlock x:Name="lblAllowEmptyInvoiceNo" Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=AllowTransWithoutInvoicNo,Mode=OneWay}" Margin="5,0,0,0" Grid.Column="0" Grid.Row="6"  VerticalAlignment="Center"/>
+            <CorasauControls:CheckEditor x:Name="ceAllowEmptyInvoiceNo" IsChecked="{Binding AllowEmptyInvoiceNo,Mode=TwoWay}" Grid.Column="2" Grid.Row="6"  />
+
+            <TextBlock Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=InvoiceTextTemplate,Mode=OneWay}" Margin="5,0,0,0" Grid.Column="0" Grid.Row="8" />
+            <CorasauControls:TextEditor HandleKeyDown="False" Text="{Binding InvoiceTextTemplate,Mode=TwoWay}" AcceptsReturn="True" VerticalContentAlignment="Top" TextWrapping="Wrap" HorizontalContentAlignment="Left" Grid.Column="2"  Grid.Row="8" Height="250"  x:Name="txtInvoiceTextTemplate"/>
+            <TextBlock Text="{Binding Converter={StaticResource  GlobalLocalizationValueConverter},ConverterParameter=InvoiceTextTemplateNoLines,Mode=OneWay}" Margin="5,0,0,0" Grid.Column="0" Grid.Row="9" />
+            <CorasauControls:TextEditor HandleKeyDown="False" Text="{Binding InvoiceTextTemplateNoLines,Mode=TwoWay}" AcceptsReturn="True" VerticalContentAlignment="Top" TextWrapping="Wrap" HorizontalContentAlignment="Left" Grid.Column="2"  Grid.Row="9" Height="140"  x:Name="txtInvoiceTextTemplateNoLines"/>
         </Grid>
         <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="1" Orientation="Horizontal" Margin="0 10 0 0">
             <Button x:Name="OKButton" IsDefault="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OK,Mode=OneWay}" Click="OKButton_Click" MinWidth="75" Height="23" 

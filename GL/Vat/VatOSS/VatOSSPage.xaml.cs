@@ -262,6 +262,9 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 if (lastGLVat == null)
                     continue;
+                var priceInclVat = invLine.InvoiceRef._PricesInclVat;
+                var vatAmount = lastGLVat.VatAmount(-invLine.NetAmount, invLine._Date, false, priceInclVat ? GLVatCalculationMethod.Brutto : GLVatCalculationMethod.Netto);
+                var amount = priceInclVat ? -invLine.NetAmount - vatAmount : -invLine.NetAmount;
 
                 var vatOSS = new VatOSSTable
                 {
@@ -277,9 +280,10 @@ namespace UnicontaClient.Pages.CustomPage
                     _BusinessCountry = lastGLVat._BusinessCountry,
                     _ShipmentCountry = lastGLVat._ShipmentCountry,
                     _Id = lastGLVat._Id,
-                    _Amount = -invLine.NetAmount
+                    _Amount = amount,
+                    _VatAmount = vatAmount
                 };
-                vatOSS._VatAmount = lastGLVat.VatAmount(vatOSS._Amount, vatOSS._Date, false, GLVatCalculationMethod.Netto);
+
                 listOfResults.Add(vatOSS);
             }
 

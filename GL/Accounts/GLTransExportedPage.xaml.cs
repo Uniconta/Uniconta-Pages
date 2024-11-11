@@ -142,15 +142,26 @@ namespace UnicontaClient.Pages.CustomPage
                         ConnectToDatev(selectedItem);
                     break;
                 case "Upload":
-                    if (UnicontaMessageBox.Show(String.Format("Möchten Sie {0:d} - {1:d} Version {3} ({2}) zu DATEV hochladen?", selectedItem._FromDate, selectedItem._ToDate, selectedItem.Comment, selectedItem._SuppVersion), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OKCancel) == MessageBoxResult.OK)
-                        if ((!string.IsNullOrEmpty(selectedItem._SendToDatevDOC)) || (!string.IsNullOrEmpty(selectedItem.SendToDatevEXTF)))
-
-                            if (UnicontaMessageBox.Show(String.Format("Sie haben {0:d} - {1:d} Version {3} ({2}) bereits zu DATEV hochgeladen. Möchten Sie noch einmal hochladen?", selectedItem._FromDate, selectedItem._ToDate, selectedItem.Comment, selectedItem._SuppVersion), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OKCancel) == MessageBoxResult.OK)
-                                FilUpload(selectedItem);
-                            else
-                                FilUpload(selectedItem);
-                        else
+                    if (!string.IsNullOrEmpty(DatevDetails.AccessToken) && DatevDetails.Tokenvalidto > DateTime.Now)
+                    {
+                        if (UnicontaMessageBox.Show(String.Format("Möchten Sie {0:d} - {1:d} Version {3} ({2}) zu DATEV hochladen?", selectedItem._FromDate, selectedItem._ToDate, selectedItem.Comment, selectedItem._SuppVersion), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+                        {
+                            if ((!string.IsNullOrEmpty(selectedItem._SendToDatevDOC)) || (!string.IsNullOrEmpty(selectedItem.SendToDatevEXTF)))
+                                if (UnicontaMessageBox.Show(String.Format("Sie haben {0:d} - {1:d} Version {3} ({2}) bereits zu DATEV hochgeladen. Möchten Sie noch einmal hochladen?", selectedItem._FromDate, selectedItem._ToDate, selectedItem.Comment, selectedItem._SuppVersion), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+                                {
+                                    FilUpload(selectedItem);
+                                    break;
+                                }
+                                else
+                                    break;
                             FilUpload(selectedItem);
+                            break;
+                        }
+                        else
+                            break;
+                    }
+                    else
+                        UnicontaMessageBox.Show("Der DATEV Zugangstoken ist ungültig oder abgelaufen", "Fehler", MessageBoxButton.OK);
                     break;
                 case "ConnectedApplications":
                     Process.Start("https://apps.datev.de/tokrevui");
@@ -167,7 +178,7 @@ namespace UnicontaClient.Pages.CustomPage
         async void SaveDatev()
         {
             var datev = await UnicontaClient.Pages.GLTransPage.CreateDatevHeader(api);
-            var cw = new CwDatevHeaderParams(datev.Consultant, datev.Client, datev.Path, datev.DefaultAccount, datev.LanguageId, datev.FiscalYearBegin, api);
+            var cw = new CwDatevHeaderParams(datev.Consultant, datev.Client, datev.Path, datev.DefaultAccount, datev.LanguageId, datev.FiscalYearBegin, datev.Active, api);
             cw.Closed += delegate
             {
                 if (cw.DialogResult == true)
@@ -178,6 +189,7 @@ namespace UnicontaClient.Pages.CustomPage
                     datev.DefaultAccount = cw.DefaultAccount;
                     datev.LanguageId = cw.LanguageId;
                     datev.FiscalYearBegin = cw.FiscalYearBegin;
+                    datev.Active = cw.Active; //Per
                     UnicontaClient.Pages.GLTransPage.SaveDatevHeader(datev, api);
                 }
             };
@@ -222,12 +234,18 @@ namespace UnicontaClient.Pages.CustomPage
 
         public async void ConnectToDatev(GLTransExportedClient selectedItem)
         {
+            var datev = await CreateDatevHeader();
+            if (datev.Active != true)
+            {
+                UnicontaMessageBox.Show("Sie haben in DATEV-Informationen nicht bestätigt, dass bei DATEV das Produkt DATEV Buchungsdatenservice aktiviert ist", "Fehler", MessageBoxButton.OK);
+                return;
+            }
             busyIndicator.IsBusy = true;
             byte status = 0;
             if (!string.IsNullOrEmpty(DatevDetails.AccessToken) && DatevDetails.Tokenvalidto > DateTime.Now)
             {
-                var UCService = DatevDetails.UCService;
-                if (UCService == 2 || UCService == 3 && (DatevDetails.Send == true) && (selectedItem.SendToDatevDOC == null))
+                var UCService = selectedItem.DatevService;
+                if ((UCService == "Belege" || UCService == "Buchungen & Belege") && (DatevDetails.Send == true) && (selectedItem.SendToDatevDOC == null))
                 {
                     busyIndicator.IsBusy = false;
                     UnicontaMessageBox.Show("Sie können sich nicht von DATEV abmelden, solange noch Dokumente hochgeladen werden", "Fehler", MessageBoxButton.OK);
@@ -571,6 +589,8 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         if (cwComboBox.DialogResult == true && DatevDetails.UCService == 3)
                             DatevDetails.UCService = cwComboBox.SelectedItemIndex + 1;
+                        if (cwComboBox.DialogResult == false)
+                            return;
                         var datev = await CreateDatevHeader();
                         var url = "Https://accounting-extf-files.api.datev.de/platform/v3/clients/" + Convert.ToInt32(datev.Consultant) + "-" + datev.Client + "/extf-files/import";
                         var partname = "";
@@ -579,6 +599,7 @@ namespace UnicontaClient.Pages.CustomPage
                         string[] loc = new string[3];
                         busyIndicator.IsBusy = true;
                         var client = new HttpClient();
+                        client.Timeout = TimeSpan.FromSeconds(300);
                         if (DatevDetails.UCService == 1 || DatevDetails.UCService == 3)
                         {
                             for (int i = 0; i < 3; i++)
@@ -594,7 +615,8 @@ namespace UnicontaClient.Pages.CustomPage
                                 {
                                     status = 3;
                                     InsDatevLog(selectedItem, DateTime.Now, url + "/extf-files/ import " + " Method.Post", "extf-file " + datev.Path + "\\" + partname + ".csv" + " Content-Type " + "application/octet-stream", "", status, "No files available");
-                                    UnicontaMessageBox.Show("No files available", "Error", MessageBoxButton.OK);
+                                    busyIndicator.IsBusy = false;
+                                    UnicontaMessageBox.Show("Keine Buchungsdateien gefunden", "Error", MessageBoxButton.OK);
                                     return;
                                 }
 
@@ -652,7 +674,7 @@ namespace UnicontaClient.Pages.CustomPage
                         var UpTextEXTF = "";
                         if (DatevDetails.UCService == 2 || DatevDetails.UCService == 3)
                         {
-                            UpText = "Die Belege werden vom Server hochgeladen";
+                            UpText = "Die Belege werden vom Server hochgeladen. Sie können diese Seite verlassen, mit Uniconta an anderer Stelle weiterarbeiten. ";
                         }
                         if (DatevDetails.UCService == 1 || DatevDetails.UCService == 3)
                         {
@@ -674,6 +696,8 @@ namespace UnicontaClient.Pages.CustomPage
                             Cmp.SetUserField("AccessToken", DatevDetails.AccessToken);
                             Cmp.SetUserField("RefreshToken", DatevDetails.RefreshToken);
                             Cmp.SetUserField("MaxJournalPostedId", selectedItem._MaxJournalPostedId);
+                            Cmp.SetUserField("SuppVersion", selectedItem.SuppVersion);
+                            Cmp.SetUserField("ToDate", selectedItem._ToDate);
                             api.Update(Cmp);
                         }
 

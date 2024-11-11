@@ -166,6 +166,8 @@ namespace UnicontaClient.Pages.CustomPage
                 Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
                 CostValue.Visible = CostValue.ShowInColumnChooser = false;
             }
+            if (Comp.InvPackaging)
+                Consumer.Visible = Consumer.ShowInColumnChooser = false;
         }
 
         void dgDebtorOrdersGrid_RowDoubleClick()
@@ -326,6 +328,13 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     PostProjectOrder(selectedItem);
                     break;
+                case "Packaging":
+                    if (selectedItem != null)
+                    {
+                        header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Packaging"), selectedItem._OrderNumber);
+                        AddDockItem(TabControls.DebtorPackingShipmentPage, selectedItem, header);
+                    }
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -378,18 +387,19 @@ namespace UnicontaClient.Pages.CustomPage
                     var Contacts = api.GetCache(typeof(Uniconta.DataModel.Contact));
                     foreach (var rec in lst)
                     {
-                        if (!reload && rec._DCAccount != null && cache.Get(rec._DCAccount) == null)
-                            reload = true;
+                        if (rec._DCAccount != null && cache.Get(rec._DCAccount) == null)
+                        {
+                            reload = true; 
+                            break;
+                        }
                         if (rec._ContactRef != 0 && Contacts != null && Contacts.Get(rec._ContactRef) == null)
                         {
-                            Contacts = null;
-                            api.LoadCache(typeof(Uniconta.DataModel.Contact), true);
-                            if (reload)
-                                break;
+                            reload = true; 
+                            break;
                         }
                     }
                     if (reload)
-                        await api.LoadCache(typeof(Uniconta.DataModel.Debtor), true);
+                        await api.UpdateCache(new[] { typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.Contact) });
                 }
             }
             if (refresh)
@@ -639,7 +649,6 @@ namespace UnicontaClient.Pages.CustomPage
         protected override void LoadCacheInBackGround()
         {
             var orders = api.GetCache(typeof(Uniconta.DataModel.DebtorOrder));
-            TestDebtorReload(false, orders?.GetNotNullArray as IEnumerable<DebtorOrder>);
 
             var Comp = api.CompanyEntity;
             var lst = new List<Type>(20) { typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.Employee), typeof(Uniconta.DataModel.GLVat) };
@@ -680,7 +689,13 @@ namespace UnicontaClient.Pages.CustomPage
                 lst.Add(typeof(Uniconta.DataModel.GLDimType4));
             if (Comp.NumberOfDimensions >= 5)
                 lst.Add(typeof(Uniconta.DataModel.GLDimType5));
-            lst.Add(typeof(Uniconta.DataModel.InvItem));
+            if (api.GetCache(typeof(Uniconta.DataModel.InvItem)) != null)
+                api.UpdateCache();
+            else
+            {
+                lst.Add(typeof(Uniconta.DataModel.InvItem));
+                TestDebtorReload(false, orders?.GetNotNullArray as IEnumerable<DebtorOrder>);
+            }
             LoadType(lst);
         }
 
@@ -749,7 +764,12 @@ namespace UnicontaClient.Pages.CustomPage
                 if (additionalOrdersList != null)
                     GenrateInvoiceDialog.SetAdditionalOrders(additionalOrdersList);
             }
-            GenrateInvoiceDialog.SetOIOUBLLabelText(api.CompanyEntity._OIOUBLSendOnServer);
+
+            if (!api.CompanyEntity._DeactivateSendNemhandel)
+            {
+                GenrateInvoiceDialog.SetOIOUBLLabelText(true);
+                GenrateInvoiceDialog.EnableSentEinvoice(api.CompanyEntity._OIOUBLSendOnServer && invoiceInXML);
+            }
 
             GenrateInvoiceDialog.Closed += async delegate
             {

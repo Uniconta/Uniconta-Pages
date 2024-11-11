@@ -1,35 +1,21 @@
 using Uniconta.API.System;
 using UnicontaClient.Models;
-using UnicontaClient.Utilities;
-using Uniconta.ClientTools;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
-using Uniconta.DataModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 using Uniconta.ClientTools.Util;
 using System.Windows;
-using DevExpress.Xpf.Editors.Controls;
 using Uniconta.ClientTools.Controls;
-using Uniconta.API.DebtorCreditor;
 using UnicontaClient.Pages.GL.ChartOfAccount.Reports;
 using System.Text.RegularExpressions;
-using System.Collections;
 using System.Text;
-using UnicontaClient.Pages;
 using Microsoft.Identity.Client;
 using System.Threading.Tasks;
-using UnicontaClient.Controls.Dialogs;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -125,6 +111,7 @@ namespace UnicontaClient.Pages.CustomPage
                             title = Uniconta.ClientTools.Localization.lookup("VerifyGraph");
                         CWCommentsDialogBox dialog = new CWCommentsDialogBox(title, Uniconta.ClientTools.Localization.lookup("Email"));
                         dialog.DialogTableId = 2000000043;
+                        dialog.SizeToContent = SizeToContent.WidthAndHeight; 
                         dialog.Closing += async delegate
                         {
                             if (dialog.DialogResult == true)
@@ -166,10 +153,9 @@ namespace UnicontaClient.Pages.CustomPage
                         return;
                     var objWizardWindow = new WizardWindow(new UnicontaClient.Pages.EmailSetupWizard(), string.Format(Uniconta.ClientTools.Localization.lookup("CreateOBJ"),
                     Uniconta.ClientTools.Localization.lookup("EmailSetup")));
-                    objWizardWindow.Width = System.Convert.ToDouble(System.Windows.SystemParameters.PrimaryScreenWidth) * 0.14;
-                    objWizardWindow.Height = System.Convert.ToDouble(System.Windows.SystemParameters.PrimaryScreenHeight) * 0.20;
+                    objWizardWindow.SizeToContent = SizeToContent.WidthAndHeight;
                     objWizardWindow.MinHeight = 120.0d;
-                    objWizardWindow.MinWidth = 350.0d;
+                    objWizardWindow.MinWidth = 300.0d;
 
                     objWizardWindow.Closed += delegate
                   {
@@ -195,14 +181,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "Save":
                     if (Validate())
-                    {
-                        //if (editrow.Html)
-                        //{
-                        //    if (!ContainsHTML(editrow.Body))
-                        //        editrow.Html = false;
-                        //}
                         frmRibbon_BaseActions(ActionType);
-                    }
                     break;
                 default:
                     frmRibbon_BaseActions(ActionType);

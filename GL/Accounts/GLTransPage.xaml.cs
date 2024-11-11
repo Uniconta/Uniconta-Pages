@@ -25,6 +25,7 @@ using Uniconta.Common.Utility;
 using Uniconta.DataModel;
 using UnicontaClient.Models;
 using UnicontaClient.Pages.GL.ChartOfAccount.Reports;
+using System.Text.RegularExpressions;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -53,7 +54,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         bool newSupplement;
         string Command;
-        private int AccountLength;      
+        private int AccountLength;
         GLTransExportedClient glTransExported;
         SQLCache Accounts, Debtors, Creditors, VATs, Pays; //Datev Zahlungsbedegungen
         public GLTransPage(UnicontaBaseEntity master, string Command) : base(master)
@@ -79,7 +80,7 @@ namespace UnicontaClient.Pages.CustomPage
                 ribbonControl.DisableButtons("ExportToDatev");
             if (!api.CompanyEntity.DATEV)
                 ribbonControl.DisableButtons("SendDocToDatev");
-            DatevMarked.Visible = DatevMarked.ShowInColumnChooser = api.CompanyEntity.DATEV;           
+            DatevMarked.Visible = DatevMarked.ShowInColumnChooser = api.CompanyEntity.DATEV;
         }
 
         public override Task InitQuery()
@@ -152,25 +153,31 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         DebtorTransactions.ShowVoucher(dgAccountsTransGrid.syncEntity, api, busyIndicator);
                     break;
-                case "SendDocToDatev":                  
+                case "SendDocToDatev":
                     dgAccountsTransGrid.CurrentColumn = Date;
-                    var markedRows = (dgAccountsTransGrid.GetVisibleRows() as IEnumerable<GLTransClient>)?.Where(gl => gl.DatevMarked == true)?.ToList(); 
-                    if (markedRows?.Count() > 0)
-                    { 
+                    var markedRows = (dgAccountsTransGrid.GetVisibleRows() as IEnumerable<GLTransClient>)?.Where(gl => gl.DatevMarked == true)?.ToList();
+                    var makR = markedRows?.Count();
+                    if (makR > 0)
+                    {
                         if ((!string.IsNullOrEmpty(DatevDetails.AccessToken) && DatevDetails.Tokenvalidto > DateTime.Now))
                         {
-                            DatevEntity.SendDocToDatev(api, markedRows, glTransExported);
-                            foreach (var item in markedRows)
+                            if (UnicontaMessageBox.Show(String.Format("Sollen die {0} markierten Belege hochgeladen werden? Bitte beachten Sie: nachdem Sie das Hochladen best�tigt haben, werden die Belege im Hintergrund hochgeladen. Bleiben Sie auf dieser Seite bis eine weitere Mitteilung erfolgt ist.", makR), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OKCancel) == MessageBoxResult.OK)
                             {
-                                item.DatevMarked = false;
-                                dgAccountsTransGrid.RefreshData();
+                                DatevEntity.SendDocToDatev(api, markedRows, glTransExported);
+
+                                foreach (var item in markedRows)
+                                {
+                                    item.DatevMarked = false;
+                                    dgAccountsTransGrid.RefreshData();
+                                }
                             }
+                            return;
                         }
                         else
-                            UnicontaMessageBox.Show("Der DATEV Zugangstoken ist ung�ltig oder abgelaufen", "Fehler", MessageBoxButton.OK); 
+                            UnicontaMessageBox.Show("Der DATEV Zugangstoken ist ung�ltig oder abgelaufen", "Fehler", MessageBoxButton.OK);
                     }
                     else
-                    UnicontaMessageBox.Show("Es sind keine Belege markiert, die an DATEV hochgeladen werden sollen", "Fehler", MessageBoxButton.OK);                                       
+                        UnicontaMessageBox.Show("Es sind keine Belege markiert, die an DATEV hochgeladen werden sollen", "Fehler", MessageBoxButton.OK);
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -275,6 +282,14 @@ namespace UnicontaClient.Pages.CustomPage
                 return x._JournalPostedId - y._JournalPostedId;
             }
         }
+        internal class transSort : IComparer<CreditorTrans>  //Per
+        {
+            public int Compare(CreditorTrans x, CreditorTrans y)
+            {
+                var tmp = x._Voucher.CompareTo(y._Voucher);
+                return tmp == 0 ? x._JournalPostedId - y._JournalPostedId : tmp;
+            }
+        }
 
         async void ExportToDatev()
         {
@@ -327,10 +342,10 @@ namespace UnicontaClient.Pages.CustomPage
                     var filter = new[]
                     {
                         PropValuePair.GenereteWhereElements("Date", typeof(DateTime), String.Format("{0:d}..{1:d}", glTransExported._FromDate, glTransExported._ToDate)),
-                        PropValuePair.GenereteWhereElements("DeliveryDate", typeof(DateTime), "!null")
                     };
 
                     var invSort = new invoiceSort();
+                    var traSort = new transSort();
 
                     var debInvoice = await api.Query<Uniconta.DataModel.DebtorInvoice>(filter);
                     if (debInvoice.Length > 0)
@@ -342,8 +357,12 @@ namespace UnicontaClient.Pages.CustomPage
                         Array.Sort(creInvoice, invSort);
                     else
                         creInvoice = null;
-
-                    SaveGLTransactions(datev, defaultPath + "/" + glTransFileName, debInvoice, creInvoice, invSort);
+                    var creTrans = await api.Query<Uniconta.DataModel.CreditorTrans>(filter);
+                    if (creTrans.Length > 0)
+                        Array.Sort(creTrans, traSort);
+                    else
+                        creTrans = null;
+                    SaveGLTransactions(datev, defaultPath + "/" + glTransFileName, debInvoice, creInvoice, invSort, traSort, creTrans);
                     SaveDebtorCreditor(datev, defaultPath + "/" + DCFileName);
                     SaveGLAccountLabels(datev, defaultPath + "/" + accountLabelFileName);
                     UnicontaMessageBox.Show("DATEV Export erfolgreich", Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OK);
@@ -355,7 +374,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        private void SaveGLTransactions(DatevHeader datev, string fileName, DCInvoice[] debInvoice, DCInvoice[] creInvoice, invoiceSort invSort)
+        private void SaveGLTransactions(DatevHeader datev, string fileName, DCInvoice[] debInvoice, DCInvoice[] creInvoice, invoiceSort invSort, transSort traSort, CreditorTrans[] creTrans)
         {
             using (Stream stream = File.Create(fileName))
             {
@@ -367,6 +386,8 @@ namespace UnicontaClient.Pages.CustomPage
                     VATs = VATs,
                     Pays = Pays,
                     invSort = invSort,
+                    traSort = traSort,
+                    creTrans = creTrans,
                     debInvoice = debInvoice,
                     creInvoice = creInvoice
                 };
@@ -464,7 +485,7 @@ namespace UnicontaClient.Pages.CustomPage
             string consultant, client, defaultContraAccount, LanguageId;
             public DateTime fromDate, toDate, fiscalYearBegin;
             string currency;
-            private int AccountLength;           
+            private int AccountLength;
             List<int> EmptyFieldIndicesDatevPosting;
             List<int> EmptyFieldIndicesDCDatev;
             List<int> EmptyFieldIndicesDatevAccountLabel;
@@ -476,7 +497,10 @@ namespace UnicontaClient.Pages.CustomPage
             string[] line;
             internal invoiceSort invSort;
             DebtorInvoice invSearch;
+            CreditorTrans transSearch; //Per
             internal DCInvoice[] debInvoice, creInvoice;
+            internal CreditorTrans[] creTrans; //Per
+            internal transSort traSort;
 
             public DateveWrapper(Company company, GLTransExportedClient glTransExported, DatevHeader datev, int AccountLength)
             {
@@ -500,6 +524,7 @@ namespace UnicontaClient.Pages.CustomPage
                 line = new string[300];
 
                 invSearch = new DebtorInvoice();
+                transSearch = new CreditorTrans(); //Per
             }
 
             void PopulateEmptyFieldIndexLists()
@@ -561,7 +586,7 @@ namespace UnicontaClient.Pages.CustomPage
                 header.DataCategory = 16;
                 header.FormatName = "Debitoren/Kreditoren";
                 header.FormatVersion = 5;
-                string CustomerVendorHeadline = "Konto;Name (Adressattyp Unternehmen);Unternehmensgegenstand;Name (Adressattyp nat�rl. Person);Vorname (Adressattyp nat�rl. Person);Name (Adressattyp keine Angabe);Adressattyp;Kurzbezeichnung;EU-Land;EU-UStID;Anrede;Titel/Akad. Grad;Adelstitel;Namensvorsatz;Adressart;Stra�e;Postfach;Postleitzahl;Ort;Land;Versandzusatz;Adresszusatz;Abweichende Anrede;Abw. Zustellbezeichnung 1;Abw. Zustellbezeichnung 2;Kennz. Korrespondenzadresse;Adresse G ltig von;Adresse G�ltig bis;Telefon;Bemerkung (Telefon);Telefon GL;Bemerkung (Telefon GL);E-Mail;Bemerkung (E-Mail);Internet;Bemerkung (Internet);Fax;Bemerkung (Fax);Sonstige;Bemerkung (Sonstige);Bankleitzahl 1;Bankbezeichnung 1;Bank-Kontonummer 1;L�nderkennzeichen 1;IBAN-Nr. 1;IBAN1 korrekt;SWIFT-Code 1;Abw. Kontoinhaber 1;Kennz. Hauptbankverb. 1;Bankverb 1 G ltig von;Bankverb 1 G�ltig bis;Bankleitzahl 2;Bankbezeichnung 2;Bank-Kontonummer 2;L�nderkennzeichen 2;IBAN-Nr. 2;IBAN2 korrekt;SWIFT-Code 2;Abw. Kontoinhaber 2;Kennz. Hauptbankverb. 2;Bankverb 2 G�ltig von;Bankverb 2 G�ltig bis;Bankleitzahl 3;Bankbezeichnung 3;Bank-Kontonummer 3;L�nderkennzeichen 3;IBAN-Nr. 3;IBAN3 korrekt;SWIFT-Code 3;Abw. Kontoinhaber 3;Kennz. Hauptbankverb. 3;Bankverb 3 G�ltig von;Bankverb 3 G ltig bis;Bankleitzahl 4;Bankbezeichnung 4;Bank-Kontonummer 4;L�nderkennzeichen 4;IBAN-Nr. 4;IBAN4 korrekt;SWIFT-Code 4;Abw. Kontoinhaber 4;Kennz. Hauptbankverb. 4;Bankverb 4 G�ltig von;Bankverb 4 G�ltig bis;Bankleitzahl 5;Bankbezeichnung 5;Bank-Kontonummer 5;L�nderkennzeichen 5;IBAN-Nr. 5;IBAN5 korrekt;SWIFT-Code 5;Abw. Kontoinhaber 5;Kennz. Hauptbankverb. 5;Bankverb 5 G�ltig von;Bankverb 5 G�ltig bis;Leerfeld;Briefanrede;Gru formel;Kundennummer;Steuernummer;Sprache;Ansprechpartner;Vertreter;Sachbearbeiter;Diverse-Konto;Ausgabeziel;W�hrungssteuerung;Kreditlimit (Debitor);Zahlungsbedingung;F�lligkeit in Tagen (Debitor);Skonto in Prozent (Debitor);Kreditoren-Ziel 1 Tg.;Kreditoren-Skonto 1 %;Kreditoren-Ziel 2 Tg.;Kreditoren-Skonto 2 %;Kreditoren-Ziel 3 Brutto Tg.;Kreditoren-Ziel 4 Tg.;Kreditoren-Skonto 4 %;Kreditoren-Ziel 5 Tg.;Kreditoren-Skonto 5 %;Mahnung;Kontoauszug;Mahntext 1;Mahntext 2;Mahntext 3;Kontoauszugstext;Mahnlimit Betrag;Mahnlimit %;Zinsberechnung;Mahnzinssatz 1;Mahnzinssatz 2;Mahnzinssatz 3;Lastschrift;Verfahren;Mandantenbank;Zahlungstr�ger;Indiv. Feld 1;Indiv. Feld 2;Indiv. Feld 3;Indiv. Feld 4;Indiv. Feld 5;Indiv. Feld 6;Indiv. Feld 7;Indiv. Feld 8;Indiv. Feld 9;Indiv. Feld 10;Indiv. Feld 11;Indiv. Feld 12;Indiv. Feld 13;Indiv. Feld 14;Indiv. Feld 15;Abweichende Anrede (Rechnungsadresse);Adressart (Rechnungsadresse);Stra e (Rechnungsadresse);Postfach (Rechnungsadresse);Postleitzahl (Rechnungsadresse);Ort (Rechnungsadresse);Land (Rechnungsadresse);Versandzusatz (Rechnungsadresse);Adresszusatz (Rechnungsadresse);Abw. Zustellbezeichnung 1 (Rechnungsadresse);Abw. Zustellbezeichnung 2 (Rechnungsadresse);Adresse G�ltig von (Rechnungsadresse);Adresse G ltig bis (Rechnungsadresse);Bankleitzahl 6;Bankbezeichnung 6;Bank-Kontonummer 6;L�nderkennzeichen 6;IBAN-Nr. 6;IBAN6 korrekt;SWIFT-Code 6;Abw. Kontoinhaber 6;Kennz. Hauptbankverb. 6;Bankverb 6 G�ltig von;Bankverb 6 G�ltig bis;Bankleitzahl 7;Bankbezeichnung 7;Bank-Kontonummer 7;L�nderkennzeichen 7;IBAN-Nr. 7;IBAN7 korrekt;SWIFT-Code 7;Abw. Kontoinhaber 7;Kennz. Hauptbankverb. 7;Bankverb 7 G ltig von;Bankverb 7 G�ltig bis;Bankleitzahl 8;Bankbezeichnung 8;Bank-Kontonummer 8;L nderkennzeichen 8;IBAN-Nr. 8;IBAN8 korrekt;SWIFT-Code 8;Abw. Kontoinhaber 8;Kennz. Hauptbankverb. 8;Bankverb 8 G ltig von;Bankverb 8 G�ltig bis;Bankleitzahl 9;Bankbezeichnung 9;Bank-Kontonummer 9;L�nderkennzeichen 9;IBAN-Nr. 9;IBAN9 korrekt;SWIFT-Code 9;Abw. Kontoinhaber 9;Kennz. Hauptbankverb. 9;Bankverb 9 G�ltig von;Bankverb 9 G�ltig bis;Bankleitzahl 10;Bankbezeichnung 10;Bank-Kontonummer 10;L�nderkennzeichen 10;IBAN-Nr. 10;IBAN10 korrekt;SWIFT-Code 10;Abw. Kontoinhaber 10;Kennz. Hauptbankverb. 10;Bankverb 10 G�ltig von;Bankverb 10 G�ltig bis;Nummer Fremdsystem;Insolvent;Mandatsreferenz 1;Mandatsreferenz 2;Mandatsreferenz 3;Mandatsreferenz 4;Mandatsreferenz 5;Mandatsreferenz 6;Mandatsreferenz 7;Mandatsreferenz 8;Mandatsreferenz 9;Mandatsreferenz 10;Verkn�pftes OPOS-Konto;Mahnsperre bis;Lastschriftsperre bis;Zahlungssperre bis;Geb�hrenberechnung;Mahngeb�hr 1;Mahngeb�hr 2;Mahngeb�hr 3;Pauschalenberechnung;Verzugspauschale 1;Verzugspauschale 2;Verzugspauschale 3;Alternativer Suchname;Status;Anschrift manuell ge�ndert(Korrespondenzadresse);Anschrift individuell(Korrespondenzadresse;Anschrift manuell ge�ndert(Rechnungsadresse;Anschrift individuell (Rechnungsadresse);Fristberechnung bei Debitor;Mahnfrist 1;Mahnfrist 2;Mahnfrist 3;Letzte Frist";
+                string CustomerVendorHeadline = "Konto;Name (Adressattyp Unternehmen);Unternehmensgegenstand;Name (Adressattyp nat�rl. Person);Vorname (Adressattyp nat�rl. Person);Name (Adressattyp keine Angabe);Adressattyp;Kurzbezeichnung;EU-Land;EU-UStID;Anrede;Titel/Akad. Grad;Adelstitel;Namensvorsatz;Adressart;Stra�e;Postfach;Postleitzahl;Ort;Land;Versandzusatz;Adresszusatz;Abweichende Anrede;Abw. Zustellbezeichnung 1;Abw. Zustellbezeichnung 2;Kennz. Korrespondenzadresse;Adresse G�ltig von;Adresse G�ltig bis;Telefon;Bemerkung (Telefon);Telefon GL;Bemerkung (Telefon GL);E-Mail;Bemerkung (E-Mail);Internet;Bemerkung (Internet);Fax;Bemerkung (Fax);Sonstige;Bemerkung (Sonstige);Bankleitzahl 1;Bankbezeichnung 1;Bank-Kontonummer 1;L�nderkennzeichen 1;IBAN-Nr. 1;IBAN1 korrekt;SWIFT-Code 1;Abw. Kontoinhaber 1;Kennz. Hauptbankverb. 1;Bankverb 1 G�ltig von;Bankverb 1 G�ltig bis;Bankleitzahl 2;Bankbezeichnung 2;Bank-Kontonummer 2;L�nderkennzeichen 2;IBAN-Nr. 2;IBAN2 korrekt;SWIFT-Code 2;Abw. Kontoinhaber 2;Kennz. Hauptbankverb. 2;Bankverb 2 G�ltig von;Bankverb 2 G�ltig bis;Bankleitzahl 3;Bankbezeichnung 3;Bank-Kontonummer 3;L�nderkennzeichen 3;IBAN-Nr. 3;IBAN3 korrekt;SWIFT-Code 3;Abw. Kontoinhaber 3;Kennz. Hauptbankverb. 3;Bankverb 3 G�ltig von;Bankverb 3 G�ltig bis;Bankleitzahl 4;Bankbezeichnung 4;Bank-Kontonummer 4;L�nderkennzeichen 4;IBAN-Nr. 4;IBAN4 korrekt;SWIFT-Code 4;Abw. Kontoinhaber 4;Kennz. Hauptbankverb. 4;Bankverb 4 G�ltig von;Bankverb 4 G�ltig bis;Bankleitzahl 5;Bankbezeichnung 5;Bank-Kontonummer 5;L�nderkennzeichen 5;IBAN-Nr. 5;IBAN5 korrekt;SWIFT-Code 5;Abw. Kontoinhaber 5;Kennz. Hauptbankverb. 5;Bankverb 5 G�ltig von;Bankverb 5 G�ltig bis;Leerfeld;Briefanrede;Gru�formel;Kundennummer;Steuernummer;Sprache;Ansprechpartner;Vertreter;Sachbearbeiter;Diverse-Konto;Ausgabeziel;W�hrungssteuerung;Kreditlimit (Debitor);Zahlungsbedingung;F�lligkeit in Tagen (Debitor);Skonto in Prozent (Debitor);Kreditoren-Ziel 1 Tg.;Kreditoren-Skonto 1 %;Kreditoren-Ziel 2 Tg.;Kreditoren-Skonto 2 %;Kreditoren-Ziel 3 Brutto Tg.;Kreditoren-Ziel 4 Tg.;Kreditoren-Skonto 4 %;Kreditoren-Ziel 5 Tg.;Kreditoren-Skonto 5 %;Mahnung;Kontoauszug;Mahntext 1;Mahntext 2;Mahntext 3;Kontoauszugstext;Mahnlimit Betrag;Mahnlimit %;Zinsberechnung;Mahnzinssatz 1;Mahnzinssatz 2;Mahnzinssatz 3;Lastschrift;Verfahren;Mandantenbank;Zahlungstr�ger;Indiv. Feld 1;Indiv. Feld 2;Indiv. Feld 3;Indiv. Feld 4;Indiv. Feld 5;Indiv. Feld 6;Indiv. Feld 7;Indiv. Feld 8;Indiv. Feld 9;Indiv. Feld 10;Indiv. Feld 11;Indiv. Feld 12;Indiv. Feld 13;Indiv. Feld 14;Indiv. Feld 15;Abweichende Anrede (Rechnungsadresse);Adressart (Rechnungsadresse);Stra�e (Rechnungsadresse);Postfach (Rechnungsadresse);Postleitzahl (Rechnungsadresse);Ort (Rechnungsadresse);Land (Rechnungsadresse);Versandzusatz (Rechnungsadresse);Adresszusatz (Rechnungsadresse);Abw. Zustellbezeichnung 1 (Rechnungsadresse);Abw. Zustellbezeichnung 2 (Rechnungsadresse);Adresse G�ltig von (Rechnungsadresse);Adresse G�ltig bis (Rechnungsadresse);Bankleitzahl 6;Bankbezeichnung 6;Bank-Kontonummer 6;L�nderkennzeichen 6;IBAN-Nr. 6;IBAN6 korrekt;SWIFT-Code 6;Abw. Kontoinhaber 6;Kennz. Hauptbankverb. 6;Bankverb 6 G�ltig von;Bankverb 6 G�ltig bis;Bankleitzahl 7;Bankbezeichnung 7;Bank-Kontonummer 7;L�nderkennzeichen 7;IBAN-Nr. 7;IBAN7 korrekt;SWIFT-Code 7;Abw. Kontoinhaber 7;Kennz. Hauptbankverb. 7;Bankverb 7 G�ltig von;Bankverb 7 G�ltig bis;Bankleitzahl 8;Bankbezeichnung 8;Bank-Kontonummer 8;L�nderkennzeichen 8;IBAN-Nr. 8;IBAN8 korrekt;SWIFT-Code 8;Abw. Kontoinhaber 8;Kennz. Hauptbankverb. 8;Bankverb 8 G�ltig von;Bankverb 8 G�ltig bis;Bankleitzahl 9;Bankbezeichnung 9;Bank-Kontonummer 9;L�nderkennzeichen 9;IBAN-Nr. 9;IBAN9 korrekt;SWIFT-Code 9;Abw. Kontoinhaber 9;Kennz. Hauptbankverb. 9;Bankverb 9 G�ltig von;Bankverb 9 G�ltig bis;Bankleitzahl 10;Bankbezeichnung 10;Bank-Kontonummer 10;L�nderkennzeichen 10;IBAN-Nr. 10;IBAN10 korrekt;SWIFT-Code 10;Abw. Kontoinhaber 10;Kennz. Hauptbankverb. 10;Bankverb 10 G�ltig von;Bankverb 10 G�ltig bis;Nummer Fremdsystem;Insolvent;Mandatsreferenz 1;Mandatsreferenz 2;Mandatsreferenz 3;Mandatsreferenz 4;Mandatsreferenz 5;Mandatsreferenz 6;Mandatsreferenz 7;Mandatsreferenz 8;Mandatsreferenz 9;Mandatsreferenz 10;Verkn�pftes OPOS-Konto;Mahnsperre bis;Lastschriftsperre bis;Zahlungssperre bis;Geb�hrenberechnung;Mahngeb�hr 1;Mahngeb�hr 2;Mahngeb�hr 3;Pauschalenberechnung;Verzugspauschale 1;Verzugspauschale 2;Verzugspauschale 3;Alternativer Suchname;Status;Anschrift manuell ge�ndert(Korrespondenzadresse);Anschrift individuell(Korrespondenzadresse;Anschrift manuell ge�ndert(Rechnungsadresse;Anschrift individuell (Rechnungsadresse);Fristberechnung bei Debitor;Mahnfrist 1;Mahnfrist 2;Mahnfrist 3;Letzte Frist";
 
                 fileStream.WriteLine(header.getHeaderString());
                 fileStream.WriteLine(CustomerVendorHeadline);
@@ -606,7 +631,7 @@ namespace UnicontaClient.Pages.CustomPage
                 header.DataCategory = 21;
                 header.FormatName = "Buchungsstapel";
                 header.FormatVersion = 12; //PG fra 9 til 12
-                string EntriesHeadline = "Umsatz (ohne Soll/Haben-Kz);Soll/Haben-Kennzeichen;WKZ Umsatz;Kurs;Basis-Umsatz;WKZ Basis-Umsatz;Konto;Gegenkonto (ohne BU-Schl ssel);BU-Schl ssel;Belegdatum;Belegfeld 1;Belegfeld 2;Skonto;Buchungstext;Postensperre;Diverse Adressnummer;Gesch ftspartnerbank;Sachverhalt;Zinssperre;Beleglink;Beleginfo - Art 1;Beleginfo - Inhalt 1;Beleginfo - Art 2;Beleginfo - Inhalt 2;Beleginfo - Art 3;Beleginfo - Inhalt 3;Beleginfo - Art 4;Beleginfo - Inhalt 4;Beleginfo - Art 5;Beleginfo - Inhalt 5;Beleginfo - Art 6;Beleginfo - Inhalt 6;Beleginfo - Art 7;Beleginfo - Inhalt 7;Beleginfo - Art 8;Beleginfo - Inhalt 8;KOST1 - Kostenstelle;KOST2 - Kostenstelle;Kost-Menge;EU-Land u. UStID;EU-Steuersatz;Abw. Versteuerungsart;Sachverhalt L+L;Funktionserg nzung L+L;BU 49 Hauptfunktionstyp;BU 49 Hauptfunktionsnummer;BU 49 Funktionserg nzung;Zusatzinformation - Art 1;Zusatzinformation- Inhalt 1;Zusatzinformation - Art 2;Zusatzinformation- Inhalt 2;Zusatzinformation - Art 3;Zusatzinformation- Inhalt 3;Zusatzinformation - Art 4;Zusatzinformation- Inhalt 4;Zusatzinformation - Art 5;Zusatzinformation- Inhalt 5;Zusatzinformation - Art 6;Zusatzinformation- Inhalt 6;Zusatzinformation - Art 7;Zusatzinformation- Inhalt 7;Zusatzinformation - Art 8;Zusatzinformation- Inhalt 8;Zusatzinformation - Art 9;Zusatzinformation- Inhalt 9;Zusatzinformation - Art 10;Zusatzinformation- Inhalt 10;Zusatzinformation - Art 11;Zusatzinformation- Inhalt 11;Zusatzinformation - Art 12;Zusatzinformation- Inhalt 12;Zusatzinformation - Art 13;Zusatzinformation- Inhalt 13;Zusatzinformation - Art 14;Zusatzinformation- Inhalt 14;Zusatzinformation - Art 15;Zusatzinformation- Inhalt 15;Zusatzinformation - Art 16;Zusatzinformation- Inhalt 16;Zusatzinformation - Art 17;Zusatzinformation- Inhalt 17;Zusatzinformation - Art 18;Zusatzinformation- Inhalt 18;Zusatzinformation - Art 19;Zusatzinformation- Inhalt 19;Zusatzinformation - Art 20;Zusatzinformation- Inhalt 20;St ck;Gewicht;Zahlweise;Forderungsart;Veranlagungsjahr;Zugeordnete F lligkeit;Skontotyp;Auftragsnummer;Buchungstyp;Ust-Schl ssel (Anzahlungen);EU-Land (Anzahlungen);Sachverhalt L+L (Anzahlungen);EU-Steuersatz (Anzahlungen);Erl skonto (Anzahlungen);Herkunft-Kz;Leerfeld;KOST-Datum;Mandatsreferenz;Skontosperre;Gesellschaftername;Beteiligtennummer;Identifikationsnummer;Zeichnernummer;Postensperre bis;Bezeichnung SoBil-Sachverhalt;Kennzeichen SoBil-Buchung;Festschreibung;Leistungsdatum;Datum Zuord.Steuerperiode;F lligkeit;Generalumkehr (GU);Steuersatz;Land;Abrechnungsreferenz;BVV-Position;EU-Land u. UStID (Ursprung);EU-Steuersatz (Ursprung)";  //PG Datev 4 Neue
+                string EntriesHeadline = "Umsatz (ohne Soll/Haben-Kz);Soll/Haben-Kennzeichen;WKZ Umsatz;Kurs;Basis-Umsatz;WKZ Basis-Umsatz;Konto;Gegenkonto (ohne BU-Schl�ssel);BU-Schl�ssel;Belegdatum;Belegfeld 1;Belegfeld 2;Skonto;Buchungstext;Postensperre;Diverse Adressnummer;Gesch�ftspartnerbank;Sachverhalt;Zinssperre;Beleglink;Beleginfo - Art 1;Beleginfo - Inhalt 1;Beleginfo - Art 2;Beleginfo - Inhalt 2;Beleginfo - Art 3;Beleginfo - Inhalt 3;Beleginfo - Art 4;Beleginfo - Inhalt 4;Beleginfo - Art 5;Beleginfo - Inhalt 5;Beleginfo - Art 6;Beleginfo - Inhalt 6;Beleginfo - Art 7;Beleginfo - Inhalt 7;Beleginfo - Art 8;Beleginfo - Inhalt 8;KOST1 - Kostenstelle;KOST2 - Kostenstelle;Kost-Menge;EU-Land u. UStID;EU-Steuersatz;Abw. Versteuerungsart;Sachverhalt L+L;Funktionserg nzung L+L;BU 49 Hauptfunktionstyp;BU 49 Hauptfunktionsnummer;BU 49 Funktionserg nzung;Zusatzinformation - Art 1;Zusatzinformation- Inhalt 1;Zusatzinformation - Art 2;Zusatzinformation- Inhalt 2;Zusatzinformation - Art 3;Zusatzinformation- Inhalt 3;Zusatzinformation - Art 4;Zusatzinformation- Inhalt 4;Zusatzinformation - Art 5;Zusatzinformation- Inhalt 5;Zusatzinformation - Art 6;Zusatzinformation- Inhalt 6;Zusatzinformation - Art 7;Zusatzinformation- Inhalt 7;Zusatzinformation - Art 8;Zusatzinformation- Inhalt 8;Zusatzinformation - Art 9;Zusatzinformation- Inhalt 9;Zusatzinformation - Art 10;Zusatzinformation- Inhalt 10;Zusatzinformation - Art 11;Zusatzinformation- Inhalt 11;Zusatzinformation - Art 12;Zusatzinformation- Inhalt 12;Zusatzinformation - Art 13;Zusatzinformation- Inhalt 13;Zusatzinformation - Art 14;Zusatzinformation- Inhalt 14;Zusatzinformation - Art 15;Zusatzinformation- Inhalt 15;Zusatzinformation - Art 16;Zusatzinformation- Inhalt 16;Zusatzinformation - Art 17;Zusatzinformation- Inhalt 17;Zusatzinformation - Art 18;Zusatzinformation- Inhalt 18;Zusatzinformation - Art 19;Zusatzinformation- Inhalt 19;Zusatzinformation - Art 20;Zusatzinformation- Inhalt 20;St ck;Gewicht;Zahlweise;Forderungsart;Veranlagungsjahr;Zugeordnete F lligkeit;Skontotyp;Auftragsnummer;Buchungstyp;Ust-Schl ssel (Anzahlungen);EU-Land (Anzahlungen);Sachverhalt L+L (Anzahlungen);EU-Steuersatz (Anzahlungen);Erl skonto (Anzahlungen);Herkunft-Kz;Leerfeld;KOST-Datum;Mandatsreferenz;Skontosperre;Gesellschaftername;Beteiligtennummer;Identifikationsnummer;Zeichnernummer;Postensperre bis;Bezeichnung SoBil-Sachverhalt;Kennzeichen SoBil-Buchung;Festschreibung;Leistungsdatum;Datum Zuord.Steuerperiode;F lligkeit;Generalumkehr (GU);Steuersatz;Land;Abrechnungsreferenz;BVV-Position;EU-Land u. UStID (Ursprung);EU-Steuersatz (Ursprung)";  //PG Datev 4 Neue
 
                 fileStream.WriteLine(header.getHeaderString());
                 fileStream.WriteLine(EntriesHeadline);
@@ -740,7 +765,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             public DATEVPosting ToDatevPosting(GLTransClient tc, string companyCurr, string dcaccount, DateTime DueDate, DateTime Exportdate)
             {
-                
+
                 var vat = (this.VATs.Get(tc._Vat) as GLVat);
                 var isAutoAccount = (this.Accounts.Get(tc.Account) as GLAccount)._DATEVAuto;
 
@@ -763,7 +788,7 @@ namespace UnicontaClient.Pages.CustomPage
                     TransactionValue = Math.Abs(tc._Amount) + (vat?._OffsetAccount == null ? Math.Abs(tc.AmountVat) : 0),
                     TransactionValueCurr = companyCurr,
                     DebitCreditLabel = tc._AmountCent > 0 ? "S" : "H", // H = Creditor (Haben), S = Debitor (Soll)
-                    InvoiceField1 = Inv1,
+                    InvoiceField1 = Convert.ToString(Inv1),
 
                     KOSTQuantity = (long)tc._Qty,
                     InvoiceDate = tc._Date,
@@ -774,7 +799,7 @@ namespace UnicontaClient.Pages.CustomPage
                     PostingText = Ptext,                    //Datev l�nge auf 60                    
                     cID = tc.CompanyId,  //DT Per
                     Exported = Exportdate
-                   
+
 
                 };
 
@@ -782,11 +807,13 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     entry.ContraAccount = dcaccount;
                     entry.EUMemberStateAndVATI = tc.LegalIdent;
+                    string pattern = @"[^a-zA-Z0-9\$\&\%\*\+\-\/]"; // Pattern to match all disallowed characters
 
                     DCInvoice[] arr;
+                    CreditorTrans[] arrT;
                     if (tc._DCType == GLTransRefType.Debtor)
                     {
-                        arr = this.debInvoice;                        
+                        arr = this.debInvoice;
                         entry.DocumentRef = tc.Invoice; //PG Guid p� Debitor poster!
                     }
                     else if (tc._DCType == GLTransRefType.Creditor)
@@ -799,6 +826,23 @@ namespace UnicontaClient.Pages.CustomPage
                         var pos = Array.BinarySearch(arr, invSearch, invSort);
                         if (pos >= 0 && pos < arr.Length)
                             entry.DelvDate = arr[pos]._DeliveryDate;
+
+                    }
+                    if (tc._DCType == GLTransRefType.Creditor) //PG Try to find Invoice for payment
+                    {
+                        arrT = this.creTrans;
+
+                        if (arrT != null)
+                        {
+                            this.transSearch._Voucher = tc._Voucher;
+                            this.transSearch._JournalPostedId = tc._JournalPostedId;
+                        }
+                        var pos1 = Array.BinarySearch(arrT, transSearch, traSort);
+                        if (pos1 >= 0 && pos1 < arrT.Length)
+                        {
+                            if (arrT[pos1]._InvoiceAN != null)
+                                entry.InvoiceField1 = Regex.Replace(arrT[pos1]._InvoiceAN, pattern, "");
+                        }
                     }
                 }
                 else
@@ -888,6 +932,8 @@ namespace UnicontaClient.Pages.CustomPage
                 int pdinverr = 0;
                 var doubpd = new List<String>();
                 int numbofdub = 0;
+                int confl = 0;
+                int DocRef = 0;
                 var clientId = UtilDisplay.GetKey("DatevClientId");
                 var datev = await CreateDatevHeader(crud);
                 var doubinv = new List<String>();
@@ -912,71 +958,68 @@ namespace UnicontaClient.Pages.CustomPage
                 foreach (var Tr in Trans)
                 {
                     int idx = 0;
-                    int idx1 = 0;                  
-                    idx = doubpd.IndexOf(Convert.ToString(Tr.DocumentRef));                    
-                    var HTTPConnMethod = "";
-                    byte statussend = 0;                    
-                   
-                    if (idx != -1)
-                    {
-                        numbofdub = numbofdub + 1;
-                    }
+                    int idx1 = 0;
+                    var name = "";
 
-                    if (Tr.HasVoucher == true && idx == -1) // to get atach doc.
+                    var HTTPConnMethod = "";
+                    byte statussend = 0;
+                    int invbeleg = 0;
+
+                    if (Tr.HasVoucher == true) // to get atach doc.
                     {
                         List<PropValuePair> filter2 = new List<PropValuePair>();
                         filter2.Add(PropValuePair.GenereteWhereElements("_RowId", typeof(int), Convert.ToString(Tr._DocumentRef)));
 
-                        var Doc = crud.Query<VouchersClient>(filter2).Result;
-                        if (Doc.Length != 0)
+                        var Doc = await crud.Query<VouchersClient>(filter2);
+                        if (Doc[0].Invoice != null)
+                            invbeleg = (int)NumberConvert.ToInt(Doc[0]._Invoice);
+                        else
+                            invbeleg = (Tr._Invoice > 0) ? Tr._Invoice : Tr._Voucher;
+
+
+                        var Res = await crud.Read(Doc[0]);
+                        name = Convert.ToString(GetInvoiceGuid(Tr.CompanyId, SmallDate.Pack(Tr.Date), Tr.DocumentRef, Convert.ToInt32(Tr.Account), invbeleg));
+                        if (Doc.Count() != 0 && Res == ErrorCodes.Succes && (Doc[0]._Data != null))
                         {
-                            doubpd.Add(Convert.ToString(Tr.DocumentRef));
+                            var bytec = new ByteArrayContent(Doc[0]._Data);
 
                             var metadata = new
                             {
-                                //Metadaten //Anurag
+                                //Metadaten
                                 document_type = "Rechnungseingang",
                                 note = "Uniconta",
                                 category = "Uniconta",
-                                folder = "Belege",                                
-                                register = glTransExported.FromDate.ToString("dd.MM.yy") + ".." + glTransExported.ToDate.ToString("dd.MM.yy") + " - " + glTransExported.SuppVersion
+                                folder = "Belege",
+                                register = glTransExported.FromDate.ToString("yyyy.MM")
                             };
 
-                            var Res = crud.Read(Doc[0]).Result;
-                            var bytec = new ByteArrayContent(Doc[0]._Data);
-                            var name = Convert.ToString(GetInvoiceGuid(Tr.CompanyId, SmallDate.Pack(Tr.Date), Tr.DocumentRef));                         
+
+                            //var name = Convert.ToString(GetInvoiceGuid(Tr.CompanyId, SmallDate.Pack(Tr.Date), Tr.DocumentRef, Convert.ToInt32(Tr.Account), Tr.Invoice));
+                            DocRef = Tr.DocumentRef;
+
                             var content = new MultipartFormDataContent { { bytec, "file", name + "." + Doc[0].Fileextension } };
                             content.Headers.Add("X-DATEV-Client-Id", clientId);
 
-                            // Metadaten hinzuf�gen  //Anurag
+                            // Metadaten hinzuf�gen  
                             var metadataContent = new StringContent(JsonConvert.SerializeObject(metadata));
                             metadataContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
                             content.Add(metadataContent, "metadata");
 
                             var restCon = "";
                             var gemresp = "";
-                            var sandbox = false;
-
-                            if (sandbox == true)
-                            {
-                                var apiresult = await apiClient.PutAsync(new Uri("https://sandbox-api.datev.de/accounting/v1/clients/" + datev.Consultant + "-" + datev.Client + "/documents/" + name), content);
-                                restCon = await apiresult.Content.ReadAsStringAsync();
-                                gemresp = apiresult.StatusCode.ToString();                               
-                            }
-                            else
+                            if (Doc[0]._Data.Length < 300000)
                             {
                                 var apiresult = await apiClient.PutAsync(new Uri("https://accounting-documents.api.datev.de/platform/v2/clients/" + datev.Consultant + "-" + datev.Client + "/documents/" + name), content);
                                 restCon = await apiresult.Content.ReadAsStringAsync();
-                                gemresp = apiresult.StatusCode.ToString();                                
-                            }
-                            if (sandbox == true)
-                            {
-                                HTTPConnMethod = "https://sandbox-api.datev.de/accounting/v1/clients/" + datev.Client + "/documents/" + name + " Method.Put";
+                                gemresp = apiresult.StatusCode.ToString();
                             }
                             else
                             {
-                                HTTPConnMethod = "https://accounting-documents.api.datev.de/platform/v2/clients/" + Convert.ToInt32(datev.Consultant) + "-" + datev.Client + "/documents/" + name + " Method.Put";
+                                gemresp = "Unauthorized";
+                                restCon = "Ein Dokument darf max. 300kb gro� sein";
                             }
+
+                            HTTPConnMethod = "https://accounting-documents.api.datev.de/platform/v2/clients/" + Convert.ToInt32(datev.Consultant) + "-" + datev.Client + "/documents/" + name + " Method.Put";
 
                             if (gemresp == "Created")
                             {
@@ -986,7 +1029,11 @@ namespace UnicontaClient.Pages.CustomPage
                             else
                                 pdinverr = pdinverr + 1;
                             if (gemresp == "Conflict")
+                            {
                                 statussend = 5;
+                                confl = confl + 1;
+                                pdinverr = pdinverr - 1;
+                            }
                             if (gemresp == "Unauthorized")
                                 statussend = 3;
                             if (gemresp == "BadRequest")
@@ -994,36 +1041,36 @@ namespace UnicontaClient.Pages.CustomPage
                             if (gemresp == "NotFound")
                                 statussend = 6;
 
-                            InsDatevLog(crud, glTransExported, DateTime.Now, HTTPConnMethod, "X-DATEV-Client-Id " + clientId + " Filename " + name + "." + FileextensionsTypes.PDF, "doc-file " + datev.Path + "\\" + name + "." + FileextensionsTypes.PDF + " Content-Type " + "application/octet-stream", statussend, "X-Vcap-Request-Id " + restCon);
+                            InsDatevLog(crud, glTransExported, DateTime.Now, HTTPConnMethod, "X-DATEV-Client-Id " + clientId + " Filename " + name + "." + FileextensionsTypes.PDF, "doc-file " + datev.Path + "\\" + name + "." + FileextensionsTypes.PDF + " Content-Type " + "application/octet-stream", statussend, "X-Vcap-Request-Id " + restCon, DocRef);
                         }
 
                     }
 
-                    idx1 = doubinv.IndexOf(Convert.ToString(Tr._JournalPostedId));
+                    idx1 = doubinv.IndexOf(Convert.ToString(Tr.Invoice));
 
                     if (idx1 != -1)
                     {
                         numboinv = numboinv + 1;
                     }
-                    if (Tr._DCType == GLTransRefType.Debtor && idx1 == -1) // to send all coustomer Inv 
+                    if (Tr._DCType == GLTransRefType.Debtor && idx1 == -1) // to send coustomer Inv 
                     {
-                        doubinv.Add(Convert.ToString(Tr._JournalPostedId));
+                        doubinv.Add(Convert.ToString(Tr.Invoice));
                         List<PropValuePair> filter2 = new List<PropValuePair>();
-                        //filter2.Add(PropValuePair.GenereteWhereElements("_JournalPostedId", typeof(string), Convert.ToString(Tr._JournalPostedId)));
                         filter2.Add(PropValuePair.GenereteWhereElements("InvoiceNumber", typeof(string), Convert.ToString(Tr.Invoice)));
                         var Debinv = await crud.Query<DebtorInvoiceClient>(filter2);
                         foreach (var D in Debinv.Where(D => D != null))
                         {
                             var metadata = new
                             {
-                                //Metadaten //Anurag
+                                //Metadaten 
                                 document_type = "Rechnungsausgang",
                                 note = "Uniconta",
                                 category = "Uniconta",
                                 folder = "Belege",
-                                register = glTransExported.FromDate.ToString("dd.MM.yy") + ".." + glTransExported.ToDate.ToString("dd.MM.yy") + " " + glTransExported.SuppVersion
+                                register = glTransExported.FromDate.ToString("yyyy.MM")
                             };
-                            var name = Convert.ToString(GetInvoiceGuid(Tr.CompanyId, SmallDate.Pack(Tr.Date), Tr.Invoice));  //Master                            
+                            name = Convert.ToString(GetInvoiceGuid(Tr.CompanyId, SmallDate.Pack(Tr.Date), Tr.Invoice, Convert.ToInt32(Tr.Account), Tr.Invoice));  //Master                            
+                            DocRef = Tr.Invoice;
 
                             var invoicePdf = await new Uniconta.API.DebtorCreditor.InvoiceAPI(crud).GetInvoicePdf(D);
                             if (invoicePdf != null)
@@ -1032,35 +1079,27 @@ namespace UnicontaClient.Pages.CustomPage
                                 var content = new MultipartFormDataContent { { bytec, "file", name + "." + FileextensionsTypes.PDF } };
                                 content.Headers.Add("X-DATEV-Client-Id", clientId);
 
-                                // Metadaten hinzuf�gen //Anurag
+                                // Metadaten hinzuf�gen 
                                 var metadataContent = new StringContent(JsonConvert.SerializeObject(metadata));
                                 metadataContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
                                 content.Add(metadataContent, "metadata");
 
                                 var restCon = "";
                                 var gemresp = "";
-                                var sandbox = false;
-                                if (sandbox == true)
-                                {
-                                    var apiresult = await apiClient.PutAsync(new Uri("https://sandbox-api.datev.de/accounting/v1/clients/" + datev.Consultant + "-" + datev.Client + "/documents/" + name), content);
-                                    restCon = await apiresult.Content.ReadAsStringAsync();
-                                    gemresp = apiresult.StatusCode.ToString();
-                                }
-                                else
+
+                                if (invoicePdf.Length < 300000)
                                 {
                                     var apiresult = await apiClient.PutAsync(new Uri("https://accounting-documents.api.datev.de/platform/v2/clients/" + datev.Consultant + "-" + datev.Client + "/documents/" + name), content);
                                     restCon = await apiresult.Content.ReadAsStringAsync();
                                     gemresp = apiresult.StatusCode.ToString();
                                 }
-
-                                if (sandbox == true)
-                                {
-                                    HTTPConnMethod = "https://sandbox-api.datev.de/accounting/v1/clients/" + datev.Client + "/documents/" + name + " Method.Put";
-                                }
                                 else
                                 {
-                                    HTTPConnMethod = "https://accounting-documents.api.datev.de/platform/v2/clients/" + Convert.ToInt32(datev.Consultant) + "-" + datev.Client + "/documents/" + name + " Method.Put";
+                                    gemresp = "BadRequest";
+                                    restCon = "Ein Dokument darf max. 300kb gro� sein";
                                 }
+
+                                HTTPConnMethod = "https://accounting-documents.api.datev.de/platform/v2/clients/" + Convert.ToInt32(datev.Consultant) + "-" + datev.Client + "/documents/" + name + " Method.Put";
 
                                 if (gemresp == "Created")
                                 {
@@ -1070,7 +1109,11 @@ namespace UnicontaClient.Pages.CustomPage
                                 else
                                     pdinverr = pdinverr + 1;
                                 if (gemresp == "Conflict")
+                                {
                                     statussend = 5;
+                                    confl = confl + 1;
+                                    pdinverr = pdinverr - 1;
+                                }
                                 if (gemresp == "Unauthorized")
                                     statussend = 3;
                                 if (gemresp == "BadRequest")
@@ -1078,17 +1121,18 @@ namespace UnicontaClient.Pages.CustomPage
                                 if (gemresp == "NotFound")
                                     statussend = 6;
 
-                                InsDatevLog(crud, glTransExported, DateTime.Now, HTTPConnMethod, "X-DATEV-Client-Id " + clientId + " Filename " + name + "." + FileextensionsTypes.PDF, "doc-file " + datev.Path + "\\" + name + "." + FileextensionsTypes.PDF + " Content-Type " + "application/octet-stream", statussend, "X-Vcap-Request-Id " + restCon);                                
+                                InsDatevLog(crud, glTransExported, DateTime.Now, HTTPConnMethod, "X-DATEV-Client-Id " + clientId + " Filename " + name + "." + FileextensionsTypes.PDF, "doc-file " + datev.Path + "\\" + name + "." + FileextensionsTypes.PDF + " Content-Type " + "application/octet-stream", statussend, "X-Vcap-Request-Id " + restCon, DocRef);
 
                             }
                         }
                     }
 
                 }
-                UnicontaMessageBox.Show(Convert.ToString(pd + inv) + " Belege hochgeladen am " + DateTime.Now + " und " + Convert.ToString(pdinverr) + " mit Fehler ", "DATEV", MessageBoxButton.OK);
+
+                UnicontaMessageBox.Show(Convert.ToString(pd + inv) + " Beleg(e) hochgeladen am " + DateTime.Now + " " + Convert.ToString(confl) + " bereits hochgeladen. " + Convert.ToString(pdinverr) + " mit Fehler ", "DATEV", MessageBoxButton.OK);
             }
-           
-            public static async void InsDatevLog(CrudAPI api, GLTransExportedClient glTransExported, DateTime lDate, String conMet, String head, String body, byte resp, string respb) 
+
+            public static async void InsDatevLog(CrudAPI api, GLTransExportedClient glTransExported, DateTime lDate, String conMet, String head, String body, byte resp, string respb, int Docr)
             {
                 if (glTransExported != null)
                 {
@@ -1097,36 +1141,18 @@ namespace UnicontaClient.Pages.CustomPage
                     log._Time = DateTime.Now;
                     log._HTTPConnMethod = conMet;
                     log._HTTPHeader = head;
-                    log._HTTPBody = body;
+                    log._HTTPBody = body + " Client " + Convert.ToString(Docr);
                     log._HTTPRESPONSECode = resp;
                     log._HTTPRESPONSEBody = respb;
                     await api.Insert(log);
                 }
             }
-            static public Guid GetInvoiceGuid(DCAccount dc, short Date, long Invoice, int JournalPostedId)    //DT Per
-            {
-                return GetInvoiceGuid(dc.RowId, dc.CompanyId, Date, Invoice, JournalPostedId);
-            }
 
-
-            static public Guid GetInvoiceGuid(int Account, int CompanyId, short Date, long Invoice, int JournalPostedId)   //DT Per
-            {
-                var i1 = Account ^ 0x5453df31;
-                var i2 = (CompanyId << 1) ^ (0x7e094f31 * Account);
-                var i3 = (((uint)Date << 16) | (uint)(Invoice & 0xFFFF)) ^ (0x3C234942 * Account);
-                var i4 = JournalPostedId ^ (0x21E39982 * Account);
-                var docguid = new Guid((uint)i1, (ushort)i2, (ushort)((i2 >> 16 | 0x4000) & 0x4FFF), (byte)i3, (byte)(i3 >> 8), (byte)(i3 >> 16), (byte)(i3 >> 24), (byte)i4, (byte)(i4 >> 8), (byte)(i4 >> 16), (byte)(i4 >> 24));               
-                return docguid;
-
-            }
-
-
-            static public Guid GetInvoiceGuid(int CompanyId, short Date, int DocumentRef)
+            static public Guid GetInvoiceGuid(int CompanyId, short Date, int DocumentRef, int Acc, int Invoice)
             {
                 if (DocumentRef == 0)
                     return Guid.Empty;
-                const int Account = 1;
-                const int Invoice = 0;   
+                int Account = Acc * 0x7c02b442 * DocumentRef;
                 var i1 = Account ^ 0x5453df31;
                 var i2 = (CompanyId << 1) ^ (0x7e094f31 * Account);
                 var i3 = (((uint)Date << 16) | (uint)(Invoice & 0xFFFF)) ^ (0x3C234942 * Account);
@@ -1148,7 +1174,7 @@ namespace UnicontaClient.Pages.CustomPage
             public string Account;
             public DateTime InvoiceDate, DueDate;
             public string ContraAccount;
-            public int InvoiceField1;
+            public string InvoiceField1; //PG
             public string PostingText;
             public string KOST1;
             public string KOST2;
@@ -1176,10 +1202,10 @@ namespace UnicontaClient.Pages.CustomPage
                 line[7] = ContraAccount;
                 line[8] = AddSingleQuotes(VAT);
                 line[9] = InvoiceDate == DateTime.MinValue ? "" : InvoiceDate.ToString("ddMM");
-                line[10] = InvoiceField1 == 0 ? "\"\"" : AddSingleQuotes(NumberConvert.ToString(InvoiceField1));
+                line[10] = AddSingleQuotes((InvoiceField1)); //Per
                 line[11] = DueDate == DateTime.MinValue ? "\"\"" : AddSingleQuotes(DueDate.ToString("ddMMyy"));
-                Guid DatevGuid = GetInvoiceGuid(cID, SmallDate.Pack(Date), DocumentRef); //Anurag
-                if (DatevGuid != Guid.Empty)                 
+                Guid DatevGuid = GetInvoiceGuid(cID, SmallDate.Pack(Date), DocumentRef, Convert.ToInt32(Account), (int)NumberConvert.ToInt(InvoiceField1));
+                if (DatevGuid != Guid.Empty)
                     line[19] = AddSingleQuotes("BEDI " + AddDoubleQuotes(Convert.ToString(DatevGuid)));  //DT Per
                 else
                     line[19] = AddSingleQuotes("");
@@ -1217,7 +1243,7 @@ namespace UnicontaClient.Pages.CustomPage
                 line[15] = AddSingleQuotes(FirstN(dcAccount._Address1, 36));
                 line[17] = AddSingleQuotes(dcAccount._ZipCode);
                 line[18] = AddSingleQuotes(dcAccount._City);
-                line[19] = AddSingleQuotes(TwoLetterISOLanguageName); //Datev  nderkennzeichnung in Gro buchstaben
+                line[19] = AddSingleQuotes(TwoLetterISOLanguageName); //Datev  L�nderkennzeichnung in Gro�buchstaben
                 line[44] = AddSingleQuotes(dcAccount._PaymentId);
                 line[46] = AddSingleQuotes(dcAccount._SWIFT);
 
@@ -1241,7 +1267,6 @@ namespace UnicontaClient.Pages.CustomPage
                 line[1] = AddSingleQuotes(FirstN(Account._Name, 40));
                 line[2] = AddSingleQuotes(LanguageId);
                 line[3] = AddSingleQuotes("");   //PG
-
             }
 
             private string FormatAccount(string a)

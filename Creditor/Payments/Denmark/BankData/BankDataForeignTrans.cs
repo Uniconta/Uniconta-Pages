@@ -29,7 +29,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
             SharedCodeForCreateBankFormatFields(company, tran, paymentFormat, bankAccount, danishFields);
             SharedForeignReceiverBankInfo(danishFields, tran);
 
-            var externalAdvText = StandardPaymentFunctions.ExternalMessage(paymentFormat._Message, tran, company, creditor);
+            var externalAdvText = StandardPaymentFunctions.ExternalMessage(paymentFormat, tran, company, creditor);
             var message = externalAdvText;
 
             message = NETSNorge.processString(message, 140, false);

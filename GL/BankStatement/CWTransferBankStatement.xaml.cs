@@ -41,16 +41,17 @@ namespace UnicontaClient.Pages.CustomPage
         [InputFieldData]
         [Display(Name = "AssignVoucherNumber", ResourceType = typeof(InputFieldDataText))]
         public bool AddVoucherNumber { get; set; }
+        [InputFieldData]
+        [Display(Name = "OnlyLineWithPhysicalVoucher", ResourceType = typeof(InputFieldDataText))]
+        public bool HasPhysicalVoucher { get; set; }
 
         static int SelectedBankAccPosIndex = 0;
         static string lclJournal;
-        static bool? lclIsMarkLine, lclAddVouNo;
+        static bool? lclIsMarkLine, lclAddVouNo, lclHasVoucher;
         CrudAPI Capi;
-#if !SILVERLIGHT
         protected override int DialogId { get { return DialogTableId; } }
         public int DialogTableId { get; set; }
         protected override bool ShowTableValueButton { get { return true; } }
-#endif
         public CWTransferBankStatement(DateTime fromdate, DateTime todate, CrudAPI api, Uniconta.DataModel.BankStatement master, bool IsLedgerPosting = false)
         {
             FromDate = fromdate;
@@ -66,12 +67,7 @@ namespace UnicontaClient.Pages.CustomPage
             cbTransfer.ItemsSource = new string[] { dateinterval, Uniconta.ClientTools.Localization.lookup("SelectedRows") };
             cbBankAccountPos.SelectedIndex = SelectedBankAccPosIndex;
             cbTransfer.SelectedIndex = 0;
-#if !SILVERLIGHT
             this.Title = Uniconta.ClientTools.Localization.lookup("GenerateJournalLines");
-#endif
-#if SILVERLIGHT
-            Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             this.Loaded += CW_Loaded;
 
             if (!IsLedgerPosting)
@@ -94,26 +90,18 @@ namespace UnicontaClient.Pages.CustomPage
                 lookupJournal.Focus();
                 chkLine.IsChecked = lclIsMarkLine == null ? isMarkLine : lclIsMarkLine;
                 cbkAssignVouNo.IsChecked = lclAddVouNo == null ? AddVoucherNumber : lclAddVouNo;
-                if (!string.IsNullOrEmpty(lclJournal))
+                cbkHasVoucherNo.IsChecked = lclHasVoucher == null ? HasPhysicalVoucher : lclHasVoucher;
+                if (Journal != null || !string.IsNullOrEmpty(lclJournal))
                     SetDefaultJournal();
             }));
         }
 
         async void SetDefaultJournal()
         {
-            var cache = Capi.CompanyEntity.GetCache(typeof(Uniconta.DataModel.GLDailyJournal));
-            if (cache == null)
-                cache = await Capi.CompanyEntity.LoadCache(typeof(Uniconta.DataModel.GLDailyJournal), Capi);
-            foreach (var r in cache.GetRecords)
-            {
-                var rec = r as Uniconta.DataModel.GLDailyJournal;
-                if (rec._Journal == lclJournal)
-                {
-                    lookupJournal.SelectedItem = rec;
-                    break;
-                }
-            }
+            var cache = Capi.GetCache(typeof(Uniconta.DataModel.GLDailyJournal)) ?? await Capi.LoadCache(typeof(Uniconta.DataModel.GLDailyJournal));
+            lookupJournal.SelectedItem = cache.Get(Journal ?? lclJournal);
         }
+
         private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
@@ -133,6 +121,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             lclIsMarkLine = (bool)chkLine.IsChecked;
             lclAddVouNo = (bool)cbkAssignVouNo.IsChecked;
+            lclHasVoucher = (bool)cbkHasVoucherNo.IsChecked;
             SelectedBankAccPosIndex = cbBankAccountPos.SelectedIndex;
             lclJournal = Journal;
             SetDialogResult(true);

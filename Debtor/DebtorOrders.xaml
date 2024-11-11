@@ -50,18 +50,18 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrders"
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Account" ReadOnly="True" AllowEditing="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" ReadOnly="True">
-                        <localPage:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
-                            <DataTemplate>
+                        <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Name,RelativeSource={RelativeSource TemplatedParent}}" PreviewMouseDown="Name_PreviewMouseDown"></TextBlock>
-                                    <TextBlock Grid.Column="1"></TextBlock>
+                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding Value}" PreviewMouseDown="Name_PreviewMouseDown" />
+                                    <TextBlock Grid.Column="1" />
                                 </Grid>
-                            </DataTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                            </ControlTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Group"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderNumber" AllowThousandMask="false" Width="70"/>
@@ -162,6 +162,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrders"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryContactPerson" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryPhone" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryContactEmail" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Consumer" Visible="False" />
                 </localPage:DebtorOrdersGrid.Columns>
                 <localPage:DebtorOrdersGrid.TotalSummary>
                     <localPage:SumColumn FieldName="OrderTotal" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>

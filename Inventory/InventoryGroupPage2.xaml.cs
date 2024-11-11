@@ -97,16 +97,18 @@ namespace UnicontaClient.Pages.CustomPage
             var api = this.api;
             var Comp = api.CompanyEntity;
 
-            var Cache = Comp.GetCache(typeof(GLVat)) ?? await Comp.LoadCache(typeof(GLVat), api).ConfigureAwait(false);
+            var Cache = Comp.GetCache(typeof(GLVat)) ?? await api.LoadCache(typeof(GLVat)).ConfigureAwait(false);
 
-            var vatsales = new VatCacheFilter(Cache, GLVatSaleBuy.Sales);
-            leSalesVat.cacheFilter = leSalesVat1.cacheFilter = leSalesVat2.cacheFilter = leSalesVat3.cacheFilter = leSalesVat4.cacheFilter = vatsales;
-            var vatbuy = new VatCacheFilter(Cache, GLVatSaleBuy.Buy);
-            lePurchaseVat.cacheFilter = lePurchaseVat1.cacheFilter = lePurchaseVat2.cacheFilter = lePurchaseVat3.cacheFilter = lePurchaseVat4.cacheFilter = vatbuy;
+            if (!Comp._AllowPurchaseVatOnSales)
+            {
+                leSalesVat.cacheFilter = leSalesVat1.cacheFilter = leSalesVat2.cacheFilter = leSalesVat3.cacheFilter = leSalesVat4.cacheFilter
+                    = new VatCacheFilter(Cache, GLVatSaleBuy.Sales);
+                lePurchaseVat.cacheFilter = lePurchaseVat1.cacheFilter = lePurchaseVat2.cacheFilter = lePurchaseVat3.cacheFilter = lePurchaseVat4.cacheFilter
+                    = new VatCacheFilter(Cache, GLVatSaleBuy.Buy);
+            }
 
             Cache = Comp.GetCache(typeof(Uniconta.DataModel.NumberSerie)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.NumberSerie), api).ConfigureAwait(false);
-            var numbers = new NumberSerieSQLCacheFilter(Cache, true);
-            leAutoNumber.cacheFilter = numbers;
+            leAutoNumber.cacheFilter = new NumberSerieSQLCacheFilter(Cache, true);
 
             LoadType(typeof(Uniconta.DataModel.GLAccount));
 

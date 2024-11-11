@@ -44,7 +44,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorPaymentFormatPage2"
                         <CorasauControls:ComboBoxEditor x:Name="cmbNoneBankDayAction" SelectedItem="{Binding NoneBankDayAction,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
-                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpMessage" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Message}" Orientation="Vertical" 
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpMessage" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=NotificationText}" Orientation="Vertical" 
                                                         CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem FieldName="ExtendedText" x:Name="liExtendedText">
                         <CorasauControls:CheckEditor IsChecked="{Binding ExtendedText,Mode=TwoWay}"/>

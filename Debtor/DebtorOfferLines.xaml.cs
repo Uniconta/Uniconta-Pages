@@ -907,8 +907,7 @@ namespace UnicontaClient.Pages.CustomPage
                 await savetask;
             await dgDebtorOfferLineGrid.RefreshTask();
             RecalculateAmount();
-            if (this.items.CacheAge.TotalMinutes > 10d)
-                this.items = await api.LoadCache(typeof(Uniconta.DataModel.InvItem), true);
+            api.UpdateCache();
         }
 
         async void ViewStorage()

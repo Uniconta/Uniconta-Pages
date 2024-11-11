@@ -13,11 +13,6 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryTransactions"
     d:DesignHeight="300" d:DesignWidth="400">
     <UserControl.Resources>
         <Util:MaskConverter x:Key="MaskConverter" />
-        <localPage:SubTotalRowStyleConverter x:Key="SubTotalRowStyleConverter"/>
-        <Style x:Key="SubTotalRowStyle" TargetType="dxg:RowControl">
-            <Setter Property="FontWeight" Value="{Binding Row.SubTotal, Converter={StaticResource SubTotalRowStyleConverter}}"/>
-            <Setter Property="Height" Value="25"/>
-        </Style>
     </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
@@ -107,9 +102,6 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryTransactions"
                     <localPage:SumColumn FieldName="Margin" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <localPage:SumColumn FieldName="CostValue" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <localPage:SumColumn FieldName="MarginRatio" SummaryType="Custom" DisplayFormat="{}{0:N2}" />
-                    <localPage:SumColumn FieldName="Weight" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
-                    <localPage:SumColumn FieldName="Cartons" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
-                    <localPage:SumColumn FieldName="Volume" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                 </localPage:InvTransactionGrid.TotalSummary>
             </localPage:InvTransactionGrid>
         </CorasauControls:BusyIndicator>

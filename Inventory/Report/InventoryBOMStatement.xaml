@@ -63,6 +63,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryBOMStatement"
                                 <local:CorasauDataGridTemplateColumnClient x:Name="ShowOnInvoice" Width="60"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="ShowOnPacknote" Width="60"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="ShowOnPicklist" Width="60"/>
+                                <local:CorasauDataGridTemplateColumnClient x:Name="ShowOnConfirmation" Width="60"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="InclValueOnInvoice" Width="60"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="Weight" Visible="False" />
                                 <local:CorasauDataGridTemplateColumnClient x:Name="Volume" Visible="False" />

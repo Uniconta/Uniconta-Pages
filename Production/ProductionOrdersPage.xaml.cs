@@ -215,6 +215,18 @@ namespace UnicontaClient.Pages.CustomPage
                         cwOrderFromOrder.Show();
                     }
                     break;
+                case "Storage":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.InvItemStoragePage, dgProductionOrders.syncEntity, true, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("OnHand"), selectedItem._OrderNumber));
+                    break;
+                case "InvReservation":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.InventoryReservationReport, dgProductionOrders.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Reservations"), selectedItem._OrderNumber));
+                    break;
+                case "InvStockProfile":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.InvStorageProfileReport, dgProductionOrders.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("StockProfile"), selectedItem._OrderNumber));
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;

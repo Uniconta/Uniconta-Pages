@@ -22,4 +22,7 @@
       <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16" ShortcutKey=""/>
     </RibbonItem>
   </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="RegisterEdelivery" LocalizedNameKey="RegisterEdelivery" LargeGlyph="Nemhandel_Connect_32x32"/>
+  </RibbonItem>
 </root>

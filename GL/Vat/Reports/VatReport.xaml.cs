@@ -633,7 +633,7 @@ namespace UnicontaClient.Pages.CustomPage
                     AccsFound.Clear();
 
                     if ((VatReported == null || VatReported._MaxJournalPostedId == 0 || Journal != null) && !PrevPeriod)
-                        AccTotals = await rapi.GenerateTotal(AccLst, FromDate, ToDate, Journal, null, 0, true, false);
+                        AccTotals = await rapi.GenerateTotal(AccLst, FromDate, ToDate, Journal, null, 0, true, false, -1, int.MaxValue);
                     else
                         AccTotals = await rapi.GenerateTotal(AccLst, VatReported, PrevPeriod);
 

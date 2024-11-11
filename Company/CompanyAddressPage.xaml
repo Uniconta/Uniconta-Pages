@@ -19,19 +19,20 @@ x:Class="UnicontaClient.Pages.CustomPage.CompanyAddressPage"
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <local:CompanyAddressGrid x:Name="dgCompanyAddress" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
                 <local:CompanyAddressGrid.Columns>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Name" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Number" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Name" Width="100" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Address1" Width="100"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Address2" Width="100"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Address3" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ZipCode" Width="60" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="City" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="ZipCode" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Country" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="ContactPerson" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="GLN" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Phone" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="ContactEmail" />
-                    
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Default" />
+
                 </local:CompanyAddressGrid.Columns>
             </local:CompanyAddressGrid>
         </CorasauControls:BusyIndicator>

@@ -143,45 +143,61 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         GeneratePollReport(selectedItem);
                     break;
-                case "ConnectToBank":
+              
+                case "AiiaRegister":
+                    if (selectedItem == null) return;
+                    BankAiia(0, selectedItem); break;
+                case "AiiaUnregister":
+                    if (selectedItem == null) return;
+                    BankAiia(2, selectedItem);break;
+                case "AiiaSync":
+                    if (selectedItem == null) return;
+                    BankAiia(3, selectedItem); break;
+                case "AiiaGetTrans":
+                    if (selectedItem == null) return;
+                    BankAiia(4, selectedItem); break;
+                case "AiiaAccounts":
+                    if (selectedItem == null) return;
+                    BankAiia(5, selectedItem); break;
+                case "AiiaHub":
+                    if (selectedItem == null) return;
+                    BankAiia(6, selectedItem); break;
+
+                case "ConnectToND":
                     if (selectedItem == null) return;
 
-                    CWBankAPI cwBank = new CWBankAPI(api, selectedItem);
-                    cwBank.Closing += async delegate
+                    CWBankAPI cwBankND = new CWBankAPI(api, selectedItem, 2);
+                    cwBankND.Closing += async delegate
                     {
-                        if (cwBank.DialogResult == true)
-                            await BankAPI(cwBank);
+                        if (cwBankND.DialogResult == true)
+                            await BankAPI(cwBankND, 2);
                     };
-                    cwBank.Show();
+                    cwBankND.Show();
                     break;
+
+                case "ConnectToBC":
+                    if (selectedItem == null) return;
+
+                    CWBankAPI cwBankBC = new CWBankAPI(api, selectedItem, 1);
+                    cwBankBC.Closing += async delegate
+                    {
+                        if (cwBankBC.DialogResult == true)
+                            await BankAPI(cwBankBC, 1);
+                    };
+                    cwBankBC.Show();
+                    break;
+
                 case "BankLog":
                     if (selectedItem != null)
                         AddDockItem(TabControls.BankLogGridPage, dgBankStatement.syncEntity);
                     break;
-
+                case "MatchVoucherToLines":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.MatchPhysicalVoucherToBSLines, selectedItem);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
-            }
-        }
-
-        async Task ConnectAiia(bool aiiaHub)
-        {
-            try
-            {
-                var uri = aiiaHub ? Aiia.GetURIAiiaHub() : await Aiia.GetURIAiiaApp(api);
-                if (aiiaHub)
-                {
-                    Utility.OpenWebSite(uri);
-                }
-                else
-                {
-                    var cwBrowserView = new CWBrowserDialog(uri);
-                    cwBrowserView.Show();
-                }
-            }
-            catch
-            {
             }
         }
 
@@ -285,7 +301,128 @@ namespace UnicontaClient.Pages.CustomPage
             return pollsrc;
         }
 
-        async Task BankAPI(CWBankAPI cwBank)
+        #region Aiia
+        async Task BankAiia(int type, BankStatementClient selectedItem)
+        {
+            BankStatementAPI bankApi = new BankStatementAPI(api);
+            switch (type)
+            {
+                case 0: await AiiaRegister(bankApi); break;
+                case 2: await AiiaUnRegister(bankApi); break;
+                case 3: await AiiaSync(bankApi); break;
+                case 4: AiiaGetTrans(bankApi, selectedItem); break;
+                case 5: await AiiaAccounts(bankApi); break;
+                case 6: await AiiaHub(bankApi); break;
+            }
+        }
+
+        async Task AiiaRegister(BankStatementAPI bankApi)
+        {
+            var err = await bankApi.AiiaActivate("CheckServiceId");
+            if (err == ErrorCodes.Succes)
+                await ConnectAiia(false);
+            else
+                UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup(err.ToString()), Uniconta.ClientTools.Localization.lookup("Information"));
+        }
+
+        async Task AiiaUnRegister(BankStatementAPI bankApi)
+        {
+            var err = await bankApi.AiiaDeactivate();
+            UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup(err.ToString()), Uniconta.ClientTools.Localization.lookup("Information"));
+        }
+
+        async Task AiiaAccounts(BankStatementAPI bankApi)
+        {
+            var logText = await bankApi.AiiaAccounts();
+            if (logText != null)
+            {
+                CWShowBankAPILog cwLog = new CWShowBankAPILog(logText);
+                cwLog.Show();
+            }
+            else
+                UnicontaMessageBox.Show(string.Concat(Uniconta.ClientTools.Localization.lookup("UnableToConnectTo"), " ", Uniconta.ClientTools.Localization.lookup("MCOpenBanking")), Uniconta.ClientTools.Localization.lookup("Information"));
+        }
+
+        async Task AiiaHub(BankStatementAPI bankApi)
+        {
+            await ConnectAiia(true);
+        }
+
+        void AiiaGetTrans(BankStatementAPI bankApi, BankStatementClient selectedItem)
+        {
+            CWBankAPI cwBank = new CWBankAPI(api, selectedItem, 0);
+            cwBank.Closing += async delegate
+            {
+                if (cwBank.DialogResult == true)
+                {
+                    var err = await bankApi.AiiaTransOnDemand(selectedItem.Account, CWBankAPI.FromDate, CWBankAPI.ToDate);
+                    UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup(err.ToString()), Uniconta.ClientTools.Localization.lookup("Information"));
+                }
+            };
+            cwBank.Show();
+        }
+
+        async Task AiiaSync(BankStatementAPI bankApi)
+        {
+            try
+            {
+                if (busyIndicator != null)
+                    busyIndicator.IsBusy = true;
+
+                var response = await bankApi.AiiaSynchronize();
+                var splitText = response?.Split(';');
+
+                ErrorCodes errEnum;
+                if (splitText?.Length != 2)
+                    UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup(ErrorCodes.NoSucces.ToString()), Uniconta.ClientTools.Localization.lookup("Information"));
+                else
+                {
+                    var authUrl = splitText[1];
+                    if (!Enum.TryParse(splitText[0], true, out errEnum))
+                        errEnum = ErrorCodes.NoSucces;
+
+                    if (!string.IsNullOrEmpty(authUrl))
+                    {
+                        if (busyIndicator != null)
+                            busyIndicator.IsBusy = false;
+                        var cwBrowserView = new CWBrowserDialog(authUrl);
+                        cwBrowserView.Show();
+                    }
+                    else
+                    {
+                        if (busyIndicator != null)
+                            busyIndicator.IsBusy = false;
+                        UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup(errEnum.ToString()), Uniconta.ClientTools.Localization.lookup("Information"));
+                    }
+                }
+            }
+            finally
+            {
+                if (busyIndicator != null)
+                    busyIndicator.IsBusy = false;
+            }
+        }
+
+        async Task ConnectAiia(bool aiiaHub)
+        {
+            try
+            {
+                var uri = aiiaHub ? Aiia.GetURIAiiaHub() : await Aiia.GetURIAiiaApp(api);
+                if (aiiaHub)
+                {
+                    Utility.OpenWebSite(uri);
+                }
+                else
+                {
+                    var cwBrowserView = new CWBrowserDialog(uri);
+                    cwBrowserView.Show();
+                }
+            }
+            catch {}
+        }
+        #endregion
+
+        async Task BankAPI(CWBankAPI cwBank, int bankservice)
         {
             BankStatementAPI bankApi = new BankStatementAPI(api);
 
@@ -297,20 +434,11 @@ namespace UnicontaClient.Pages.CustomPage
             switch (CWBankAPI.Type)
             {
                 case 0: //Register
-                    if (CWBankAPI.BankService == 0)
-                        serviceId = string.Concat("CheckServiceId", serviceId);
-
-                    err = await bankApi.ActivateBankConnect(serviceId, (byte)CWBankAPI.BankService, (byte)cwBank.Bank, cwBank.ActivationCode);
+                    err = await bankApi.ActivateBankConnect(serviceId, (byte)bankservice, (byte)cwBank.Bank, cwBank.ActivationCode);
                     switch (err)
                     {
-                        case ErrorCodes.Succes:
-                            if (CWBankAPI.BankService == 0)
-                                await ConnectAiia(false);
-                            else
-                                dialogText = string.Concat(Uniconta.ClientTools.Localization.lookup("ConnectedTo"), " ", cwBank.BankServiceName);
-                            break;
+                        case ErrorCodes.Succes: dialogText = string.Concat(Uniconta.ClientTools.Localization.lookup("ConnectedTo"), " ", cwBank.BankServiceName); break;
                         case ErrorCodes.AutoBankingNotActivated: dialogText = Uniconta.ClientTools.Localization.lookup("AutoBankingNotActivated"); break;
-                        case ErrorCodes.AiiaNotActivated: dialogText = Uniconta.ClientTools.Localization.lookup("AiiaNotActivated"); break;
                         case ErrorCodes.IgnoreUpdate:
                         case ErrorCodes.CouldNotCreate:
                         case ErrorCodes.NoSucces: dialogText = string.Concat(Uniconta.ClientTools.Localization.lookup("UnableToConnectTo"), " ", cwBank.BankServiceName); break;
@@ -320,14 +448,11 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     break;
                 case 1: //Connect
-                    if (CWBankAPI.BankService == 0)
-                        break;
-                    err = await bankApi.AddBankConnect(serviceId, (byte)CWBankAPI.BankService, cwBank.Company.CompanyId, 1);
+                    err = await bankApi.AddBankConnect(serviceId, (byte)bankservice, cwBank.Company.CompanyId, 1);
                     switch (err)
                     {
                         case ErrorCodes.Succes: dialogText = string.Format("{0} {1}: ({2}) {3}", Uniconta.ClientTools.Localization.lookup("ConnectedTo"), Uniconta.ClientTools.Localization.lookup("Company"), cwBank.Company.CompanyId, cwBank.Company.Name); break;
                         case ErrorCodes.AutoBankingNotActivated: dialogText = Uniconta.ClientTools.Localization.lookup("AutoBankingNotActivated"); break;
-                        case ErrorCodes.AiiaNotActivated: dialogText = Uniconta.ClientTools.Localization.lookup("AiiaNotActivated"); break;
                         case ErrorCodes.IgnoreUpdate:
                         case ErrorCodes.CouldNotCreate:
                         case ErrorCodes.NoSucces: dialogText = string.Format("{0} {1}: ({2}) {3}", Uniconta.ClientTools.Localization.lookup("UnableToConnectTo"), Uniconta.ClientTools.Localization.lookup("Company"), cwBank.Company.CompanyId, cwBank.Company.Name); break;
@@ -337,56 +462,24 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     break;
                 case 2: //Unregister
-                    err = await bankApi.AddBankConnect(serviceId, (byte)CWBankAPI.BankService, cwBank.Company.CompanyId, 2);
+                    err = await bankApi.AddBankConnect(serviceId, (byte)bankservice, cwBank.Company.CompanyId, 2);
                     switch (err)
                     {
                         case ErrorCodes.Succes: dialogText = string.Concat(Uniconta.ClientTools.Localization.lookup("Unregistered"), " ", cwBank.BankServiceName); break;
                         case ErrorCodes.AutoBankingNotActivated: dialogText = Uniconta.ClientTools.Localization.lookup("AutoBankingNotActivated"); break;
-                        case ErrorCodes.AiiaNotActivated: dialogText = Uniconta.ClientTools.Localization.lookup("AiiaNotActivated"); break;
                         case ErrorCodes.IgnoreUpdate: dialogText = string.Format("{0} {1}: ({2}) {3}", Uniconta.ClientTools.Localization.lookup("UnableToConnectTo"), Uniconta.ClientTools.Localization.lookup("Company"), cwBank.Company.CompanyId, cwBank.Company.Name); break;
                         case ErrorCodes.NoSubscription:
                         case ErrorCodes.CannotDeleteRecord: dialogText = Uniconta.ClientTools.Localization.lookup("ConnectionCannotUnregister"); break;
                         default: dialogText = Uniconta.ClientTools.Localization.lookup(err.ToString()); break;
                     }
                     break;
-                case 3: //Sync
-                    if (CWBankAPI.BankService == 0)
-                    {
-                        var authUrl = await bankApi.AiiaSynchronize();
-                        if (authUrl != null)
-                        {
-                            var cwBrowserView = new CWBrowserDialog(authUrl);
-                            cwBrowserView.Show();
-                        }
-                        else
-                            dialogText = Uniconta.ClientTools.Localization.lookup("RequestSent");
-                    }
-                    break;
-                case 4: //OnDemand
-                    if (CWBankAPI.BankService == 0)
-                    {
-                        err = await bankApi.AiiaTransOnDemand(cwBank.BankAccount, CWBankAPI.FromDate, CWBankAPI.ToDate);
-                        switch (err)
-                        {
-                            case ErrorCodes.Succes: dialogText = Uniconta.ClientTools.Localization.lookup("RequestSent"); break;
-                            case ErrorCodes.AiiaNotActivated: dialogText = Uniconta.ClientTools.Localization.lookup("AiiaNotActivated"); break;
-                            default: dialogText = Uniconta.ClientTools.Localization.lookup(err.ToString()); break;
-                        }
-                    }
-                    else
-                        dialogText = Uniconta.ClientTools.Localization.lookup("FunctionNotSupported");
-                    break;
-                case 5: //Service Info
-                    logText = await bankApi.ShowBankConnect(serviceId, (byte)CWBankAPI.BankService);
+                case 3: //Service Info
+                    logText = await bankApi.ShowBankConnect(serviceId, (byte)bankservice);
                     if (logText == null)
                     {
                         dialogText = string.Concat(Uniconta.ClientTools.Localization.lookup("UnableToConnectTo"), " ", cwBank.BankServiceName);
                         logText = null;
                     }
-                    break;
-                case 6: //Settings
-                    if (CWBankAPI.BankService == 0)
-                        await ConnectAiia(true);
                     break;
             }
 

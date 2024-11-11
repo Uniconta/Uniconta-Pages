@@ -52,23 +52,23 @@ namespace UnicontaClient.Pages.CustomPage
         private string settlement;
         private double RemainingAmt, RemainingAmtCur, sumCashDiscount;
         byte settleCur;
-        GLDailyJournalLineClient SelectedJournalLine;
+        GLDailyJournalLineClient selectedLine;
         BankStatementLineClient SelectedBankStatemenLine;
         bool OffSet, RoundTo100;
         private object[] refreshParams;
         private List<long> markedlist;
         int GraceDays;
-        public SettleOpenTransactionPage(UnicontaBaseEntity baseEntity, byte openTransType, UnicontaBaseEntity selectedjournalLine, bool offSet, IEnumerable<string> markedList) : base(null)
+        public SettleOpenTransactionPage(UnicontaBaseEntity baseEntity, byte openTransType, UnicontaBaseEntity selectedLine, bool offSet, IEnumerable<string> markedList) : base(null)
         {
             InitializeComponent();
             this.DataContext = this;
             this.OffSet = offSet;
             this.OpenTransactionType = openTransType;
             InitializePage(baseEntity, openTransType);
-            if (selectedjournalLine is GLDailyJournalLineClient)
-                SelectedJournalLine = selectedjournalLine as GLDailyJournalLineClient;
-            else if (selectedjournalLine is BankStatementLineClient)
-                SelectedBankStatemenLine = selectedjournalLine as BankStatementLineClient;
+            if (selectedLine is GLDailyJournalLineClient)
+                selectedLine = selectedLine as GLDailyJournalLineClient;
+            else if (selectedLine is BankStatementLineClient)
+                SelectedBankStatemenLine = selectedLine as BankStatementLineClient;
 
             ((DevExpress.Xpf.Grid.TableView)dgOpenTransactionGrid.View).RowStyle = Application.Current.Resources["DisableStyleRow"] as Style;
             InitGridView(markedList);
@@ -139,14 +139,14 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void InitGridView(IEnumerable<string> markedList)
         {
-            var settle = SelectedJournalLine?._Settlements ?? SelectedBankStatemenLine?._Settlement;
+            var settle = selectedLine?._Settlements ?? SelectedBankStatemenLine?._Settlement;
             if (settle != null)
             {
                 var settlements = settle.Split(';');
 
-                if (SelectedJournalLine != null)
+                if (selectedLine != null)
                 {
-                    var SettleValue = SelectedJournalLine._SettleValue;
+                    var SettleValue = selectedLine._SettleValue;
                     foreach (var p in settlements)
                     {
                         if (string.IsNullOrWhiteSpace(p))
@@ -170,8 +170,8 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else
             {
-                if (!string.IsNullOrEmpty(SelectedJournalLine?._Invoice))
-                    selectedInvoices.Add(SelectedJournalLine._Invoice);
+                if (!string.IsNullOrEmpty(selectedLine?._Invoice))
+                    selectedInvoices.Add(selectedLine._Invoice);
                 else if (!string.IsNullOrEmpty(SelectedBankStatemenLine?._Invoice))
                     selectedInvoices.Add(SelectedBankStatemenLine._Invoice);
             }
@@ -396,11 +396,11 @@ namespace UnicontaClient.Pages.CustomPage
 
                 settlement = sb.ToStringAndRelease();
 
-                if (SelectedJournalLine != null)
+                if (selectedLine != null)
                 {
                     refreshParams = new object[]
                     {
-                        SelectedJournalLine,
+                        selectedLine,
                         settlement,
                         RemainingAmt,
                         RemainingAmtCur,
@@ -585,7 +585,7 @@ namespace UnicontaClient.Pages.CustomPage
             var amountOpenCur = row._AmountOpenCur;
             if (row._CashDiscount != 0)
             {
-                DateTime dt = (SelectedJournalLine != null) ? SelectedJournalLine._Date : (SelectedBankStatemenLine != null ? SelectedBankStatemenLine._Date : DateTime.MinValue);
+                DateTime dt = (selectedLine != null) ? selectedLine._Date : (SelectedBankStatemenLine != null ? SelectedBankStatemenLine._Date : DateTime.MinValue);
                 if (dt <= row._CashDiscountDate.AddDays(this.GraceDays))
                 {
                     sumCashDiscount += row._CashDiscount;

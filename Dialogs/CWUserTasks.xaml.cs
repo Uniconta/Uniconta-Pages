@@ -127,7 +127,7 @@ namespace UnicontaClient.Controls.Dialogs
             }
             if (userAccess != null && !isNewAccount)
             {
-                var err = await api.GiveCompanyAccess(userAccess._Uid, userAccess._Rights);
+                var err = await api.GiveCompanyAccess(userAccess);
                 if (err != ErrorCodes.Succes)
                     UtilDisplay.ShowErrorCode(err);
             }

@@ -47,6 +47,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ClosingSheetLinesAll"
                     <local:CorasauDataGridTemplateColumnClient x:Name="SplitToDate" Width="90" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="OffsetText"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="OffsetTransType" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Qty" Width="90" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension1" x:Name="coldim1"/>
                     <local:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension2" x:Name="coldim2"/>
                     <local:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension3" x:Name="coldim3"/>

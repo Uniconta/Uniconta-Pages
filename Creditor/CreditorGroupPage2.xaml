@@ -57,6 +57,11 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorGroupPage2"
                         <CorasauControls:LookupEditor x:Name="itemNameGroupLookupEditor" Text="{Binding ItemNameGroup}" />
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpPayment" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Payment}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutItem FieldName="BankMessage" x:Name="liBankMessage">
+                        <CorasauControls:TextEditor  x:Name="txtBankMessage" Text="{Binding BankMessage,Mode=TwoWay}"  />
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpAccount" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Accounts}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem FieldName="SummeryAccount" x:Name="liSummeryAccount">
                         <CorasauControls:LookupEditor x:Name="SummeryAccountlookupeditior" Text="{Binding SummeryAccount,Mode=TwoWay}"/>

@@ -21,24 +21,17 @@ namespace UnicontaClient.Pages.CustomPage
 {
     public partial class CWSendUBL : ChildWindow
     {
-#if !SILVERLIGHT
         protected override int DialogId { get { return DialogTableId; } }
         public int DialogTableId { get; set; }
         protected override bool ShowTableValueButton { get { return true; } }
-#endif
+
         public CWSendUBL(int cntInvoices)
         {
             this.DataContext = this;
 
             InitializeComponent();
-#if !SILVERLIGHT
             this.Title = Uniconta.ClientTools.Localization.lookup("SendInvoicebyUBL");
-
-#else
-            UnicontaClient.Utilities.Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
-            lblprompt.Text = string.Concat("Der er markeret ", cntInvoices, cntInvoices > 1 ? " fakturaer" : " faktura", " som sendes via NemHandel");
-
+            lblprompt.Text = string.Format(Uniconta.ClientTools.Localization.lookup("InvoicesMarkedNemhandel"), cntInvoices);
             this.Loaded += CW_Loaded;
         }
 

@@ -30,7 +30,9 @@ namespace UnicontaClient.Pages.CustomPage
         [ForeignKeyAttribute(ForeignKeyTable = typeof(ProjectClient))]
         [Display(Name = "Project", ResourceType = typeof(InputFieldDataText))]
         public string Project { get; set; }
+        public bool AllLines { get; set; }
 
+        public bool ShowAllLines;
         public CWProjects(CrudAPI api, string title = null)
         {
             InitializeComponent();
@@ -39,10 +41,13 @@ namespace UnicontaClient.Pages.CustomPage
             this.Title = title ?? Uniconta.ClientTools.Localization.lookup("Select");
             lblProject.Text = string.Format(Uniconta.ClientTools.Localization.lookup("ToOBJ"), Uniconta.ClientTools.Localization.lookup("Project"));
             this.Loaded += CW_Loaded;
+            chkAllLines.Visibility = txtAllLines.Visibility = Visibility.Collapsed;
         }
 
         private void CW_Loaded(object sender, RoutedEventArgs e)
         {
+            if (ShowAllLines)
+                chkAllLines.Visibility = txtAllLines.Visibility = Visibility.Visible;
             Dispatcher.BeginInvoke(new Action(() => { leProject.Focus(); }));
         }
         private void OKButton_Click(object sender, RoutedEventArgs e)

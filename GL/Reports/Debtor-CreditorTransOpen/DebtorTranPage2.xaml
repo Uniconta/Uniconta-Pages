@@ -3,11 +3,7 @@
 x:Class="UnicontaClient.Pages.CustomPage.DebtorTranPage2"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
-    mc:Ignorable="d"
-    d:DesignHeight="300" d:DesignWidth="400">
+    xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" >
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -19,6 +15,9 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorTranPage2"
                 <CorasauControls:CorasauLayoutGroup x:Name="grpDescription" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem FieldName="DueDate" x:Name="liDueDate">
                         <CorasauControls:DateEditor EditValue="{Binding DueDate,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="GraceDate" x:Name="liGraceDate">
+                        <CorasauControls:DateEditor EditValue="{Binding GraceDate,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="PaymentFormat" x:Name="liPaymentFormat">
                         <CorasauControls:LookupEditor x:Name="PaymtFormatlookupeditor" Text="{Binding PaymentFormat,Mode=TwoWay}" />

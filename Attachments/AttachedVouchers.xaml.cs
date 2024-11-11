@@ -192,11 +192,16 @@ namespace UnicontaClient.Pages.CustomPage
                         selectedItem.SetNewBuffer(buffer);
                         selectedItem._Url = url;
                         selectedItem._NoCompress = !cwUpdateFile.Compress;
+                        selectedItem._Fileextension = cwUpdateFile.fileExtensionType;
+                        selectedItem._ScanDoc = true;
                         busyIndicator.IsBusy = true;
                         var err = await api.Update(org, selectedItem);
                         busyIndicator.IsBusy = false;
                         if (err == 0)
+                        {
                             VoucherCache.SetGlobalVoucherCache(selectedItem);
+                            dgAttachedVoucherGrid.UpdateItemSource(2, selectedItem);
+                        }
                         else
                             UtilDisplay.ShowErrorCode(err);
                     }

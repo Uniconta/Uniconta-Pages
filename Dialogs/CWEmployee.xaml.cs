@@ -1,17 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using Uniconta.API.System;
 using Uniconta.ClientTools;
 using Uniconta.ClientTools.DataModel;
@@ -37,6 +26,7 @@ namespace UnicontaClient.Pages
         protected override int DialogId { get { return DialogTableId; } }
         protected override bool ShowTableValueButton { get { return true; } }
         public bool IsCreateEmployee;
+        public bool HideComments;
         public Uniconta.DataModel.Employee SelectedEmployee;
         public CWEmployee(CrudAPI api)
         {
@@ -55,8 +45,9 @@ namespace UnicontaClient.Pages
                     OKButton.Content = string.Format(Uniconta.ClientTools.Localization.lookup("Set"));
                 }
                 else
-                { 
-                   btnCreateEmployee.Visibility =tblOr.Visibility = Visibility.Collapsed;
+                {
+                    btnCreateEmployee.Visibility = tblOr.Visibility = Visibility.Collapsed;
+                    lblComments.Visibility = txtComments.Visibility = HideComments ? Visibility.Collapsed : Visibility.Visible;
                 }
             };
         }
@@ -77,7 +68,7 @@ namespace UnicontaClient.Pages
         {
             if (e.Key == Key.Escape)
                 CancelButton_Click(this, e);
-            else if(e.Key == Key.Enter)
+            else if (e.Key == Key.Enter)
             {
                 if (OKButton.IsFocused)
                     OKButton_Click(this, e);

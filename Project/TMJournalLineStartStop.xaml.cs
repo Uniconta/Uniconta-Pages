@@ -175,7 +175,7 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
 
             var projectJournalLine = Activator.CreateInstance(selectedItem.GetType()) as ProjectJournalLineClient;
-            CorasauDataGrid.CopyAndClearRowId(selectedItem, projectJournalLine);
+            CorasauDataGrid.CopyAndClearRowId(selectedItem, projectJournalLine, api);
             AddDockItem(TabControls.DebtorAccountPage2, new object[2] { projectJournalLine, IdObject.get(false) }, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), "Add_16x16");
         }
 

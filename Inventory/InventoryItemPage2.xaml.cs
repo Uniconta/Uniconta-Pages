@@ -83,11 +83,18 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void frmRibbon_OnItemClicked(string ActionType)
         {
-            if (ActionType == "Save" && !VaidateEAN(editrow._EAN))
+            if (ActionType == "Save" && !Validate())
                 return;
             frmRibbon_BaseActions(ActionType);
         }
-
+        bool Validate()
+        { 
+           if(!VaidateEAN(editrow._EAN))
+                return false;
+            if (!ValidateItemNumber(txtItem))
+                return false;
+            return true;
+        }
         bool VaidateEAN(string ean)
         {
             if (Utility.IsValidEAN(ean, api.CompanyEntity))
@@ -341,16 +348,23 @@ namespace UnicontaClient.Pages.CustomPage
                     Uniconta.ClientTools.Localization.lookup("Attachment")), ViewerType.Attachment);
             }
         }
-
+        bool ValidateItemNumber(TextEditor te)
+        {
+            var item = itemCache?.Get(te.Text);
+            if (item != null && item.RowId != editrow.RowId)
+            {
+                UnicontaMessageBox.Show(string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("Item"), string.Format(Uniconta.ClientTools.Localization.lookup("AlreadyExistOBJ"), te.Text)), Uniconta.ClientTools.Localization.lookup("Warning"));
+                return false;
+            }
+            return true;
+        }
         private void txtItem_LostFocus(object sender, RoutedEventArgs e)
         {
+            if (Keyboard.FocusedElement == txtItem)
+                return;
             var s = sender as TextEditor;
             if (s != null && isLayoutCtrlLoaded && s.IsLoaded && itemCache != null)
-            {
-                var item = itemCache.Get(s.Text);
-                if (item != null && item.RowId != editrow.RowId)
-                    UnicontaMessageBox.Show(string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("Item"), string.Format(Uniconta.ClientTools.Localization.lookup("AlreadyExistOBJ"), s.Text)), Uniconta.ClientTools.Localization.lookup("Warning"));
-            }
+                ValidateItemNumber(s);
         }
     }
 

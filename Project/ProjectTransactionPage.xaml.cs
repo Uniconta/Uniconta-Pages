@@ -193,7 +193,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (Comp.HideCostPrice)
             {
                 Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
-           CostAmount.Visible = CostAmount.ShowInColumnChooser = CostPrice.Visible = CostPrice.ShowInColumnChooser = false;
+                CostAmount.Visible = CostAmount.ShowInColumnChooser = CostPrice.Visible = CostPrice.ShowInColumnChooser = false;
             }
         }
 
@@ -314,9 +314,16 @@ namespace UnicontaClient.Pages.CustomPage
         {
             List<PropValuePair> filter;
             if (includeSubProject)
-                filter = new List<PropValuePair>() { PropValuePair.GenereteParameter("IncludeSubProject", typeof(string), "1") };
+                filter = new List<PropValuePair>(2) { PropValuePair.GenereteParameter("IncludeSubProject", typeof(string), "1") };
             else
                 filter = null;
+
+            if (api.CompanyEntity.HideInternalProjects)
+            {
+                if (filter == null)
+                    filter = new List<PropValuePair>(1);
+                filter.Add(PropValuePair.GenereteParameter("HideInternalProjects", typeof(string), "1"));
+            }
 
             await dgProjectTransaction.Filter(filter);
 

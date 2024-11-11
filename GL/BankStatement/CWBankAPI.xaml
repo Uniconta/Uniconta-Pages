@@ -23,9 +23,6 @@ x:Class="UnicontaClient.Pages.CustomPage.CWBankAPI"
                             <Image Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/group-web_16x16.svg, UsePalette=True}" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}" Width="16" Height="16" Stretch="UniformToFill" HorizontalAlignment="Left" />
                         </DataTemplate>
                     </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
-                    <ClientToolsControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=WebService}">
-                        <CorasauControls:ComboBoxEditor x:Name="cmbBankService" Height="25" SelectedIndex="{Binding BankService,Mode=TwoWay}" HorizontalAlignment="Stretch" SelectedIndexChanged="BankService_SelectedIndexChanged"/>
-                    </ClientToolsControls:CorasauLayoutItem>
                     <ClientToolsControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Function}">
                         <CorasauControls:ComboBoxEditor x:Name="cmbBankAPIFunction" Height="25" SelectedIndex="{Binding Type,Mode=TwoWay}" HorizontalAlignment="Stretch" SelectedIndexChanged="BankAPIFunction_SelectedIndexChanged"/>
                     </ClientToolsControls:CorasauLayoutItem>
@@ -37,9 +34,6 @@ x:Class="UnicontaClient.Pages.CustomPage.CWBankAPI"
                             <Image Source="{dx:SvgImageSource  Uri=/UnicontaPages;component/Assets/img/group-questiont_16x16.svg, UsePalette=True}" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}" Width="16" Height="16" Stretch="UniformToFill" HorizontalAlignment="Left" />
                         </DataTemplate>
                     </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
-                    <CorasauControls:CorasauLayoutItem FieldName="BankAccount" x:Name="liBankAccount">
-                        <CorasauControls:LookupEditor x:Name="leBankAccount" Text="{Binding BankAccount,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="FromDate">
                         <CorasauControls:DateEditor EditValue="{Binding FromDate,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                     </CorasauControls:CorasauLayoutItem>

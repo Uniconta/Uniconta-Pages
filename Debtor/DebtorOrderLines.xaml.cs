@@ -1139,8 +1139,7 @@ namespace UnicontaClient.Pages.CustomPage
                 await savetask;
             await dgDebtorOrderLineGrid.RefreshTask();
             RecalculateAmount();
-            if (this.items.CacheAge.TotalMinutes > 10d)
-                this.items = await api.LoadCache(typeof(Uniconta.DataModel.InvItem), true);
+            api.UpdateCache();
         }
 
         async void ViewStorage()
@@ -1213,7 +1212,12 @@ namespace UnicontaClient.Pages.CustomPage
             var additionalOrdersList = Utility.GetAdditionalOrders(api, dbOrder);
             if (additionalOrdersList != null)
                 GenrateInvoiceDialog.SetAdditionalOrders(additionalOrdersList);
-            GenrateInvoiceDialog.SetOIOUBLLabelText(api.CompanyEntity._OIOUBLSendOnServer);
+
+            if (!api.CompanyEntity._DeactivateSendNemhandel)
+            {
+                GenrateInvoiceDialog.SetOIOUBLLabelText(true);
+                GenrateInvoiceDialog.EnableSentEinvoice(api.CompanyEntity._OIOUBLSendOnServer && invoiceInXML);
+            }
 
             GenrateInvoiceDialog.Closed += async delegate
             {

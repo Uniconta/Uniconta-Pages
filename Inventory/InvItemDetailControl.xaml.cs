@@ -70,7 +70,25 @@ namespace UnicontaClient.Pages.CustomPage
                     grpQty.Visibility = Visibility.Collapsed;
                 if(comp.HideCostPrice)
                     liCostPrice.Visibility = Visibility.Collapsed;
-
+                if (!comp.SetupSizes)
+                    grpSize.Visibility = Visibility.Collapsed;
+                if (!comp.InvDuty)
+                    liDutyGroup.Visibility = Visibility.Collapsed;
+                if (comp._InvGroups)
+                {
+                    if (!string.IsNullOrEmpty(comp._CategoryGroup))
+                    {
+                        liCategoryGroup.IsLabelSet = true;
+                        liCategoryGroup.Label = comp._CategoryGroup;
+                    }
+                    if (!string.IsNullOrEmpty(comp._BrandGroup))
+                    {
+                        liBrandGroup.IsLabelSet = true;
+                        liBrandGroup.Label = comp._BrandGroup;
+                    }
+                }
+                else
+                    grpBrand.Visibility = Visibility.Collapsed;
             }
         }
         public Visibility Visible { get { return this.Visibility; } set { this.Visibility = value; this.layoutItems.Visibility = value; } }

@@ -96,7 +96,7 @@ x:Class="UnicontaClient.Pages.CustomPage.EmployeeRegistrationLinePage"
                         </Button.Content>
                     </Button>
                 </Grid>
-                <localPage:EmployeeRegistrationLinePageGrid x:Name="dgEmployeeRegistrationLinePageGrid" Grid.Row="1" AutoGenerateColumns="None" HorizontalAlignment="Stretch" CustomSummary="dgEmployeeRegistrationLinePageGrid_CustomSummary">
+                <localPage:EmployeeRegistrationLinePageGrid x:Name="dgEmployeeRegistrationLinePageGrid" Grid.Row="1" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
                     <localPage:EmployeeRegistrationLinePageGrid.Columns>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Activity" AllowEditing="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="FromTime" ShowTime="True" AllowEditing="False" Width="130">
@@ -110,17 +110,13 @@ x:Class="UnicontaClient.Pages.CustomPage.EmployeeRegistrationLinePage"
                             </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
                         </localPage:CorasauDataGridTemplateColumnClient>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" Visible="False" AllowEditing="False"/>
-                        <localPage:CorasauDataGridTemplateColumnClient FieldName="TotalTime" UnboundDataType="{x:Type sys:TimeSpan}" AllowEditing="False" ShowCriteriaInAutoFilterRow="False"
-                                                                       Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TotalHours}" >
-                            <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
-                                <dxe:TextEditSettings DisplayFormat="hh\:mm" />
-                            </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
-                        </localPage:CorasauDataGridTemplateColumnClient>
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Qty" Visible="False" AllowEditing="False" />
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="WorkingHours" AllowEditing="False" ReadOnly="True" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="ApprovedAdm" AllowEditing="False" MinWidth="100"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="ApprovedEmp" AllowEditing="False" MinWidth="100"/>
                     </localPage:EmployeeRegistrationLinePageGrid.Columns>
                     <localPage:EmployeeRegistrationLinePageGrid.TotalSummary>
-                        <localPage:SumColumn DisplayFormat="dd\:hh\:mm" SummaryType="Custom" FieldName="TotalTime" />
+                        <localPage:SumColumn SummaryType="Sum" FieldName="WorkingHours" />
                     </localPage:EmployeeRegistrationLinePageGrid.TotalSummary>
                 </localPage:EmployeeRegistrationLinePageGrid>
             </Grid>

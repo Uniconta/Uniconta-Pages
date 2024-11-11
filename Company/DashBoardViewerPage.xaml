@@ -7,8 +7,10 @@ x:Class="UnicontaClient.Pages.CustomPage.DashBoardViewerPage"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
         xmlns:dxpg="http://schemas.devexpress.com/winfx/2008/xaml/pivotgrid"
+        xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
         xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
-       xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+        xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars" 
+        xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
         xmlns:dxdash="http://schemas.devexpress.com/winfx/2008/xaml/dashboard" >
     <UserControl.Resources>
         <DataTemplate x:Key="pivotTemplate">
@@ -24,12 +26,16 @@ x:Class="UnicontaClient.Pages.CustomPage.DashBoardViewerPage"
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <StackPanel Orientation="Horizontal" Grid.Row="0" x:Name="rowFilter">
-            <Button Height="35" Width="45" ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Filter}" ContentTemplate="{StaticResource FilterButtonTemplate}" HorizontalAlignment="Left"   x:Name="btnFilter" Cursor="Hand" Click="Button_Click"  />
-            <Button Height="35" Width="45" ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ClearFilter}" ContentTemplate="{StaticResource ClearFilterButtonTemplate}" HorizontalAlignment="Left"  x:Name="btnClearFilter" Cursor="Hand" Click="btnClearFilter_Click"  />
-            <Button Height="35" Width="45" ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Refresh}" ContentTemplate="{StaticResource RefeshButtonTemplate}" HorizontalAlignment="Left"  x:Name="btnRefresh" Cursor="Hand" Click="btnRefresh_Click"  />
-            <Button Height="35" Width="45" ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=WindowSetting}" ContentTemplate="{StaticResource WinSettgButtonTemplate}" HorizontalAlignment="Left"  x:Name="btnWinSettg" Cursor="Hand" Click="btnWinSettg_Click"  />
-        </StackPanel>
+        <dxb:ToolBarControl x:Name="rowFilter" Caption="Default Layout">
+            <dxb:BarButtonItem Description="To apply server filter selected entity" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Filter}" ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Filter}"  
+                               BorderThickness="1" BorderBrush="{StaticResource TopMenuTextForeground}" LargeGlyph="{dx:DXImage 'SvgImages/Filter/Filter.svg'}" x:Name="btnFilter" Cursor="Hand" ItemClick="btnFilter_ItemClick" IsEnabled="False"/>
+            <dxb:BarButtonItem Description="To remove the server filter" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ClearFilter}" ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ClearFilter}" 
+                               BorderThickness="1" BorderBrush="{StaticResource TopMenuTextForeground}" LargeGlyph="{dx:DXImage 'SvgImages/Dashboards/ClearFilter.svg'}" x:Name="btnClearFilter" Cursor="Hand"  ItemClick="btnClearFilter_Click" IsEnabled="False"/>
+            <dxb:BarButtonItem Description="To refresh the source of dashboard" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Refresh}" ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Refresh}"
+                               BorderThickness="1" BorderBrush="{StaticResource TopMenuTextForeground}" LargeGlyph="{dx:DXImage 'SvgImages/Icon Builder/Actions_Refresh.svg'}" x:Name="btnRefresh" Cursor="Hand" ItemClick="btnRefresh_Click"/>
+            <dxb:BarButtonItem Description="To change window settings for the page" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=WindowSetting}" ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=WindowSetting}"
+                               BorderThickness="1" BorderBrush="{StaticResource TopMenuTextForeground}" LargeGlyph="{dx:DXImage 'SvgImages/Icon Builder/Actions_Settings.svg'}" x:Name="btnWinSettg" Cursor="Hand" ItemClick="btnWinSettg_Click"/>
+        </dxb:ToolBarControl>
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
             <CorasauControls:UnicontaDashboardControl Grid.Row="1" x:Name="dashboardViewerUniconta" AllowInspectAggregatedData="True"
                              AllowInspectRawData="True"  AllowPrintDashboardItems="True" 

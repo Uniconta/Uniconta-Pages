@@ -37,6 +37,11 @@
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
+    <RibbonItem Action="Storage" LocalizedNameKey="OnHand" Module="Storage" ControlName="InvItemStoragePage" LargeGlyph="Inventory_Trans_32x32"/>
+    <RibbonItem Action="InvReservation" LocalizedNameKey="Reservations" ControlName="InventoryReservationReport" Module="Storage" LargeGlyph="Item_Number_32x32"/>
+    <RibbonItem Action="InvStockProfile" LocalizedNameKey="StockProfile" ControlName="InvStorageProfileReport" Module="Storage" LargeGlyph="Storage_32x32"/>
+  </RibbonItem>
+  <RibbonItem>
     <RibbonItem Action="ProductionPosted" LocalizedNameKey="ProductionPosted" ControlName="ProductionPostedGridPage" LargeGlyph="Offset_Account_32x32" Glyph=""/>
   </RibbonItem>
   <RibbonItem>

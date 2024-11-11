@@ -9,6 +9,8 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionPostedGridPage"
             xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools">
     <UserControl.Resources>
         <Util:MaskConverter x:Key="MaskConverter" />
+        <Util:VisibilityBoolConverter x:Key="VisibilityBoolConverter" />
+        <Util:ImageNameToImagesourceConverter x:Key="ImageNameToImagesourceConverter"/>
     </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
@@ -19,20 +21,32 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionPostedGridPage"
         <UnicontaControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <local:ProductionPostedGridClient x:Name="dgProductionPostedGrid" AutoGenerateColumns="None">
                 <local:ProductionPostedGridClient.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="HasDocs" ReadOnly="True"  Width="30" >
+                        <local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                            <DataTemplate>
+                                <Image Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Document_Attachment_16x16.svg}" Width="16" Height="16" VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Document_Attachment_16x16.svg}" MouseLeftButtonDown="HasDocImage_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.HasDocs,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Date" Width="80" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Item" Width="100">
-                        <local:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
-                            <DataTemplate>
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Item,RelativeSource={RelativeSource TemplatedParent}}" PreviewMouseDown="Name_PreviewMouseDown"></TextBlock>
-                                    <TextBlock Grid.Column="1"></TextBlock>
+                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding Value}" PreviewMouseDown="Name_PreviewMouseDown" />
+                                    <TextBlock Grid.Column="1"/>
                                 </Grid>
-                            </DataTemplate>
-                        </local:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Qty" Width="60">
                         <local:CorasauDataGridTemplateColumnClient.CellTemplate>
@@ -45,7 +59,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionPostedGridPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="OrderNumber" Width="60" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" Width="60"  />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Voucher" Width="60" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="RelatedOrder" Width="60" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="RelatedOrder" Width="60" IsEditSettingSet="True" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="BatchNumber" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="BatchRowId" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Account" />

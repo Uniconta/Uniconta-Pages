@@ -226,6 +226,10 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         AddDockItem(TabControls.UserRestrictedMethodPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("BlockFunctions"), selectedItem._Name));
                     break;
+                case "BlockReports":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.UserRestrictedReportPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("BlockReports"), selectedItem._Name));
+                    break;
                 case "UserProfiles":
                     if (selectedItem != null)
                         AddDockItem(TabControls.UserProfileUserPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("UserProfiles"), selectedItem._Name));
@@ -329,13 +333,13 @@ namespace UnicontaClient.Pages.CustomPage
                 fixedProfile = FixedProfiles.ProjectTimeUser;
             else if (userType == UserTypes.InvoiceUser)
                 fixedProfile = FixedProfiles.Invoice;
-            var userAccess= _companyUsers.Where(u => u._LoginId == LoginId).FirstOrDefault();
+            var userAccess = _companyUsers.Where(u => u._LoginId == LoginId).FirstOrDefault();
             if (userAccess != null)
             {
                 var rights = AccessLevel.SetFixedProfile(userAccess._Rights, fixedProfile);
                 userAccess._Rights = rights;
                 userAccess.NotifyPropertyChanged("FixedProfile");
-                companyAPI.GiveCompanyAccess(userAccess._Uid, rights);
+                companyAPI.GiveCompanyAccess(userAccess);
             }
         }
         public async override Task InitQuery()

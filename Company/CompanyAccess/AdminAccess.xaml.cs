@@ -56,7 +56,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 case "Accept":
                     if (selectedItem == null) return;
-                    ErrorCodes res = await companyAPI.GiveCompanyAccess(selectedItem._Uid, 0);
+                    ErrorCodes res = await companyAPI.GiveCompanyAccess(selectedItem);
                     if (res != ErrorCodes.Succes)
                         UtilDisplay.ShowErrorCode(res);
                     else

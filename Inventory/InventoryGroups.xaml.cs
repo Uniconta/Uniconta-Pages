@@ -136,7 +136,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (selectedItem == null)
                 return;
             var invGroup = Activator.CreateInstance(selectedItem.GetType()) as InvGroupClient;
-            CorasauDataGrid.CopyAndClearRowId(selectedItem, invGroup);
+            CorasauDataGrid.CopyAndClearRowId(selectedItem, invGroup, api);
             object[] copyParam = new object[2];
             copyParam[0] = invGroup;
             copyParam[1] = false;

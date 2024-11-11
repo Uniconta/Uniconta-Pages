@@ -73,8 +73,10 @@ namespace UnicontaClient.Pages.CustomPage
                 long total = 0, vouchertotal = 0;
                 int i = 0;
                 int voucher = 0;
+                int CompanyId = api.CompanyId;
                 foreach (var t in (IEnumerable<GLTransClientTotal>)simulatedTransactions)
                 {
+                    t.CompanyId = CompanyId;
                     if (t._Voucher != voucher)
                     {
                         voucher = t._Voucher;
@@ -102,7 +104,7 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgSimulatedTran);
             dgSimulatedTran.BusyIndicator = busyIndicator;
 
-            localMenu.OnItemClicked += LocalMenu_OnItemClicked; ;
+            localMenu.OnItemClicked += LocalMenu_OnItemClicked;
             dgSimulatedTran.ShowTotalSummary();
             LedgerCache = this.api.GetCache(typeof(GLAccount));
         }
@@ -129,12 +131,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void ViewAccountPostingBalance()
         {
             if (balance != null)
-            {
-                object[] paramArr = new object[2];
-                paramArr[0] = api;
-                paramArr[1] = balance;
-                AddDockItem(TabControls.AccountPostingBalancePage, paramArr, true, Uniconta.ClientTools.Localization.lookup("TraceBalance"));
-            }
+                AddDockItem(TabControls.AccountPostingBalancePage, new object[2] { api, balance }, true, Uniconta.ClientTools.Localization.lookup("TraceBalance"));
         }
 
         public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)

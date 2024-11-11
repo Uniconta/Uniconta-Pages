@@ -26,6 +26,7 @@ using System.Reflection.Emit;
 using System.Data;
 using Uniconta.ClientTools.Util;
 using DevExpress.Data.Filtering;
+using DashBoardView;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -41,6 +42,7 @@ namespace UnicontaClient.Pages.CustomPage
         private Dictionary<string, List<FilterProperties>> lstOfNewFilters;
         private Dictionary<string, FilterSorter> lstOfSorters;
         private Dictionary<int, Type[]> ListOfReportTableTypes;
+        private Dictionary<string, UnicontaBaseEntity[]> lstOfDataSources;
         public IEnumerable<PropValuePair> filterValues;
         Dictionary<string, List<DashboardUserField>> dashboardUserFields;
         string selectedDataSourceName;
@@ -98,11 +100,13 @@ namespace UnicontaClient.Pages.CustomPage
             CriteriaOperator.RegisterCustomFunction(new DashBoardView.ExchangeRateFunction(new CrudAPI(api)));
             InitializeComponent();
             this.BusyIndicator = busyIndicator;
+            //localMenu.OnItemClicked += LocalMenu_OnItemClicked; ;
             dashboardViewerUniconta.ObjectDataSourceLoadingBehavior = DevExpress.DataAccess.DocumentLoadingBehavior.LoadAsIs;
             dataSourceAndTypeMap = new Dictionary<string, Type>();
             lstOfNewFilters = new Dictionary<string, List<FilterProperties>>();
             lstOfSorters = new Dictionary<string, FilterSorter>();
             ListOfReportTableTypes = new Dictionary<int, Type[]>();
+            lstOfDataSources = new Dictionary<string, UnicontaBaseEntity[]>();
             LoadListOfTableTypes(company);
             dashboardViewerUniconta.Loaded += DashboardViewerUniconta_Loaded;
             dashboardViewerUniconta.DashboardLoaded += DashboardViewerUniconta_DashboardLoaded;
@@ -121,6 +125,14 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (timer != null)
                 timer.Tick -= Timer_Tick;
+
+            //Removing registered functions
+            foreach (var func in CriteriaOperator.GetCustomFunctions())
+            {
+                if (func is GetAppEnumIndexFunction appEnumFunc)
+                    CriteriaOperator.UnregisterCustomFunction(appEnumFunc);
+            }
+
             base.PageClosing();
         }
 
@@ -150,13 +162,13 @@ namespace UnicontaClient.Pages.CustomPage
         {
             foreach (var col in targetLst)
             {
-                var name = ((DataItem)col).Name;
+                var name = col.Name;
                 var savedName = pivot.CustomProperties.GetValue(col.UniqueId) ?? string.Empty;
 
                 if ((name != null || !string.IsNullOrEmpty(name)) && (col.Name.StartsWith("&") || col.Name.StartsWith("@") || savedName.StartsWith("@") || savedName.StartsWith("&")))
                 {
                     name = savedName;
-                    ((DataItem)col).Name = Uniconta.ClientTools.Localization.lookup(name.Substring(1));
+                    col.Name = Uniconta.ClientTools.Localization.lookup(name.Substring(1));
                 }
                 IsNestedField(col, dataSourceName);
             }
@@ -166,13 +178,13 @@ namespace UnicontaClient.Pages.CustomPage
         {
             foreach (var col in targetLst)
             {
-                var name = ((DataItem)col).Name;
+                var name = col.Name;
                 var savedName = chart.CustomProperties.GetValue(col.UniqueId) ?? string.Empty;
 
                 if ((name != null || !string.IsNullOrEmpty(name)) && (col.Name.StartsWith("&") || col.Name.StartsWith("@") || savedName.StartsWith("@") || savedName.StartsWith("&")))
                 {
                     name = savedName;
-                    ((DataItem)col).Name = Uniconta.ClientTools.Localization.lookup(name.Substring(1));
+                    col.Name = Uniconta.ClientTools.Localization.lookup(name.Substring(1));
                 }
             }
         }
@@ -189,13 +201,13 @@ namespace UnicontaClient.Pages.CustomPage
         {
             foreach (var col in targetLst)
             {
-                var name = ((DataItem)col).Name;
+                var name = col.Name;
                 var savedName = pie.CustomProperties.GetValue(col.UniqueId) ?? string.Empty;
 
                 if ((name != null || !string.IsNullOrEmpty(name)) && (col.Name.StartsWith("&") || col.Name.StartsWith("@") || savedName.StartsWith("@") || savedName.StartsWith("&")))
                 {
                     name = savedName;
-                    ((DataItem)col).Name = Uniconta.ClientTools.Localization.lookup(name.Substring(1));
+                    col.Name = Uniconta.ClientTools.Localization.lookup(name.Substring(1));
                 }
                 IsNestedField(col, dataSourceName);
             }
@@ -205,13 +217,13 @@ namespace UnicontaClient.Pages.CustomPage
         {
             foreach (var col in targetLst)
             {
-                var name = ((DataItem)col).Name;
+                var name = col.Name;
                 var savedName = sctChart.CustomProperties.GetValue(col.UniqueId) ?? string.Empty;
 
                 if ((name != null || !string.IsNullOrEmpty(name)) && (col.Name.StartsWith("&") || col.Name.StartsWith("@") || savedName.StartsWith("@") || savedName.StartsWith("&")))
                 {
                     name = savedName;
-                    ((DataItem)col).Name = Uniconta.ClientTools.Localization.lookup(name.Substring(1));
+                    col.Name = Uniconta.ClientTools.Localization.lookup(name.Substring(1));
                 }
                 IsNestedField(col, dataSourceName);
             }
@@ -330,6 +342,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             if (!dasdboard.Title.ShowMasterFilterState)
+                /*localMenu*/
                 rowFilter.Visibility = Visibility.Collapsed;
 
             XElement data = e.Dashboard.UserData;
@@ -509,6 +522,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (string.IsNullOrEmpty(titleText))
                     dashboardViewerUniconta.TitleContent = string.Empty;
             }
+            btnClearFilter.IsEnabled = btnFilter.IsEnabled = tableType != null && selectedDataSourceName != null ? true : false;
         }
 
         public static DateTime MakeDate(long ticks) { return new DateTime(ticks); }
@@ -628,7 +642,7 @@ namespace UnicontaClient.Pages.CustomPage
                 timer.Stop();
         }
 
-        private async Task<bool> Initialise()
+        private async void Initialise()
         {
             busyIndicator.IsBusy = true;
             if (_selectedDashBoard == null)
@@ -656,12 +670,14 @@ namespace UnicontaClient.Pages.CustomPage
                     dashboardViewerUniconta.TitleContent = !string.IsNullOrEmpty(titleText) ? titleText : _selectedDashBoard.Name;
                 }
                 else
+                {
                     UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup(result.ToString()), Uniconta.ClientTools.Localization.lookup("Error"));
+                    CloseDockItem();
+                }
             }
 
             if (_selectedDashBoard == null)
                 busyIndicator.IsBusy = false;
-            return true;
         }
 
         private bool ReadDataFromDB(byte[] selectedDashBoardBinary)
@@ -766,7 +782,24 @@ namespace UnicontaClient.Pages.CustomPage
         {
             return Task.Run(async () =>
             {
-                return await crudApi.Query(Activator.CreateInstance(type) as UnicontaBaseEntity, masters, filterValue);
+                //When the Masters and type is same then if we query it will return all the result.
+                //So the master is the source itself and we dont query.
+                //We just have create an array of the type and it will work.
+                if (masters != null && masters.Count() == 1 && masters.First().GetType() == type)
+                {
+                    var masterEntity = (UnicontaBaseEntity[])Array.CreateInstance(type, 1);
+                    var rec = Activator.CreateInstance(type) as UnicontaBaseEntity;
+                    StreamingManager.Copy(masters.First(), rec);
+                    masterEntity[0] = rec;
+                    return masterEntity;
+                }
+
+                var data = await crudApi.Query(Activator.CreateInstance(type) as UnicontaBaseEntity, masters, filterValue);
+
+                if (PropSort != null)
+                    Array.Sort(data, PropSort);
+
+                return data;
             });
         }
 
@@ -824,7 +857,7 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         bool IsDashBoardTableTYpe = false;
                         Type dashbaordTableType = null;
-
+                        CriteriaOperator.RegisterCustomFunction(new GetAppEnumIndexFunction(typeofTable));
                         if (!LoadOnOpen)
                             e.Data = Activator.CreateInstance(typeofTable);
                         else
@@ -861,6 +894,11 @@ namespace UnicontaClient.Pages.CustomPage
                                 else
                                     filterValues = null;
 
+                                if (lstOfSorters.ContainsKey(DataSourceComponentName))
+                                    PropSort = lstOfSorters[DataSourceComponentName];
+                                else
+                                    PropSort = null;
+
                                 if (propValuePair != null)
                                 {
                                     var propLst = new List<PropValuePair>(1) { propValuePair };
@@ -885,8 +923,8 @@ namespace UnicontaClient.Pages.CustomPage
                                     data = Query(type, compApi, masterRecords, filterValues).GetAwaiter().GetResult();
                                 }
 
-                                if (lstOfSorters != null && lstOfSorters.ContainsKey(DataSourceComponentName))
-                                    Array.Sort(data, lstOfSorters[DataSourceComponentName]);
+                                if (lstOfDataSources != null && !lstOfDataSources.ContainsKey(DataSourceComponentName))
+                                    lstOfDataSources.Add(DataSourceComponentName, data);
 
                                 if (typeofTable.Equals(typeof(CompanyDocumentClient)))
                                     ReadData(data, compApi ?? api).GetAwaiter().GetResult(); // if there is image in property it will load again;
@@ -960,7 +998,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
 
-            return new List<UnicontaBaseEntity>() { master };
+            return new List<UnicontaBaseEntity>(1) { master };
         }
 
         bool TableContainLoginIdProp(Type retType)
@@ -1026,12 +1064,7 @@ namespace UnicontaClient.Pages.CustomPage
             return retType;
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            OpenFilterDialog();
-        }
-
-        public void OpenFilterDialog()
+        private void btnFilter_ItemClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
         {
             try
             {
@@ -1047,23 +1080,19 @@ namespace UnicontaClient.Pages.CustomPage
                         PropSort = lstOfSorters[selectedDataSourceName];
                     else
                         PropSort = null;
-                    Filter[] filters = null;
-                    SortingProperties[] sorters = null;
-                    //if (filterValues != null)
-                    //    filters = Utility.CreateDefaultFilter(filterValues, tableType);
-                    if (filterValues != null)
-                        filters = filterProps.Select(p => new Filter() { name = p.PropertyName, value = p.UserInput, parameterType = p.ParameterType }).ToArray();
-                    if (PropSort != null)
-                        sorters = Utility.CreateDefaultSort(PropSort);
+
                     var fixedComp = fixedCompanies?.FirstOrDefault(x => x.DatasourceName == selectedDataSourceName);
                     if (fixedComp == null || this.company.CompanyId == fixedComp?.CompanyId)
-                        filterDialog = new CWServerFilter(api, tableType, filters, sorters, null);
+                        filterDialog = new CWServerFilter(api, tableType, filterProps?.Select(p => new Filter() { name = p.PropertyName, value = p.UserInput, parameterType = p.ParameterType }).ToArray(),
+                            Utility.CreateDefaultSort(PropSort), null);
                     else
                     {
-                        var comp = CWDefaultCompany.loadedCompanies.FirstOrDefault(x => x.CompanyId == fixedComp.CompanyId) as Company;
+                        var comp = CWDefaultCompany.loadedCompanies.FirstOrDefault(x => x.CompanyId == fixedComp.CompanyId);
                         var compApi = new CrudAPI(api.session, comp);
-                        filterDialog = new CWServerFilter(compApi, tableType, filters, sorters, null);
+                        filterDialog = new CWServerFilter(compApi, tableType, filterProps.Select(p => new Filter() { name = p.PropertyName, value = p.UserInput, parameterType = p.ParameterType }).ToArray(),
+                            Utility.CreateDefaultSort(PropSort), null);
                     }
+                    filterDialog.GridSource = lstOfDataSources[selectedDataSourceName];
                     filterDialog.Closing += FilterDialog_Closing;
                     filterDialog.Show();
                 }
@@ -1078,7 +1107,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (filterDialog.DialogResult == true)
             {
-                var filtersProps = filterDialog.Filters.Select(p => new FilterProperties() { PropertyName = p.name, UserInput = p.value, ParameterType = p.parameterType });
+                var filtersProps = filterDialog.Filters?.Select(p => new FilterProperties() { PropertyName = p.name, UserInput = p.value, ParameterType = p.parameterType });
                 filterValues = filterDialog.PropValuePair;
                 PropSort = filterDialog.PropSort;
 
@@ -1119,7 +1148,7 @@ namespace UnicontaClient.Pages.CustomPage
             filterDialog.Hide();
         }
 
-        private void btnClearFilter_Click(object sender, RoutedEventArgs e)
+        private void btnClearFilter_Click(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
         {
             if (!string.IsNullOrEmpty(selectedDataSourceName))
             {
@@ -1131,7 +1160,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        private void btnRefresh_Click(object sender, RoutedEventArgs e)
+        private void btnRefresh_Click(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
         {
             dashboardViewerUniconta.ReloadData();
         }
@@ -1157,7 +1186,7 @@ namespace UnicontaClient.Pages.CustomPage
             });
         }
 
-        private void btnWinSettg_Click(object sender, RoutedEventArgs e)
+        private void btnWinSettg_Click(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
         {
             string name = this.ParentControl != null ? Convert.ToString(this.ParentControl.Tag) : NameOfControl;
             var dockSettingDialog = new CWControlDockSetting(name);

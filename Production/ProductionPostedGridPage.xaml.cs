@@ -16,6 +16,7 @@ using Uniconta.ClientTools.Util;
 using DevExpress.Xpf.Grid;
 using Uniconta.Common.Utility;
 using System.Windows.Input;
+using System.Windows.Controls;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -180,6 +181,13 @@ namespace UnicontaClient.Pages.CustomPage
         {
             InitializeComponent();
             InitPage(master);
+        }
+
+        private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var pp = (sender as Image).Tag as ProductionPostedClient;
+            if (pp != null)
+                AddDockItem(TabControls.UserDocsPage, dgProductionPostedGrid.syncEntity);
         }
     }
 }

@@ -1,11 +1,10 @@
 ﻿<ClientTools:ChildWindow x:Class="UnicontaClient.Controls.Dialogs.CWBrowserDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
         xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d"
-        Title="CWBrowserDialog" Width="500" Height="800">
+        Height="{Binding Source={x:Static SystemParameters.PrimaryScreenHeight},Converter={Util:ScreenRatioConverter},ConverterParameter='0.90'}" 
+        Width="500" MinHeight="600" ResizeMode="CanResize" KeyDown="ChildWindow_KeyDown">
     <Grid Margin="2" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition />

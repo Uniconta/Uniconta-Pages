@@ -85,6 +85,10 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         AddDockItem(TabControls.UserProfileRestrictedMethodPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("BlockFunctions"), selectedItem._Name));
                     break;
+                case "BlockReports":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.UserProfileRestrictedReportPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("BlockReports"), selectedItem._Name));
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;

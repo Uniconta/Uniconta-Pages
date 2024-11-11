@@ -8,40 +8,24 @@ using Uniconta.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
-
-using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 using Uniconta.ClientTools.Controls;
 using Uniconta.DataModel;
-using System.Collections;
 using Uniconta.ClientTools.Util;
 using System.IO;
-using System.Reflection;
 using System.ComponentModel.DataAnnotations;
 using System.Windows;
 using Uniconta.API.Plugin;
-using UnicontaClient.Creditor.Payments;
 using Uniconta.API.System;
-using DevExpress.Xpf.Grid;
 using System.Text;
-using System.Text.RegularExpressions;
 using UnicontaISO20022CreditTransfer;
 using UnicontaClient.Pages.Creditor.Payments;
 using Localization = Uniconta.ClientTools.Localization;
 using Uniconta.Common.Utility;
-using DevExpress.CodeParser;
 using Uniconta.API.DebtorCreditor;
 using UnicontaClient.Pages.Creditor.Payments.Denmark;
 using ISO20022CreditTransfer;
-using DevExpress.XtraEditors.Filtering.Templates;
-using Microsoft.Win32;
-using Uniconta.DirectDebitPayment;
 using Newtonsoft.Json;
 
 using UnicontaClient.Pages;
@@ -447,7 +431,7 @@ namespace UnicontaClient.Pages.CustomPage
                                     lineclient.SetMaster(DJclient);
                                     lineclient._DCPostType = DCPostType.Payment;
                                     lineclient._LineNumber = ++LineNumber;
-                                    lineclient._Date = cTOpenClient.PaymentDate != DateTime.MinValue ? cTOpenClient.PaymentDate : cTOpenClient._DueDate;
+                                    lineclient._Date = cTOpenClient.GetPayDate();
                                     lineclient._TransType = cwLine.TransType;
                                     lineclient._AccountType = (byte)GLJournalAccountType.Creditor;
                                     lineclient._Account = cTOpenClient.Account;
@@ -689,7 +673,7 @@ namespace UnicontaClient.Pages.CustomPage
                     return;
 
                 var paymentFormatRec = cwwin.PaymentFormat;
-                var paymMethod = paymentFormatRec.PaymentMethod;
+                var paymMethod = (ExportFormatType)paymentFormatRec._ExportFormat;
                 var paymentFormat = paymentFormatRec._Format;
 
                 if (cwwin.userPlugin == null)
@@ -1291,9 +1275,9 @@ namespace UnicontaClient.Pages.CustomPage
                             if (cred._PaymentMethod == PaymentTypes.VendorBankAccount && CountryId == CountryCode.Norway)
                                 creditorPaymId = string.Empty; //Norway PaymentId is used for Kid-No when PaymentType=VendorBankAccount
                             else if (cred._PaymentMethod == PaymentTypes.IBAN && ((CountryId == CountryCode.Estonia && cred._Country == CountryCode.Estonia) || (CountryId == CountryCode.Switzerland && cred._Country == CountryCode.Switzerland)))
-                                creditorPaymId = string.Empty; //Estonia and Switzerland PaymentId is used for Payment Reference for Domestic payments  
+                                creditorPaymId = null; //Estonia and Switzerland PaymentId is used for Payment Reference for Domestic payments  
                             else if ((cred._PaymentMethod == PaymentTypes.PaymentMethod3 || cred._PaymentMethod == PaymentTypes.PaymentMethod5) && CountryId == CountryCode.Sweden)
-                                creditorPaymId = string.Empty; //Norway PaymentId is used for OCR-No when PaymentType=PaymentMethod3
+                                creditorPaymId = string.Empty; //Norway PaymentId is used for OCR-No when PaymentType=PaymentMethod3   //TODO:Undersøg disse - skal stå til NULL
                             else
                                 creditorPaymId = cred._PaymentId;
 
@@ -1334,13 +1318,11 @@ namespace UnicontaClient.Pages.CustomPage
                 if (rec._SWIFT == null)
                     rec._SWIFT = cred._SWIFT;
 
-                string paymMessage = paymFormatClient?._Message ?? string.Empty;
-
-                rec._Message = StandardPaymentFunctions.ExternalMessage(paymMessage, rec, company, cred, true);
+                rec._Message = StandardPaymentFunctions.ExternalMessage(paymFormatClient, rec, company, cred, true);
 
                 if (rec._PaymentDate < today)
                 {
-                    var paymDate = rec._PaymentDate == DateTime.MinValue ? rec._DueDate : rec._PaymentDate;
+                    var paymDate = rec.GetPayDate();
                     rec._PaymentDate = today > paymDate ? today : paymDate;
                     if (paymFormatClient != null && paymFormatClient._PaymentAction != NoneBankDayAction.None)
                         rec._PaymentDate = Uniconta.DirectDebitPayment.Common.AdjustToNextBankDay(CountryId, rec._PaymentDate, paymFormatClient._PaymentAction == NoneBankDayAction.After ? true : false);

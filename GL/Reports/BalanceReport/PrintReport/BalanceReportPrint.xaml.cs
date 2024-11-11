@@ -331,25 +331,29 @@ namespace UnicontaClient.Pages.CustomPage
         readonly BalanceClient blc;
         readonly HeaderData hdrData;
         public HeaderData HeaderData { get { return hdrData; } }
-        public BalanceReportdata(BalanceClient blc, HeaderData hdrData)
+        public BalanceReportdata(BalanceClient blc, HeaderData hdrData, bool showZero)
         {
             this.blc = blc;
             this.hdrData = hdrData;
             var header = (blc.Acc == null || blc.AccountTypeEnum == GLAccountTypes.Header);
 
-            this.Col1 = new CustomColumn(blc.Col1, hdrData.ShowDCCol1, header);
-            this.Col2 = new CustomColumn(blc.Col2, hdrData.ShowDCCol2, header);
-            this.Col3 = new CustomColumn(blc.Col3, hdrData.ShowDCCol3, header);
-            this.Col4 = new CustomColumn(blc.Col4, hdrData.ShowDCCol4, header);
-            this.Col5 = new CustomColumn(blc.Col5, hdrData.ShowDCCol5, header);
-            this.Col6 = new CustomColumn(blc.Col6, hdrData.ShowDCCol6, header);
-            this.Col7 = new CustomColumn(blc.Col7, hdrData.ShowDCCol7, header);
-            this.Col8 = new CustomColumn(blc.Col8, hdrData.ShowDCCol8, header);
-            this.Col9 = new CustomColumn(blc.Col9, hdrData.ShowDCCol9, header);
-            this.Col10 = new CustomColumn(blc.Col10, hdrData.ShowDCCol10, header);
-            this.Col11 = new CustomColumn(blc.Col11, hdrData.ShowDCCol11, header);
-            this.Col12 = new CustomColumn(blc.Col12, hdrData.ShowDCCol12, header);
-            this.Col13 = new CustomColumn(blc.Col13, hdrData.ShowDCCol13, header);
+            this.Col1 = new CustomColumn(blc.Col1, hdrData.ShowDCCol1, header) { showZero = showZero };
+            this.Col2 = new CustomColumn(blc.Col2, hdrData.ShowDCCol2, header) { showZero = showZero };
+            this.Col3 = new CustomColumn(blc.Col3, hdrData.ShowDCCol3, header) { showZero = showZero };
+            this.Col4 = new CustomColumn(blc.Col4, hdrData.ShowDCCol4, header) { showZero = showZero };
+            this.Col5 = new CustomColumn(blc.Col5, hdrData.ShowDCCol5, header) { showZero = showZero };
+            this.Col6 = new CustomColumn(blc.Col6, hdrData.ShowDCCol6, header) { showZero = showZero };
+            this.Col7 = new CustomColumn(blc.Col7, hdrData.ShowDCCol7, header) { showZero = showZero };
+            this.Col8 = new CustomColumn(blc.Col8, hdrData.ShowDCCol8, header) { showZero = showZero };
+            this.Col9 = new CustomColumn(blc.Col9, hdrData.ShowDCCol9, header) { showZero = showZero };
+            this.Col10 = new CustomColumn(blc.Col10, hdrData.ShowDCCol10, header) { showZero = showZero };
+            this.Col11 = new CustomColumn(blc.Col11, hdrData.ShowDCCol11, header) { showZero = showZero };
+            this.Col12 = new CustomColumn(blc.Col12, hdrData.ShowDCCol12, header) { showZero = showZero };
+            this.Col13 = new CustomColumn(blc.Col13, hdrData.ShowDCCol13, header) { showZero = showZero };
+        }
+        public BalanceReportdata(BalanceClient blc, HeaderData hdrData) : this(blc, hdrData, false)
+        {
+
         }
 
         public GLAccountTypes AccountTypeEnum { get { return blc.AccountTypeEnum; } }

@@ -25,6 +25,7 @@ using Uniconta.ClientTools.Controls;
 using DevExpress.Xpf.Editors;
 using System.ComponentModel;
 using Uniconta.Common.Utility;
+using FromXSDFile.OIOUBL.ExportImport.eDelivery;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -219,7 +220,8 @@ namespace UnicontaClient.Pages.CustomPage
                 grpApproval.Visibility = Visibility.Collapsed;
             if (!Comp.SetupSizes)
                 grpSize.Visibility = Visibility.Collapsed;
-
+            if (!Comp.InvPackaging)
+                ESGGroup.Visibility = Visibility.Collapsed;
             if (!Comp.ProjectTask)
                 projectTask.Visibility = Visibility.Collapsed;
             else if (editrow?._Project != null)
@@ -682,6 +684,31 @@ namespace UnicontaClient.Pages.CustomPage
 
             comboBoxEditor.ItemsSource = new string[] { string.Format(Uniconta.ClientTools.Localization.lookup("CreateOBJ"), Uniconta.ClientTools.Localization.lookup("Debtor")), Uniconta.ClientTools.Localization.lookup("OneTimeDebtor") };
             comboBoxEditor.SelectedIndexChanged += ComboBoxEditor_SelectedIndexChanged;
+        }
+
+        public static void CheckOrderNo(TextEdit txtOrderNumber, Type type, CrudAPI api, string oldOrderNumber)
+        {
+            var s = txtOrderNumber;
+            if (s?.IsLoaded == true)
+            {
+                string ordernumber = s.Text;
+                if (!string.IsNullOrEmpty(ordernumber) && !ordernumber.Equals(oldOrderNumber))
+                {
+                    var order = api.CompanyEntity.GetCache(type)?.Get(ordernumber);
+                    if (order != null)
+                    {
+                        UnicontaMessageBox.Show(string.Format("{0} {1} ", Uniconta.ClientTools.Localization.lookup("Order"), string.Format(Uniconta.ClientTools.Localization.lookup("AlreadyExistOBJ"), s.Text))
+                            , Uniconta.ClientTools.Localization.lookup("Information"));
+                        txtOrderNumber.Text = oldOrderNumber;
+                    }
+                }
+            }
+        }
+
+        private void OrderNumber_LostFocus(object sender, RoutedEventArgs e)
+        {
+            string originalOrderNumber = Convert.ToString((this.LoadedRow as DCOrder)?._OrderNumber);
+            CheckOrderNo(sender as TextEdit, typeof(DebtorOrder), api, originalOrderNumber);
         }
     }
 }

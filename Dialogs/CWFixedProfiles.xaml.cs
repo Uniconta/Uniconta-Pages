@@ -74,9 +74,8 @@ namespace UnicontaClient.Controls.Dialogs
         }
         private async void OKButton_Click(object sender, RoutedEventArgs e)
         {
-
             userAccess._Rights = AccessLevel.SetFixedProfile(userAccess._Rights, profile);
-            var err = await api.GiveCompanyAccess(userAccess._Uid, userAccess._Rights);
+            var err = await api.GiveCompanyAccess(userAccess);
             if (err != ErrorCodes.Succes)
             {
                 UtilDisplay.ShowErrorCode(err);

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+	<RibbonItem TabId="0" LocalizedNameKey="Home">
+		<!---When we create new TabPage -->
+		<RibbonItem Action="FilterDashboard" ShortcutKey="Ctrl+I" LocalizedNameKey="Filter" LargeGlyph="Filter_32x32"/>
+		<RibbonItem Action="ClearFilterDashBoard" ShortcutKey="Ctrl+K" LocalizedNameKey="ClearFilter" LargeGlyph="Filter_Clear_32x32"/>
+	</RibbonItem>
+	<RibbonItem>
+		<RibbonItem Action="RefreshDashboard" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh" LargeGlyph="refresh"/>
+	</RibbonItem>
+	<RibbonItem>
+		<RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" LargeGlyph="Setup_32x32" />
+	</RibbonItem>
+</root>

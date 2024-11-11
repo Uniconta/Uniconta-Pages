@@ -90,6 +90,7 @@ x:Class="UnicontaClient.Pages.CustomPage.GLAccountsPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="StandardAccount" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ConsolidationAccount" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DATEVAuto" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Interest" Visible="False" />
                     <localPage:ComboBoxColumnClient x:Name="cldim1" FieldName="Dim1ParmDisplay" Visible="False" />
                     <localPage:ComboBoxColumnClient x:Name="cldim2" FieldName="Dim2ParmDisplay" Visible="False"/>
                     <localPage:ComboBoxColumnClient x:Name="cldim3" FieldName="Dim3ParmDisplay" Visible="False"/>

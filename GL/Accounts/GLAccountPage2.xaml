@@ -143,6 +143,9 @@ x:Class="UnicontaClient.Pages.CustomPage.GLAccountPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="StandardAccount" x:Name="liStandardAccount">
                         <CorasauControls:LookupEditor x:Name="StandardAccountLookupEditor" Text="{Binding StandardAccount,Mode=TwoWay}" />
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Interest" x:Name="liInterest">
+                        <CorasauControls:LookupEditor x:Name="leInterest" Text="{Binding Interest,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
 
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="usedim"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=UseDimensions}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">

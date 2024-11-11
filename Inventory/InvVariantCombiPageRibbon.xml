@@ -28,4 +28,7 @@
       <RibbonItem Action="InvExplodeBOM" LocalizedNameKey="ExplodedBOM" ControlName="InvBOMExplodePage" Glyph="Customer_Group_16x16"/>
     </RibbonItem>
   </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="Packaging" LocalizedNameKey="Packaging" Module="InvPackaging" LargeGlyph="Pack_Note_32x32"/>
+  </RibbonItem>
 </root>

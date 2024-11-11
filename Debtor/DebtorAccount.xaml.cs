@@ -124,7 +124,8 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             dgDebtorAccountGrid.Readonly = true;
-
+            if (Comp.InvPackaging)
+                Consumer.Visible = Consumer.ShowInColumnChooser = false;
             var rb = (RibbonBase)localMenu.DataContext;
             if (rb != null)
             {
@@ -192,7 +193,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "DebtorOrders":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.DebtorOrdersMultiple, dgDebtorAccountGrid.syncEntity);
+                        AddDockItem(TabControls.DebtorOrders, dgDebtorAccountGrid.syncEntity,string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Orders"), selectedItem._Name));
                     break;
                 case "FollowUp":
                     if (selectedItem != null)
@@ -213,9 +214,8 @@ namespace UnicontaClient.Pages.CustomPage
                         AddDockItem(TabControls.UserDocsPage, dgDebtorAccountGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), selectedItem._Name));
                     break;
                 case "Orders":
-                    if (dgDebtorAccountGrid.syncEntity == null)
-                        return;
-                    AddDockItem(TabControls.DebtorOrdersMultiple, dgDebtorAccountGrid.syncEntity);
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.DebtorOrders, dgDebtorAccountGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Orders"), selectedItem._Name));
                     break;
                 case "Offers":
                     if (selectedItem != null)

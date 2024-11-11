@@ -26,7 +26,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BankLogGridPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Created" ShowTime="True" Width="130"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Updated" ShowTime="True" Width="130"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="LogType" Width="80"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="RequestType" Width="170"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="RequestType" Width="190"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="MessageType" Width="80"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Message" Width="500">
                         <local:CorasauDataGridTemplateColumnClient.EditSettings>

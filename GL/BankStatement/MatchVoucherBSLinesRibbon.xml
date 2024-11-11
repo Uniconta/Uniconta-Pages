@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+	<RibbonItem TabId="0" LocalizedNameKey="Home">
+		<!---When we create a new group and a new TabPage -->
+		<RibbonItem Action="Attach" LocalizedNameKey="Attach" ShortcutKey="CTRL+B" Glyph="Attachments_16x16" LargeGlyph="Attachments_32x32"/>
+		<RibbonItem Action="Detach" LocalizedNameKey="Detach" Glyph="Attachments_16x16" LargeGlyph="close-32x32"/>
+	</RibbonItem>
+	<RibbonItem>
+		<RibbonItem Action="AutoMatch" LocalizedNameKey="AutoMatch" LargeGlyph="Default_Values_32x32" />
+    <RibbonItem Action="SaveLines" LocalizedNameKey="SaveOBJ" Parameter="Lines" LargeGlyph="save-32x32" />
+  </RibbonItem>
+	<RibbonItem>
+		<RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh" LargeGlyph="refresh"/>
+    <RibbonItem Action="Interval" LocalizedNameKey="Period" LargeGlyph="Interval_32x32"/>
+  </RibbonItem>
+	<RibbonItem>
+		<RibbonItem Action="ViewPhysicalVoucher" LocalizedNameKey="ViewOBJ" Parameter="PhysicalVoucher" LargeGlyph="View_Voucher_32x32"/>
+		<RibbonItem Action="ViewAttachedVoucher" LocalizedNameKey="ViewOBJ" Parameter="Attachment" LargeGlyph="View_32x32"/>
+    <RibbonItem Action="SendVoucherReminder" LocalizedNameKey="SendReminder" LargeGlyph="Interval_32x32" />
+  </RibbonItem>
+	<RibbonItem>
+		<!---If we want to create a new group in same PageTab-->
+		<RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32">
+			<!---If we want Inner menu-->
+			<RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
+			<RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16" ShortcutKey="" />
+			<RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
+			<RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16" ShortcutKey=""/>
+			<RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16" ShortcutKey="Ctrl+U"/>
+			<RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16" LargeGlyph="ExportLayout_16x16" ShortcutKey=""/>
+			<RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16" LargeGlyph="Import_16x16" ShortcutKey=""/>
+			<RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16" ShortcutKey=""/>
+			<RibbonItem Action="FieldSetting" LocalizedNameKey="FieldSetting" Glyph="Setup_16x16" ShortcutKey=""/>
+		</RibbonItem>
+	</RibbonItem>
+	<RibbonItem>
+		<RibbonItem Action="Unlinked" LocalizedNameKey="Unlinked"  LargeGlyph="Check_Journal_32x32"/>
+    <RibbonItem Action="ChangeOrientation" LocalizedNameKey="ChangeOrientation" LargeGlyph="Dimension_Setup_32x32" />
+  </RibbonItem>
+	<RibbonItem>
+		<RibbonItem Action="AssignText" LocalizedNameKey="AssignOBJ" Parameter="Text" ButtonType="CheckBox" />
+	</RibbonItem>
+</root>

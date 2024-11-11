@@ -227,6 +227,11 @@ namespace UnicontaClient.Pages.CustomPage
             IsSendXmlSalesInvoice = sendXmlSalesInvoice;
         }
 
+        public void EnableSentEinvoice(bool enable)
+        {
+            liGenerateOIOUBLClicked.IsEnabled = enable;
+        }
+
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
             var str = txtInvNumber.Text;

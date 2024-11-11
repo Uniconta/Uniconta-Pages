@@ -101,9 +101,8 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 case "TestMail":
                     CWCommentsDialogBox dialog = new CWCommentsDialogBox(Uniconta.ClientTools.Localization.lookup("VerifyPOP3"), Uniconta.ClientTools.Localization.lookup("Email"));
-#if !SILVERLIGHT
                     dialog.DialogTableId = 2000000043;
-#endif
+                    dialog.SizeToContent = SizeToContent.WidthAndHeight;
                     dialog.Closing += async delegate
                     {
                         if (dialog.DialogResult == true)
@@ -137,15 +136,9 @@ namespace UnicontaClient.Pages.CustomPage
                 case "SetUpEMail":
                     var objWizardWindow = new WizardWindow(new UnicontaClient.Pages.EmailSetupWizard(), string.Format(Uniconta.ClientTools.Localization.lookup("CreateOBJ"),
                     Uniconta.ClientTools.Localization.lookup("EmailSetup")));
-#if !SILVERLIGHT
-                    objWizardWindow.Width = System.Convert.ToDouble(System.Windows.SystemParameters.PrimaryScreenWidth) * 0.14;
-                    objWizardWindow.Height = System.Convert.ToDouble(System.Windows.SystemParameters.PrimaryScreenHeight) * 0.20;
-#else
-                    objWizardWindow.Width = System.Convert.ToDouble(System.Windows.Browser.HtmlPage.Window.Eval("screen.width")) * 0.18;
-                    objWizardWindow.Height = System.Convert.ToDouble(System.Windows.Browser.HtmlPage.Window.Eval("screen.height")) * 0.16;
-#endif
+                    objWizardWindow.SizeToContent = SizeToContent.WidthAndHeight;
                     objWizardWindow.MinHeight = 120.0d;
-                    objWizardWindow.MinWidth = 350.0d;
+                    objWizardWindow.MinWidth = 300.0d;
 
                     objWizardWindow.Closed += delegate
                   {
@@ -171,14 +164,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "Save":
                     if (ValidateSMTP())
-                    {
-                        //if (editrow.Html)
-                        //{
-                        //    if (!ContainsHTML(editrow.Body))
-                        //        editrow.Html = false;
-                        //}
                         frmRibbon_BaseActions(ActionType);
-                    }
                     break;
                 default:
                     frmRibbon_BaseActions(ActionType);
@@ -189,7 +175,6 @@ namespace UnicontaClient.Pages.CustomPage
         bool ValidateSMTP()
         {
             object element;
-#if !SILVERLIGHT
             element = FocusManager.GetFocusedElement(UtilDisplay.GetCurentWindow());
             if (element is Control)
             {
@@ -197,15 +182,7 @@ namespace UnicontaClient.Pages.CustomPage
                 TraversalRequest tReq = new TraversalRequest(FocusNavigationDirection.Down);
                 ctrl.MoveFocus(tReq);
             }
-#else
-            element = FocusManager.GetFocusedElement();
-            if (element is SLTextBox)
-            {
-                var dp = (element as TextBox).Tag as DateEditor;
-                if (dp != null)
-                    dp.UpdateEditValueSource();
-            }
-#endif
+
             if (isSMTPValidated == true)
                 return true;
             if (editrow._host == string.Empty)
@@ -225,11 +202,7 @@ namespace UnicontaClient.Pages.CustomPage
                 isSMTPValidated = false;
             if (isSMTPValidated == false)
             {
-#if !SILVERLIGHT
                 if (UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("SMTPVerifyMsg"), Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-#else
-                if( UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("SMTPVerifyMsg"), Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.OKCancel) == MessageBoxResult.OK)
-#endif
                 {
                     FrmRibbon_OnItemClicked("TestMail");
                     return false;
@@ -309,14 +282,9 @@ namespace UnicontaClient.Pages.CustomPage
                 hyperlink = "https://www.uniconta.com/da/unipedia/mail_server/";
             else
                 hyperlink = "https://www.uniconta.com/unipedia-global/mail-server-set-up/";
-#if !SILVERLIGHT
+
             UnicontaHyperLinkMessageBox.Show(errMsg, hyperlink,
                 lastErrors != null && lastErrors.Length > 0 ? Uniconta.ClientTools.Localization.lookup("Error") : Uniconta.ClientTools.Localization.lookup("Message"));
-#else
-            errMsg = string.Concat(errMsg, "\r\n", hyperlink);
-            UnicontaMessageBox.Show(errMsg, lastErrors != null && lastErrors.Length > 0 ? Uniconta.ClientTools.Localization.lookup("Error") :
-                   Uniconta.ClientTools.Localization.lookup("Message"), MessageBoxButton.OK);
-#endif
         }
 
         private void InsertIntoBody(string inputText)
@@ -331,7 +299,6 @@ namespace UnicontaClient.Pages.CustomPage
             txtEmailBody.Select(txtEmailBody.SelectionStart, 0);
             txtEmailBody.Focus();
         }
-#if !SILVERLIGHT
 
         private void Email_ButtonClicked(object sender)
         {
@@ -368,7 +335,6 @@ namespace UnicontaClient.Pages.CustomPage
             };
             cwTextControl.Show();
         }
-#endif
     }
 }
 

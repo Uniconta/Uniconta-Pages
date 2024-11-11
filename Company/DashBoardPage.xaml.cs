@@ -1,23 +1,13 @@
-using UnicontaClient.Models;
-using UnicontaClient.Pages;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using Uniconta.API.Service;
+using UnicontaClient.Models;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
-using DevExpress.Data.Filtering;
+using System.Collections.Generic;
+using Uniconta.ClientTools;
+using System.Threading.Tasks;
+using System.Linq;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -40,27 +30,116 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgDashboardpage.RowDoubleClick += DgDashboardpage_RowDoubleClick;
             colUserId.Header = Uniconta.ClientTools.Localization.lookup("UserId");
+
         }
 
         private void DgDashboardpage_RowDoubleClick()
         {
-            ribbonControl.PerformRibbonAction("OpenDashboard");
+            OpenDashboard();
         }
 
         void localMenu_OnItemClicked(string ActionType)
         {
-            var selectedItem = dgDashboardpage.SelectedItem as DashboardClient;
             switch (ActionType)
             {
                 case "OpenDashboard":
-                    if (selectedItem == null)
-                        return;
-                    AddDockItem(TabControls.DashBoardViewerPage, selectedItem, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("Dashboard"), selectedItem._Name));
+                    OpenDashboard();
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
+        }
+
+        void OpenDashboard()
+        {
+            var selectedItem = dgDashboardpage.SelectedItem as DashboardClient;
+
+            if (selectedItem == null)
+                return;
+            AddDockItem(TabControls.DashBoardViewerPage, selectedItem, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("Dashboard"), selectedItem._Name));
+        }
+
+        public override Task InitQuery()
+        {
+            return LoadDashBoardGridSource();
+        }
+
+        async Task LoadDashBoardGridSource()
+        {
+            busyIndicator.IsBusy = true;
+            var Arr = await api.Query<DashboardClient>();
+            if (Arr.Length != 0)
+            {
+                var comp = api.CompanyEntity;
+                var moduleWiseList = new List<UnicontaBaseEntity>(Arr.Length);
+                var moduleWiseGroup = Arr.GroupBy(x => x.Module);
+
+                foreach (var grp in moduleWiseGroup)
+                {
+                    var moduleIdx = AppEnums.Modules.IndexOf(grp.Key);
+
+                    switch (moduleIdx)
+                    {
+                        case 0:
+                            if (comp.ShowLedger)
+                                moduleWiseList.AddRange(grp);
+                            break;
+                        case 3:
+                            if (comp.ShowDebtor)
+                                moduleWiseList.AddRange(grp);
+                            break;
+                        case 4:
+                            if (comp.ShowCreditor)
+                                moduleWiseList.AddRange(grp);
+                            break;
+                        case 5:
+                            if (comp.ShowProject)
+                                moduleWiseList.AddRange(grp);
+                            break;
+                        case 6:
+                            if (comp.ShowTools)
+                                moduleWiseList.AddRange(grp);
+                            break;
+                        case 7:
+                            if (comp.ShowCrm)
+                                moduleWiseList.AddRange(grp);
+                            break;
+                        case 8:
+                            if (comp.ShowInventory)
+                                moduleWiseList.AddRange(grp);
+                            break;
+                        case 9:
+                            if (comp.Shipments)
+                                moduleWiseList.AddRange(grp);
+                            break;
+                        case 10:
+                            if (comp.ShowCompany)
+                                moduleWiseList.AddRange(grp);
+                            break;
+                        case 12:
+                            if (comp._ProjectPlanning)
+                                moduleWiseList.AddRange(grp);
+                            break;
+                        default:
+                            moduleWiseList.AddRange(grp);
+                            break;
+                    }
+                }
+
+                var dashBoardClient = new DashboardClient[moduleWiseList.Count];
+                int idx = 0;
+                foreach(var item in moduleWiseList)
+                {
+                    DashboardClient dashBoard = new DashboardClient();
+                    StreamingManager.Copy(item, dashBoard);
+                    dashBoardClient[idx] = dashBoard;
+                    idx++;
+                }
+
+                dgDashboardpage.SetSource(dashBoardClient);
+            }
+            busyIndicator.IsBusy = false;
         }
     }
 }

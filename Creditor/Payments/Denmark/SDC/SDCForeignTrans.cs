@@ -65,7 +65,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments.Denmark
                 NETSNorge.processString(string.Empty, 35, false)
             };
 
-            var externalAdvText = StandardPaymentFunctions.ExternalMessage(paymentFormat._Message, tran, company, creditor);
+            var externalAdvText = StandardPaymentFunctions.ExternalMessage(paymentFormat, tran, company, creditor);
 
             var message = NETSNorge.processString(externalAdvText, 140, false);
 

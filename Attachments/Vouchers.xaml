@@ -112,18 +112,18 @@ x:Class="UnicontaClient.Pages.CustomPage.Vouchers"
                             </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="PrimaryKeyId" Width="70" AllowEditing="False">
-                            <localPage:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
-                                <DataTemplate>
+                            <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                                <ControlTemplate>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.PrimaryKeyId,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" PreviewMouseDown="PrimaryKeyId_PreviewMouseDown"></TextBlock>
-                                        <TextBlock Grid.Column="1"></TextBlock>
+                                        <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding Value}" PreviewMouseDown="PrimaryKeyId_PreviewMouseDown" />
+                                        <TextBlock Grid.Column="1" />
                                     </Grid>
-                                </DataTemplate>
-                            </localPage:CorasauDataGridTemplateColumnClient.CellDisplayTemplate>
+                                </ControlTemplate>
+                            </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Created" ShowTime="True" AllowEditing="False" Width="110">
                             <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
@@ -187,7 +187,7 @@ x:Class="UnicontaClient.Pages.CustomPage.Vouchers"
                         </localPage:CorasauDataGridTemplateColumnClient>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Approved"  HideHeaderCheck="True" Width="70" AllowEditing="True" Visible="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Approved2" HideHeaderCheck="True" Width="70" AllowEditing="True" Visible="False"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="SentToBilagscan" Width="70" AllowEditing="True" Visible="False"/>
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="SentToScanner" Width="70" AllowEditing="True" Visible="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="UserLogidId" Width="100" AllowEditing="False" Visible="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Envelope" AllowEditing="False" Visible="False" Width="55" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="PayDate" AllowEditing="True" Width="85" Visible="False" />
@@ -224,6 +224,7 @@ x:Class="UnicontaClient.Pages.CustomPage.Vouchers"
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="SizeKB" Visible="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="OnHold" HideHeaderCheck="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Reference" Visible="False" />
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" Visible="False" AllowEditing="False" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="ViewInFolder" Visible="False" ColumnFilterMode="DisplayText" ReadOnly="True"/>
 
 

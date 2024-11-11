@@ -12,7 +12,6 @@ using DevExpress.Data.Filtering;
 using System.Collections.Generic;
 using System.Linq;
 using System.Collections.ObjectModel;
-using DevExpress.Data;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -21,7 +20,6 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override Type TableType { get { return typeof(EmployeeRegistrationLineClient); } }
         public override bool Readonly { get { return false; } }
-
     }
 
     public partial class EmployeeRegistrationLinePage : GridBasePage
@@ -61,7 +59,6 @@ namespace UnicontaClient.Pages.CustomPage
             ShowHideMenu();
             ResetChartData(DateTime.Now);
             FilterString(currentWeekIndex);
-
         }
 
         private void ShowHideMenu()
@@ -106,7 +103,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var stDate = GetCurrentWeekStartDate(DateTime.Now);
             stDate = stDate.AddDays(increaseWeek * 7);
-            var enDate = stDate.AddDays(7).AddMinutes(-1);
+            var enDate = stDate.AddDays(7);
             currentWeekStartDate = stDate;
 
             ResetChartData(stDate);
@@ -222,6 +219,10 @@ namespace UnicontaClient.Pages.CustomPage
                 case "ApproveAdmin":
                     Approve(false);
                     break;
+                case "TransactionsReport":
+                    var Parameters = new List<BasePage.ValuePair> { new BasePage.ValuePair("Dashboard", "work_db_report user") };
+                    AddDockItem(TabControls.DashBoardViewerPage, null, string.Concat(Uniconta.ClientTools.Localization.lookup("Dashboard"), ": ", "work_db_report user"), null, true, null, Parameters);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -267,9 +268,18 @@ namespace UnicontaClient.Pages.CustomPage
 
                 var result = await api.Insert(activityrecordBreaker.InsertList);
 
-                if (result == ErrorCodes.Succes)
-                    foreach (var rec in activityrecordBreaker.InsertList)
-                        dgEmployeeRegistrationLinePageGrid.UpdateItemSource(1, rec);
+                if (result != ErrorCodes.Succes)
+                {
+                    UtilDisplay.ShowErrorCode(result);
+                    return;
+                }
+
+                foreach (var rec in activityrecordBreaker.InsertList)
+                {
+                    var empRegLineClientUser = api.CompanyEntity.CreateUserType<EmployeeRegistrationLineClient>();
+                    StreamingManager.Copy(rec, empRegLineClientUser);
+                    dgEmployeeRegistrationLinePageGrid.UpdateItemSource(1, empRegLineClientUser);
+                }
 
                 UpdateUI();
             };
@@ -297,9 +307,11 @@ namespace UnicontaClient.Pages.CustomPage
                     UtilDisplay.ShowErrorCode(result);
                     return;
                 }
-
                 foreach (var rec in activityrecordBreaker.UpdateList)
-                    dgEmployeeRegistrationLinePageGrid.UpdateItemSource(2, rec);
+                {
+                    StreamingManager.Copy(rec, selectedItem);
+                    dgEmployeeRegistrationLinePageGrid.UpdateItemSource(2, selectedItem);
+                }
 
                 if (activityrecordBreaker?.InsertList != null && activityrecordBreaker.InsertList.Count != 0)
                     result = await api.Insert(activityrecordBreaker.InsertList);
@@ -311,8 +323,11 @@ namespace UnicontaClient.Pages.CustomPage
                 }
 
                 foreach (var rec in activityrecordBreaker.InsertList)
-                    dgEmployeeRegistrationLinePageGrid.UpdateItemSource(1, rec);
-
+                {
+                    var empRegLineClientUser = api.CompanyEntity.CreateUserType<EmployeeRegistrationLineClient>();
+                    StreamingManager.Copy(rec, empRegLineClientUser);
+                    dgEmployeeRegistrationLinePageGrid.UpdateItemSource(1, empRegLineClientUser);
+                }
                 UpdateUI();
             };
             cwAddActivity.ShowDialog();
@@ -330,20 +345,20 @@ namespace UnicontaClient.Pages.CustomPage
             FilterString(currentWeekIndex);
         }
 
-        private void dgEmployeeRegistrationLinePageGrid_CustomSummary(object sender, DevExpress.Data.CustomSummaryEventArgs e)
-        {
-            if (e.Item is GridSummaryItem summaryItem && summaryItem.FieldName == "TotalTime")
-            {
-                if (e.SummaryProcess == CustomSummaryProcess.Start)
-                {
-                    e.TotalValue = TimeSpan.Zero;
-                }
-                else if (e.SummaryProcess == CustomSummaryProcess.Calculate)
-                {
-                    if (e.Row is EmployeeRegistrationLineClient empReg && empReg._Activity != Uniconta.DataModel.InternalType.Pause)
-                        e.TotalValue = ((TimeSpan)e.TotalValue) + (TimeSpan)e.FieldValue;
-                }
-            }
-        }
+        //private void dgEmployeeRegistrationLinePageGrid_CustomSummary(object sender, DevExpress.Data.CustomSummaryEventArgs e)
+        //{
+        //    if (e.Item is GridSummaryItem summaryItem && summaryItem.FieldName == "TotalTime")
+        //    {
+        //        if (e.SummaryProcess == CustomSummaryProcess.Start)
+        //        {
+        //            e.TotalValue = TimeSpan.Zero;
+        //        }
+        //        else if (e.SummaryProcess == CustomSummaryProcess.Calculate)
+        //        {
+        //            if (e.Row is EmployeeRegistrationLineClient empReg && empReg._Activity != Uniconta.DataModel.InternalType.Pause)
+        //                e.TotalValue = ((TimeSpan)e.TotalValue) + (TimeSpan)e.FieldValue;
+        //        }
+        //    }
+        //}
     }
 }

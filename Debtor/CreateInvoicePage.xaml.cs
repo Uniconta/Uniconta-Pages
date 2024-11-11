@@ -800,7 +800,12 @@ namespace UnicontaClient.Pages.CustomPage
             GenrateInvoiceDialog.SetInvPrintPreview(showInvPrintPrv);
             if (dbOrder._InvoiceDate != DateTime.MinValue)
                 GenrateInvoiceDialog.SetInvoiceDate(dbOrder._InvoiceDate);
-            GenrateInvoiceDialog.SetOIOUBLLabelText(api.CompanyEntity._OIOUBLSendOnServer);
+
+            if (!api.CompanyEntity._DeactivateSendNemhandel)
+            {
+                GenrateInvoiceDialog.SetOIOUBLLabelText(true);
+                GenrateInvoiceDialog.EnableSentEinvoice(api.CompanyEntity._OIOUBLSendOnServer && invoiceInXML);
+            }
 
             GenrateInvoiceDialog.Closed += async delegate
             {
