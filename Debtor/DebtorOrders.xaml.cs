@@ -166,8 +166,8 @@ namespace UnicontaClient.Pages.CustomPage
                 Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
                 CostValue.Visible = CostValue.ShowInColumnChooser = false;
             }
-            if (Comp.InvPackaging)
-                Consumer.Visible = Consumer.ShowInColumnChooser = false;
+            if (!Comp.InvPackaging)
+                PackagingConsumer.Visible = PackagingConsumer.ShowInColumnChooser = false;
         }
 
         void dgDebtorOrdersGrid_RowDoubleClick()
@@ -766,10 +766,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             if (!api.CompanyEntity._DeactivateSendNemhandel)
-            {
-                GenrateInvoiceDialog.SetOIOUBLLabelText(true);
-                GenrateInvoiceDialog.EnableSentEinvoice(api.CompanyEntity._OIOUBLSendOnServer && invoiceInXML);
-            }
+                GenrateInvoiceDialog.SentByEInvoice(api, UtilCommon.GetEndPoint(dbOrder, debtor, api));
 
             GenrateInvoiceDialog.Closed += async delegate
             {

@@ -8,6 +8,8 @@ using System.Windows;
 using Uniconta.Common.User;
 using Uniconta.ClientTools.DataModel;
 using UnicontaClient.Pages;
+using DevExpress.Utils.Extensions;
+using DevExpress.Xpf.Editors;
 
 namespace UnicontaClient.Controls.Dialogs
 {
@@ -124,6 +126,14 @@ namespace UnicontaClient.Controls.Dialogs
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             SetDialogResult(false);
+        }
+
+        private void cmbUsers_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Delete || e.Key == Key.Back)
+            {
+                ((ComboBoxEdit)sender).EditValue = null;
+            }
         }
     }
 }

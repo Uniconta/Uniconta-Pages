@@ -18,6 +18,7 @@ x:Class="UnicontaClient.Pages.CustomPage.UserCompaniesGridPage"
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <local:UserCompaniesGridClient x:Name="dgUserCompaniesGridClient" AutoGenerateColumns="None">
                 <local:UserCompaniesGridClient.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PrimaryKeyId" Width="70" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="CompanyName" Width="250">
                         <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                             <ControlTemplate>
@@ -31,16 +32,61 @@ x:Class="UnicontaClient.Pages.CustomPage.UserCompaniesGridPage"
                                 </Grid>
                             </ControlTemplate>
                         </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
-                        </local:CorasauDataGridTemplateColumnClient>
-                        <local:CorasauDataGridTemplateColumnClient x:Name="Id" Width="100" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="PrimaryKeyId" Width="70" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="OwnerUid" Width="60" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="ClientId" />
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Id" Width="70" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OwnerUid" Width="60" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ClientId" Width="70" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="NInbox" Width="60">
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding Value}" PreviewMouseDown="NInbox_PreviewMouseDown" />
+                                    <TextBlock Grid.Column="1" />
+                                </Grid>
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="NJournal" Width="60">
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding Value}" PreviewMouseDown="NJournal_PreviewMouseDown" />
+                                    <TextBlock Grid.Column="1" />
+                                </Grid>
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="BankStatus" Width="70">
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <Grid Margin="5" VerticalAlignment="Center" HorizontalAlignment="Left">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="3" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Image Source="{Binding DataContext.RowData.Row.BankStatus,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource BankStatusConverter}}" 
+Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
+                                    <TextBlock Text="{Binding DataContext.RowData.Row.BankStatus,RelativeSource={RelativeSource TemplatedParent}}" Grid.Column="2" />
+                                </Grid>
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="LastBankTrans" Visible="False" Width="90"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="LastPosting" Visible="False"  Width="90"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Created" Width="90" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ScanEmail" Width="250"  />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Country" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Currency" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="EORI" Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="ScanEmail" Width="250" Visible="False" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Created" Width="90" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="ConvertedFrom" Width="80" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="BackupFrom" Width="50" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Deleted" Width="70" Visible="False"/>
@@ -71,53 +117,7 @@ x:Class="UnicontaClient.Pages.CustomPage.UserCompaniesGridPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="UseVatOperation" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="TransCount" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="UseUnrealizedVat" Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="BankStatus" Visible="False" Width="70">
-                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
-                            <ControlTemplate>
-                                <Grid Margin="5" VerticalAlignment="Center" HorizontalAlignment="Left">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="3" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <Image Source="{Binding DataContext.RowData.Row.BankStatus,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource BankStatusConverter}}" 
-Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
-                                    <TextBlock Text="{Binding DataContext.RowData.Row.BankStatus,RelativeSource={RelativeSource TemplatedParent}}" Grid.Column="2" />
-                                </Grid>
-                            </ControlTemplate>
-                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
-                    </local:CorasauDataGridTemplateColumnClient>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="LastBankTrans" Visible="False" Width="90"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="LastPosting" Visible="False"  Width="90"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="NInbox" Visible="False" Width="60">
-                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
-                            <ControlTemplate>
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding Value}" PreviewMouseDown="NInbox_PreviewMouseDown" />
-                                    <TextBlock Grid.Column="1" />
-                                </Grid>
-                            </ControlTemplate>
-                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
-                    </local:CorasauDataGridTemplateColumnClient>
-                <local:CorasauDataGridTemplateColumnClient x:Name="NJournal" Visible="False" Width="60">
-                    <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
-                        <ControlTemplate>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding Value}" PreviewMouseDown="NJournal_PreviewMouseDown" />
-                                    <TextBlock Grid.Column="1" />
-                                </Grid>
-                        </ControlTemplate>
-                    </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
-                </local:CorasauDataGridTemplateColumnClient>
-                </local:UserCompaniesGridClient.Columns>
+                    </local:UserCompaniesGridClient.Columns>
             </local:UserCompaniesGridClient>
         </CorasauControls:BusyIndicator>
     </Grid>

@@ -38,6 +38,8 @@ namespace UnicontaClient.Pages.CustomPage
         Uniconta.DataModel.Debtor Debtor;
         ContactClient Contact;
         ProjectClient Project;
+        bool lookupZipCode = true;
+
         public ProjectPage2(UnicontaBaseEntity sourcedata, bool IsEdit)
             : base(sourcedata, IsEdit)
         {
@@ -174,17 +176,25 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (e.PropertyName == "ZipCode")
             {
-                var city = await UtilDisplay.GetCityAndAddress(editrow.ZipCode, editrow._WorkCountry != 0 ? editrow._WorkCountry : api.CompanyEntity._CountryId);
-                if (city != null)
+                if (lookupZipCode)
                 {
-                    editrow.City = city[0];
-                    var add1 = city[1];
-                    if (!string.IsNullOrEmpty(add1))
-                        editrow.WorkAddress1 = add1;
-                    var zip = city[2];
-                    if (!string.IsNullOrEmpty(zip))
-                        editrow.ZipCode = zip;
+                    var city = await UtilDisplay.GetCityAndAddress(editrow.ZipCode, editrow._WorkCountry != 0 ? editrow._WorkCountry : api.CompanyEntity._CountryId);
+                    if (city != null)
+                    {
+                        editrow.City = city[0];
+                        var add1 = city[1];
+                        if (!string.IsNullOrEmpty(add1))
+                            editrow.WorkAddress1 = add1;
+                        var zip = city[2];
+                        if (!string.IsNullOrEmpty(zip))
+                        {
+                            lookupZipCode = false;
+                            editrow.ZipCode = zip;
+                        }
+                    }
                 }
+                else
+                    lookupZipCode = true;
             }
         }
         
@@ -292,6 +302,28 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var selectedItem = cmbContactName.SelectedItem as Contact;
             GoToContact(selectedItem, e.Key);
+        }
+
+        private void lblInstallation_ButtonClicked(object sender)
+        {
+            var selectedInstallation = leInstallation.SelectedItem as WorkInstallationClient;
+            if (selectedInstallation != null)
+                CopyAddressToRow(selectedInstallation._Name, selectedInstallation._Address1, selectedInstallation._Address2, selectedInstallation._Address3, selectedInstallation._ZipCode, selectedInstallation._City, selectedInstallation._Country);
+        }
+
+        private void CopyAddressToRow(string name, string address1, string address2, string address3, string zipCode, string city, CountryCode? country)
+        {
+            var row = this.editrow;
+            row.WorkAddress1 = address1;
+            row.WorkAddress2 = address2;
+            row.WorkAddress3 = address3;
+            row.City = city;
+            if (row.ZipCode != zipCode)
+            {
+                lookupZipCode = false;
+                row.ZipCode = zipCode;
+            }
+            row.WorkCountry = country;
         }
     }
 }

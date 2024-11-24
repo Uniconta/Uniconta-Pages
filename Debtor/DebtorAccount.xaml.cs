@@ -124,8 +124,8 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             dgDebtorAccountGrid.Readonly = true;
-            if (Comp.InvPackaging)
-                Consumer.Visible = Consumer.ShowInColumnChooser = false;
+            if (!Comp.InvPackaging)
+                PackagingConsumer.Visible = PackagingConsumer.ShowInColumnChooser = false;
             var rb = (RibbonBase)localMenu.DataContext;
             if (rb != null)
             {

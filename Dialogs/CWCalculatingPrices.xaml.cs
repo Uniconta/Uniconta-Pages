@@ -52,11 +52,12 @@ namespace UnicontaClient.Controls.Dialogs
             InitializeComponent();
             _api = api;
             leNumberSeries.api = api;
-            this.Title = $"{Uniconta.ClientTools.Localization.lookup("RecalculateCostPrices")} ({Uniconta.ClientTools.Localization.lookup("AlwaysCheckUnipedia")})" ;
+            this.Title = $"{Uniconta.ClientTools.Localization.lookup("RecalculateCostPrices")} ({Uniconta.ClientTools.Localization.lookup("AlwaysCheckUnipedia")})";
             txtPostingPer.Text = $"{Uniconta.ClientTools.Localization.lookup("PostingPer")} ({Uniconta.ClientTools.Localization.lookup("UseOnlyInvoice")})";
             this.DataContext = this;
             cmbPostingPer.ItemsSource = new string[] { Uniconta.ClientTools.Localization.lookup("Invoice"), Uniconta.ClientTools.Localization.lookup("Journal") };
             this.Loaded += CWCalculatingPrices_Loaded;
+            txtUpdateCost.Text = string.Format(Uniconta.ClientTools.Localization.lookup("UpdateOBJ"), Uniconta.ClientTools.Localization.lookup("CostPrices")) + " (" + Uniconta.ClientTools.Localization.lookup("ItemTable") + ")";
         }
 
         public CWCalculatingPrices(CrudAPI api, DateTime financialStartDate) : this(api)

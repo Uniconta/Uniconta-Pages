@@ -46,8 +46,8 @@
 		<RibbonItem Action="AiiaAccounts" LocalizedNameKey="ShowRegisteredBankAccounts" Glyph="Account-statement_32x32"/>
 		  <RibbonItem Action="AiiaHub" LocalizedNameKey="MCOpenBankingHub" EnableSeperator="True" Glyph="Translation_32x32"/>
 		<RibbonItem Action="AiiaUnregister" LocalizedNameKey="UnregisterBank" Glyph="Bank_Disconnect_32x32"/>
-		<RibbonItem Action="ConnectToND" LocalizedNameKey="ConnectToOBJ" Parameter="Nordea" EnableSeperator="True" Glyph="Bank_Connect_32x32"/>
-	    <RibbonItem Action="ConnectToBC" LocalizedNameKey="ConnectToOBJ" Parameter="Bank Connect" Glyph="Bank_Connect_32x32"/>
+		<RibbonItem Action="ConnectToND" LocalizedNameKey="ConnectToNordea" EnableSeperator="True" Glyph="Bank_Connect_32x32"/>
+	    <RibbonItem Action="ConnectToBC" LocalizedNameKey="ConnectToBC" Glyph="Bank_Connect_32x32"/>
 	  </RibbonItem>
   </RibbonItem>
 </root>

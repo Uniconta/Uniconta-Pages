@@ -39,6 +39,7 @@ x:Class="UnicontaClient.Pages.CustomPage.GLVatPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="RateAfterDate" Width="50" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Rate2AfterDate" Width="50" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Blocked" Width="50"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ShowZeroOnInvoice" Width="50" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="UsedSalesVat" Width="50" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Id" Visible="False"/>

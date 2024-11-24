@@ -1,21 +1,10 @@
 using UnicontaClient.Models;
-using UnicontaClient.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Uniconta.API.System;
-using Uniconta.ClientTools;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
@@ -35,9 +24,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             InitializeComponent();
             InitPage(crudApi);
-#if !SILVERLIGHT
             FocusManager.SetFocusedElement(txtName, txtName);
-#endif
         }
 
         public DebtorLayoutGroupPage2(UnicontaBaseEntity sourcedata, bool isEdit)
@@ -47,12 +34,9 @@ namespace UnicontaClient.Pages.CustomPage
             InitPage(api);
 
             if (sourcedata == null)
-            {
-#if !SILVERLIGHT
                 FocusManager.SetFocusedElement(txtName, txtName);
-#endif
-            }
         }
+
         public override string NameOfControl { get { return TabControls.DebtorLayoutGroupPage2; } }
         public override Type TableType { get { return typeof(DebtorLayoutGroupClient); } }
         public override UnicontaBaseEntity ModifiedRow { get { return editrow; } set { editrow = (DebtorLayoutGroupClient)value; } }
@@ -74,7 +58,6 @@ namespace UnicontaClient.Pages.CustomPage
 
         async private void SetSource()
         {
-#if !SILVERLIGHT
             cmbStRep.ItemsSource = await PrepareSource(typeof(StandardStatementReportClient));
             cmbStCurRep.ItemsSource = await PrepareSource(typeof(StandardStatementCurrencyReportClient));
             cmbInvRep.ItemsSource = await PrepareSource(typeof(StandardInvoiceReportClient));
@@ -87,7 +70,6 @@ namespace UnicontaClient.Pages.CustomPage
             cmbColCurRep.ItemsSource = await PrepareSource(typeof(StandardCollectionCurrencyClient));
             cmbIntNoteCurRep.ItemsSource = await PrepareSource(typeof(StandardInterestNoteCurrencyClient));
             cmbPickingListRep.ItemsSource = await PrepareSource(typeof(StandardSalesPickingListClient));
-#endif
         }
 
         async private Task<string[]> PrepareSource(Type type)
@@ -113,6 +95,7 @@ namespace UnicontaClient.Pages.CustomPage
             cmbCollectionEmail.ItemsSource = emailList.Where(x => x._EmailType == DebtorEmailType.Collection || x._EmailType == DebtorEmailType.CollectionLetter1 ||
             x._EmailType == DebtorEmailType.CollectionLetter2 || x._EmailType == DebtorEmailType.CollectionLetter3 || x._EmailType == DebtorEmailType.PaymentReminder).Select(x => x._Name).ToList();
             cmbInterestNoteEmail.ItemsSource = emailList.Where(x => x._EmailType == DebtorEmailType.InterestNote).Select(x => x._Name).ToList();
+            cmbPickingListEmail.ItemsSource = emailList.Where(x => x._EmailType == DebtorEmailType.PickingList).Select(x => x._Name).ToList();
         }
 
         private void frmRibbon_OnItemClicked(string ActionType)

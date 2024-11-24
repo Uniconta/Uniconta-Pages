@@ -5,10 +5,9 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccountStat"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-  xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"
-                    xmlns:toolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit" 
-                    xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
-                    xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
+    xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"
+    xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+    xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
 
     <Pages:GridBasePage.Resources>
     
@@ -45,16 +44,16 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccountStat"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Account"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AccountName"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Qty" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CostValue"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesValue"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DB"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CostValue" Mask="N0"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesValue" Mask="N0"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DB" Mask="N0"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="MarginRatio" Width="60"/>
                 </localPage:InvStatisticsGrid.Columns>
                 <localPage:InvStatisticsGrid.TotalSummary>
                     <localPage:SumColumn FieldName="Qty" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
-                    <localPage:SumColumn FieldName="CostValue" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
-                    <localPage:SumColumn FieldName="SalesValue" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
-                    <localPage:SumColumn FieldName="DB" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="CostValue" SummaryType="Sum" DisplayFormat="{}{0:N0}"/>
+                    <localPage:SumColumn FieldName="SalesValue" SummaryType="Sum" DisplayFormat="{}{0:N0}"/>
+                    <localPage:SumColumn FieldName="DB" SummaryType="Sum" DisplayFormat="{}{0:N0}"/>
                 </localPage:InvStatisticsGrid.TotalSummary>
             </localPage:InvStatisticsGrid>
         </CorasauControls:BusyIndicator>

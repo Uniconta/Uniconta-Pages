@@ -27,6 +27,9 @@ namespace UnicontaISO20022CreditTransfer
         UBS_SIX,
         CreditSuisse,
         Nordea_SE,
-        DanskeBank_SE
+        DanskeBank_SE,
+        BankData,
+        BEC,
+        SDC
     }
 }

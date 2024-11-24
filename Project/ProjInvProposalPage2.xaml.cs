@@ -51,6 +51,7 @@ namespace UnicontaClient.Pages.CustomPage
         SQLCache ProjectCache;
         ProjectClient Project;
         ContactClient Contact;
+        string parmWorkspace;
         public ProjInvProposalPage2(UnicontaBaseEntity sourcedata, UnicontaBaseEntity master) /* called for edit from particular account */
             : base(sourcedata, true)
         {
@@ -75,6 +76,29 @@ namespace UnicontaClient.Pages.CustomPage
         public ProjInvProposalPage2(CrudAPI crudApi, UnicontaBaseEntity master) /* called for add from particular account */
             : base(crudApi, "")
         {
+            InitializeComponent();
+            if (master != null)
+            {
+                Debtor = master as DebtorClient;
+                if (Debtor == null)
+                {
+                    Contact = master as ContactClient;
+                    if (Contact == null)
+                    {
+                        Project = master as ProjectClient;
+                        Debtor = Project?.Debtor;
+                    }
+                    else
+                        Debtor = Contact.Debtor;
+                }
+            }
+            InitPage(api);
+        }
+
+        public ProjInvProposalPage2(CrudAPI crudApi, UnicontaBaseEntity master, string workspace) /* called for add from particular account */
+           : base(crudApi, "")
+        {
+            parmWorkspace = workspace;
             InitializeComponent();
             if (master != null)
             {
@@ -144,6 +168,7 @@ namespace UnicontaClient.Pages.CustomPage
                     leAccount.IsEnabled = txtName.IsEnabled = false;
                     Projectlookupeditor.IsEnabled = false;
                     SetPrCategory(editrow);
+                    SetWorkspace(editrow);
                 }
             }
             else
@@ -432,6 +457,23 @@ namespace UnicontaClient.Pages.CustomPage
                     editrow.PrCategory = rec._Number;
                     if (rec._Default)
                         break;
+                }
+            }
+        }
+        async void SetWorkspace(ProjectInvoiceProposalClient editrow)
+        {
+            if (parmWorkspace != null)
+                editrow._WorkSpace = parmWorkspace;
+            else
+            {
+                var wrkSpaces = api.GetCache(typeof(Uniconta.DataModel.PrWorkSpace)) ?? await api.LoadCache(typeof(Uniconta.DataModel.PrWorkSpace));
+                foreach (var rec in (Uniconta.DataModel.PrWorkSpace[])wrkSpaces.GetNotNullArray)
+                {
+                    if (rec._Default)
+                    {
+                        editrow._WorkSpace = rec._Number;
+                        break;
+                    }
                 }
             }
         }

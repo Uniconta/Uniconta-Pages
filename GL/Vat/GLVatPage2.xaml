@@ -44,6 +44,9 @@ x:Class="UnicontaClient.Pages.CustomPage.GLVatPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="UsedSalesVat" x:Name="liUsedSalesVat">
                         <CorasauControls:CheckEditor IsChecked="{Binding UsedSalesVat,Mode=TwoWay}" />
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Blocked" x:Name="liBlocked">
+                        <CorasauControls:CheckEditor IsChecked="{Binding Blocked,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpOptions" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Options}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem FieldName="Method" x:Name="liMethod">

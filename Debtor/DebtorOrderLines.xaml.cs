@@ -1214,10 +1214,7 @@ namespace UnicontaClient.Pages.CustomPage
                 GenrateInvoiceDialog.SetAdditionalOrders(additionalOrdersList);
 
             if (!api.CompanyEntity._DeactivateSendNemhandel)
-            {
-                GenrateInvoiceDialog.SetOIOUBLLabelText(true);
-                GenrateInvoiceDialog.EnableSentEinvoice(api.CompanyEntity._OIOUBLSendOnServer && invoiceInXML);
-            }
+                GenrateInvoiceDialog.SentByEInvoice(api, UtilCommon.GetEndPoint(dbOrder, debtor, api));
 
             GenrateInvoiceDialog.Closed += async delegate
             {

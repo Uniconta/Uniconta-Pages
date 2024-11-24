@@ -139,7 +139,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override Task InitQuery()
         {
             var rec = Activator.CreateInstance(this.dgTabledataGrid.UserTableType) as Uniconta.DataModel.TableDataWithKey;
-            if (rec != null && this.dgTabledataGrid.ReuseCache(rec))
+            if (rec != null && master == null && this.dgTabledataGrid.ReuseCache(rec))
                 return null;
             return base.InitQuery();
         }

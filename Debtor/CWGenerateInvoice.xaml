@@ -114,7 +114,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWGenerateInvoice"
                             <TextBlock x:Name="txtNoMailMsg" />
                         </ClientToolsControls:CorasauLayoutItem>
                     </ClientToolsControls:CorasauLayoutGroup>
-                    <ClientToolsControls:CorasauLayoutGroup x:Name="lgUBL" IsCollapsible="False" GroupBoxDisplayMode="Light" View="GroupBox" Visibility="Collapsed" HorizontalAlignment="Stretch" ClientToolsControls:CorasauLayoutControl.AllowHorizontalSizing="True">
+                    <ClientToolsControls:CorasauLayoutGroup x:Name="lgUBL" IsCollapsible="False" GroupBoxDisplayMode="Light" View="GroupBox" Visibility="Collapsed" Orientation="Vertical" HorizontalAlignment="Stretch" ClientToolsControls:CorasauLayoutControl.AllowHorizontalSizing="True">
                         <ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
                             <DataTemplate>
                                 <Image Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/group-file_16x16.svg, UsePalette=True}" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}" Width="16" Height="16" Stretch="Fill" HorizontalAlignment="Left"/>
@@ -122,6 +122,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CWGenerateInvoice"
                         </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
                         <ClientToolsControls:CorasauLayoutItem FieldName="GenerateOIOUBLClicked" x:Name="liGenerateOIOUBLClicked" LabelTemplate="{StaticResource SecondayLableTemplate}">
                             <ClientToolsControls:CheckEditor x:Name="chkOIOUBL" IsChecked="{Binding GenerateOIOUBLClicked,Mode=TwoWay}"/>
+                        </ClientToolsControls:CorasauLayoutItem>
+                        <ClientToolsControls:CorasauLayoutItem x:Name="liReceiverEndPoint"  Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Receiver}" LabelTemplate="{StaticResource SecondayLableTemplate}" Visibility="Collapsed">
+                            <Label x:Name="lblReceiverEndPoint" VerticalAlignment="Center" HorizontalAlignment="Stretch" />
                         </ClientToolsControls:CorasauLayoutItem>
                     </ClientToolsControls:CorasauLayoutGroup>
                 </ClientToolsControls:CorasauLayoutGroup>

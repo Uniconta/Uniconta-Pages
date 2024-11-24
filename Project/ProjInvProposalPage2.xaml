@@ -68,7 +68,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjInvProposalPage2"
 
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="OrderNumber" x:Name="liOrderNumber">
-                            <CorasauControls:IntegerEditor EditValue="{Binding OrderNumber,Mode=TwoWay}" SetMask="false"/>
+                            <CorasauControls:IntegerEditor EditValue="{Binding OrderNumber,Mode=OneWay}" IsReadOnly="True" SetMask="false"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="DeliveryDate" x:Name="liDeliveryDate">
                             <CorasauControls:DateEditor x:Name="deDeLiveryDate" EditValue="{Binding DeliveryDate,Mode=TwoWay}"/>

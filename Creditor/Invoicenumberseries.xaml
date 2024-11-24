@@ -14,7 +14,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorInvoicenumberseries"
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Assets/SaveEditRibbon.xml" Grid.Row="0"/>
-        <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+        <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Vertical" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
             <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=NumberSerie}" Orientation="Vertical" MinWidth="300" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem FieldName="PurchaseOrder">
@@ -24,6 +24,11 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorInvoicenumberseries"
                         <CorasauControls:LookupEditor x:Name="cmbCreditorVoucherSerie" Text="{Binding CreditorVoucherSerie,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
+            </CorasauControls:CorasauLayoutGroup>
+            <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpNemHandel" ItemLabelsAlignment="Default" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=NemHandel}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                <CorasauControls:CorasauLayoutItem FieldName="EDeliveryFee" x:Name="liEDeliveryFee">
+                    <CorasauControls:LookupEditor x:Name="leEDeliveryFee" Text="{Binding EDeliveryFee,Mode=TwoWay}"/>
+                </CorasauControls:CorasauLayoutItem>
             </CorasauControls:CorasauLayoutGroup>
         </CorasauControls:CorasauLayoutControl>       
     </Grid>

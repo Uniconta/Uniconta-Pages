@@ -71,8 +71,8 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class BankStatementLinePage : GridBasePage
     {
         public override string NameOfControl { get { return TabControls.BankStatementLinePage; } }
-        static DateTime fromDate;
-        static DateTime toDate;
+        static public DateTime fromDate;
+        static public DateTime toDate;
 
         Uniconta.API.GeneralLedger.ReportAPI tranApi;
         BankStatementAPI bankTransApi;
@@ -727,8 +727,8 @@ namespace UnicontaClient.Pages.CustomPage
                 case "ShowAmount":
                     ShowAmountWindow();
                     break;
-                case "AutoMatch":
-                    AutoMatch();
+                case "AutoReconciliation":
+                    AutoReconciliation();
                     break;
                 case "AddMapping":
                     if (selectedItem != null)
@@ -1131,7 +1131,7 @@ namespace UnicontaClient.Pages.CustomPage
             bst.Mark = false;
         }
 
-        void AutoMatch()
+        void AutoReconciliation()
         {
             var lstbsl = ((IEnumerable<BankStatementLineGridClient>)dgBankStatementLine.ItemsSource);
             if (lstbsl == null)
@@ -1142,13 +1142,13 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
             var actList = lstAct.Where(ac => ac.Mark == false && ac.State == (byte)1).ToList();
             var days = DaysSlip;
-            var cnt = AutoMatchOne2One(bstList, actList, days);
-            cnt += AutoMatchOne2Many(bstList, actList, days);
-            cnt += AutoMatchMany2One(bstList, actList, days);
+            var cnt = AutoReconciliationOne2One(bstList, actList, days);
+            cnt += AutoReconciliationOne2Many(bstList, actList, days);
+            cnt += AutoReconciliationMany2One(bstList, actList, days);
             UnicontaMessageBox.Show(string.Format("{0}: {1}", Localization.lookup("NumberOfRecords"), cnt), Localization.lookup("Message"));
         }
 
-        int AutoMatchOne2One(List<BankStatementLineGridClient> bstList, List<GLTransClientTotalBank> actList, int slip)
+        int AutoReconciliationOne2One(List<BankStatementLineGridClient> bstList, List<GLTransClientTotalBank> actList, int slip)
         {
             int cnt = 0;
             bool MatchText = true;
@@ -1212,7 +1212,7 @@ namespace UnicontaClient.Pages.CustomPage
             return cnt;
         }
 
-        int AutoMatchOne2Many(List<BankStatementLineGridClient> bstList, List<GLTransClientTotalBank> actList, int slip)
+        int AutoReconciliationOne2Many(List<BankStatementLineGridClient> bstList, List<GLTransClientTotalBank> actList, int slip)
         {
             int cnt = 0;
             var actlen = actList.Count;
@@ -1295,7 +1295,7 @@ namespace UnicontaClient.Pages.CustomPage
             return cnt;
         }
 
-        int AutoMatchMany2One(List<BankStatementLineGridClient> bstList, List<GLTransClientTotalBank> actList, int slip)
+        int AutoReconciliationMany2One(List<BankStatementLineGridClient> bstList, List<GLTransClientTotalBank> actList, int slip)
         {
             int cnt = 0;
             var bstlen = bstList.Count;

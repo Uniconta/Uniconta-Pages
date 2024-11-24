@@ -82,8 +82,10 @@ namespace UnicontaClient.Pages.CustomPage
                 country != CountryCode.Norway)
                 liPymtCodeOpt.Visibility = Visibility.Collapsed;
 
-            RemoveMenuItem();
+            if (session.User._Role <= (byte)Uniconta.Common.User.UserRoles.Accountant)
+                UtilDisplay.RemoveMenuCommand((RibbonBase)frmRibbon.DataContext, "Delete");
 
+            RemoveMenuItem();
             cmbSendAppRemdr.ItemsSource = AppEnums.Weekdays.Values.ToList();
             SetOwnerName();
         }

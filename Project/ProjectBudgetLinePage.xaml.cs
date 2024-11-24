@@ -118,7 +118,7 @@ namespace UnicontaClient.Pages.CustomPage
                 ProjectBudgetLineLocal Cur = null;
                 int n = -1;
                 DateTime LastDateTime = DateTime.MinValue;
-                foreach (var journalLine in (IEnumerable<ProjectBudgetLineLocal>) lst)
+                foreach (var journalLine in (IEnumerable<ProjectBudgetLineLocal>)lst)
                 {
                     if (journalLine._Date != DateTime.MinValue && Cur == null)
                         LastDateTime = journalLine._Date;

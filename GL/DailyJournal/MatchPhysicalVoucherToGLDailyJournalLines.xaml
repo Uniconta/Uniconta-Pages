@@ -26,7 +26,7 @@ x:Class="UnicontaClient.Pages.CustomPage.MatchPhysicalVoucherToGLDailyJournalLin
                         </docking:LayoutPanel.CaptionTemplate>
                         <localPage:VouchersGridLocal x:Name="dgvoucherGrid" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
                             <localPage:VouchersGridLocal.Columns>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="IsAttached" Width="60"  />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="IsAttached" Width="60" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="PrimaryKeyId" Width="70"  />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingDate" Width="80"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Created" ShowTime="True"  Width="120" AllowSorting="True" Visible="False" >

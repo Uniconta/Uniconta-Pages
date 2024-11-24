@@ -9,6 +9,7 @@ using Uniconta.ClientTools.Page;
 using Uniconta.API.Service;
 using Uniconta.ClientTools.Util;
 using Uniconta.ClientTools.Controls;
+using static UnicontaClient.Pages.NewImportPhysicalVouchersPage;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -27,6 +28,7 @@ namespace UnicontaClient.Pages.CustomPage
             company = api.CompanyEntity;
             leReading.Label = string.Format(Uniconta.ClientTools.Localization.lookup("LoadOBJ"), Uniconta.ClientTools.Localization.lookup("Status"));
             leWriting.Label = string.Format(Uniconta.ClientTools.Localization.lookup("SaveOBJ"), Uniconta.ClientTools.Localization.lookup("Status"));
+            browseCtrlColumn.Label = Uniconta.ClientTools.Localization.lookup("SelectDirectory");
             txtLogs.DataContext = txtReading.DataContext = txtWriting.DataContext = _logs;
             progressBarSave.Minimum = progressBarLoad.Minimum = 0;
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;

@@ -802,10 +802,7 @@ namespace UnicontaClient.Pages.CustomPage
                 GenrateInvoiceDialog.SetInvoiceDate(dbOrder._InvoiceDate);
 
             if (!api.CompanyEntity._DeactivateSendNemhandel)
-            {
-                GenrateInvoiceDialog.SetOIOUBLLabelText(true);
-                GenrateInvoiceDialog.EnableSentEinvoice(api.CompanyEntity._OIOUBLSendOnServer && invoiceInXML);
-            }
+                GenrateInvoiceDialog.SentByEInvoice(api, UtilCommon.GetEndPoint(dbOrder, dc, api));
 
             GenrateInvoiceDialog.Closed += async delegate
             {

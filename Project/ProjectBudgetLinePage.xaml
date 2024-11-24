@@ -91,6 +91,8 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectBudgetLinePage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CreditorAccount" Width="70" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CreditorName" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="QtyPurchased" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="QtyTaken" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Comment" Width="300">
                         <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
                             <editor:TextEditSettings TextWrapping="Wrap" AcceptsReturn="True"/>

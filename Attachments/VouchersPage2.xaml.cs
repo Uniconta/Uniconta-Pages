@@ -194,6 +194,7 @@ namespace UnicontaClient.Pages.CustomPage
             // This here will first save the record without attachment. Then it will update with attachement.
             // The update will be done without await, so it will be done in the background.
             // This way it is fast to upload a document, since the user will not have to wait.
+            VouchersClient voucher;
             var multiVouchers = this.multiVouchers;
             if (multiVouchers != null && browseControl.IsMultiSelect)
             {
@@ -203,7 +204,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var buffers = new byte[l][];
                     for (int i = 0; (i < l); i++)
                     {
-                        var voucher = multiVouchers[i];
+                        voucher = multiVouchers[i];
                         if (voucher._Data != null)
                         {
                             if (voucher._Fileextension == FileextensionsTypes.JPEG ||
@@ -216,6 +217,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 {
                                     voucher._Data = imageBytes;
                                     voucher._Fileextension = FileextensionsTypes.JPEG;
+                                    voucher._NoCompress = true;
                                 }
                             }
                             buffers[i] = voucher._Data;
@@ -248,28 +250,30 @@ namespace UnicontaClient.Pages.CustomPage
                 voucherClientRow = multiVouchers[0];
             }
             byte[] buf = null;
-            if (LoadedRow == null && voucherClientRow != null)
+            voucher = voucherClientRow;
+            if (LoadedRow == null && voucher != null)
             {
-                voucherClientRow._ScanDoc = true;
-                buf = voucherClientRow._Data;
-                if (buf != null && buf.Length > 110000 && !voucherClientRow._NoCompress &&
-                       (voucherClientRow._Fileextension == FileextensionsTypes.JPEG ||
-                        voucherClientRow._Fileextension == FileextensionsTypes.BMP ||
-                        voucherClientRow._Fileextension == FileextensionsTypes.GIF ||
-                        voucherClientRow._Fileextension == FileextensionsTypes.TIFF))
+                voucher._ScanDoc = true;
+                buf = voucher._Data;
+                if (buf != null && buf.Length > 110000 && !voucher._NoCompress &&
+                       (voucher._Fileextension == FileextensionsTypes.JPEG ||
+                        voucher._Fileextension == FileextensionsTypes.BMP ||
+                        voucher._Fileextension == FileextensionsTypes.GIF ||
+                        voucher._Fileextension == FileextensionsTypes.TIFF))
                 {
                     buf = FileBrowseControl.ImageResize(buf, ".jpg");
                     if (buf != null)
                     {
-                        voucherClientRow._Data = buf;
-                        voucherClientRow._Fileextension = FileextensionsTypes.JPEG;
+                        voucher._Data = buf;
+                        voucher._Fileextension = FileextensionsTypes.JPEG;
+                        voucher._NoCompress = true;
                     }
                     else
-                        buf = voucherClientRow._Data;
+                        buf = voucher._Data;
                 }
 
                 if (buf != null && buf.Length > 200000)
-                    voucherClientRow._Data = null;
+                    voucher._Data = null;
                 else
                     buf = null;
             }
@@ -281,13 +285,13 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (buf != null)
             {
-                if (voucherClientRow.RowId != 0)
-                    Utility.UpdateBuffers(api, new[] { buf }, new[] { voucherClientRow });
+                if (voucher.RowId != 0)
+                    Utility.UpdateBuffers(api, new[] { buf }, new[] { voucher });
                 else
-                    voucherClientRow._Data = buf;
+                    voucher._Data = buf;
             }
-            else if (voucherClientRow != null)
-                VoucherCache.SetGlobalVoucherCache(voucherClientRow);
+            else if (voucher != null)
+                VoucherCache.SetGlobalVoucherCache(voucher);
         }
 
         bool generateLine = false;

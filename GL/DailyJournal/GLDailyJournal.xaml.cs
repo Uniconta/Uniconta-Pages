@@ -123,7 +123,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         AddDockItem(TabControls.PostedJournals, selectedItem);
                     break;
-                case "MatchVoucherToJournalLines":
+                case "MatchVoucherToLines":
                     if (selectedItem != null)
                         AddDockItem(TabControls.MatchPhysicalVoucherToGLDailyJournalLines, selectedItem);
                     break;

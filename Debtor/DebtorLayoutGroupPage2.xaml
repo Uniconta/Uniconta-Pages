@@ -126,7 +126,10 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorLayoutGroupPage2"
                         <CorasauControls:CorasauLayoutItem FieldName="InterestNoteEmail" x:Name="liInterestNoteEmail">
                             <CorasauControls:ComboBoxEditor x:Name="cmbInterestNoteEmail" MinWidth="180" SelectedItem="{Binding InterestNoteEmail,Mode=TwoWay}"  />
                         </CorasauControls:CorasauLayoutItem>
-                    </CorasauControls:CorasauLayoutGroup>
+                    <CorasauControls:CorasauLayoutItem FieldName="PickingListEmail" x:Name="liPickingListEmail">
+                        <CorasauControls:ComboBoxEditor x:Name="cmbPickingListEmail" MinWidth="180" SelectedItem="{Binding PickingListEmail,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutControl>
         </Grid>

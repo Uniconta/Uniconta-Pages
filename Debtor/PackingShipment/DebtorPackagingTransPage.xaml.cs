@@ -68,8 +68,8 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         dgDebtorPackagingTransGrid.CopyRow();
                     break;
-                case "AddDebtorPackagingTrans":
-                    AddInvPackagingTrans();
+                case "AddPackingModel":
+                    AddPackingModel();
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -77,7 +77,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        void AddInvPackagingTrans()
+        void AddPackingModel()
         {
             var shipmentDialog = new CWPackingShipmentModel(api);
             shipmentDialog.Closing += async delegate

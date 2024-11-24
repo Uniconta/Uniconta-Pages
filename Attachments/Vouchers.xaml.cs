@@ -67,15 +67,17 @@ namespace UnicontaClient.Pages.CustomPage
                         rec._Fileextension == FileextensionsTypes.GIF ||
                         rec._Fileextension == FileextensionsTypes.TIFF)
                     {
+                        rec._ScanDoc = true;
                         var imageBytes = FileBrowseControl.ImageResize(rec._Data, ".jpg");
                         if (imageBytes != null)
                         {
                             rec._Data = imageBytes;
                             rec._Fileextension = FileextensionsTypes.JPEG;
-                            rec._ScanDoc = true;
+                            rec._NoCompress = true;
                         }
                     }
-                    else if (rec._Fileextension == FileextensionsTypes.PDF)
+                    else if (rec._Fileextension == FileextensionsTypes.PDF ||
+                             rec._Fileextension == FileextensionsTypes.PNG)
                         rec._ScanDoc = true;
 
                     if (rec._Data != null && rec._Data.Length > TableAddOnData.MaxDocSize)

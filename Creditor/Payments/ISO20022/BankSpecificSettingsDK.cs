@@ -41,8 +41,14 @@ namespace UnicontaISO20022CreditTransfer
                 case dkBank.Nordea:
                     companyBankEnum = CompanyBankENUM.Nordea_DK;
                     return companyBankEnum;
-                case dkBank.BankConnect:
-                    companyBankEnum = CompanyBankENUM.BankConnect;
+                case dkBank.BankData:
+                    companyBankEnum = CompanyBankENUM.BankData;
+                    return companyBankEnum;
+                case dkBank.BEC:
+                    companyBankEnum = CompanyBankENUM.BEC;
+                    return companyBankEnum;
+                case dkBank.SDC:
+                    companyBankEnum = CompanyBankENUM.SDC;
                     return companyBankEnum;
                 case dkBank.Handelsbanken:
                     companyBankEnum = CompanyBankENUM.Handelsbanken;
@@ -63,14 +69,30 @@ namespace UnicontaISO20022CreditTransfer
                     return "Nordea";
                 case CompanyBankENUM.DanskeBank:
                     return "Danske Bank";
-                case CompanyBankENUM.BankConnect:
-                    return "Bank Connect"; // CredPaymFormat.BankCentral.ToString();
+                case CompanyBankENUM.BankData:
+                case CompanyBankENUM.BEC:
+                case CompanyBankENUM.SDC:
+                    return companyBankEnum.ToString();
                 case CompanyBankENUM.Handelsbanken:
                     return "Handelsbanken"; 
                 default:
                     return string.Empty;
             }
         }
+
+        public override string GenerateFileName(int fileID, int companyID)
+        {
+            switch (companyBankEnum)
+            {
+                case CompanyBankENUM.BankData:
+                case CompanyBankENUM.BEC:
+                case CompanyBankENUM.SDC:
+                    return string.Format("{0}_{1}_{2}_{3}", "ISO20022", companyBankEnum.ToString(), fileID, companyID);
+                default:
+                    return string.Format("{0}_{1}_{2}", "ISO20022", fileID, companyID);
+            }
+        }
+
 
         /// <summary>
         /// Country currency - used for calculation of Payment type
@@ -100,6 +122,9 @@ namespace UnicontaISO20022CreditTransfer
             switch (companyBankEnum)
             {
                 case CompanyBankENUM.Handelsbanken:
+                case CompanyBankENUM.BankData:
+                case CompanyBankENUM.BEC:
+                case CompanyBankENUM.SDC:
                     return DateTimeOffset.Now.ToString("yyyy-MM-ddTHH:mm:ss.fffzzz");
                 default:
                     return DateTimeOffset.Now.ToString("o");
@@ -174,7 +199,9 @@ namespace UnicontaISO20022CreditTransfer
                 case CompanyBankENUM.DanskeBank:
                     identificationId = companyCVR.Replace(" ", String.Empty);
                     return identificationId;
-                case CompanyBankENUM.BankConnect:
+                case CompanyBankENUM.BankData:
+                case CompanyBankENUM.BEC:
+                case CompanyBankENUM.SDC:
                     return identificationId; //Pt. ukendt - Kode skal sandsynligvis aftale med Banken
                 default:
                     return identificationId;
@@ -191,7 +218,9 @@ namespace UnicontaISO20022CreditTransfer
         {
             switch (companyBankEnum)
             {
-                case CompanyBankENUM.BankConnect:
+                case CompanyBankENUM.BankData:
+                case CompanyBankENUM.BEC:
+                case CompanyBankENUM.SDC:
                 case CompanyBankENUM.Nordea_DK:
                     return "CUST"; //Nordea only accept the code CUST
                 case CompanyBankENUM.Handelsbanken:
@@ -212,11 +241,13 @@ namespace UnicontaISO20022CreditTransfer
         {
             switch (companyBankEnum)
             {
-                case CompanyBankENUM.BankConnect:
                 case CompanyBankENUM.Nordea_DK:
                     return string.Empty;
                 case CompanyBankENUM.Handelsbanken:
                 case CompanyBankENUM.DanskeBank:
+                case CompanyBankENUM.BankData:
+                case CompanyBankENUM.BEC:
+                case CompanyBankENUM.SDC:
                     return "ONCL"; //Default value for Danske Bank
                 default:
                     return "ONCL";
@@ -525,7 +556,7 @@ namespace UnicontaISO20022CreditTransfer
         /// Unstructured Remittance Information
         /// </summary>
         public override List<string> Ustrd(string externalAdvText, ISO20022PaymentTypes ISOPaymType, CreditorTransPayment trans, bool extendedText)
-         {
+        {
 
             var ustrdText = StandardPaymentFunctions.RegularExpressionReplace(externalAdvText, allowedCharactersRegEx, replaceCharactersRegEx);
 
@@ -533,7 +564,7 @@ namespace UnicontaISO20022CreditTransfer
                 return null;
 
             //Extended notification
-            if (ISOPaymType == ISO20022PaymentTypes.DOMESTIC)
+            if (ISOPaymType == ISO20022PaymentTypes.DOMESTIC && companyBankEnum != CompanyBankENUM.SDC) //SDC benytter den første linie i <RmtInf><Ustrd> som posteringstekst
             {
                 if (extendedText)
                 {
@@ -569,8 +600,10 @@ namespace UnicontaISO20022CreditTransfer
                     maxStrLen = 35;
                     break;
 
-                case CompanyBankENUM.BankConnect:
-                    maxLines = 41;
+                case CompanyBankENUM.BankData:
+                case CompanyBankENUM.BEC:
+                case CompanyBankENUM.SDC:
+                    maxLines = 5;
                     maxStrLen = 35;
                     break;
 

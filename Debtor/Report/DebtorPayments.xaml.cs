@@ -667,7 +667,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var factor = interestValue;
                     if (prDay)
                     {
-                        var dt = rec._LastInterest != DateTime.MinValue ? rec._LastInterest : (rec._GraceDate != DateTime.MinValue ? rec._GraceDate : (rec._DueDate != DateTime.MinValue ? rec._DueDate : rec.Date));
+                        var dt = rec._LastInterest != DateTime.MinValue ? rec._LastInterest : (rec._DueDate != DateTime.MinValue ? rec._DueDate : rec.Date);
                         factor = Math.Max(interestValue * Math.Min((prDate - dt).TotalDays, 360d) / 30d, 0d);
                     }
                     rec.FeeAmount = Math.Round((rec._AmountOpenCur != 0 ? rec._AmountOpenCur : rec._AmountOpen) * factor / 100d, desm);

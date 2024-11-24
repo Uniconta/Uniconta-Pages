@@ -66,7 +66,7 @@ namespace UnicontaClient.Pages.CustomPage
             this.OpenTransactionType = openTransType;
             InitializePage(baseEntity, openTransType);
             if (selectedLine is GLDailyJournalLineClient)
-                selectedLine = selectedLine as GLDailyJournalLineClient;
+                this.selectedLine = selectedLine as GLDailyJournalLineClient;
             else if (selectedLine is BankStatementLineClient)
                 SelectedBankStatemenLine = selectedLine as BankStatementLineClient;
 

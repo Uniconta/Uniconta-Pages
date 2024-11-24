@@ -215,8 +215,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                     if (tr._DCType == GLTransRefType.Asset || isFam)
                     {
-                        rec._AccountType = (byte)GLTransRefType.Asset;
-                        rec._Account = tr._DCAccount;
+                        rec._Asset = tr._DCAccount;
                         var pst = _tr as FAMTransClient;
                         if (pst != null)
                             rec._AssetPostType = pst._AssetPostType;
@@ -879,10 +878,10 @@ namespace UnicontaClient.Pages.CustomPage
                     };
                     exchangeDialog.Show();
                     break;
-                case "MatchLines":
+                case "MatchVoucherToLines":
                     saveGrid();
                     var visibleRows = dgGLDailyJournalLine.GetVisibleRows() as IEnumerable<JournalLineGridClient>;
-                    string header = string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("MatchLines"), masterRecord.KeyStr, masterRecord.KeyName);
+                    string header = string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("MatchVoucherToLines"), masterRecord.KeyStr, masterRecord.KeyName);
                     if (visibleRows.Count() > 0)
                     {
                         var page = dockCtrl.AddDockItem(TabControls.MatchPhysicalVoucherToGLDailyJournalLines, ParentControl, masterRecord, header) as MatchPhysicalVoucherToGLDailyJournalLines;

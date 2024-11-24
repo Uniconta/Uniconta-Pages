@@ -26,6 +26,6 @@
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="AddInvPackagingTrans" LocalizedNameKey="AddOBJ" Parameter="PackagingTrans" LargeGlyph="Transactions_32x32"/>
+    <RibbonItem Action="AddPackingModel" LocalizedNameKey="AddOBJ" Parameter="PackingModel" LargeGlyph="Transactions_32x32"/>
   </RibbonItem>
 </root>

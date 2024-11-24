@@ -12,7 +12,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorPackingShipmentPage"
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Assets/EditableGridRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Debtor/PackingShipment/DebtorPackingShipmentGridRibbon.xml" x:Name="localMenu"/>
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <local:DebtorPackingShipmentGrid x:Name="dgDebtorPackingShipmentGrid" AutoGenerateColumns="None">
                 <local:DebtorPackingShipmentGrid.Columns>

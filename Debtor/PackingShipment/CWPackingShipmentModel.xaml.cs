@@ -35,7 +35,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             this.DataContext = this;
             InitializeComponent();
-            this.Title = Uniconta.ClientTools.Localization.lookup("PackagingTrans");
+            this.Title = Uniconta.ClientTools.Localization.lookup("PackingModel");
             this.SizeToContent = SizeToContent.Height;
             lookupPackingShipment.api = api;
             this.api = api;

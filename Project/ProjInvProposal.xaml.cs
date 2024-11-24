@@ -44,6 +44,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override string NameOfControl { get { return TabControls.ProjInvProposal; } }
 
         private SynchronizeEntity syncEntity;
+        private string parmWorkspace;
         public ProjInvProposal(BaseAPI api, string lookupKey)
             : base(api, lookupKey)
         {
@@ -96,6 +97,16 @@ namespace UnicontaClient.Pages.CustomPage
         public ProjInvProposal(UnicontaBaseEntity master)
             : base(master)
         {
+            Init(master);
+            if (syncEntity != null)
+                dgProjInvProposalGrid.UpdateMaster(master);
+
+        }
+
+        public ProjInvProposal(UnicontaBaseEntity master, string workspace)
+           : base(master)
+        {
+            parmWorkspace = workspace;
             Init(master);
             if (syncEntity != null)
                 dgProjInvProposalGrid.UpdateMaster(master);
@@ -220,7 +231,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "AddRow":
                     if (dgProjInvProposalGrid.masterRecords != null)
                     {
-                        AddDockItem(TabControls.ProjInvProposalPage2, new object[] { api, dgProjInvProposalGrid.masterRecord }, Uniconta.ClientTools.Localization.lookup("InvoiceProposal"), "Add_16x16");
+                        AddDockItem(TabControls.ProjInvProposalPage2, new object[] { api, dgProjInvProposalGrid.masterRecord, parmWorkspace }, Uniconta.ClientTools.Localization.lookup("InvoiceProposal"), "Add_16x16");
                     }
                     else
                         AddDockItem(TabControls.ProjInvProposalPage2, api, Uniconta.ClientTools.Localization.lookup("InvoiceProposal"), "Add_16x16");
@@ -533,10 +544,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (additionalOrdersList != null)
                 GenrateInvoiceDialog.SetAdditionalOrders(additionalOrdersList);
             if (!api.CompanyEntity._DeactivateSendNemhandel)
-            {
-                GenrateInvoiceDialog.SetOIOUBLLabelText(true);
-                GenrateInvoiceDialog.EnableSentEinvoice(api.CompanyEntity._OIOUBLSendOnServer);
-            }
+                GenrateInvoiceDialog.SentByEInvoice(api, null, true);
 
             GenrateInvoiceDialog.Closed += async delegate
             {

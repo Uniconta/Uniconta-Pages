@@ -27,7 +27,7 @@
     <RibbonItem Action="GLDailyJournalPosted" LocalizedNameKey="PostedJournals" ControlName="PostedJournals" Glyph="Cover_16x16" LargeGlyph="Posted_Journal_32x32" />
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="MatchVoucherToJournalLines" LocalizedNameKey="MatchVoucherToJournalLines" ControlName="MatchPhysicalVoucherToGLDailyJournalLines" LargeGlyph="Match_32x32" />
+    <RibbonItem Action="MatchVoucherToLines" LocalizedNameKey="MatchVoucherToLines" ControlName="MatchPhysicalVoucherToGLDailyJournalLines" LargeGlyph="Match_32x32" />
   </RibbonItem>
   <RibbonItem LocalizedNameKey="Load">
     <RibbonItem Action="ImportBankStatement" LocalizedNameKey="ImportOBJ" Parameter="BankStatement" ControlName="ImportGLDailyJournal" LargeGlyph="Import_32x32"/>

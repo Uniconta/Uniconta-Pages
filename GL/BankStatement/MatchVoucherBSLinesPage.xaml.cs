@@ -35,8 +35,8 @@ namespace UnicontaClient.Pages.CustomPage
         int DaysSlip;
         bool ShowCurrency;
         BankStatementAPI bankTransApi;
-        static DateTime fromDate;
-        static DateTime toDate;
+        DateTime fromDate { get { return BankStatementLinePage.fromDate; } set { BankStatementLinePage.fromDate = value; } }
+        DateTime toDate { get { return BankStatementLinePage.toDate; } set { BankStatementLinePage.toDate = value; } }
 
         public MatchVoucherBSLinesPage(UnicontaBaseEntity master)
             : base(null)
@@ -403,6 +403,9 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedLine != null)
                         Utility.SendVoucherReminder(api, selectedLine._Date, selectedLine._AmountCur != 0 ? selectedLine._AmountCur : selectedLine._Amount, selectedLine._Currency, selectedLine._Text);
                     break;
+                case "RefreshGrid":
+                    InitQuery();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -571,17 +574,15 @@ namespace UnicontaClient.Pages.CustomPage
             busyIndicator.IsBusy = false;
         }
 
-        public async override Task InitQuery()
+        public override Task InitQuery()
         {
-            busyIndicator.IsBusy = true;
             dgVoucherGrid.Filter(null);
-            BindBankStatementLines();
-            busyIndicator.IsBusy = false;
+            return BindBankStatementLines();
         }
-        async void BindBankStatementLines()
+        async Task BindBankStatementLines()
         {
             busyIndicator.IsBusy = true;
-            var bankStmtLines = (BankStatementLineGridClient[])await bankTransApi.GetTransactions(new BankStatementLineGridClient(), master, fromDate, toDate, true);
+            var bankStmtLines = (BankStatementLineGridClient[])await bankTransApi.GetTransactions(new BankStatementLineGridClient(), master, fromDate, toDate, true, false);
             dgBSLinesGrid.SetSource(bankStmtLines);
             SetVoucherIsAttached();
             busyIndicator.IsBusy = false;

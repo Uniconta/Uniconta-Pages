@@ -65,7 +65,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjInvProposal"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Account" Width="100" ReadOnly="True" AllowEditing="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Width="150" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Group"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderNumber" Width="70"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderNumber" Width="70" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderTotal" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="NoLines" Width="50" ReadOnly="True" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Margin" Width="90"/>

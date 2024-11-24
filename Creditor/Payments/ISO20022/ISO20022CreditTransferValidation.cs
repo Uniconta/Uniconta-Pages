@@ -867,7 +867,9 @@ namespace ISO20022CreditTransfer
                         return true;
                 case CompanyBankENUM.DanskeBank:
                     return true; //Pt. ukendt - Kode skal sandsynligvis aftale med Banken
-                case CompanyBankENUM.BankConnect:
+                case CompanyBankENUM.BankData:
+                case CompanyBankENUM.BEC:
+                case CompanyBankENUM.SDC:
                     return true; //Pt. ukendt - Kode skal sandsynligvis aftale med Banken
                 default:
                     return true;

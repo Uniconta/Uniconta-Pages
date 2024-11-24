@@ -10,6 +10,8 @@ using Uniconta.Common;
 using Uniconta.DataModel;
 using Uniconta.API.GeneralLedger;
 using Uniconta.ClientTools;
+using static UnicontaClient.Pages.NewImportPhysicalVouchersPage;
+
 
 
 #if WPF

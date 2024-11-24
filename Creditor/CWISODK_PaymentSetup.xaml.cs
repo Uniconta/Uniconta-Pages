@@ -35,14 +35,9 @@ namespace UnicontaClient.Pages.CustomPage
             paymentFormatISODK = new CreditorPaymentFormatClientISODK();
             StreamingManager.Copy(paymentFormat, paymentFormatISODK);
             cmbBank.ItemsSource = Enum.GetValues(typeof(dkBank));
-            //cmbBankCentral.ItemsSource = Enum.GetValues(typeof(BankConnectCentral));
-
 
             this.DataContext = paymentFormatISODK;
             this.Title = string.Format(Uniconta.ClientTools.Localization.lookup("SetupOBJ"), Uniconta.ClientTools.Localization.lookup("Payment"));
-#if SILVERLIGHT
-            Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             this.Loaded += CW_Loaded;
         }
         private void CW_Loaded(object sender, RoutedEventArgs e)
@@ -78,30 +73,21 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void cmbBank_SelectedIndexChanged(object sender, RoutedEventArgs e)
         {
-            //TODOBankCentral tilføjes ifm. BankConnect
             switch (paymentFormatISODK.Bank)
             {
                 case dkBank.Danske_Bank:
                     lblTestMarked.Visibility = ceTestMarked.Visibility = Visibility.Visible;
                     lblBatchBook.Visibility = ceBatchBooking.Visibility = Visibility.Visible;
                     lblCode.Visibility = txtCode.Visibility = Visibility.Collapsed;
-                    //lblBankCentral.Visibility = cmbBankCentral.Visibility = Visibility.Collapsed;
                     break;
                 case dkBank.Nordea:
                     lblTestMarked.Visibility = ceTestMarked.Visibility = Visibility.Collapsed;
                     lblBatchBook.Visibility = ceBatchBooking.Visibility = Visibility.Visible;
                     lblCode.Visibility = txtCode.Visibility = Visibility.Collapsed;
-                    //lblBankCentral.Visibility = cmbBankCentral.Visibility = Visibility.Collapsed;
                     break;
-                //case dkBank.BankConnect:
-                //    lblBankCentral.Visibility = cmbBankCentral.Visibility = Visibility.Visible;
-                //    lblTestMarked.Visibility = ceTestMarked.Visibility = Visibility.Collapsed;
-                //    lblBatchBook.Visibility = ceBatchBooking.Visibility = Visibility.Collapsed;
-                //    break;
                 default:
                     lblTestMarked.Visibility = ceTestMarked.Visibility = Visibility.Collapsed;
                     lblBatchBook.Visibility = ceBatchBooking.Visibility = Visibility.Collapsed;
-                    //lblBankCentral.Visibility = cmbBankCentral.Visibility = Visibility.Collapsed;
                     lblCode.Visibility = txtCode.Visibility = Visibility.Collapsed;
                     break;
             }

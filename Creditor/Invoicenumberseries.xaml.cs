@@ -34,7 +34,7 @@ namespace UnicontaClient.Pages.CustomPage
             : base(sourceData, true)
         {
             InitializeComponent();
-            cmbCreditorVoucherSerie.api = api;
+            cmbCreditorVoucherSerie.api = leEDeliveryFee.api = api;
             layoutControl = layoutItems;
 
             layoutItems.DataContext = editrow;

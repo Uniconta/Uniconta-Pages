@@ -643,7 +643,12 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                     {
                         var salesHeader = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("InvoiceProposal"), selectedItem.Debtor);
-                        AddDockItem(TabControls.ProjInvProposal, selectedItem.ProjectRef, salesHeader);
+
+                        object[] param = new object[2];
+                        param[0] = (object)selectedItem.ProjectRef;
+                        param[1] = selectedItem._Workspace;
+
+                        AddDockItem(TabControls.ProjInvProposal, param, salesHeader);
                     }
                     break;
                 case "ZeroInvoice":

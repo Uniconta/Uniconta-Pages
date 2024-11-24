@@ -19,6 +19,9 @@ using System.ComponentModel.DataAnnotations;
 using UnicontaClient.Controls;
 using Uniconta.ClientTools.Controls;
 using Uniconta.API.System;
+using Uniconta.ClientTools.Util;
+using Uniconta.API.Service;
+using System.Text.RegularExpressions;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -70,6 +73,7 @@ namespace UnicontaClient.Pages.CustomPage
         protected override int DialogId { get { return DialogTableId; } }
         public int DialogTableId { get; set; }
         protected override bool ShowTableValueButton { get { return true; } }
+        private bool invoiceInXml;
         private bool IsSendXmlSalesInvoice;
         public CWGenerateInvoice(bool showSimulation, string title, bool showInputforInvNumber, bool askForEmail, bool showInvoice, bool isShowInvoiceVisible, bool showNoEmailMsg, string debtorName,
             bool isShowUpdateInv, bool isOrderOrQuickInv, bool isQuickPrintVisible, bool isDebtorOrder, bool InvoiceInXML, bool isPageCountVisible)
@@ -81,6 +85,7 @@ namespace UnicontaClient.Pages.CustomPage
             bool isShowUpdateInv = false, bool isOrderOrQuickInv = false, bool isQuickPrintVisible = true, bool isDebtorOrder = false, bool InvoiceInXML = false, bool isPageCountVisible = true, string AccountName = null)
         {
             this.DataContext = this;
+            this.invoiceInXml = InvoiceInXML;
             InitializeComponent();
             ShowInvoice = true;
             this.Title = Uniconta.ClientTools.Localization.lookup("GenerateInvoice");
@@ -222,14 +227,26 @@ namespace UnicontaClient.Pages.CustomPage
             _api = api;
         }
 
-        public void SetOIOUBLLabelText(bool sendXmlSalesInvoice)
+        public void SentByEInvoice(CrudAPI api, Tuple<NHRNetworkType, NHREndPointType, string> endPoint, bool forceEnableEinvoice = false)
         {
-            IsSendXmlSalesInvoice = sendXmlSalesInvoice;
-        }
+            IsSendXmlSalesInvoice = true;
+            var enableEinvoice = api.CompanyEntity._OIOUBLSendOnServer && invoiceInXml && (endPoint == null || endPoint.Item3 != null);
+            chkOIOUBL.IsChecked = enableEinvoice;
+            liGenerateOIOUBLClicked.IsEnabled = enableEinvoice || forceEnableEinvoice;
 
-        public void EnableSentEinvoice(bool enable)
-        {
-            liGenerateOIOUBLClicked.IsEnabled = enable;
+            if (!enableEinvoice || endPoint == null)
+                return;
+            
+            liReceiverEndPoint.Visibility = Visibility.Visible;
+            var endPointId = Regex.Replace(endPoint.Item3, "[^0-9]", "");
+            var baseUrl = api.session.Connection.Target == APITarget.Live ? NHR.NHR_WEB : NHR.NHR_WEB_DEMO;
+            var keyValue = endPoint.Item2 == NHREndPointType.GLN ? "&key=" : "DK%3ACVR&key=";
+            var NHRUrl = string.Concat(baseUrl, keyValue, endPointId);
+
+            if (endPoint.Item1 == NHRNetworkType.Peppol)
+                lblReceiverEndPoint.Content = string.Concat("Peppol", Environment.NewLine, Uniconta.ClientTools.Localization.lookup(endPoint.Item2 == NHREndPointType.GLN ? "GLNnumber" : "CompanyRegNo"),": ", endPoint.Item3);
+            else
+                lblReceiverEndPoint.Content = UtilDisplay.CreateHyperLinkTextControl(NHRUrl, string.Concat(Uniconta.ClientTools.Localization.lookup(endPoint.Item2 == NHREndPointType.GLN ? "GLNnumber" : "CompanyRegNo"), ": ", endPointId));
         }
 
         private void OKButton_Click(object sender, RoutedEventArgs e)

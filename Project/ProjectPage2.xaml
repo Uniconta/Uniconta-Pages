@@ -44,9 +44,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectPage2"
                     <CorasauControls:CorasauLayoutItem x:Name="liPrType" FieldName="PrType">
                         <CorasauControls:LookupEditor  x:Name="lePrType" Text="{Binding PrType,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liInstallation" FieldName="Installation">
-                        <CorasauControls:LookupEditor  x:Name="leInstallation" Text="{Binding Installation,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
+          
                     <CorasauControls:CorasauLayoutItem FieldName="ContactName" x:Name="liContactName" Style="{StaticResource LayoutItemsstyle}" ButtonContent="+">
                         <CorasauControls:ComboBoxEditor AllowNullInput="True" AssignNullValueOnClearingEditText="True" x:Name="cmbContactName"  EditValueChanged="cmbContactName_EditValueChanged" KeyDown="cmbContactName_KeyDown"/>
                     </CorasauControls:CorasauLayoutItem>
@@ -113,7 +111,9 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectPage2"
                     <CorasauControls:CorasauLayoutItem x:Name="liWorkCountry" FieldName="WorkCountry">
                         <CorasauControls:ComboBoxEditor x:Name="cbCountry" SelectedItem="{Binding WorkCountry,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
-
+                    <CorasauControls:CorasauLayoutItem x:Name="liInstallation" FieldName="Installation" Style="{StaticResource LayoutItemsstyle}" ButtonContent="&#x2B9D;" ButtonClicked="lblInstallation_ButtonClicked">
+                        <CorasauControls:LookupEditor x:Name="leInstallation" EditValue="{Binding Installation,Mode=TwoWay}" MinWidth="70"/>
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup x:Name="grpReference" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Reference}"  Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="330">
                     <CorasauControls:CorasauLayoutItem x:Name="liYourRef" FieldName="YourRef">

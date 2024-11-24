@@ -51,7 +51,8 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorLayoutGroupPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="StatementEmail" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="StatementCurEmail" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CollectionEmail" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InterestNoteEmail" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InterestNoteEmail" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PickingListEmail" Visible="False"/>
                 </localPage:DebtorLayoutGroupGrid.Columns>
             </localPage:DebtorLayoutGroupGrid>
         </CorasauControls:BusyIndicator>
