@@ -184,7 +184,7 @@ namespace UnicontaISO20022CreditTransfer
         /// ONCL (Standard Transfer)
         /// SDCL (Same-day Transfer)
         /// </summary>
-        public virtual string ExternalLocalInstrument(string currencyCode, DateTime executionDate)
+        public virtual string ExternalLocalInstrument(string currencyCode, DateTime executionDate, PaymentTypes paymentMethod, ISO20022PaymentTypes ISOPaymType)
         {
             return "ONCL";
         }

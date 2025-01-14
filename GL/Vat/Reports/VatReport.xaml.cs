@@ -633,7 +633,7 @@ namespace UnicontaClient.Pages.CustomPage
                     AccsFound.Clear();
 
                     if ((VatReported == null || VatReported._MaxJournalPostedId == 0 || Journal != null) && !PrevPeriod)
-                        AccTotals = await rapi.GenerateTotal(AccLst, FromDate, ToDate, Journal, null, 0, true, false, -1, int.MaxValue);
+                        AccTotals = await rapi.GenerateTotal(AccLst, FromDate, ToDate, Journal, null, 0, true, false);
                     else
                         AccTotals = await rapi.GenerateTotal(AccLst, VatReported, PrevPeriod);
 
@@ -968,6 +968,8 @@ namespace UnicontaClient.Pages.CustomPage
                     if (AccLst != null && AccLst.Count > 0)
                     {
                         AccTotals = await rapi.GenerateTotal(AccLst, FromDate, ToDate);
+                        //AccTotals = await rapi.GenerateTotal(AccLst, FromDate, ToDate, null, null, 0, true, false, -1, int.MaxValue);
+
                         if (AccTotals != null && AccTotals.Length > 0)
                         {
                             var otherTaxList = new ReportDataDenmark[AccTotals.Length];
@@ -975,12 +977,17 @@ namespace UnicontaClient.Pages.CustomPage
                             {
                                 var Acc = (GLAccount)accounts.Get(acTot.AccountRowId);
                                 i = (int)Acc._SystemAccount - (int)SystemAccountTypes.OilDuty + 14;
-                                sumPeriod[i] = new VatSumOperationReport()
+                                if (sumPeriod[i] == null)
                                 {
-                                    Acc = Acc,
-                                    _Amount = (acTot._Debit - acTot._Credit) / 100d,
-                                    _Line = i
-                                };
+                                    sumPeriod[i] = new VatSumOperationReport()
+                                    {
+                                        Acc = Acc,
+                                        _Amount = (acTot._Debit - acTot._Credit) / 100d,
+                                        _Line = i
+                                    };
+                                }
+                                else
+                                    sumPeriod[i]._Amount += (acTot._Debit - acTot._Credit) / 100d;
                             }
                         }
                     }

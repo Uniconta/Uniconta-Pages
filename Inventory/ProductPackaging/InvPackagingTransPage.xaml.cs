@@ -167,7 +167,6 @@ namespace UnicontaClient.Pages.CustomPage
                     Date.Visible = false;
                     JournalPostedId.Visible = false;
                     PackagingType.Visible = false;
-                    PackagingRateLevel.Visible = false;
                     Country.Visible = false;
 
                     dgInvPackagingTransGrid.ItemsSource = dictlst;
@@ -198,6 +197,9 @@ namespace UnicontaClient.Pages.CustomPage
                 c = string.Compare(x.WasteSorting, y.WasteSorting);
                 if (c != 0)
                     return false;
+                c = string.Compare(x.PackagingRateLevel, y.PackagingRateLevel);
+                if (c != 0)
+                    return false;
                 c = string.Compare(x.PackagingConsumer, y.PackagingConsumer);
                 if (c != 0)
                     return false;
@@ -205,7 +207,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             public int GetHashCode(InvPackagingTransClient x)
             {
-                return Util.GetHashCode(x.Period) * Util.GetHashCode(x.Category) * Util.GetHashCode(x.WasteSorting) * Util.GetHashCode(x.PackagingConsumer);
+                return Util.GetHashCode(x.Period) * Util.GetHashCode(x.Category) * Util.GetHashCode(x.WasteSorting) * Util.GetHashCode(x.PackagingRateLevel) * Util.GetHashCode(x.PackagingConsumer);
             }
         }
 
@@ -255,7 +257,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private Dictionary<string, int> MapColumnsToIndices()
         {
-            var dictionaryColumnIndices = new Dictionary<string, int>(5);
+            var dictionaryColumnIndices = new Dictionary<string, int>(6);
 
             int idx = 1;
             string key = "Period";
@@ -273,11 +275,16 @@ namespace UnicontaClient.Pages.CustomPage
                 dictionaryColumnIndices.Add(key, idx);
 
             idx = 4;
-            key = "PackagingConsumer";
+            key = "PackagingRateLevel";
             if (!dictionaryColumnIndices.ContainsKey(key))
                 dictionaryColumnIndices.Add(key, idx);
 
             idx = 5;
+            key = "PackagingConsumer";
+            if (!dictionaryColumnIndices.ContainsKey(key))
+                dictionaryColumnIndices.Add(key, idx);
+
+            idx = 6;
             key = "Weight";
             if (!dictionaryColumnIndices.ContainsKey(key))
                 dictionaryColumnIndices.Add(key, idx);

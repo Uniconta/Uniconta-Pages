@@ -61,8 +61,8 @@
     <RibbonItem Action="InvTransPivot" LocalizedNameKey="PivotTable" ControlName="InvTransPivotPage" LargeGlyph="Category_Charge_32x32" />
   </RibbonItem>
   <RibbonItem LocalizedNameKey="Variant">
-    <RibbonItem Action="VariantCombi" LocalizedNameKey="ItemVariants" Module="ItemVariants" LargeGlyph="Variants_Combination_32x32"/>
-    <RibbonItem Action="VariantDetails" LocalizedNameKey="InvVariantDetail" Module="ItemVariants" LargeGlyph="Preview_32x32"/>
+    <RibbonItem Action="VariantCombi" LocalizedNameKey="ItemVariants" Module="ItemVariants" LargeGlyph="Variants_Combination_32x32" ShortcutKey=""/>
+    <RibbonItem Action="VariantDetails" LocalizedNameKey="InvVariantDetail" Module="ItemVariants" LargeGlyph="Preview_32x32" ShortcutKey=""/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="InventorySeriesBatch" LocalizedNameKey="SerialBatchNumbers" ControlName="InvSeriesBatch" Module="SerialBatchNumbers" Glyph="Account-statement_32x32" LargeGlyph="Account-statement_32x32"/>
@@ -71,11 +71,11 @@
     <RibbonItem Action="InvPurchaseAccounts" LocalizedNameKey="PurchaseAccounts" ControlName="InvPurchaseAccountPage" Module="PurchaseAccounts" LargeGlyph="Vendor_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="LanguageItemText" LocalizedNameKey="LanguageItemText" ControlName="LanguageItemTextPage" Module="InvClientName" Glyph="Translation_32x32" LargeGlyph="Translation_32x32"/>
+    <RibbonItem Action="LanguageItemText" LocalizedNameKey="LanguageItemText" ControlName="LanguageItemTextPage" Module="InvClientName" Glyph="Translation_32x32" LargeGlyph="Translation_32x32" ShortcutKey=""/>
     <RibbonItem Action="Prices" LocalizedNameKey="SalesPricesAndDiscounts" ControlName="CustomerPriceListLinePage" Module="InvPrice" LargeGlyph="PriceTag_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="Packaging" LocalizedNameKey="Packaging" Module="InvPackaging" LargeGlyph="Pack_Note_32x32"/>
+    <RibbonItem Action="Packaging" LocalizedNameKey="Packaging" Module="InvPackaging" LargeGlyph="Pack_32x32"/>
   </RibbonItem>
   <RibbonItem TabId="1" LocalizedNameKey="EditAll">
     <RibbonItem Action="EditAll"  LocalizedNameKey="EditAll" Glyph="Edit_16x16" LargeGlyph="Edit_32x32"/>

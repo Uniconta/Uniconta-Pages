@@ -237,7 +237,7 @@ namespace UnicontaISO20022CreditTransfer
         /// ONCL (Standard Transfer)
         /// SDCL (Same-day Transfer)
         /// </summary>
-        public override string ExternalLocalInstrument(string currencyCode, DateTime executionDate)
+        public override string ExternalLocalInstrument(string currencyCode, DateTime executionDate, PaymentTypes paymentMethod, ISO20022PaymentTypes ISOPaymType)
         {
             switch (companyBankEnum)
             {
@@ -245,10 +245,15 @@ namespace UnicontaISO20022CreditTransfer
                     return string.Empty;
                 case CompanyBankENUM.Handelsbanken:
                 case CompanyBankENUM.DanskeBank:
+                    return "ONCL"; //Default value for Danske Bank
                 case CompanyBankENUM.BankData:
                 case CompanyBankENUM.BEC:
                 case CompanyBankENUM.SDC:
-                    return "ONCL"; //Default value for Danske Bank
+                    if (paymentMethod == PaymentTypes.IBAN) 
+                        return ISOPaymType == ISO20022PaymentTypes.DOMESTIC ? "ONCL" : "IN";
+                    else if (paymentMethod == PaymentTypes.VendorBankAccount)
+                        return "ONCL";
+                    return string.Empty;
                 default:
                     return "ONCL";
             }

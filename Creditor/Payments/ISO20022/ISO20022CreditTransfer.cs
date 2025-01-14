@@ -257,7 +257,7 @@ namespace ISO20022CreditTransfer
                 doc.ISOPaymentType = bankSpecific.ISOPaymentType(currency, bankAccount._IBAN, isPaymentTypeIBAN ? creditorAcc : string.Empty, creditorBIC, credBankCountryId, doc.CompanyCountryId);
                 doc.ExtServiceCode = bankSpecific.ExtServiceCode(doc.ISOPaymentType);
                 doc.ExtServicePrtry = bankSpecific.ExtServicePrtry(doc.ISOPaymentType, creditorBIC);
-                doc.ExternalLocalInstrument = bankSpecific.ExternalLocalInstrument(currency, doc.RequestedExecutionDate);
+                doc.ExternalLocalInstrument = bankSpecific.ExternalLocalInstrument(currency, doc.RequestedExecutionDate, rec._PaymentMethod, doc.ISOPaymentType);
                 doc.InstructionPriority = bankSpecific.InstructionPriority();
                 doc.ExtCategoryPurpose = bankSpecific.ExtCategoryPurpose(doc.ISOPaymentType);
                 doc.ExtProprietaryCode = bankSpecific.ExtProprietaryCode();

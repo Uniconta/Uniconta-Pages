@@ -200,6 +200,12 @@ namespace UnicontaClient.Pages.CustomPage
                         newDebtor.NewIndustryCode = IndustryCodes.Get(ci.industrycode?.code)?.KeyStr;
                     else
                         newDebtor.NewIndustryCode = ci.industrycode?.code;
+                    var state = ci.companystatus;
+                    if (state != null)
+                    {
+                        newDebtor._companyState = state.StatusCode();
+                        newDebtor.NotifyPropertyChanged("NewCompanyState");
+                    }
                     newDebList.Add(newDebtor);
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("Loading") + " " + NumberConvert.ToString(newDebList.Count);
                     busyIndicator.IsBusy = false;
@@ -246,6 +252,12 @@ namespace UnicontaClient.Pages.CustomPage
                     newCreditor.NewCity = address.cityname;
                     newCreditor.NewName = ci.life.name;
                     newCreditor.NewIndustryCode = IndustryCodes.Get(ci.industrycode?.code)?.KeyStr;
+                    var state = ci.companystatus;
+                    if (state != null)
+                    {
+                        newCreditor._companyState = state.StatusCode();
+                        newCreditor.NotifyPropertyChanged("NewCompanyState");
+                    }
                     newCredList.Add(newCreditor);
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("Loading") + " " + NumberConvert.ToString(newCredList.Count);
                     busyIndicator.IsBusy = false;
@@ -292,6 +304,12 @@ namespace UnicontaClient.Pages.CustomPage
                     newProspect.NewCity = address.cityname;
                     newProspect.NewName = ci.life.name;
                     newProspect.NewIndustryCode = IndustryCodes.Get(ci.industrycode?.code)?.KeyStr;
+                    var state = ci.companystatus;
+                    if (state != null)
+                    {
+                        newProspect._companyState = state.StatusCode();
+                        newProspect.NotifyPropertyChanged("NewCompanyState");
+                    }
                     newProsList.Add(newProspect);
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("Loading") + " " + NumberConvert.ToString(newProsList.Count);
                     busyIndicator.IsBusy = false;
@@ -340,6 +358,7 @@ namespace UnicontaClient.Pages.CustomPage
                 item._City = item.NewCity;
                 item._Name = item.NewName;
                 item._IndustryCode= item.NewIndustryCode;
+                item.CompanyState = item.NewCompanyState;
                 lst2[i] = item;
                 i++;
             }
@@ -362,6 +381,7 @@ namespace UnicontaClient.Pages.CustomPage
                 item._ZipCode = item.NewZipCode;
                 item._City = item.NewCity;
                 item._IndustryCode= item.NewIndustryCode;
+                item.CompanyState = item.NewCompanyState;
                 lst2[i] = item;
                 i++;
             }
@@ -384,6 +404,7 @@ namespace UnicontaClient.Pages.CustomPage
                 item._ZipCode = item.NewZipCode;
                 item._City = item.NewCity;
                 item._IndustryCode= item.NewIndustryCode;
+                item.CompanyState = item.NewCompanyState;
                 lst2[i] = item;
                 i++;
             }
@@ -431,6 +452,7 @@ namespace UnicontaClient.Pages.CustomPage
     public class DebtorClientLocal : DebtorClient
     {
         private string _address, _address2, _city, _zipCode, _name, _industryCode;
+        public byte _companyState;
         [StringLength(60)]
         [Display(Name = "NewAddress", ResourceType = typeof(DCAccountText))]
         public string NewAddress { get { return _address; } set { _address = value; NotifyPropertyChanged("NewAddress1"); } }
@@ -456,12 +478,13 @@ namespace UnicontaClient.Pages.CustomPage
       
         [AppEnum(EnumName = "CompanyState")]
         [Display(Name = "NewCompanyState", ResourceType = typeof(DCAccountText))]
-        public string NewCompanyState { get { return AppEnums.CompanyState.ToString((int)_StateOfCompany); } set { if (value == null) return; _StateOfCompany = (byte)AppEnums.CompanyState.IndexOf(value); NotifyPropertyChanged("NewCompanyState"); } }
+        public string NewCompanyState { get { return AppEnums.CompanyState.ToString((int)_companyState); } set { if (value == null) return; _companyState = (byte)AppEnums.CompanyState.IndexOf(value); NotifyPropertyChanged("NewCompanyState"); } }
     }
 
     public class CreditorClientLocal : CreditorClient
     {
         private string _address, _address2, _city, _zipCode, _name, _industryCode;
+        public byte _companyState;
         [StringLength(60)]
         [Display(Name = "NewAddress", ResourceType = typeof(DCAccountText))]
         public string NewAddress { get { return _address; } set { _address = value; NotifyPropertyChanged("NewAddress1"); } }
@@ -486,12 +509,13 @@ namespace UnicontaClient.Pages.CustomPage
         public string NewIndustryCode { get { return _industryCode; } set { _industryCode = value; NotifyPropertyChanged("NewIndustryCode"); } }
         [AppEnum(EnumName = "CompanyState")]
         [Display(Name = "NewCompanyState", ResourceType = typeof(DCAccountText))]
-        public string NewCompanyState { get { return AppEnums.CompanyState.ToString((int)_StateOfCompany); } set { if (value == null) return; _StateOfCompany = (byte)AppEnums.CompanyState.IndexOf(value); NotifyPropertyChanged("CompanyState"); } }
+        public string NewCompanyState { get { return AppEnums.CompanyState.ToString((int)_companyState); } set { if (value == null) return; _companyState = (byte)AppEnums.CompanyState.IndexOf(value); NotifyPropertyChanged("NewCompanyState"); } }
     }
 
     public class CrmProspectClientLocal : CrmProspectClient
     {
         private string _address, _address2, _city, _zipCode, _name, _industryCode;
+        public byte _companyState;
         [StringLength(60)]
         [Display(Name = "NewAddress", ResourceType = typeof(DCAccountText))]
         public string NewAddress { get { return _address; } set { _address = value; NotifyPropertyChanged("NewAddress1"); } }
@@ -517,7 +541,7 @@ namespace UnicontaClient.Pages.CustomPage
      
         [AppEnum(EnumName = "CompanyState")]
         [Display(Name = "NewCompanyState", ResourceType = typeof(DCAccountText))]
-        public string NewCompanyState { get { return AppEnums.CompanyState.ToString((int)_StateOfCompany); } set { if (value == null) return; _StateOfCompany = (byte)AppEnums.CompanyState.IndexOf(value); NotifyPropertyChanged("CompanyState"); } }
+        public string NewCompanyState { get { return AppEnums.CompanyState.ToString((int)_companyState); } set { if (value == null) return; _companyState = (byte)AppEnums.CompanyState.IndexOf(value); NotifyPropertyChanged("NewCompanyState"); } }
     }
 }
 

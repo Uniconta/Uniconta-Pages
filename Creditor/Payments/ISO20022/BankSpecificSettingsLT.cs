@@ -271,7 +271,7 @@ namespace UnicontaISO20022CreditTransfer
         /// ONCL (Standard Transfer)
         /// SDCL (Same-day Transfer)
         /// </summary>
-        public override string ExternalLocalInstrument(string currencyCode, DateTime executionDate)
+        public override string ExternalLocalInstrument(string currencyCode, DateTime executionDate, PaymentTypes paymentMethod, ISO20022PaymentTypes ISOPaymType)
         {
             switch (CredPaymFormat.Bank)
             {

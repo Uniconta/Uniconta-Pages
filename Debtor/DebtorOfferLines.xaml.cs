@@ -1,4 +1,3 @@
-using Uniconta.API.DebtorCreditor;
 using UnicontaClient.Models;
 using Uniconta.ClientTools;
 using Uniconta.ClientTools.Controls;
@@ -10,24 +9,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 using Uniconta.ClientTools.Util;
-
-using Uniconta.API.GeneralLedger;
-using System.Text;
 using UnicontaClient.Utilities;
 using DevExpress.Xpf.Grid;
 using Uniconta.API.System;
-using UnicontaClient.Pages;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -212,12 +201,18 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (!company.Warehouse)
                 Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
-           RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
             if (company.HideCostPrice)
             {
                 Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
            CostPrice.Visible = CostPrice.ShowInColumnChooser = CostValue.Visible = CostValue.ShowInColumnChooser = false;
                 UtilDisplay.RemoveMenuCommand(rb, new string[] { "CostValue", "DB" });
+            }
+
+            if (Order?._PricesInclVat == true)
+            {
+                Margin.Visible = Margin.ShowInColumnChooser = false;
+                MarginRatio.Visible = MarginRatio.ShowInColumnChooser = false;
             }
         }
 

@@ -124,6 +124,10 @@ namespace UnicontaClient.Pages.CustomPage
             txtDateTo.DateTime = InventoryStatement.DefaultToDate;
             txtDateFrm.DateTime = InventoryStatement.DefaultFromDate;
 
+            ItemCache = api.GetCache(typeof(Uniconta.DataModel.InvItem));
+            if (ItemCache == null)
+                api.LoadCache(typeof(Uniconta.DataModel.InvItem));
+ 
             GetMenuItem();
         }
 
@@ -221,7 +225,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             dgInvTran.Visibility = Visibility.Visible;
             busyIndicator.IsBusy = false;
-            if (statementList?.Count == 1)
+            if (statementList != null && statementList.Count == 1)
                 ExpandAndCollapseAll(false);
         }
         public override object GetPrintParameter()
@@ -230,7 +234,8 @@ namespace UnicontaClient.Pages.CustomPage
                 dgInvTran.ExpandMasterRow(rowHandle);
             return base.GetPrintParameter();
         }
-        List<InvItemStatementList> statementList = null;
+
+        List<InvItemStatementList> statementList;
         void FillStatement(InvTransClientTotal[] listtran)
         {
             var isAscending = cbxAscending.IsChecked.GetValueOrDefault();
@@ -242,6 +247,8 @@ namespace UnicontaClient.Pages.CustomPage
 
             statementList = new List<InvItemStatementList>(Math.Min(20, dataRowCount));
 
+            if (ItemCache == null)
+                ItemCache = api.LoadCache(typeof(Uniconta.DataModel.InvItem)).GetAwaiter().GetResult();
             string curItem = " ";
             InvItemStatementList ob = null;
             var tlst = new List<InvTransClientTotal>(100);
@@ -253,7 +260,7 @@ namespace UnicontaClient.Pages.CustomPage
                 var t = listtran[n];
                 if (t._Item != curItem)
                 {
-                    var ac = (InvItem)ItemCache.Get(t._Item);
+                    var ac = ItemCache.Get(t._Item) as InvItem;
                     if (ac == null)
                         continue;
 
@@ -261,6 +268,7 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         if (!skipBlank || SumCost != 0 || SumQty != 0 || tlst.Count > 1)
                         {
+                            statementList.Add(ob);
                             ob._SumQty = Math.Round(SumQty, ob.itm._Decimals);
                             ob._SumCost = SumCost;
                             ob.ChildRecord = tlst.ToArray();
@@ -269,10 +277,9 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                     }
                     tlst.Clear();
-
+                    
                     curItem = ac._Item;
                     ob = new InvItemStatementList() { itm = ac };
-                    statementList.Add(ob);
                     SumCost = 0;
                     SumQty = 0d;
                 }
@@ -286,8 +293,9 @@ namespace UnicontaClient.Pages.CustomPage
                 tlst.Add(t);
             }
 
-            if (ob != null)
-            {
+            if (ob != null && (!skipBlank || SumCost != 0 || SumQty != 0 || tlst.Count > 1))
+            { 
+                statementList.Add(ob);
                 ob._SumQty = Math.Round(SumQty, ob.itm._Decimals);
                 ob._SumCost = SumCost;
                 ob.ChildRecord = tlst.ToArray();
@@ -306,10 +314,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override async Task LoadCacheInBackGroundAsync()
         {
-            var api = this.api;
-            var Comp = api.CompanyEntity;
-            ItemCache = Comp.GetCache(typeof(Uniconta.DataModel.InvItem)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.InvItem), api).ConfigureAwait(false);
-
+            if (ItemCache == null)
+                ItemCache = await api.LoadCache(typeof(Uniconta.DataModel.InvItem)).ConfigureAwait(false);
             LoadType(new Type[] { typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.Creditor) });
         }
 
@@ -344,8 +350,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void GetMenuItem()
         {
-            RibbonBase rb = (RibbonBase)localMenu.DataContext;
-            ibase = UtilDisplay.GetMenuCommandByName(rb, "ExpandAndCollapse");
+            ibase = UtilDisplay.GetMenuCommandByName((RibbonBase)localMenu.DataContext, "ExpandAndCollapse");
         }
 
         int dataRowCount;

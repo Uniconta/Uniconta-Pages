@@ -100,7 +100,8 @@ namespace UnicontaClient.Pages.CustomPage
         {
             busyIndicator.IsBusy = true;
             var masters = new List<UnicontaBaseEntity> { projectJournal };
-            var prJrnLineLst = await api.Query<ProjectJournalLineClient>(masters, null);
+            var prjLineInstance = api.CompanyEntity.CreateUserType<ProjectJournalLineClient>();
+            var prJrnLineLst = await api.Query(prjLineInstance, masters, null);
             dgJournalLineStartStopPageGrid.ItemsSource = prJrnLineLst?.Where(x => x.Qty == 0 && x.TimeTo.TimeOfDay.ToString() == "00:00:00" && !string.IsNullOrEmpty(x.Text) && !x.Text.Contains("Text:")).ToList();
             dgJournalLineStartStopPageGrid.Visibility = Visibility.Visible;
             busyIndicator.IsBusy = false;
@@ -119,7 +120,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 case "AddRow":
                     {
-                        var newItem = new ProjectJournalLineClient();
+                        var newItem = api.CompanyEntity.CreateUserType<ProjectJournalLineClient>();
                         newItem.SetMaster(projectJournal);
                         AddDockItem(TabControls.TmJournalLineStartStopPage2, new object[] { newItem, false, true }, Uniconta.ClientTools.Localization.lookup("StartTimeRegistration"), "Add_16x16");
                     }

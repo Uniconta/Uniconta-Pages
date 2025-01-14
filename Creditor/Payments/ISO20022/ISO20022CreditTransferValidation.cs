@@ -240,7 +240,7 @@ namespace ISO20022CreditTransfer
             }
             else if (credPaymFormat._ExportFormat == (byte)ExportFormatType.ISO20022_DK)
             {
-                if (paymentType == PaymentTypes.IBAN && isoPaymentType == ISO20022PaymentTypes.DOMESTIC) //Not sure which banks has this requirement.
+                if (paymentType == PaymentTypes.IBAN && isoPaymentType == ISO20022PaymentTypes.DOMESTIC && (CompanyBankEnum != CompanyBankENUM.BankData && CompanyBankEnum != CompanyBankENUM.BEC && CompanyBankEnum != CompanyBankENUM.SDC)) //Not sure which banks has this requirement.
                     checkErrors.Add(new CheckError(String.Format("It's not allowed to use IBAN as creditor account for domestic payments.")));
             }
 
@@ -850,31 +850,6 @@ namespace ISO20022CreditTransfer
             return true;
         }
 
-        /// <summary>
-        /// Tdentification assigned by an institution.
-        /// Max. 35 characters.
-        /// </summary>
-        private bool IdentificationId(String identificationId)
-        {
-            identificationId = identificationId ?? string.Empty;
-
-            switch (CompanyBankEnum)
-            {
-                case CompanyBankENUM.Nordea_DK:
-                    if (identificationId == string.Empty)
-                        return false;
-                    else
-                        return true;
-                case CompanyBankENUM.DanskeBank:
-                    return true; //Pt. ukendt - Kode skal sandsynligvis aftale med Banken
-                case CompanyBankENUM.BankData:
-                case CompanyBankENUM.BEC:
-                case CompanyBankENUM.SDC:
-                    return true; //Pt. ukendt - Kode skal sandsynligvis aftale med Banken
-                default:
-                    return true;
-            }
-        }
 
         /// <summary>
         /// Modulus 10 check digit validation

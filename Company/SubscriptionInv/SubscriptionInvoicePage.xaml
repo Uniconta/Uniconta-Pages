@@ -40,6 +40,7 @@ x:Class="UnicontaClient.Pages.CustomPage.SubscriptionInvoicePage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ModuleCrm" Width="50" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ModuleProject" Width="50" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ModuleProduction" Width="50" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AutomationPackage" Width="50" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Send" Width="90" />
                 </localPage:SubscriptionInvoiceGrid.Columns>
                 <localPage:SubscriptionInvoiceGrid.TotalSummary>

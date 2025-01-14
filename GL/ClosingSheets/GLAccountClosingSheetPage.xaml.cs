@@ -171,10 +171,16 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override void PageClosing()
         {
-            dgGLTable.tableView.PostEditor();
-            SaveNotes();
+            SaveFields();
             base.PageClosing();
         }
+
+        private void SaveFields()
+        {
+            dgGLTable.tableView.PostEditor();
+            SaveNotes();
+        }
+
         public override bool IsDataChaged => false;
         void DataControl_CurrentItemChanged(object sender, DevExpress.Xpf.Grid.CurrentItemChangedEventArgs e)
         {
@@ -212,7 +218,8 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (screenName == TabControls.ClosingSheetLinesAll)
             {
-                BindGrid();
+                var t = BindGrid();
+                LoadNotes(t);
                 mainList = null;
                 ClosingSheetHasLinesList = null;
             }
@@ -256,6 +263,7 @@ namespace UnicontaClient.Pages.CustomPage
                         AddDockItem(TabControls.ClosingSheetLines, new object[] { masterRecord, dgGLTable.syncEntity, this.AccountListCache }, string.Format("{0}: {1}, {2}", Uniconta.ClientTools.Localization.lookup("ClosingSheetLines"), selectedItem._Account, masterRecord._Name));
                     break;
                 case "ClosingSheetLinesAll":
+                    SaveFields();
                     AddDockItem(TabControls.ClosingSheetLinesAll, new object[] { masterRecord }, string.Format("{0}: {1}", masterRecord._Name, Uniconta.ClientTools.Localization.lookup("AllLines")));
                     break;
                 case "ClosingSheetHasLines":

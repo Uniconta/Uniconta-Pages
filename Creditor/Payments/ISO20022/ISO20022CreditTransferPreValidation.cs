@@ -140,8 +140,8 @@ namespace ISO20022CreditTransfer
                         PreCheckErrors.Add(new PreCheckError(string.Format("Payment format '{0}' is not available for GL Journal generated payments", credPaymFormat._ExportFormat))); //TODO:Opret label
 
                     CompanyBankName(paymentformat);
-                    CustomerIdentificationId(bankAccount._BankCompanyId, paymentformat);
-                    BankIdentificationId(bankAccount._ContractId, paymentformat);
+                    CustomerIdentificationId(bankAccount._BankCompanyId, paymentformat); //Field Bank "Kunde-Id"
+                    BankIdentificationId(bankAccount._ContractId, paymentformat); //Field Bank "Identifikation af aftalen"
 
                     CompanySWIFT(bankAccount._SWIFT, paymentformat);
                     CompanyIBAN(bankAccount._IBAN, paymentformat);
@@ -217,7 +217,7 @@ namespace ISO20022CreditTransfer
         /// </summary>
         public void CompanySWIFT(String swift, ExportFormatType exportFormat)
         {
-            //For now we require that IBAN/SWIFT is always filled in for ISO20022 payments - we probably has to ease the rule on the long run
+            //For now we require that IBAN/SWIFT is always filled in for ISO20022 payments - except for BankConnect (BankData, BEC and SDC)
             if (formatTypeISO)
             {
                 SWIFTok = true;
@@ -226,7 +226,9 @@ namespace ISO20022CreditTransfer
 
                 if (string.IsNullOrEmpty(swift))
                 {
-                    preCheckErrors.Add(new PreCheckError(String.Format("The SWIFT code has not been filled in. (Format: {0})", credPaymFormat._Format)));
+                    var isBC = companyBankEnum == CompanyBankENUM.BankData || companyBankEnum == CompanyBankENUM.BEC || companyBankEnum == CompanyBankENUM.SDC;
+                    if (!isBC)
+                        preCheckErrors.Add(new PreCheckError(String.Format("The SWIFT code has not been filled in. (Format: {0})", credPaymFormat._Format)));
                     SWIFTok = false;
                 }
                 else if (!StandardPaymentFunctions.ValidateBIC(swift))
@@ -243,7 +245,7 @@ namespace ISO20022CreditTransfer
         /// </summary>
         public void CompanyIBAN(String iban, ExportFormatType exportFormat)
         {
-            //For now we require that IBAN/SWIFT is always filled in for ISO20022 payments - we probably has to ease the rule on the long run
+            //For now we require that IBAN/SWIFT is always filled in for ISO20022 payments - except for BankConnect (BankData, BEC and SDC)
             if (formatTypeISO)
             {
                 IBANok = true;
@@ -252,7 +254,9 @@ namespace ISO20022CreditTransfer
 
                 if (string.IsNullOrEmpty(iban))
                 {
-                    preCheckErrors.Add(new PreCheckError(String.Format("The IBAN number has not been filled in. (Format: {0})", credPaymFormat._Format)));
+                    var isBC = companyBankEnum == CompanyBankENUM.BankData || companyBankEnum == CompanyBankENUM.BEC || companyBankEnum == CompanyBankENUM.SDC;
+                    if (!isBC)
+                        preCheckErrors.Add(new PreCheckError(String.Format("The IBAN number has not been filled in. (Format: {0})", credPaymFormat._Format)));
                     IBANok = false;
                 }
                 else if (!StandardPaymentFunctions.ValidateIBAN(iban))
@@ -304,6 +308,12 @@ namespace ISO20022CreditTransfer
                     case CompanyBankENUM.Handelsbanken:
                         if (string.IsNullOrEmpty(bankIdentificationId) || (bankIdentificationId.Length < 10 || bankIdentificationId.Length > 18))
                             preCheckErrors.Add(new PreCheckError(String.Format("The Bank Identification Id is mandatory for '{0}'.  (Min 10 and Max 18 characters may be allowed)", companyBankEnum)));
+                        break;
+                    case CompanyBankENUM.BankData:
+                    case CompanyBankENUM.BEC:
+                    case CompanyBankENUM.SDC:
+                        if (string.IsNullOrEmpty(bankIdentificationId))
+                            preCheckErrors.Add(new PreCheckError("Feltet 'Identifikation af aftalen' (Bankafstemning) skal udfyldes"));
                         break;
                 }
             }

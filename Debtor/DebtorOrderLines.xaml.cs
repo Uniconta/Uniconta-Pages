@@ -10,26 +10,15 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 using Uniconta.ClientTools.Util;
-
-using Uniconta.API.GeneralLedger;
-using System.Text;
 using UnicontaClient.Utilities;
 using DevExpress.Xpf.Grid;
-using UnicontaClient.Controls.Dialogs;
-using UnicontaClient.Pages;
 using Uniconta.Common.Utility;
-using Microsoft.Win32;
+
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
@@ -327,6 +316,12 @@ namespace UnicontaClient.Pages.CustomPage
                CostPrice.Visible = CostPrice.ShowInColumnChooser = CostValue.Visible = CostValue.ShowInColumnChooser = false;
                 UtilDisplay.RemoveMenuCommand(rb, new string[] { "CostValue", "DB" });
             }
+
+            if (Order?._PricesInclVat == true)
+            {
+                Margin.Visible = Margin.ShowInColumnChooser = false;
+                MarginRatio.Visible = MarginRatio.ShowInColumnChooser = false;
+            }
         }
 
         void SetVariantColumns()
@@ -424,7 +419,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var masterRecord = dgDebtorOrderLineGrid.masterRecord;
                     var currentRecrod = args[4] as UnicontaBaseEntity;
 
-                    if (currentRecrod!=null && object.ReferenceEquals(masterRecord, currentRecrod))
+                    if (currentRecrod != null && object.ReferenceEquals(masterRecord, currentRecrod))
                         dgDebtorOrderLineGrid.PasteRows(orderlines);
                 }
             }

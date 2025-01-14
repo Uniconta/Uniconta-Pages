@@ -82,7 +82,7 @@ namespace UnicontaClient.Pages.CustomPage
                 country != CountryCode.Norway)
                 liPymtCodeOpt.Visibility = Visibility.Collapsed;
 
-            if (session.User._Role <= (byte)Uniconta.Common.User.UserRoles.Accountant)
+            if (session.User._Role <= (byte)Uniconta.Common.User.UserRoles.Accountant && api.CompanyEntity._OwnerUid != session.Uid)
                 UtilDisplay.RemoveMenuCommand((RibbonBase)frmRibbon.DataContext, "Delete");
 
             RemoveMenuItem();

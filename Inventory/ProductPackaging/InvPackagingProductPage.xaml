@@ -22,7 +22,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InvPackagingProductPage"
                     <local:ComboBoxColumnClient x:Name="WasteSorting" />
                     <local:ComboBoxColumnClient x:Name="PackagingRateLevel" />
                     <local:ComboBoxColumnClient x:Name="PackagingConsumer" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Weight" AllowThousandMask="True" Mask="N3"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Weight" AllowThousandMask="True" Mask="N4"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Text" Width="300" />
                 </local:InvPackagingProductPageGrid.Columns>
             </local:InvPackagingProductPageGrid>

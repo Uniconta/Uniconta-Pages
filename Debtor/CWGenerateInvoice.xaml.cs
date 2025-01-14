@@ -227,6 +227,9 @@ namespace UnicontaClient.Pages.CustomPage
             _api = api;
         }
 
+        public void SetOIOUBLLabelText(bool sendXmlSalesInvoice) { } //Method to backward compatible
+
+
         public void SentByEInvoice(CrudAPI api, Tuple<NHRNetworkType, NHREndPointType, string> endPoint, bool forceEnableEinvoice = false)
         {
             IsSendXmlSalesInvoice = true;

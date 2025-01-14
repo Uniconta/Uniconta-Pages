@@ -303,7 +303,7 @@ namespace UnicontaISO20022CreditTransfer
             return string.Empty;
         }
 
-        public override string ExternalLocalInstrument(string currencyCode, DateTime executionDate)
+        public override string ExternalLocalInstrument(string currencyCode, DateTime executionDate, PaymentTypes paymentMethod, ISO20022PaymentTypes ISOPaymType)
         {
             return string.Empty;
         }

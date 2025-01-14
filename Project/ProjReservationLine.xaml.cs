@@ -74,7 +74,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     var it = (ProjectBudgetLineClient)_it;
                     var itemCache = api.CompanyEntity.GetCache(typeof(InvItem));
-                    if (it._Item == null || (itemCache?.Get(it._Item) as InvItem)?._ItemType != (byte)ItemType.Item || it._QtyPurchased != 0d || it._QtyTaken != 0d)
+                    if (it._Item == null || (itemCache?.Get(it._Item) as InvItem)?._ItemType != (byte)ItemType.Item || it._QtyTaken != 0d)
                         continue;
                     lst.Add(CreateNewReservationLine(it._Item, it._Qty, it._Text, 0d, 0d, 0d, 0d, it._Variant1, it._Variant2, it._Variant3, it._Variant4, it._Variant5, it._Unit,
                     it._Date, 0, null, it._Task, it._WorkSpace));

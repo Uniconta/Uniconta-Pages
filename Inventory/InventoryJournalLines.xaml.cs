@@ -175,6 +175,10 @@ namespace UnicontaClient.Pages.CustomPage
                 dgInvJournalLine.ClearFilter();
                 dgInvJournalLine.IsLoadedFromLayoutSaved = false;
             }
+            if (api.CompanyEntity.HideCostPrice)
+            {
+                CostPrice.Visible = CostPrice.ShowInColumnChooser = CostValue.Visible = CostValue.ShowInColumnChooser = false;
+            }
         }
 
         bool DataChanged;

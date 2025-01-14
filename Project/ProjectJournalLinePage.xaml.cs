@@ -226,6 +226,12 @@ namespace UnicontaClient.Pages.CustomPage
             var rb = (RibbonBase)localMenu.DataContext;
             if (masterJournalEmployee?._UserLogidId != api?.session?.LoginId)
                 UtilDisplay.RemoveMenuCommand(rb, "EmployeeRegistrationLinePage");
+
+            if (api.CompanyEntity.HideCostPrice)
+            {
+                CostPrice.Visible = CostPrice.ShowInColumnChooser =
+                CostAmount.Visible = CostAmount.ShowInColumnChooser = false;
+            }
         }
 
         private void DataControl_CurrentItemChanged(object sender, DevExpress.Xpf.Grid.CurrentItemChangedEventArgs e)
@@ -630,11 +636,12 @@ namespace UnicontaClient.Pages.CustomPage
                 PayrollCache = api.GetCache(typeof(Uniconta.DataModel.EmpPayrollCategory)) ?? await api.LoadCache(typeof(Uniconta.DataModel.EmpPayrollCategory)).ConfigureAwait(false);
             if (api.CompanyEntity.Warehouse)
                 WarehouseCache = api.GetCache(typeof(Uniconta.DataModel.InvWarehouse)) ?? await api.LoadCache(typeof(Uniconta.DataModel.InvWarehouse)).ConfigureAwait(false);
-            WorkspaceCache = WorkspaceCache ?? await api.LoadCache<Uniconta.DataModel.PrWorkSpace>().ConfigureAwait(false);
+            if (WorkspaceCache == null)
+                WorkspaceCache = await api.LoadCache<Uniconta.DataModel.PrWorkSpace>().ConfigureAwait(false);
 
             TimePriceLookup = new Uniconta.API.Project.FindPricesEmpl(api, true);
 
-            dgProjectJournalLinePageGrid.WorkSpaceDefault = WorkspaceCache.FirstOrDefault(s => s._Default)?._Number; ;
+            dgProjectJournalLinePageGrid.WorkSpaceDefault = WorkspaceCache?.FirstOrDefault(s => s._Default)?._Number;
         }
 
         private void localMenu_OnItemClicked(string ActionType)

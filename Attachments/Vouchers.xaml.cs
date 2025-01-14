@@ -118,21 +118,17 @@ namespace UnicontaClient.Pages.CustomPage
             var tr = tableArgs.TargetRow as VouchersClient;
             foreach (var row in e.DraggedRows)
             {
-                if (tr != null)
+                if (row is VouchersClient dr)
                 {
-                    if (row is VouchersClient)
+                    this.SetLoadedRow(dr);
+                    dr._ViewInFolder = tr._ViewInFolder;
+                    this.SetModifiedRow(dr);
+                }
+                else if (row is UserDocsClient userDoc)
+                {
+                    var result = api.Read(userDoc).Result;
+                    if (result == ErrorCodes.Succes)
                     {
-                        var dr = row as VouchersClient;
-                        this.SetLoadedRow(dr);
-                        dr._ViewInFolder = tr._ViewInFolder;
-                        this.SetModifiedRow(dr);
-                    }
-                    else if (row is UserDocsClient)
-                    {
-                        var userDoc = row as UserDocsClient;
-                        var result = api.Read(userDoc).Result;
-                        if (result != ErrorCodes.Succes)
-                            continue;
                         var userDocs = new List<UnicontaBaseEntity>() { userDoc };
                         _canInsert = true;
                         PasteRows(userDocs);
@@ -147,17 +143,18 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (copyFromRows.FirstOrDefault() is UserDocsClient)
             {
+                var t = api.CompanyEntity.GetUserTypeNotNull(typeof(VouchersClient));
                 var lst = new List<UnicontaBaseEntity>(copyFromRows.Count());
                 foreach (var row in copyFromRows)
                 {
                     var doc = (UserDocsClient)row;
-                    var voucher = Activator.CreateInstance(api.CompanyEntity.GetUserTypeNotNull(typeof(VouchersClient))) as VouchersClient;
+                    var voucher = Activator.CreateInstance(t) as VouchersClient;
                     voucher.SetMaster(api.CompanyEntity);
-
-                    voucher.Text = doc._Text;
-                    voucher.Fileextension = doc.DocumentType;
-                    voucher.VoucherAttachment = doc._Data;
-                    voucher.Url = doc._Url;
+                    voucher._ScanDoc = true;
+                    voucher._Text = doc._Text;
+                    voucher._Fileextension = doc.DocumentType;
+                    voucher._Data = doc._Data;
+                    voucher._Url = doc._Url;
                     lst.Add(voucher);
                 }
                 return lst;
@@ -545,6 +542,8 @@ namespace UnicontaClient.Pages.CustomPage
                     var dc = (Uniconta.DataModel.DCAccount)CreditorCache?.Get(rec._CreditorAccount);
                     if (dc == null)
                         return;
+                    if (dc._PostingAccount != null)
+                        rec.CostAccount = dc._PostingAccount;
                     if (dc._Dim1 != null)
                         rec.Dimension1 = dc._Dim1;
                     if (dc._Dim2 != null)
@@ -557,8 +556,6 @@ namespace UnicontaClient.Pages.CustomPage
                         rec.Dimension5 = dc._Dim5;
                     if (dc._Currency != 0)
                         rec.Currency = AppEnums.Currencies.ToString((int)dc._Currency);
-                    if (dc._PostingAccount != null)
-                        rec.CostAccount = dc._PostingAccount;
                     if (dc._Vat != null && rec._Vat == null)
                     {
                         if (rec._CostAccount != null)
@@ -1167,8 +1164,17 @@ namespace UnicontaClient.Pages.CustomPage
 
         private async void ConvertToPDF(VouchersClient voucherClient)
         {
-            if (voucherClient.Fileextension != FileextensionsTypes.PDF)
+            var fileExt = voucherClient.Fileextension;
+            if (fileExt != FileextensionsTypes.PDF)
             {
+                if (fileExt != FileextensionsTypes.DOC && fileExt != FileextensionsTypes.DOCX && fileExt != FileextensionsTypes.TXT &&
+                    fileExt != FileextensionsTypes.CSV && fileExt != FileextensionsTypes.RTF && fileExt != FileextensionsTypes.HTML &&
+                    fileExt != FileextensionsTypes.MHT && fileExt != FileextensionsTypes.ODT && fileExt != FileextensionsTypes.JPEG &&
+                    fileExt != FileextensionsTypes.PNG && fileExt != FileextensionsTypes.MSG && fileExt != FileextensionsTypes.EML)
+                {
+                    UnicontaMessageBox.Show(Localization.lookup("ConversionNotSupport"),Localization.lookup("Information"));
+                    return;
+                }
 
                 if (UnicontaMessageBox.Show(Localization.lookup("AreYouSureToContinue"),
                     Localization.lookup("Confirmation"), MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)

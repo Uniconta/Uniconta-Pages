@@ -329,7 +329,7 @@ namespace UnicontaISO20022CreditTransfer
         /// 
         /// ING_Bank: Not used
         /// </summary>
-        public override string ExternalLocalInstrument(string currencyCode, DateTime executionDate)
+        public override string ExternalLocalInstrument(string currencyCode, DateTime executionDate, PaymentTypes paymentMethod, ISO20022PaymentTypes ISOPaymType)
         {
             switch (companyBankEnum)
             {

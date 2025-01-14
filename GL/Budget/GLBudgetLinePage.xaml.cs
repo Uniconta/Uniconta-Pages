@@ -316,15 +316,21 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         if (n == 5) // half year
                             n = 6;
-                        else if (n == 6) // year
-                            n = 12;
+                        else // years
+                            n = (n - 5) * 12;
                     }
                     var RegulatePct = rec._Regulate / 100d;
                     var recAmount = rec._Amount;
                     int i = 0;
                     for (;;)
                     {
-                        var newDate = recDate.AddMonths(i * n);
+                        DateTime newDate;
+                        if (n == 11 * 12) // week
+                            newDate = recDate.AddDays(i * 7);
+                        else if (n == 12 * 13) // 2 weeks
+                            newDate = recDate.AddDays(i * 7 * 2);
+                        else
+                            newDate = recDate.AddMonths(i * n);
                         if (newDate > recToDate)
                             break;
                         if (newDate >= BudgetFromDate)

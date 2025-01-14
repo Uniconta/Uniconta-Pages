@@ -662,7 +662,7 @@ namespace UnicontaClient.Pages.CustomPage
                         args[0] = api;
                         args[1] = selectedItem.DebtorRef.Account;
                         string header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("DebtorAccount"), selectedItem.DebtorRef?._Name);
-                        this.AddDockItem(TabControls.DebtorAccount_lookup, args, header, null, false);
+                        this.AddDockItem(TabControls.DebtorAccount, args, header, null, false);
                     }
                     break;
                 case "ViewNotes":

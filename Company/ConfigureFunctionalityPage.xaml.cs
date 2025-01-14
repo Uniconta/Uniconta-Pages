@@ -112,7 +112,20 @@ namespace UnicontaClient.Pages.CustomPage
             cbStorageOnAll.IsEnabled = HasStorage;
         }
 
-        private void cmbDocumentScanner_SelectedIndexChanged(object sender, RoutedEventArgs e) =>
-            editrow.DocumentScanner = (PayableDocumentScanners)cmbDocumentScanner.SelectedIndex;
+        private void cmbDocumentScanner_SelectedIndexChanged(object sender, RoutedEventArgs e)
+        {
+            var selected = (PayableDocumentScanners)cmbDocumentScanner.SelectedIndex;
+            if (selected == editrow.DocumentScanner)
+                return;
+
+            editrow.DocumentScanner = selected;
+            if (selected == 0)
+                return;
+
+            var result = MessageBox.Show(CompanyClientText.AutoSaveCreditors + "?",
+                Uniconta.ClientTools.Localization.lookup("DocumentScannersPay"), MessageBoxButton.YesNo);
+
+            editrow._PaperFlowSaveCreditors = result == MessageBoxResult.Yes;
+        }
     }
 }

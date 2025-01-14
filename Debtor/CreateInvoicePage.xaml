@@ -49,37 +49,37 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateInvoicePage"
                                 <ColumnDefinition Width="150" />
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DAccount}"  Grid.Column="0" Grid.Row="0" />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DAccount}" Foreground="{StaticResource BodyTextColorBrush}"  Grid.Column="0" Grid.Row="0" />
                             <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="0" HorizontalAlignment="Center"  Margin="38,0,0,0" >
                                 <CorasauControls:LookupEditor MaxWidth="140" x:Name="LeAccount" EditValue="{Binding Account,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  EditValueChanged="leAccount_EditValueChanged"   />
                                 <CorasauControls:ComboBoxEditor Margin="3,0,0,0" ShowText="False" Width="30" x:Name="cmbCreateAccount" SelectedIndexChanged="cmbCreateAccount_SelectedIndexChanged" />
                              </StackPanel>
 
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Name}" Grid.Column="0" Grid.Row="2" />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Name}" Grid.Column="0" Grid.Row="2" Foreground="{StaticResource BodyTextColorBrush}"/>
                             <CorasauControls:TextEditor MaxWidth="170"   x:Name="txtName"    Text="{Binding Name,Mode=OneWay}"  Grid.Column="1" Grid.Row="2" Margin="5,0,0,0"  />
 
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=RevenueAccount}"  Grid.Column="0" Grid.Row="4" />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=RevenueAccount}" Grid.Column="0" Grid.Row="4" Foreground="{StaticResource BodyTextColorBrush}" />
                             <CorasauControls:LookupEditor MaxWidth="170"  x:Name="LePostingAccount" EditValue="{Binding PostingAccount,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Column="1"  Grid.Row="4" Margin="5,0,0,0"  />
 
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TransactionText}" Grid.Column="0" Grid.Row="6" />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TransactionText}" Grid.Column="0" Grid.Row="6" Foreground="{StaticResource BodyTextColorBrush}"/>
                             <CorasauControls:TextEditor MaxWidth="170"   x:Name="txtPostingText"  Text="{Binding PostingText,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Column="1" Grid.Row="6" Margin="5,0,0,0"  />
 
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LayoutGroup}"  Grid.Column="0" Grid.Row="8" />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LayoutGroup}" Grid.Column="0" Grid.Row="8" Foreground="{StaticResource BodyTextColorBrush}" />
                             <CorasauControls:LookupEditor MaxWidth="170"  x:Name="leLayoutGroup" EditValue="{Binding LayoutGroup,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Column="1"  Grid.Row="8" Margin="5,0,0,0"  />
 
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=InvoiceAccount}"  Grid.Column="3" Grid.Row="0" />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=InvoiceAccount}" Grid.Column="3" Grid.Row="0" Foreground="{StaticResource BodyTextColorBrush}" />
                             <CorasauControls:LookupEditor MaxWidth="170"  x:Name="leInvAccount" EditValue="{Binding InvoiceAccount,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Column="4"  Grid.Row="0" Margin="5,0,0,0"  />
 
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CurBalance}"  Grid.Column="3" Grid.Row="2" />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CurBalance}" Grid.Column="3" Grid.Row="2" Foreground="{StaticResource BodyTextColorBrush}" />
                             <CorasauControls:TextEditor MaxWidth="170" x:Name="txtCurBalance"  Text="{Binding CurBalance,Mode=OneWay}" IsReadOnly="True" Mask="N2" MaskType="Numeric" Grid.Column="4" Grid.Row="2" Margin="5,0,0,0" />
 
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Overdue}"  Grid.Column="3" Grid.Row="4" />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Overdue}" Grid.Column="3" Grid.Row="4" Foreground="{StaticResource BodyTextColorBrush}" />
                             <CorasauControls:TextEditor MaxWidth="170" x:Name="txtOverdue"  Text="{Binding Overdue,Mode=OneWay}" IsReadOnly="True" Mask="N2" MaskType="Numeric" Grid.Column="4" Grid.Row="4" Margin="5,0,0,0" />
 
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CreditMax}"  Grid.Column="3" Grid.Row="6" />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CreditMax}" Grid.Column="3" Grid.Row="6" Foreground="{StaticResource BodyTextColorBrush}" />
                             <CorasauControls:TextEditor MaxWidth="170" x:Name="txtCreditMax"  Text="{Binding CreditMax,Mode=OneWay}" Mask="N2" MaskType="Numeric" IsReadOnly="True" Grid.Column="4" Grid.Row="6" Margin="5,0,0,0" />
 
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PriceList}" x:Name="tbPriceList"  Grid.Column="3" Grid.Row="8" />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PriceList}" x:Name="tbPriceList" Grid.Column="3" Grid.Row="8" Foreground="{StaticResource BodyTextColorBrush}" />
                             <CorasauControls:LookupEditor MaxWidth="170"  x:Name="lePriceList" EditValue="{Binding PriceList,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" EditValueChanged="lePriceList_EditValueChanged"  Grid.Column="4"  Grid.Row="8" Margin="5,0,0,0"  />
                         </Grid>
                     </dxn:NavBarGroup>
@@ -105,24 +105,24 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateInvoicePage"
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
 
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DeliveryName}" Grid.Column="0" Grid.Row="0" />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DeliveryName}" Grid.Column="0" Grid.Row="0" Foreground="{StaticResource BodyTextColorBrush}"/>
                             <CorasauControls:TextEditor MaxWidth="170"  Text="{Binding DeliveryName,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Grid.Row="0" Margin="5,0,0,0"  />
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DeliveryAddress1}" Grid.Column="0" Grid.Row="2" />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DeliveryAddress1}" Grid.Column="0" Grid.Row="2" Foreground="{StaticResource BodyTextColorBrush}"/>
                             <CorasauControls:TextEditor MaxWidth="170"  Text="{Binding DeliveryAddress1,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Grid.Row="2" Margin="5,0,0,0"  />
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DeliveryAddress2}" Grid.Column="0" Grid.Row="4" />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DeliveryAddress2}" Grid.Column="0" Grid.Row="4" Foreground="{StaticResource BodyTextColorBrush}"/>
                             <CorasauControls:TextEditor  MaxWidth="170" Text="{Binding DeliveryAddress2,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Column="1" Grid.Row="4" Margin="5,0,0,0"  />
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DeliveryAddress3}" Grid.Column="0" Grid.Row="6" />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DeliveryAddress3}" Grid.Column="0" Grid.Row="6" Foreground="{StaticResource BodyTextColorBrush}"/>
                             <CorasauControls:TextEditor  MaxWidth="170" Text="{Binding DeliveryAddress3,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Column="1" Grid.Row="6" Margin="5,0,0,0"  />
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DeliveryIsInvoiceAddress}" Grid.Column="0" Grid.Row="8" TextWrapping="Wrap"/>
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DeliveryIsInvoiceAddress}" Grid.Column="0" Grid.Row="8" TextWrapping="Wrap" Foreground="{StaticResource BodyTextColorBrush}"/>
                             <CorasauControls:CheckEditor MinWidth="170" MaxWidth="170" HorizontalAlignment="Center" IsChecked="{Binding DeliveryIsInvoiceAddress,Mode=TwoWay}"  Grid.Column="1" Grid.Row="8" Margin="5,0,0,0"  />
 
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DeliveryZipcode}" Grid.Column="3" Grid.Row="0" />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DeliveryZipcode}" Grid.Column="3" Grid.Row="0" Foreground="{StaticResource BodyTextColorBrush}"/>
                             <CorasauControls:TextEditor MaxWidth="170"  Text="{Binding DeliveryZipCode,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.Column="4" Grid.Row="0" Margin="5,0,0,0" x:Name="txtDelZipCode" />
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DeliveryCity}" Grid.Column="3" Grid.Row="2" />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DeliveryCity}" Grid.Column="3" Grid.Row="2" Foreground="{StaticResource BodyTextColorBrush}"/>
                             <CorasauControls:TextEditor MaxWidth="170"  Text="{Binding DeliveryCity,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.Column="4" Grid.Row="2" Margin="5,0,0,0"  />
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DeliveryCountry}" Grid.Column="3" Grid.Row="4" />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DeliveryCountry}" Grid.Column="3" Grid.Row="4" Foreground="{StaticResource BodyTextColorBrush}"/>
                             <CorasauControls:ComboBoxEditor  MaxWidth="170" x:Name="cbDeliveryCountry" SelectedItem="{Binding DeliveryCountry,Mode=TwoWay}" Grid.Column="4" Grid.Row="4" Margin="5,0,0,0"  />
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Installation}"  Grid.Column="3" Grid.Row="6"  />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Installation}" Grid.Column="3" Grid.Row="6" Foreground="{StaticResource BodyTextColorBrush}" />
                             <CorasauControls:LookupEditor MaxWidth="170"  x:Name="leDeliveryAddress" EditValue="{Binding Installation,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Column="4"  Grid.Row="6" Margin="5,0,0,0"  />
                         </Grid>
                     </dxn:NavBarGroup>
@@ -147,25 +147,25 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateInvoicePage"
                                 <ColumnDefinition Width="150" />
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=YourRef}" Grid.Column="0" Grid.Row="0" />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=YourRef}" Grid.Column="0" Grid.Row="0" Foreground="{StaticResource BodyTextColorBrush}"/>
                             <CorasauControls:TextEditor  MaxWidth="170" Text="{Binding YourRef,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Grid.Row="0" Margin="5,0,0,0"  />
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Requisition}" Grid.Column="0" Grid.Row="2" />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Requisition}" Grid.Column="0" Grid.Row="2" Foreground="{StaticResource BodyTextColorBrush}"/>
                             <CorasauControls:TextEditor  MaxWidth="170" Text="{Binding Requisition,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Grid.Row="2" Margin="5,0,0,0"  />
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OurRef}" Grid.Column="0" Grid.Row="4" />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OurRef}" Grid.Column="0" Grid.Row="4" Foreground="{StaticResource BodyTextColorBrush}"/>
                             <CorasauControls:TextEditor  MaxWidth="170" Text="{Binding OurRef,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Column="1" Grid.Row="4" Margin="5,0,0,0"  />
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Remark}" Grid.Column="0" Grid.Row="6" Grid.RowSpan="3"  />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Remark}" Grid.Column="0" Grid.Row="6" Grid.RowSpan="3" Foreground="{StaticResource BodyTextColorBrush}" />
                             <CorasauControls:TextEditor MaxWidth="170"  Text="{Binding Remark,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Column="1" Grid.Row="6" Margin="5,0,0,0" Grid.RowSpan="3"  AcceptsReturn="True" VerticalContentAlignment="Top" TextWrapping="Wrap" />
-                          
-                            
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Employee}" Grid.Column="3" Grid.Row="0" />
+
+
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Employee}" Grid.Column="3" Grid.Row="0" Foreground="{StaticResource BodyTextColorBrush}" />
                             <CorasauControls:LookupEditor x:Name="employeelookupeditor" EditValue="{Binding Employee,Mode=TwoWay}"  MaxWidth="170" Grid.Column="4" Grid.Row="0" Margin="5,0,0,0" VerticalAlignment="Top"  />
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CustomsNo}" Grid.Column="3" Grid.Row="2" />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CustomsNo}" Grid.Column="3" Grid.Row="2" Foreground="{StaticResource BodyTextColorBrush}"/>
                             <CorasauControls:TextEditor MaxWidth="170"  Text="{Binding CustomsNo,Mode=TwoWay}"  Grid.Column="4" Grid.Row="2" Margin="5,0,0,0"  VerticalAlignment="Top" />
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Contact}" Grid.Column="3" Grid.Row="4"  VerticalAlignment="Top" />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Contact}" Grid.Column="3" Grid.Row="4" VerticalAlignment="Top" Foreground="{StaticResource BodyTextColorBrush}" />
                             <CorasauControls:ComboBoxEditor MaxWidth="170"  AllowNullInput="True" AssignNullValueOnClearingEditText="True" x:Name="cmbContactName"  EditValueChanged="cmbContactName_EditValueChanged" VerticalAlignment="Top" VerticalContentAlignment="Top"  Grid.Column="4" Grid.Row="4"  Margin="5,0,0,0"  />
-                            <TextBlock x:Name="tbProject" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Project}" Grid.Column="3" Grid.Row="6" />
+                            <TextBlock x:Name="tbProject" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Project}" Grid.Column="3" Grid.Row="6" Foreground="{StaticResource BodyTextColorBrush}"/>
                             <CorasauControls:LookupEditor x:Name="Projectlookupeditor" EditValue="{Binding Project,Mode=TwoWay}" MaxWidth="170" Grid.Column="4" Grid.Row="6" Margin="5,0,0,0"  />
-                            <TextBlock x:Name="tbPrCategory" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Category}" Grid.Column="3" Grid.Row="8" />
+                            <TextBlock x:Name="tbPrCategory" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Category}" Grid.Column="3" Grid.Row="8" Foreground="{StaticResource BodyTextColorBrush}"/>
                             <CorasauControls:LookupEditor x:Name="PrCategorylookupeditor" EditValue="{Binding PrCategory,Mode=TwoWay}"  MaxWidth="170" Grid.Column="4" Grid.Row="8" Margin="5,0,0,0" VerticalAlignment="Top"  />
                         </Grid>
                     </dxn:NavBarGroup>
@@ -193,43 +193,43 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateInvoicePage"
                                 <ColumnDefinition Width="100" />
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OrderNumber}" Grid.Column="0" Grid.Row="0" />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OrderNumber}" Grid.Column="0" Grid.Row="0" Foreground="{StaticResource BodyTextColorBrush}"/>
                             <CorasauControls:IntegerEditor MaxWidth="170"  Text="{Binding OrderNumber,Mode=TwoWay}" Grid.Column="1" Grid.Row="0" Margin="5,0,0,0" SetMask="False" />
 
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=EndDiscountPct}" Grid.Column="0" Grid.Row="2" />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=EndDiscountPct}" Grid.Column="0" Grid.Row="2" Foreground="{StaticResource BodyTextColorBrush}"/>
                             <CorasauControls:DoubleEditor MaxWidth="170" FieldName="EndDiscountPct"   Grid.Column="1" Grid.Row="2" Margin="5,0,0,0"  />
 
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Payment}" Grid.Column="0" Grid.Row="4" />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Payment}" Grid.Column="0" Grid.Row="4" Foreground="{StaticResource BodyTextColorBrush}"/>
                             <CorasauControls:LookupEditor MaxWidth="170" x:Name="lePayment"   EditValue="{Binding Payment,Mode=TwoWay}"  Grid.Column="1" Grid.Row="4" Margin="5,0,0,0"  />
 
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DueDate}" Grid.Column="0" Grid.Row="6" />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DueDate}" Grid.Column="0" Grid.Row="6" Foreground="{StaticResource BodyTextColorBrush}"/>
                             <CorasauControls:DateEditor  MaxWidth="170" EditValue="{Binding DueDate,Mode=TwoWay}" Grid.Column="1" Grid.Row="6" Margin="5,0,0,0"  />
-                            
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TransType}" Grid.Column="0" Grid.Row="8" />
+
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TransType}" Grid.Column="0" Grid.Row="8" Foreground="{StaticResource BodyTextColorBrush}" />
                             <CorasauControls:LookupEditor MaxWidth="170"  x:Name="leTransType"   EditValue="{Binding TransType,Mode=TwoWay}" Grid.Column="1" Grid.Row="8" Margin="5,0,0,0"  />
 
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Currency}" Grid.Column="3" Grid.Row="0" />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Currency}" Grid.Column="3" Grid.Row="0" Foreground="{StaticResource BodyTextColorBrush}"/>
                             <CorasauControls:ComboBoxEditor MaxWidth="170" SelectedItem="{Binding Currency,Mode=TwoWay}" Grid.Column="4" Grid.Row="0" Margin="5,0,0,0"  />
 
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ExchangeRate}" Grid.Column="3" Grid.Row="2" />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ExchangeRate}" Grid.Column="3" Grid.Row="2" Foreground="{StaticResource BodyTextColorBrush}"/>
                             <CorasauControls:DoubleEditor MaxWidth="170"   EditValue="{Binding ExchangeRate,Mode=TwoWay}"   MaskType="Numeric" MaskUseAsDisplayFormat="True" BindningIsSet="True" Mask="N4" Grid.Column="4" Grid.Row="2" Margin="5,0,0,0"  />
 
-                            <TextBlock x:Name="txtDelDate" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DeliveryDate}" Grid.Column="3" Grid.Row="4" />
+                            <TextBlock x:Name="txtDelDate" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DeliveryDate}" Grid.Column="3" Grid.Row="4" Foreground="{StaticResource BodyTextColorBrush}"/>
                             <CorasauControls:DateEditor  MaxWidth="170"  x:Name="dteDeliveryDate" EditValue="{Binding DeliveryDate,Mode=TwoWay}" Grid.Column="4" Grid.Row="4" Margin="5,0,0,0"  />
-                            
-                            <TextBlock x:Name="tbShipment" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Shipment}" Grid.Column="3" Grid.Row="6" />
+
+                            <TextBlock x:Name="tbShipment" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Shipment}" Grid.Column="3" Grid.Row="6" Foreground="{StaticResource BodyTextColorBrush}" />
                             <CorasauControls:LookupEditor  MaxWidth="170"  x:Name="leShipment" EditValue="{Binding Shipment,Mode=TwoWay}" Grid.Column="4" Grid.Row="6" Margin="5,0,0,0"  />
 
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DeliveryTerm}" Visibility="{Binding ElementName=tbShipment, Path=Visibility}" Grid.Column="3" Grid.Row="8"  />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DeliveryTerm}" Visibility="{Binding ElementName=tbShipment, Path=Visibility}" Grid.Column="3" Grid.Row="8" Foreground="{StaticResource BodyTextColorBrush}" />
                             <CorasauControls:LookupEditor MaxWidth="170"  x:Name="leDeliveryTerm"   EditValue="{Binding DeliveryTerm,Mode=TwoWay}" Visibility="{Binding ElementName=leShipment, Path=Visibility}" Grid.Column="4" Grid.Row="8" Margin="5,0,0,0"  />
 
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=InclVat}" Grid.Column="6" Grid.Row="0" />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=InclVat}" Grid.Column="6" Grid.Row="0" Foreground="{StaticResource BodyTextColorBrush}"/>
                             <CorasauControls:CheckEditor MaxWidth="170" MinWidth="170" x:Name="chkInvlVat" HorizontalAlignment="Center" IsChecked="{Binding PricesInclVat,Mode=TwoWay}"  Grid.Column="7" Grid.Row="0" Margin="5,0,0,0"  />
 
-                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Settlements}" Grid.Column="6" Grid.Row="2" />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Settlements}" Grid.Column="6" Grid.Row="2" Foreground="{StaticResource BodyTextColorBrush}"/>
                             <CorasauControls:IntegerEditor  MaxWidth="170" Text="{Binding Settlements,Mode=TwoWay}" SetMask="False"  Grid.Column="7" Grid.Row="2" Margin="5,0,0,0"  />
 
-                            <TextBlock x:Name="txtPrCategory" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Category}" Grid.Column="6" Grid.Row="4" />
+                            <TextBlock x:Name="txtPrCategory" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Category}" Grid.Column="6" Grid.Row="4" Foreground="{StaticResource BodyTextColorBrush}"/>
                             <CorasauControls:LookupEditor  MaxWidth="170"  x:Name="lePrCategory" EditValue="{Binding PrCategory,Mode=TwoWay}"  Grid.Column="7" Grid.Row="4" Margin="5,0,0,0"  />
 
                         </Grid>
@@ -251,16 +251,16 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateInvoicePage"
                                 <ColumnDefinition Width="150" />
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
-                            <TextBlock x:Name="lbldim1"  Grid.Column="0" Grid.Row="0" />
+                            <TextBlock x:Name="lbldim1" Grid.Column="0" Grid.Row="0" Foreground="{StaticResource BodyTextColorBrush}" />
                             <CorasauControls:LookupEditor MaxWidth="170" x:Name="ledim1"   EditValue="{Binding Dimension1,Mode=TwoWay}" Grid.Column="1" Grid.Row="0" Margin="5,0,0,0"  />
-                            <TextBlock x:Name="lbldim2"  Grid.Column="0" Grid.Row="2" />
+                            <TextBlock x:Name="lbldim2" Grid.Column="0" Grid.Row="2" Foreground="{StaticResource BodyTextColorBrush}" />
                             <CorasauControls:LookupEditor MaxWidth="170" x:Name="ledim2"    EditValue="{Binding Dimension2,Mode=TwoWay}"  Grid.Column="1" Grid.Row="2" Margin="5,0,0,0"  />
-                            <TextBlock x:Name="lbldim3" Grid.Column="0" Grid.Row="4" />
+                            <TextBlock x:Name="lbldim3" Grid.Column="0" Grid.Row="4" Foreground="{StaticResource BodyTextColorBrush}"/>
                             <CorasauControls:LookupEditor MaxWidth="170" x:Name="ledim3"   EditValue="{Binding Dimension3,Mode=TwoWay}"  Grid.Column="1" Grid.Row="4" Margin="5,0,0,0"  />
 
-                            <TextBlock x:Name="lbldim4"  Grid.Column="3" Grid.Row="0" />
+                            <TextBlock x:Name="lbldim4" Grid.Column="3" Grid.Row="0" Foreground="{StaticResource BodyTextColorBrush}" />
                             <CorasauControls:LookupEditor MaxWidth="170" x:Name="ledim4"    EditValue="{Binding Dimension4,Mode=TwoWay}"  Grid.Column="4" Grid.Row="0" Margin="5,0,0,0"  />
-                            <TextBlock x:Name="lbldim5" Grid.Column="3" Grid.Row="2" />
+                            <TextBlock x:Name="lbldim5" Grid.Column="3" Grid.Row="2" Foreground="{StaticResource BodyTextColorBrush}"/>
                             <CorasauControls:LookupEditor MaxWidth="170" x:Name="ledim5"   EditValue="{Binding Dimension5,Mode=TwoWay}"  Grid.Column="4" Grid.Row="2" Margin="5,0,0,0"  />
                         </Grid>
                     </dxn:NavBarGroup>

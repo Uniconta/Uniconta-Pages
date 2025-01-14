@@ -34,7 +34,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReportTemplatePrint"
                 <StackPanel Orientation="Horizontal" Grid.Row="2" VerticalAlignment="Center" Width="{Binding Path=UsablePageWidth, Mode=OneWay}" HorizontalAlignment="Stretch" dxp:ExportSettings.TargetType="Panel">
                     <StackPanel Orientation="Horizontal"  HorizontalAlignment="Left" >
                         <dxe:TextEdit IsPrintingMode="True" Text="{Binding Content.Company.CompanyName, Mode=OneWay,Converter={StaticResource VisualSpaceConverter}}" FontSize="14" FontWeight="Bold"/>
-                        <dxe:TextEdit IsPrintingMode="True" Margin="10,0,0,0" Text="{Binding Content.Company.Id, Mode=OneWay}"  FontSize="14"/>
+                        <dxe:TextEdit IsPrintingMode="True" Margin="10,0,0,0" Text="{Binding Content.Company.Id, Mode=OneWay,Converter={StaticResource VisualSpaceConverter}}"  FontSize="14"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal"  HorizontalAlignment="Right" Margin="590,0,0,0">
                         <dxe:TextEdit IsPrintingMode="True" Text="{Binding Content.CurDateTime,Mode=OneWay}"  HorizontalAlignment="Right"/>

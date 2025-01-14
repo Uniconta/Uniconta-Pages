@@ -65,8 +65,8 @@ namespace UnicontaClient.Pages.CustomPage
                 chkFromWork.Checked += chkFromWork_Checked;
                 chkToWork.Checked += chkToWork_Checked;
 
-                var emp = (Uniconta.DataModel.Employee)employeeCache.Get(editrow.Employee);
-                editrow.VechicleRegNo = emp._VechicleRegNo;
+                var emp = (Uniconta.DataModel.Employee)employeeCache.Get(editrow._Employee);
+                editrow.VechicleRegNo = emp?._VechicleRegNo;
             }
         }
         private async void frmRibbon_OnItemClicked(string ActionType)

@@ -905,7 +905,8 @@ namespace UnicontaClient.Pages.CustomPage
             var savetask = saveGrid();
             if (savetask != null)
                 await savetask;
-            dgGLDailyJournalLine.Refresh();
+            await dgGLDailyJournalLine.RefreshTask();
+            RecalculateSum(false);
         }
         private void AddVoucher(JournalLineGridClient journalLine, string actionType)
         {
@@ -1678,6 +1679,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     if (journalLine._Voucher != NewVoucher)
                     {
+                        dgGLDailyJournalLine.SetLoadedRow(journalLine);
                         journalLine.Voucher = NewVoucher;
                         dgGLDailyJournalLine.SetModifiedRow(journalLine);
                     }

@@ -191,6 +191,8 @@ namespace UnicontaClient.Pages.CustomPage
                 case "AddRow":
                     if (dgProjectGrid.masterRecords != null)
                     {
+                        if (!Utility.IsExecuteWithBlockedAccount(dgProjectGrid.masterRecord as Debtor))
+                            return;
                         AddDockItem(TabControls.ProjectPage2, new object[] { api, dgProjectGrid.masterRecord }, Uniconta.ClientTools.Localization.lookup("Project"), "Add_16x16");
                     }
                     else
@@ -489,12 +491,10 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void CreateOrder(ProjectClient selectedItem)
         {
-#if SILVERLIGHT
-            var cwCreateOrder = new CWCreateOrderFromProject(api);
-#else
+            if (!Utility.IsExecuteWithBlockedAccount(selectedItem.Debtor))
+                return;
             var cwCreateOrder = new UnicontaClient.Pages.CWCreateOrderFromProject(api, true, selectedItem);
             cwCreateOrder.DialogTableId = 2000000053;
-#endif
             cwCreateOrder.Closed += async delegate
              {
                  if (cwCreateOrder.DialogResult == true)
@@ -550,6 +550,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         void CreateZeroInvoice(ProjectClient selectedItem)
         {
+            if (!Utility.IsExecuteWithBlockedAccount(selectedItem.Debtor))
+                return;
             var cwCreateZeroInvoice = new UnicontaClient.Pages.CwCreateZeroInvoice(api, selectedItem);
             cwCreateZeroInvoice.DialogTableId = 2000000067;
             cwCreateZeroInvoice.Closed += delegate

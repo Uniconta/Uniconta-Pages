@@ -29,6 +29,6 @@
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="Packaging" LocalizedNameKey="Packaging" Module="InvPackaging" LargeGlyph="Pack_Note_32x32"/>
+    <RibbonItem Action="Packaging" LocalizedNameKey="Packaging" Module="InvPackaging" LargeGlyph="Pack_32x32"/>
   </RibbonItem>
 </root>

@@ -51,7 +51,7 @@
     <RibbonItem Action="ApproveOrder" LocalizedNameKey="Approve" LargeGlyph="Allow_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="Packaging" LocalizedNameKey="Packaging" LargeGlyph="Dispatch_32x32" Module="InvPackaging"/>
+    <RibbonItem Action="Packaging" LocalizedNameKey="TransportPackaging" LargeGlyph="Pack_32x32" Module="InvPackaging"/>
   </RibbonItem>
   <RibbonItem TabId="1" LocalizedNameKey="EditAll">
     <RibbonItem Action="EditAll"  LocalizedNameKey="EditAll"  LargeGlyph="Edit_32x32"/>

@@ -23,7 +23,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InvItemDetailControl"
                         <CorasauControls:TextEditor Text="{Binding Item}" IsReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="Name" x:Name="liName" VerticalAlignment="Top" VerticalContentAlignment="Top" LabelVerticalAlignment="Top">
-                        <CorasauControls:TextEditor Text="{Binding Name}" IsReadOnly="True" TextWrapping="Wrap" AcceptsReturn="True"  MinHeight="45" Width="{Binding ActualWidth, ElementName=txtItem}" VerticalContentAlignment="Top"/>
+                        <CorasauControls:TextEditor Text="{Binding Name}" IsReadOnly="True" TextWrapping="Wrap" AcceptsReturn="True"  MinHeight="45" VerticalContentAlignment="Top"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="ItemType" x:Name="liItemType">
                         <CorasauControls:TextEditor Text="{Binding ItemType}" IsReadOnly="True"/>

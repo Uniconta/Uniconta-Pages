@@ -374,7 +374,7 @@ namespace UnicontaISO20022CreditTransfer
         /// Deutsche_Kreditwirtschaft and Volks_Raiffeisenbanken: Not used
         /// Other german banks: For now they have an empty value
         /// </summary>
-        public override string ExternalLocalInstrument(string currencyCode, DateTime executionDate)
+        public override string ExternalLocalInstrument(string currencyCode, DateTime executionDate, PaymentTypes paymentMethod, ISO20022PaymentTypes ISOPaymType)
         {
             switch (companyBankEnum)
             {
