@@ -65,7 +65,7 @@ namespace UnicontaClient.Pages.CustomPage
             var datatemplateItem = new FrameworkElementFactory(typeof(DevExpress.Xpf.Editors.ComboBoxEdit));
             datatemplateItem.SetValue(DevExpress.Xpf.Editors.ComboBoxEdit.PopupHeightProperty, 200d);
             var source = CreatePropertySource(bankImportFormatClient);
-            datatemplateItem.SetBinding(DevExpress.Xpf.Editors.LookUpEditBase.SelectedItemProperty, new Binding("ActualDataColumnName"));
+            datatemplateItem.SetBinding(DevExpress.Xpf.Editors.LookUpEditBase.SelectedItemProperty, new System.Windows.Data.Binding("ActualDataColumnName"));
             datatemplateItem.SetValue(DevExpress.Xpf.Editors.LookUpEditBase.ItemsSourceProperty, source);
             datatemplate.VisualTree = datatemplateItem;
 
@@ -314,7 +314,7 @@ namespace UnicontaClient.Pages.CustomPage
                 this.Close();
         }
 
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {

@@ -12,6 +12,9 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using Uniconta.ClientTools.Controls;
 using Uniconta.Common.Utility;
+using Uniconta.API.DebtorCreditor;
+using Uniconta.DataModel;
+using System.Linq;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -55,6 +58,9 @@ namespace UnicontaClient.Pages.CustomPage
 
             Interests.Visible = Interests.ShowInColumnChooser = Comp.CRM;
             Products.Visible = Products.ShowInColumnChooser = Comp.CRM;
+
+            if (!Comp.AllowApproval)
+                localMenu.DisableButtons("BankApprove");
         }
 
         private void CreditorAccount_BeforeClose()
@@ -62,7 +68,7 @@ namespace UnicontaClient.Pages.CustomPage
             this.PreviewKeyDown -= RootVisual_KeyDown;
         }
 
-        private void RootVisual_KeyDown(object sender, KeyEventArgs e)
+        private void RootVisual_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.F8 && Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
             {
@@ -218,6 +224,13 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         AddDockItem(TabControls.CreditorStatement, dgCreditorAccountGrid.syncEntity);
                     break;
+                case "DeliveryAddresses":
+                    if (selectedItem != null)
+                    {
+                        var title = string.Format("{0}: {1}, {2}", Uniconta.ClientTools.Localization.lookup("DeliveryAddresses"), selectedItem._Account, selectedItem._Name);
+                        AddDockItem(TabControls.WorkInstallationPage, dgCreditorAccountGrid.syncEntity, title);
+                    }
+                    break;
                 case "CopyRecord":
                     CopyRecord(selectedItem);
                     break;
@@ -235,9 +248,70 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         AddDockItem(TabControls.CreditorInvoiceLinesPivotReport, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Pivot"), selectedItem._Name));
                     break;
+                case "CreditorBankAccount":
+                    CreditorBankDetails(selectedItem);
+                    break;
+                case "BankApprove":
+                    BankApprove();
+                    break;
+
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
+            }
+        }
+        async void CreditorBankDetails(CreditorClient selectedItem)
+        {
+            if (selectedItem != null)
+            {
+                CreditorPaymentAccountClient creditorPaymentAct = new CreditorPaymentAccountClient();
+                creditorPaymentAct.SetMaster(selectedItem);
+                var res = await api.Read(creditorPaymentAct);
+                if (res == 0)
+                {
+                    AddDockItem(TabControls.CreditorPaymentAccountPage, creditorPaymentAct, string.Format("{0}: {1}, {2}", Uniconta.ClientTools.Localization.lookup("BankDetails"), selectedItem._Account, selectedItem._Name));
+                }
+                else
+                {
+                    var pr = new object[] { api, selectedItem };
+                    AddDockItem(TabControls.CreditorPaymentAccountPage, pr, string.Format("{0}: {1}, {2}", Uniconta.ClientTools.Localization.lookup("BankDetails"), selectedItem._Account, selectedItem._Name));
+                }
+            }
+        }
+
+        async void BankApprove()
+        {
+            var selectedItems = dgCreditorAccountGrid.SelectedItems.Cast<Uniconta.ClientTools.DataModel.CreditorClient>();
+            if (selectedItems != null)
+            {
+                var msg = string.Format(Uniconta.ClientTools.Localization.lookup("VendorsMarkedBankDetails"), selectedItems.Count());
+                var result = UnicontaMessageBox.Show(msg, Uniconta.ClientTools.Localization.lookup("BankDetails"), UnicontaMessageBox.YesNo, MessageBoxImage.Question);
+                if (result != UnicontaMessageBox.Yes)
+                    return;
+               
+               busyIndicator.IsBusy = true;
+               busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("BusyMessage");
+
+               TransactionAPI tranApi = new TransactionAPI(this.api);
+
+               int cntUpd = 0;
+               foreach (var acc in selectedItems)
+               {
+                   if (acc.CreditorPaymentAccountRef == null || acc.CreditorPaymentAccountRef._Approved)
+                       continue;
+                   cntUpd++;
+                   var err = await tranApi.ApprovePaymentAccount(acc.Account);
+
+                   if (err != 0)
+                   {
+                       UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup(err.ToString()), Uniconta.ClientTools.Localization.lookup("Error"), MessageBoxButton.OK);
+                       break;
+                   }
+                   acc.CreditorPaymentAccountRef._Approved = true;
+                   acc.NotifyPropertyChanged("CreditorBankApprovement");
+               }
+
+               busyIndicator.IsBusy = false;
             }
         }
 
@@ -376,14 +450,14 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var creditorAccount = (sender as Image).Tag as CreditorClient;
+            var creditorAccount = (sender as System.Windows.Controls.Image).Tag as CreditorClient;
             if (creditorAccount != null)
                 AddDockItem(TabControls.UserDocsPage, dgCreditorAccountGrid.syncEntity);
         }
 
         private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var creditorAccount = (sender as Image).Tag as CreditorClient;
+            var creditorAccount = (sender as System.Windows.Controls.Image).Tag as CreditorClient;
             if (creditorAccount != null)
                 AddDockItem(TabControls.UserNotesPage, dgCreditorAccountGrid.syncEntity);
         }

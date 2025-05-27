@@ -12,9 +12,6 @@ x:Class="UnicontaClient.Pages.CustomPage.LanguageItemTextPage"
         mc:Ignorable="d" xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"
         d:DesignHeight="300" d:DesignWidth="400">
     <UserControl.Resources>
-        <Style x:Key="StyleRow" TargetType="dxg:RowControl">
-            <Setter Property="Height" Value="Auto"/>
-        </Style>
         <LinearGradientBrush x:Key="LinearGradientColorStyle" StartPoint="0.5,0" EndPoint="0.5,1" >
             <GradientStop Color="#696969" Offset="0.1" />
             <GradientStop Color="#8A9399" Offset="0.9" />

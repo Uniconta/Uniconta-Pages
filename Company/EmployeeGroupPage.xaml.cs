@@ -27,18 +27,26 @@ namespace UnicontaClient.Pages.CustomPage
         public override bool Readonly { get { return false; } }
     }
     public partial class EmployeeGroupPage : GridBasePage
-    { 
+    {
+        public EmployeeGroupPage(BaseAPI api, string lookupKey)
+           : base(api, lookupKey)
+        {
+            Init();
+        }
         public EmployeeGroupPage(BaseAPI API)
             : base(API, string.Empty)
         {
+            Init();
+        }
+        void Init()
+        {
             InitializeComponent();
-            localMenu.dataGrid = dgEmployeeGroup ;
+            localMenu.dataGrid = dgEmployeeGroup;
             dgEmployeeGroup.api = api;
             dgEmployeeGroup.BusyIndicator = busyIndicator;
             SetRibbonControl(localMenu, dgEmployeeGroup);
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
         }
-
         private void LocalMenu_OnItemClicked(string ActionType)
         {
             switch (ActionType)

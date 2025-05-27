@@ -30,9 +30,6 @@ namespace UnicontaClient.Pages.CustomPage
             this.DataContext = this;
             this.Title = string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("Select"), Uniconta.ClientTools.Localization.lookup("Options"));
             Loaded += CWCollectionLetter_Loaded;
-#if SILVERLIGHT
-            Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
 
             cmbCollectionLtr.ItemsSource = Utility.GetDebtorCollectionLetters();
             cmbCollectionLtr.SelectedIndex = 0;
@@ -61,7 +58,7 @@ namespace UnicontaClient.Pages.CustomPage
             Dispatcher.BeginInvoke(new Action(() => { cmbCollectionLtr.Focus(); }));
         }
 
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {

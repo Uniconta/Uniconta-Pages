@@ -68,7 +68,7 @@ namespace UnicontaClient.Pages.CustomPage
             var lookupDocumentRefEditor = sender as LookupEditor;
             if (!isDocumentRefLookupSet)
             {
-                lookupDocumentRefEditor.PopupContentTemplate = (Application.Current).Resources["LookUpUrlDocumentClientPopupContent"] as ControlTemplate;
+                lookupDocumentRefEditor.PopupContentTemplate = (System.Windows.Application.Current).Resources["LookUpUrlDocumentClientPopupContent"] as ControlTemplate;
                 lookupDocumentRefEditor.ValueMember = "RowId";
                 lookupDocumentRefEditor.SelectedIndexChanged += LookupDocumentRefEditor_SelectedIndexChanged;
                 isDocumentRefLookupSet = true;

@@ -31,11 +31,9 @@ namespace UnicontaClient.Controls.Dialogs
         [Display(Name = "UpdateSales3", ResourceType = typeof(InputFieldDataText))]
         public bool UpdateSales3 { get; set; }
 
-#if !SILVERLIGHT
         protected override int DialogId { get { return DialogTableId; } }
         public int DialogTableId { get; set; }
         protected override bool ShowTableValueButton { get { return true; } }
-#endif
         public CWUpdateBOMPrices()
         {
             this.DataContext = this;
@@ -45,12 +43,9 @@ namespace UnicontaClient.Controls.Dialogs
             txtUpdateSales1.Text = string.Format(Uniconta.ClientTools.Localization.lookup("UpdateOBJ"), string.Format("{0} 1", Uniconta.ClientTools.Localization.lookup("SalesPrice")));
             txtUpdateSales2.Text = string.Format(Uniconta.ClientTools.Localization.lookup("UpdateOBJ"), string.Format("{0} 2", Uniconta.ClientTools.Localization.lookup("SalesPrice")));
             txtUpdateSales3.Text = string.Format(Uniconta.ClientTools.Localization.lookup("UpdateOBJ"), string.Format("{0} 3", Uniconta.ClientTools.Localization.lookup("SalesPrice")));
-#if SILVERLIGHT
-            UnicontaClient.Utilities.Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
         }
 
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {

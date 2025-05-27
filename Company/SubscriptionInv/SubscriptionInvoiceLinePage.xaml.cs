@@ -16,9 +16,18 @@ namespace UnicontaClient.Pages.CustomPage
 {
     public class SubscriptionInvoiceLineSort : IComparer
     {
-        public int Compare(object x, object y)
+        public int Compare(object _x, object _y)
         {
-            return ((SubscriptionInvoiceLine)x)._LineNumber - ((SubscriptionInvoiceLine)y)._LineNumber;
+            var x = (SubscriptionInvoiceLine)_x;
+            var y = (SubscriptionInvoiceLine)_y;
+
+            var c = x.Sid - y.Sid;
+            if (c != 0)
+                return c;
+            c = DateTime.Compare(x._Date, y._Date);
+            if (c != 0)
+                return c;
+            return x._LineNumber - y._LineNumber;
         }
     }
     public class SubscriptionInvoiceLineGrid : CorasauDataGridClient
@@ -55,7 +64,7 @@ namespace UnicontaClient.Pages.CustomPage
             var syncMaster = dgSubInvoiceslineGrid.masterRecord as SubscriptionInvoiceClient;
             if (syncMaster == null)
                 return;
-            string header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("InvoiceNumber"), syncMaster.Invoice);
+            string header = string.Concat(Uniconta.ClientTools.Localization.lookup("InvoiceNumber"), ": ", syncMaster.Invoice);
             SetHeader(header);
         }
         private void InitPage(UnicontaBaseEntity master)

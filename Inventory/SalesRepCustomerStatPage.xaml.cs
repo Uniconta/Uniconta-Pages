@@ -98,7 +98,8 @@ namespace UnicontaClient.Pages.CustomPage
             base.OnLayoutLoaded();
             if (master is EmployeeClient)
                 Employee.Visible = false;
-
+            if (!api.CompanyEntity._InvGroups)
+                txtStatisticsGrp.Visibility = cbxStatisticsGrp.Visibility = Visibility.Collapsed;
             Utility.SetupVariants(api, colVariant, VariantName, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
             LoadType(new Type[] { typeof(Uniconta.DataModel.InvItem), typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.Creditor) });
         }
@@ -129,7 +130,7 @@ namespace UnicontaClient.Pages.CustomPage
                     BindGrid();
                     break;
                 case "Aggregate":
-                    aggregate((bool)cbxItem.IsChecked, (bool)cbxInvGrp.IsChecked, (bool)cbxAccount.IsChecked, (bool)cbxAccountGrp.IsChecked, (bool)cbxEmpGrp.IsChecked);
+                    aggregate(cbxItem.IsChecked.GetValueOrDefault(), cbxInvGrp.IsChecked.GetValueOrDefault(), cbxAccount.IsChecked.GetValueOrDefault(), cbxAccountGrp.IsChecked.GetValueOrDefault(), cbxEmpGrp.IsChecked.GetValueOrDefault(), cbxStatisticsGrp.IsChecked.GetValueOrDefault());
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -147,10 +148,8 @@ namespace UnicontaClient.Pages.CustomPage
                 itemFilterValues = itemFilterDialog.PropValuePair;
                 itemPropSort = itemFilterDialog.PropSort;
             }
-#if !SILVERLIGHT
             e.Cancel = true;
             itemFilterDialog.Hide();
-#endif
         }
 
         private void BindGrid()
@@ -162,6 +161,7 @@ namespace UnicontaClient.Pages.CustomPage
             cbxAccount.IsEnabled = true;
             cbxAccountGrp.IsEnabled = true;
             cbxEmpGrp.IsEnabled = true;
+            cbxStatisticsGrp.IsEnabled = true;
 
             mainList = null;
             var inputs = new List<PropValuePair>();
@@ -178,7 +178,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         IList<EmployeeDebSales> mainList;
-        void aggregate(bool aggregateItem, bool aggregateItemGroup, bool aggregateAccount, bool aggregateAccountGroup, bool aggregateEmployee)
+        void aggregate(bool aggregateItem, bool aggregateItemGroup, bool aggregateAccount, bool aggregateAccountGroup, bool aggregateEmployee, bool aggregateStaticticsGroup)
         {
             IList<EmployeeDebSales> lst;
 
@@ -220,7 +220,20 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else if (aggregateAccount)
             {
-                if (aggregateItemGroup)
+                if (aggregateStaticticsGroup)
+                {
+                    lst = (from rec in mainList
+                           group rec by new { rec._Account, rec.StatisticsGroup } into g
+                           select new EmployeeDebSales
+                           {
+                               _Account = g.Key._Account,
+                               _StatisticsGroup = g.Key.StatisticsGroup,
+                               _Qty = g.Sum(d => d._Qty),
+                               _Cost = g.Sum(d => d._Cost),
+                               _Sales = g.Sum(d => d._Sales)
+                           }).ToList();
+                }
+                else if (aggregateItemGroup)
                 {
                     lst = (from rec in mainList
                            group rec by new { rec._Account, rec.ItemGroup } into g
@@ -276,7 +289,21 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else if (aggregateAccountGroup)
             {
-                lst = (from rec in mainList
+                if (aggregateStaticticsGroup)
+                {
+                    lst = (from rec in mainList
+                           group rec by new { rec.StatisticsGroup, rec.Group } into g
+                           select new EmployeeDebSales
+                           {
+                               _StatisticsGroup = g.Key.StatisticsGroup,
+                               _debGroup = g.Key.Group,
+                               _Qty = g.Sum(d => d._Qty),
+                               _Cost = g.Sum(d => d._Cost),
+                               _Sales = g.Sum(d => d._Sales)
+                           }).ToList();
+                }
+                else
+                    lst = (from rec in mainList
                        group rec by rec.Group into g
                        select new EmployeeDebSales
                        {
@@ -298,6 +325,18 @@ namespace UnicontaClient.Pages.CustomPage
                            _Sales = g.Sum(d => d._Sales)
                        }).ToList();
             }
+            else if (aggregateStaticticsGroup)
+            {
+                lst = (from rec in mainList
+                       group rec by rec.StatisticsGroup into g
+                       select new EmployeeDebSales
+                       {
+                           _StatisticsGroup = g.Key,
+                           _Qty = g.Sum(d => d._Qty),
+                           _Cost = g.Sum(d => d._Cost),
+                           _Sales = g.Sum(d => d._Sales)
+                       }).ToList();
+            }
             else
                 lst = mainList;
 
@@ -310,7 +349,6 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 dgSalesRepCustomerStat.ItemsSource = lst;
             }
-
         }
     }
 }

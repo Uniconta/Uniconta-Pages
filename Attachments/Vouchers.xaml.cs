@@ -324,7 +324,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        private void AccordionView_MouseLeftButtonUp(object sender, MouseEventArgs e)
+        private void AccordionView_MouseLeftButtonUp(object sender, System.Windows.Input.MouseEventArgs e)
         {
             var txt = e.OriginalSource as TextBlock;
             if (txt == null)
@@ -385,11 +385,11 @@ namespace UnicontaClient.Pages.CustomPage
         private void dgVoucherGridView_DragRecordOver(object sender, DevExpress.Xpf.Core.DragRecordOverEventArgs e)
         {
             if (e.Data.GetFormats().Contains("FileName"))
-                e.Effects = DragDropEffects.Copy;
+                e.Effects = System.Windows.DragDropEffects.Copy;
             else if (e.Data.GetFormats().Contains("FileGroupDescriptor"))
-                e.Effects = DragDropEffects.All;
+                e.Effects = System.Windows.DragDropEffects.All;
             else
-                e.Effects = DragDropEffects.None;
+                e.Effects = System.Windows.DragDropEffects.None;
 
             e.Handled = true;
         }
@@ -398,9 +398,9 @@ namespace UnicontaClient.Pages.CustomPage
         {
             dgVoucherGrid.tableView.FocusedRowHandle = e.TargetRowHandle > 0 ? e.TargetRowHandle - 1 : -1;
             string[] errors = null;
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            if (e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop))
             {
-                var files = e.Data.GetData(DataFormats.FileDrop) as string[];
+                var files = e.Data.GetData(System.Windows.DataFormats.FileDrop) as string[];
                 if (files == null || files.Length == 0)
                     return;
 
@@ -542,6 +542,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var dc = (Uniconta.DataModel.DCAccount)CreditorCache?.Get(rec._CreditorAccount);
                     if (dc == null)
                         return;
+                    rec.PaymentId = null;
                     if (dc._PostingAccount != null)
                         rec.CostAccount = dc._PostingAccount;
                     if (dc._Dim1 != null)
@@ -701,7 +702,7 @@ namespace UnicontaClient.Pages.CustomPage
             this.BeforeClose -= Vouchers_BeforeClose;
         }
 
-        private void RootVisual_KeyDown(object sender, KeyEventArgs e)
+        private void RootVisual_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift) || Keyboard.Modifiers.HasFlag(ModifierKeys.Alt))
             {
@@ -1666,7 +1667,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void Offeset_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            CallOffsetAccount((sender as Image).Tag as VouchersClient);
+            CallOffsetAccount((sender as System.Windows.Controls.Image).Tag as VouchersClient);
         }
 
         private void OpenFolderWindow(object sender, ItemClickEventArgs e)
@@ -1764,15 +1765,13 @@ namespace UnicontaClient.Pages.CustomPage
                 IsSending = true;
                 Save();
 
-                var rowIds = lst.Select(v => v.RowId).Where(r => r != 0);
-
                 var documentApi = new DocumentAPI(api);
 
-                var err = await documentApi.UploadDocumentsForScan(rowIds);
+                var err = await documentApi.UploadDocumentsForScan(lst);
                 if (err == ErrorCodes.NoPaperflowOrgNumber)
                 {
                     await GetOrganisationNumber();
-                    err = await documentApi.UploadDocumentsForScan(rowIds);
+                    err = await documentApi.UploadDocumentsForScan(lst);
                 }
                 if (err != 0)
                     UnicontaMessageBox.Show(Localization.lookup(err.ToString()), Localization.lookup("DocumentScannerPay"));

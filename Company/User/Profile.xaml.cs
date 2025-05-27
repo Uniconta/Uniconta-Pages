@@ -23,6 +23,8 @@ using System.IO;
 using Corasau.Admin.API;
 using Uniconta.WindowsAPI.Service;
 using UnicontaAPI.Project.API;
+using System.Globalization;
+using System.Reflection;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -86,6 +88,18 @@ namespace UnicontaClient.Pages.CustomPage
         }
         public static string AssemblyBuildDate(Type type)
         {
+#if UNICORE
+            var buildDateStr = Assembly.GetExecutingAssembly()
+    .GetCustomAttributes<AssemblyMetadataAttribute>()
+    .FirstOrDefault(a => a.Key == "BuildTimestamp")?
+    .Value;
+            if (!string.IsNullOrEmpty(buildDateStr))
+            {
+                var buildDate = DateTime.ParseExact(buildDateStr, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal);
+                return buildDate.ToString();
+            }
+            return buildDateStr;
+#else
             string versionText = type.Assembly.FullName.Split(',')[1].Trim().Split('=')[1];
             int iDays = Convert.ToInt32(versionText.Split('.')[2]);
             DateTime refDate = new DateTime(2000, 1, 1);
@@ -94,7 +108,7 @@ namespace UnicontaClient.Pages.CustomPage
             iSeconds = iSeconds * 2;
             buildDate = buildDate.AddSeconds(iSeconds);
             return buildDate.ToString();
-
+#endif
         }
 
         private void ShowXapBuildDate()
@@ -127,6 +141,7 @@ namespace UnicontaClient.Pages.CustomPage
                         savePassword();
                     }
                     Uniconta.ClientTools.Controls.LookupEditor.DefaultImmediatePopup = editrow._AutoDropDown;
+                    Uniconta.ClientTools.Controls.LookupEditor.AlwaysImmediatePopup = editrow._AutoDropDownBigData;
                     frmRibbon_BaseActions(ActionType);
 
                     var user = api.session.User;
@@ -139,6 +154,7 @@ namespace UnicontaClient.Pages.CustomPage
                     user._ConfirmDelete = editrow._ConfirmDelete;
                     user._AutoSave = editrow._AutoSave;
                     user._UseDefaultBrowser = editrow._UseDefaultBrowser;
+                    user._HighlightRow = editrow._HighlightRow;
                     //user._IncludeFilterInLayout = editrow._IncludeFilterInLayout;
                     string msg;
                     if (Curlanguage != editrow._Language)

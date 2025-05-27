@@ -46,7 +46,7 @@ namespace UnicontaClient.Controls.Dialogs
                     await LoadCompanies(code);
                 else
                 {
-                    MessageBox.Show(Uniconta.ClientTools.Localization.lookup("FieldCannotBeEmpty"));
+                    System.Windows.MessageBox.Show(Uniconta.ClientTools.Localization.lookup("FieldCannotBeEmpty"));
                     return;
                 }
             }
@@ -141,7 +141,7 @@ namespace UnicontaClient.Controls.Dialogs
                 DialogResult = false;
         }
 
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape || (e.Key == Key.Enter && CancelBtn.IsFocused))
                 SetDialogResult(false);

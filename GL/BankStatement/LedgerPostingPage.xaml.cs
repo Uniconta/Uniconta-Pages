@@ -338,13 +338,17 @@ namespace UnicontaClient.Pages.CustomPage
                 var voucher = voucherObj[0] as VouchersClient;
                 if (voucher != null)
                 {
-                    var selectedItem = dgBankStatementLine.SelectedItem as BankStatementLineGridClient;
-                    if (selectedItem != null && voucher.RowId != 0)
+                    var openedFrom = voucherObj[1];
+                    if (openedFrom == this.ParentControl)
                     {
-                        dgBankStatementLine.SetLoadedRow(selectedItem);
-                        selectedItem.DocumentRef = voucher.RowId;
-                        selectedItem.Invoice = voucher._Invoice;
-                        dgBankStatementLine.SetModifiedRow(selectedItem);
+                        var selectedItem = dgBankStatementLine.SelectedItem as BankStatementLineGridClient;
+                        if (selectedItem != null && voucher.RowId != 0)
+                        {
+                            dgBankStatementLine.SetLoadedRow(selectedItem);
+                            selectedItem.DocumentRef = voucher.RowId;
+                            selectedItem.Invoice = voucher._Invoice;
+                            dgBankStatementLine.SetModifiedRow(selectedItem);
+                        }
                     }
                 }
             }

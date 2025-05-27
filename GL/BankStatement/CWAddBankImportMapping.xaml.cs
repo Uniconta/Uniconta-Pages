@@ -16,6 +16,7 @@ using Uniconta.ClientTools;
 using System.Windows;
 using UnicontaClient.Utilities;
 using Uniconta.DataModel;
+using System.ComponentModel.DataAnnotations;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -24,6 +25,8 @@ namespace UnicontaClient.Pages.CustomPage
     {
         private CrudAPI api;
         Uniconta.DataModel.BankStatement master;
+        [ForeignKeyAttribute(ForeignKeyTable = typeof(GLChargeGroup))]
+        public string Charge { get; set; }
 
         [ForeignKeyAttribute(ForeignKeyTable = typeof(GLDimType1))]
         public string Dimension1 { get; set;  }
@@ -45,12 +48,8 @@ namespace UnicontaClient.Pages.CustomPage
             this.DataContext = this;
             InitializeComponent();
             this.Title = Uniconta.ClientTools.Localization.lookup("AutomaticAccountSelection");
-#if SILVERLIGHT
-            Utility.SetThemeBehaviorOnChildWindow(this);
-#else
             if (string.IsNullOrWhiteSpace(cmdBankFormats.Text))
                 FocusManager.SetFocusedElement(cmdBankFormats, cmdBankFormats);
-#endif
             this.Loaded += CW_Loaded;
 
             if (master != null && master._BankImportId != 0) // last import
@@ -65,6 +64,7 @@ namespace UnicontaClient.Pages.CustomPage
             txtAccountType.Text = bankStatement.AccountType;
             txtAccount.Text = bankStatement._Account;
             txtText.Text = bankStatement._Text;
+            leCharge.api = api;
             BindDimension();
         }
 
@@ -169,14 +169,15 @@ namespace UnicontaClient.Pages.CustomPage
             bankImportMap._AccountType = (GLJournalAccountType)AppEnums.GLAccountType.IndexOf(txtAccountType.Text);
             bankImportMap._Account = txtAccount.Text;
             bankImportMap._Text = txtText.Text;
-            bankImportMap._Equal = (bool)chkEqual.IsChecked;
-            bankImportMap._StartsWith = (bool)ckkStartWith.IsChecked;
-            bankImportMap._Contains = (bool)chkContains.IsChecked;
+            bankImportMap._Equal = chkEqual.IsChecked.GetValueOrDefault();
+            bankImportMap._StartsWith = ckkStartWith.IsChecked.GetValueOrDefault();
+            bankImportMap._Contains = chkContains.IsChecked.GetValueOrDefault();
             bankImportMap._Dim1 = leDim1.Text;
             bankImportMap._Dim2 = leDim2.Text;
             bankImportMap._Dim3 = leDim3.Text;
             bankImportMap._Dim4 = leDim4.Text;
             bankImportMap._Dim5 = leDim5.Text;
+            bankImportMap._Charge = Charge;
             var err = await api.Insert(bankImportMap);
             if (err != ErrorCodes.Succes)
                 UtilDisplay.ShowErrorCode(err);
@@ -196,7 +197,7 @@ namespace UnicontaClient.Pages.CustomPage
             SetDialogResult(false);
         }
 
-        private void txtAccount_KeyDown(object sender, KeyEventArgs e)
+        private void txtAccount_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
                 SaveButton_Click(sender, e);

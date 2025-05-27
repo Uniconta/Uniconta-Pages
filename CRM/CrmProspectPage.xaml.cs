@@ -258,14 +258,14 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var prospectClient = (sender as Image).Tag as CrmProspectClient;
+            var prospectClient = (sender as System.Windows.Controls.Image).Tag as CrmProspectClient;
             if (prospectClient != null)
                 AddDockItem(TabControls.UserDocsPage, dgCrmProspectGrid.syncEntity);
         }
 
         private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var prospectClient = (sender as Image).Tag as CrmProspectClient;
+            var prospectClient = (sender as System.Windows.Controls.Image).Tag as CrmProspectClient;
             if (prospectClient != null)
                 AddDockItem(TabControls.UserNotesPage, dgCrmProspectGrid.syncEntity);
         }

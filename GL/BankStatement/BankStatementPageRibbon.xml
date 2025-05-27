@@ -48,6 +48,7 @@
 		<RibbonItem Action="AiiaUnregister" LocalizedNameKey="UnregisterBank" Glyph="Bank_Disconnect_32x32"/>
 		<RibbonItem Action="ConnectToND" LocalizedNameKey="ConnectToNordea" EnableSeperator="True" Glyph="Bank_Connect_32x32"/>
 	    <RibbonItem Action="ConnectToBC" LocalizedNameKey="ConnectToBC" Glyph="Bank_Connect_32x32"/>
+		<RibbonItem Action="AiiaAdmin" LocalizedNameKey="Administrator" EnableSeperator="True" Glyph="Download-32x32"/>
 	  </RibbonItem>
   </RibbonItem>
 </root>

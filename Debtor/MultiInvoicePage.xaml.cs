@@ -267,8 +267,8 @@ namespace UnicontaClient.Pages.CustomPage
                 UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("UpdateInBackground"), Uniconta.ClientTools.Localization.lookup("Warning"));
                 return;
             }
-
-            UnicontaClient.Pages.CWGenerateInvoice GenrateInvoiceDialog = new UnicontaClient.Pages.CWGenerateInvoice(true, string.Empty, false, true, true, isOrderOrQuickInv: true, isQuickPrintVisible: true, isPageCountVisible: false, isDebtorOrder: true);
+            bool isOrderOrQuickInv = api.CompanyEntity._CountryId == CountryCode.Germany ? false : true;
+            var GenrateInvoiceDialog = new UnicontaClient.Pages.CWGenerateInvoice(true, string.Empty, false, true, true, isOrderOrQuickInv: isOrderOrQuickInv, isQuickPrintVisible: true, isPageCountVisible: false, isDebtorOrder: true);
             GenrateInvoiceDialog.DialogTableId = 2000000011;
             GenrateInvoiceDialog.HideOutlookOption(true);
             GenrateInvoiceDialog.SetInvPrintPreview(printPreview);
@@ -276,6 +276,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (!api.CompanyEntity._DeactivateSendNemhandel)
                 GenrateInvoiceDialog.SentByEInvoice(api, null, true);
 
+            GenrateInvoiceDialog.ShowAllowCredMax(api.CompanyEntity.AllowSkipCreditMax);
             GenrateInvoiceDialog.Closed += async delegate
             {
                 if (GenrateInvoiceDialog.DialogResult == true)
@@ -293,7 +294,8 @@ namespace UnicontaClient.Pages.CustomPage
                         var invoicePostingPrintGenerator = new InvoicePostingPrintGenerator(api, this);
                         invoicePostingPrintGenerator.SetUpInvoicePosting(dbVisibleOrders, InvoiceDate, GenrateInvoiceDialog.IsSimulation, CompanyLayoutType.Invoice, GenrateInvoiceDialog.ShowInvoice, GenrateInvoiceDialog.PostOnlyDelivered, GenrateInvoiceDialog.InvoiceQuickPrint,
                             GenrateInvoiceDialog.SendByEmail, GenrateInvoiceDialog.sendOnlyToThisEmail, GenrateInvoiceDialog.Emails, GenrateInvoiceDialog.GenerateOIOUBLClicked);
-
+                        if(api.CompanyEntity.AllowSkipCreditMax)
+                            invoicePostingPrintGenerator.SetAllowCreditMax(GenrateInvoiceDialog.AllowSkipCreditMax);
                         await invoicePostingPrintGenerator.Execute();
                         busyIndicator.IsBusy = false;
                     }
@@ -352,6 +354,8 @@ namespace UnicontaClient.Pages.CustomPage
             GenrateInvoiceDialog.DialogTableId = 2000000012;
             GenrateInvoiceDialog.HideOutlookOption(true);
             GenrateInvoiceDialog.SetInvPrintPreview(printPreview);
+            GenrateInvoiceDialog.ShowAllowCredMax(api.CompanyEntity.AllowSkipCreditMax);
+
             GenrateInvoiceDialog.Closed += async delegate
             {
                 if (GenrateInvoiceDialog.DialogResult == true)
@@ -368,6 +372,9 @@ namespace UnicontaClient.Pages.CustomPage
                         var invoicePostingPrintGenerator = new InvoicePostingPrintGenerator(api, this);
                         invoicePostingPrintGenerator.SetUpInvoicePosting(dgOrderVisible, InvoiceDate, !updateStatus, docType, GenrateInvoiceDialog.ShowInvoice, GenrateInvoiceDialog.PostOnlyDelivered,
                                 GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.SendByEmail, GenrateInvoiceDialog.sendOnlyToThisEmail, GenrateInvoiceDialog.Emails, false);
+                        if (api.CompanyEntity.AllowSkipCreditMax)
+                            invoicePostingPrintGenerator.SetAllowCreditMax(GenrateInvoiceDialog.AllowSkipCreditMax);
+
                         await invoicePostingPrintGenerator.Execute();
 
                         busyIndicator.IsBusy = false;
@@ -398,12 +405,14 @@ namespace UnicontaClient.Pages.CustomPage
 
             string debtorName = debtor?.Name ?? dbOrder._DCAccount;
             bool invoiceInXML = debtor != null && debtor.IsPeppolSupported && debtor._einvoice;
-
-            UnicontaClient.Pages.CWGenerateInvoice GenrateInvoiceDialog = new UnicontaClient.Pages.CWGenerateInvoice(true, string.Empty, false, true, true, showNoEmailMsg: !showSendByMail, debtorName: debtorName, isDebtorOrder: true, isOrderOrQuickInv: true, InvoiceInXML: invoiceInXML);
+            bool isOrderOrQuickInv = api.CompanyEntity._CountryId == CountryCode.Germany ? false : true;
+            var GenrateInvoiceDialog = new UnicontaClient.Pages.CWGenerateInvoice(true, string.Empty, false, true, true, showNoEmailMsg: !showSendByMail, debtorName: debtorName, isDebtorOrder: true, isOrderOrQuickInv: isOrderOrQuickInv, InvoiceInXML: invoiceInXML);
             GenrateInvoiceDialog.DialogTableId = 2000000013;
 
             if (!api.CompanyEntity._DeactivateSendNemhandel)
                 GenrateInvoiceDialog.SentByEInvoice(api, UtilCommon.GetEndPoint(dbOrder, debtor, api));
+
+            GenrateInvoiceDialog.ShowAllowCredMax(api.CompanyEntity.AllowSkipCreditMax);
 
             GenrateInvoiceDialog.Closed += async delegate
             {
@@ -416,6 +425,9 @@ namespace UnicontaClient.Pages.CustomPage
                     invoicePostingResult.SetUpInvoicePosting(dbOrder, null, CompanyLayoutType.Invoice, GenrateInvoiceDialog.GenrateDate, null, isSimulated, GenrateInvoiceDialog.ShowInvoice, GenrateInvoiceDialog.PostOnlyDelivered,
                         GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.NumberOfPages, GenrateInvoiceDialog.SendByEmail, !isSimulated && GenrateInvoiceDialog.SendByOutlook, GenrateInvoiceDialog.sendOnlyToThisEmail,
                         GenrateInvoiceDialog.Emails, GenrateInvoiceDialog.GenerateOIOUBLClicked, null, false);
+                    if (api.CompanyEntity.AllowSkipCreditMax)
+                        invoicePostingResult.SetAllowCreditMax(GenrateInvoiceDialog.AllowSkipCreditMax);
+
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
                     var result = await invoicePostingResult.Execute();
                     busyIndicator.IsBusy = true;

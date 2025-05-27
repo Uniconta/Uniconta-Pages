@@ -11,9 +11,6 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectBudgetEstimationPage"
     xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
     xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors">
     <UserControl.Resources>
-        <Style x:Key="StyleRow" TargetType="dxg:RowControl">
-            <Setter Property="Height" Value="Auto"/>
-        </Style>
         <Util:MaskConverter x:Key="MaskConverter" />
         <Util:RowIndexConverter x:Key="RowIndexConverter" />
     </UserControl.Resources>

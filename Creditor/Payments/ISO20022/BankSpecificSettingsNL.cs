@@ -134,8 +134,8 @@ namespace UnicontaISO20022CreditTransfer
         {
             return true;
         }
-      
-        
+
+
         /// <summary>
         /// DOMESTIC Payment:
         /// Transfers within the same country where either sender or receiver uses BBAN. If both parts uses IBAN/SWIFT it will be a SEPA. This is country specific for Netherland
@@ -150,26 +150,22 @@ namespace UnicontaISO20022CreditTransfer
         /// CROSS BORDER Payment:
         /// 
         /// </summary>
-        public override ISO20022PaymentTypes ISOPaymentType(string paymentCcy, string companyIBAN, string creditorIBAN, string creditorSWIFT, string creditorCountryId, string companyCountryId)
+        public override ISO20022PaymentTypes ISOPaymentType(string paymentCcy, string companyIBAN, string creditorIBAN, string creditorSWIFT, string creditorCountryId, string companyCountryId, CountryCode creditorBankDetailsCountryId)
         {
-            companyIBAN = companyIBAN ?? string.Empty;
-            creditorIBAN = creditorIBAN ?? string.Empty;
-            creditorSWIFT = creditorSWIFT ?? string.Empty;
-            companyCountryId = companyCountryId ?? string.Empty;
-            creditorCountryId = creditorCountryId ?? string.Empty;
-
             //Company
-            var companyBankCountryId = string.Empty;
-            if (companyIBAN.Length >= 2)
+            string companyBankCountryId = null;
+            if (companyIBAN != null && companyIBAN.Length >= 2)
                 companyBankCountryId = companyIBAN.Substring(0, 2);
             else
                 companyBankCountryId = companyCountryId;
 
             //Creditor
-            var creditorBankCountryId = string.Empty;
-            if (creditorIBAN.Length >= 2)
+            string creditorBankCountryId = null;
+            if (creditorBankDetailsCountryId != CountryCode.Unknown)
+                creditorBankCountryId = ((CountryISOCode)creditorBankDetailsCountryId).ToString();
+            else if (creditorIBAN != null && creditorIBAN.Length >= 2)
                 creditorBankCountryId = creditorIBAN.Substring(0, 2);
-            else if (creditorSWIFT.Length > 6)
+            else if (creditorSWIFT != null && creditorSWIFT.Length > 6)
                 creditorBankCountryId = creditorSWIFT.Substring(4, 2);
             else
                 creditorBankCountryId = creditorCountryId;

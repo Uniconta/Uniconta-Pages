@@ -39,7 +39,7 @@ namespace UnicontaClient.Pages.Attachments
             }));
         }
 
-        private void CWCreateFolder_KeyDown(object sender, KeyEventArgs e)
+        private void CWCreateFolder_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {
@@ -69,7 +69,7 @@ namespace UnicontaClient.Pages.Attachments
 
         private void ViewMail_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var lbl = sender as Label;
+            var lbl = sender as System.Windows.Controls.Label;
             var userNote = lbl.Tag as UserNotesClient;
             if (userNote?.Token != null)
                 OutlookNotes.ViewOutlookMail(userNote);

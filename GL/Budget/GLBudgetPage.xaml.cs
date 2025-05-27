@@ -190,14 +190,14 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var budget = (sender as Image).Tag as GLBudgetClient;
+            var budget = (sender as System.Windows.Controls.Image).Tag as GLBudgetClient;
             if (budget != null)
                 AddDockItem(TabControls.UserDocsPage, dgGlBudget.syncEntity);
         }
 
         private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var budget = (sender as Image).Tag as GLBudgetClient;
+            var budget = (sender as System.Windows.Controls.Image).Tag as GLBudgetClient;
             if (budget != null)
                 AddDockItem(TabControls.UserNotesPage, dgGlBudget.syncEntity);
         }

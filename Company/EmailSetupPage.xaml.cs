@@ -128,14 +128,14 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var client = (sender as Image).Tag as CompanySMTPClient;
+            var client = (sender as System.Windows.Controls.Image).Tag as CompanySMTPClient;
             if (client != null)
                 AddDockItem(TabControls.UserDocsPage, dgEmailSetupGrid.syncEntity);
         }
 
         private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var client = (sender as Image).Tag as CompanySMTPClient;
+            var client = (sender as System.Windows.Controls.Image).Tag as CompanySMTPClient;
             if (client != null)
                 AddDockItem(TabControls.UserNotesPage, dgEmailSetupGrid.syncEntity);
         }

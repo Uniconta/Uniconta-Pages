@@ -77,11 +77,9 @@ namespace UnicontaClient.Pages.CustomPage
 
         CrudAPI api;
 
-#if !SILVERLIGHT
         public int DialogTableId;
         protected override int DialogId { get { return DialogTableId; } }
         protected override bool ShowTableValueButton { get { return true; } }
-#endif
         public CWProjectGenerateInvoice(CrudAPI crudapi, DateTime documentGenrateteDate, bool isSimulate = true, bool showInvoice = true, bool isQuickPrintVisible = true, bool askSendMail = true, bool generateOIOUBL = true,
             bool showToFromDate = false, bool showEmailList = false, bool showSendOnlyEmailCheck = false)
         {
@@ -90,14 +88,12 @@ namespace UnicontaClient.Pages.CustomPage
             InitializeComponent();
             this.Title = Uniconta.ClientTools.Localization.lookup("GenerateInvoice");
             cmbCategory.api = crudapi;
-#if !SILVERLIGHT
             tbOIOUBL.Text = string.Format(Uniconta.ClientTools.Localization.lookup("CreateOBJ"), Uniconta.ClientTools.Localization.lookup("OIOUBL"));
             if (!generateOIOUBL)
                 RowOIOUBL.Height = new GridLength(0);
 
             chkPrintInvoice.Visibility = isQuickPrintVisible ? Visibility.Visible : Visibility.Collapsed;
             stkPageNumberCount.Visibility = isQuickPrintVisible ? Visibility.Visible : Visibility.Collapsed;
-#endif
             if (!isSimulate)
                 RowChk.Height = new GridLength(0);
 
@@ -120,9 +116,6 @@ namespace UnicontaClient.Pages.CustomPage
             dpDate.DateTime = documentGenrateteDate;
             api = crudapi;
             SetItemSource(crudapi);
-#if SILVERLIGHT
-            Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             this.Loaded += CW_Loaded;
         }
 
@@ -138,7 +131,7 @@ namespace UnicontaClient.Pages.CustomPage
             Dispatcher.BeginInvoke(new Action(() => { OKButton.Focus(); }));
         }
 
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {
@@ -169,7 +162,6 @@ namespace UnicontaClient.Pages.CustomPage
             SetDialogResult(false);
         }
 
-#if !SILVERLIGHT
         private void chkShowInvoice_Checked(object sender, RoutedEventArgs e)
         {
             chkPrintInvoice.IsChecked = false;
@@ -179,6 +171,5 @@ namespace UnicontaClient.Pages.CustomPage
         {
             chkShowInvoice.IsChecked = false;
         }
-#endif
     }
 }

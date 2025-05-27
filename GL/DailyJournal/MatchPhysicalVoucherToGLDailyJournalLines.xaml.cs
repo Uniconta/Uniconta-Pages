@@ -39,7 +39,7 @@ namespace UnicontaClient.Pages.CustomPage
         GLDailyJournalClient masterRecord;
         ItemBase ibase;
         static bool AssignText;
-        Orientation orient;
+        System.Windows.Controls.Orientation orient;
         bool TwoVatCodes, UseDCVat;
         public IEnumerable<JournalLineGridClient> JournalLines { get; set; }
         public MatchPhysicalVoucherToGLDailyJournalLines(UnicontaBaseEntity master)
@@ -73,7 +73,7 @@ namespace UnicontaClient.Pages.CustomPage
             CreditorCache = Comp.GetCache(typeof(Uniconta.DataModel.Creditor));
             PaymentCache = Comp.GetCache(typeof(Uniconta.DataModel.PaymentTerm));
             localMenu.OnChecked += LocalMenu_OnChecked;
-            orient = api.session.Preference.BankStatementHorisontal ? Orientation.Horizontal : Orientation.Vertical;
+            orient = api.session.Preference.BankStatementHorisontal ? System.Windows.Controls.Orientation.Horizontal : System.Windows.Controls.Orientation.Vertical;
             lGroup.Orientation = orient;
             if (!Comp._HasWithholding)
                 Withholding.Visible = Withholding.ShowInColumnChooser = false;
@@ -447,7 +447,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (ver != rec.AccountVersion || rec.accntSource == null)
                 {
                     if (act == (byte)GLJournalAccountType.Finans)
-                        rec.accntSource = new UnicontaClient.Pages.GLDailyJournalLine.LedgerSQLCacheFilter(cache);
+                        rec.accntSource = new LedgerSQLCacheFilter(cache);
                     else
                         rec.accntSource = cache;
                     if (rec.accntSource != null)
@@ -469,7 +469,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (ver != rec.OffsetAccountVersion || rec.offsetAccntSource == null)
                 {
                     if (act == (byte)GLJournalAccountType.Finans)
-                        rec.offsetAccntSource = new UnicontaClient.Pages.GLDailyJournalLine.LedgerSQLCacheFilter(cache);
+                        rec.offsetAccntSource = new LedgerSQLCacheFilter(cache);
                     else
                         rec.offsetAccntSource = cache.GetNotNullArray;
                     if (rec.offsetAccntSource != null)
@@ -663,7 +663,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "ChangeOrientation":
                     orient = 1 - orient;
                     lGroup.Orientation = orient;
-                    api.session.Preference.BankStatementHorisontal = (orient == Orientation.Horizontal);
+                    api.session.Preference.BankStatementHorisontal = (orient == System.Windows.Controls.Orientation.Horizontal);
                     break;
                 case "SendVoucherReminder":
                     if (selectedLine != null)
@@ -727,7 +727,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 foreach (var voucher in visibleRowVouchers)
                 {
-                    if (!voucher.IsAttached && voucher._Amount != 0)
+                    if (!voucher.IsAttached && (voucher._Amount != 0 || voucher._Invoice != null))
                     {
                         DateTime date;
                         if (i == 0)
@@ -737,9 +737,11 @@ namespace UnicontaClient.Pages.CustomPage
                             date = voucher._PayDate;
                         if (date != DateTime.MinValue)
                         {
+                            var inv = voucher._Invoice;
                             var amount = Math.Abs(voucher._Amount);
                             foreach (var p in journalLines)
-                                if (Math.Abs(p.Amount) == amount && p._Date == date)
+                                if ((Math.Abs(p.Amount) == amount && p._Date == date)
+                                    || (inv != null && inv == p._Invoice))
                                 {
                                     Attach(voucher, p, true, visibleRowVouchers);
                                     rowCountUpdate++;

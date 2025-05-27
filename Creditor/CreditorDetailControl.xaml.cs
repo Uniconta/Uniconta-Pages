@@ -19,7 +19,7 @@ using Uniconta.ClientTools.Controls;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
-    public partial class CreditorDetailControl : UserControl
+    public partial class CreditorDetailControl : System.Windows.Controls.UserControl
     {
         CrudAPI _api;
         public CrudAPI api
@@ -47,10 +47,8 @@ namespace UnicontaClient.Pages.CustomPage
                     shipmentItem.Visibility = Visibility.Collapsed;
                 if (!Comp.Project)
                     liPrCategory.Visibility = Visibility.Collapsed;
-#if !SILVERLIGHT
                 if (Comp._CountryId != CountryCode.Estonia)
                     liEEIsNotVatDeclOrg.Visibility = Visibility.Collapsed;
-#endif
             }
         }
         public Visibility Visible { get { return this.Visibility; } set { this.Visibility = value; this.layoutItems.Visibility = value; } }
@@ -75,7 +73,6 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
         
-#if !SILVERLIGHT
         private void Email_ButtonClicked(object sender)
         {
             var txtEmail = ((CorasauLayoutItem)sender).Content as TextEditor;
@@ -112,6 +109,5 @@ namespace UnicontaClient.Pages.CustomPage
             var creditor = layoutItems.DataContext as CreditorClient;
             Utility.OpenWebSite(creditor._Www);
         }
-#endif
     }
 }

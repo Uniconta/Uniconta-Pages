@@ -387,6 +387,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             GenrateInvoiceDialog.SetVouchersFromCreditorOrder(api, creditorOrderClient);
+            GenrateInvoiceDialog.ShowAllowCredMax(creditor._CreditMax != 0);
 
             GenrateInvoiceDialog.Closed += async delegate
             {
@@ -400,6 +401,9 @@ namespace UnicontaClient.Pages.CustomPage
                         GenrateInvoiceDialog.sendOnlyToThisEmail, GenrateInvoiceDialog.Emails, false, null, false);
                     invoicePostingResult.SetAdditionalOrders(GenrateInvoiceDialog.AdditionalOrders?.Cast<DCOrder>().ToList());
                     invoicePostingResult.SetDocumentRef(GenrateInvoiceDialog.PhysicalVoucherRef);
+                    if (api.CompanyEntity.AllowSkipCreditMax)
+                        invoicePostingResult.SetAllowCreditMax(GenrateInvoiceDialog.AllowSkipCreditMax);
+
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
                     busyIndicator.IsBusy = true;
                     var result = await invoicePostingResult.Execute();
@@ -622,6 +626,8 @@ namespace UnicontaClient.Pages.CustomPage
             var additionalOrdersList = Utility.GetAdditionalOrders(api, dbOrder);
             if (additionalOrdersList != null)
                 GenrateOfferDialog.SetAdditionalOrders(additionalOrdersList);
+
+            GenrateOfferDialog.ShowAllowCredMax(creditor._CreditMax != 0);
             GenrateOfferDialog.Closed += async delegate
             {
                 if (GenrateOfferDialog.DialogResult == true)
@@ -639,6 +645,8 @@ namespace UnicontaClient.Pages.CustomPage
                         GenrateOfferDialog.InvoiceQuickPrint, GenrateOfferDialog.NumberOfPages, GenrateOfferDialog.SendByEmail, openOutlook, GenrateOfferDialog.sendOnlyToThisEmail, GenrateOfferDialog.Emails,
                         false, null, false);
                     invoicePostingResult.SetAdditionalOrders(GenrateOfferDialog.AdditionalOrders?.Cast<DCOrder>().ToList());
+                    if (api.CompanyEntity.AllowSkipCreditMax)
+                        invoicePostingResult.SetAllowCreditMax(GenrateOfferDialog.AllowSkipCreditMax);
 
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
                     busyIndicator.IsBusy = true;
@@ -690,11 +698,15 @@ namespace UnicontaClient.Pages.CustomPage
                     var attachedVoucher = voucherObj[0] as VouchersClient;
                     if (attachedVoucher != null)
                     {
-                        var selectedItem = dgCreditorOrdersGrid.SelectedItem as CreditorOrderClient;
-                        if (selectedItem != null)
+                        var openedFrom = voucherObj[1];
+                        if (openedFrom == this.ParentControl)
                         {
-                            selectedItem.DocumentRef = attachedVoucher.RowId;
-                            UpdateVoucher(attachedVoucher, selectedItem);
+                            var selectedItem = dgCreditorOrdersGrid.SelectedItem as CreditorOrderClient;
+                            if (selectedItem != null)
+                            {
+                                selectedItem.DocumentRef = attachedVoucher.RowId;
+                                UpdateVoucher(attachedVoucher, selectedItem);
+                            }
                         }
                     }
                 }
@@ -715,6 +727,8 @@ namespace UnicontaClient.Pages.CustomPage
             var lst = new List<Type>(20) { typeof(Uniconta.DataModel.Creditor), typeof(Uniconta.DataModel.Employee) };
             if (Comp.Contacts)
                 lst.Add(typeof(Uniconta.DataModel.Contact));
+            if (Comp.DeliveryAddress)
+                lst.Add(typeof(Uniconta.DataModel.WorkInstallation));
             if (Comp.CreditorPrice)
                 lst.Add(typeof(Uniconta.DataModel.CreditorPriceList));
             if (Comp.Shipments)
@@ -759,14 +773,14 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var order = (sender as Image).Tag as CreditorOrderClient;
+            var order = (sender as System.Windows.Controls.Image).Tag as CreditorOrderClient;
             if (order != null)
                 AddDockItem(TabControls.UserDocsPage, dgCreditorOrdersGrid.syncEntity);
         }
 
         private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var order = (sender as Image).Tag as CreditorOrderClient;
+            var order = (sender as System.Windows.Controls.Image).Tag as CreditorOrderClient;
             if (order != null)
                 AddDockItem(TabControls.UserNotesPage, dgCreditorOrdersGrid.syncEntity);
         }

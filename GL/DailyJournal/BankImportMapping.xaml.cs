@@ -165,14 +165,13 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
-            var api = this.api;
-            var Comp = api.CompanyEntity;
             if (LedgerCache == null)
-                LedgerCache = await Comp.LoadCache(typeof(GLAccount), api).ConfigureAwait(false);
+                LedgerCache = await api.LoadCache(typeof(GLAccount)).ConfigureAwait(false);
             if (DebtorCache == null)
-                DebtorCache = await Comp.LoadCache(typeof(Debtor), api).ConfigureAwait(false);
+                DebtorCache = await api.LoadCache(typeof(Debtor)).ConfigureAwait(false);
             if (CreditorCache == null)
-                CreditorCache = await Comp.LoadCache(typeof(Uniconta.DataModel.Creditor), api).ConfigureAwait(false);
+                CreditorCache = await api.LoadCache(typeof(Uniconta.DataModel.Creditor)).ConfigureAwait(false);
+            LoadType(typeof(GLChargeGroup));
         }
 
         CorasauGridLookupEditorClient prevAccount;
@@ -206,7 +205,6 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
     }
-
 
     public class BankImportMapGridClient : BankImportMapClient
     {

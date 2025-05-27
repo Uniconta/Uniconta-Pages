@@ -29,11 +29,11 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReportTemplatePrint"
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="2"/>
                 </Grid.RowDefinitions>
-                <dxe:TextEdit IsPrintingMode="True" HorizontalContentAlignment="Left" Grid.Row="0" Text="{Binding Content.BalanceName,Mode=OneWay}" VerticalAlignment="Top"  FontSize="18" FontWeight="Bold"/>
+                <dxe:TextEdit IsPrintingMode="True" HorizontalContentAlignment="Left" Grid.Row="0" Text="{Binding Content.BalanceName,Mode=OneWay}" VerticalAlignment="Top"  FontSize="18" FontWeight="Bold" Padding="{Binding Content.LeftMargin, Mode=OneWay}"/>
                 <dxe:ImageEdit Grid.Row="1" Width="{Binding Path=UsablePageWidth, Mode=OneWay}"  Height="2" dxp:ExportSettings.TargetType="Image" Source="{Binding Path=Content.Lines.Line,Mode=OneWay,Converter={StaticResource imageDataConverter}}"  />
                 <StackPanel Orientation="Horizontal" Grid.Row="2" VerticalAlignment="Center" Width="{Binding Path=UsablePageWidth, Mode=OneWay}" HorizontalAlignment="Stretch" dxp:ExportSettings.TargetType="Panel">
                     <StackPanel Orientation="Horizontal"  HorizontalAlignment="Left" >
-                        <dxe:TextEdit IsPrintingMode="True" Text="{Binding Content.Company.CompanyName, Mode=OneWay,Converter={StaticResource VisualSpaceConverter}}" FontSize="14" FontWeight="Bold"/>
+                        <dxe:TextEdit IsPrintingMode="True" Text="{Binding Content.Company.CompanyName, Mode=OneWay,Converter={StaticResource VisualSpaceConverter}}" FontSize="14" FontWeight="Bold" Padding="{Binding Content.LeftMargin, Mode=OneWay}"/>
                         <dxe:TextEdit IsPrintingMode="True" Margin="10,0,0,0" Text="{Binding Content.Company.Id, Mode=OneWay,Converter={StaticResource VisualSpaceConverter}}"  FontSize="14"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal"  HorizontalAlignment="Right" Margin="590,0,0,0">
@@ -66,7 +66,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReportTemplatePrint"
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <dxe:TextEdit IsPrintingMode="True" Width="{Binding Path=Content.AccountNameColWidth,Mode=OneWay}"  Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Text, Mode=OneWay}" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="Bold" Grid.Column="0" VerticalAlignment="Bottom" Margin="{Binding Content.LeftMargin, Mode=OneWay}"/>
+                    <dxe:TextEdit IsPrintingMode="True" Width="{Binding Path=Content.AccountNameColWidth,Mode=OneWay}"  Text="{Binding Converter={StaticResource LocalizationValueConverterINV},ConverterParameter=Text, Mode=OneWay}" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="Bold" Grid.Column="0" VerticalAlignment="Bottom" Padding="{Binding Content.LeftMargin, Mode=OneWay}"/>
                     <dxe:TextEdit IsPrintingMode="True" Text="{Binding Content.Dim1, Mode=OneWay}" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="Bold" Grid.Column="1" Width="{Binding Content.Dim1Width, Mode=OneWay}" VerticalAlignment="Bottom"/>
                     <dxe:TextEdit IsPrintingMode="True" Text="{Binding Content.Dim2, Mode=OneWay}" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="Bold" Grid.Column="2" Width="{Binding Content.Dim2Width, Mode=OneWay}" VerticalAlignment="Bottom"/>
                     <dxe:TextEdit IsPrintingMode="True" Text="{Binding Content.Dim3, Mode=OneWay}" FontSize="{Binding Content.FontSize, Mode=OneWay}" FontWeight="Bold" Grid.Column="3" Width="{Binding Content.Dim3Width, Mode=OneWay}" VerticalAlignment="Bottom"/>

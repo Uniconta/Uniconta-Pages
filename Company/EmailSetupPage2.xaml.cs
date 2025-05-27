@@ -218,9 +218,9 @@ namespace UnicontaClient.Pages.CustomPage
         {
             object element;
             element = FocusManager.GetFocusedElement(UtilDisplay.GetCurentWindow());
-            if (element is Control)
+            if (element is System.Windows.Controls.Control)
             {
-                var ctrl = element as Control;
+                var ctrl = element as System.Windows.Controls.Control;
                 TraversalRequest tReq = new TraversalRequest(FocusNavigationDirection.Down);
                 ctrl.MoveFocus(tReq);
             }
@@ -269,7 +269,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var param = new object[1];
             param[0] = editrow.Body;
-            AddDockItem(TabControls.TextInHtmlPage, param, true, Uniconta.ClientTools.Localization.lookup("TextInHtml"), null, new Point(250, 200));
+            AddDockItem(TabControls.TextInHtmlPage, param, true, Uniconta.ClientTools.Localization.lookup("TextInHtml"), null, new System.Windows.Point(250, 200));
         }
 
         private void InsertProperty_ButtonClicked(object sender, RoutedEventArgs e)
@@ -365,7 +365,11 @@ namespace UnicontaClient.Pages.CustomPage
             if (app == null)
             {
                 app = PublicClientApplicationBuilder.Create(clientId)
-            .WithRedirectUri("https://www.uniconta.com/microsoft-graph-connected")
+#if WPF
+                .WithRedirectUri("https://www.uniconta.com/microsoft-graph-connected")
+#else
+                .WithDefaultRedirectUri()
+#endif
             .Build();
             }
             var account = await AcquireTokenInteractive(isAdmin).ConfigureAwait(false);
@@ -416,11 +420,17 @@ namespace UnicontaClient.Pages.CustomPage
             try
             {
                 var accounts = (await app.GetAccountsAsync()).ToList();
+#if WPF
                 var builder = app.AcquireTokenInteractive(Scopes)
                     .WithAccount(accounts.FirstOrDefault())
                     .WithUseEmbeddedWebView(true)
                     .WithPrompt(Microsoft.Identity.Client.Prompt.Consent);
                 var result = await builder.ExecuteAsync().ConfigureAwait(false);
+#else
+                var result = await app.AcquireTokenInteractive(Scopes)
+                    .WithAccount(accounts.FirstOrDefault())
+                    .ExecuteAsync().ConfigureAwait(false);
+#endif
                 return result;
             }
             catch (Exception ex)

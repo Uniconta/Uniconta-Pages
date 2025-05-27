@@ -38,10 +38,6 @@ namespace UnicontaClient.Controls.Dialogs
             this.DataContext = paymentFormatIceland;
             LeRecievedDefaultInterestAccount.api = LeCapitalAccount.api = LeClaimFeeAccount.api = api;
             this.Title = string.Format(Uniconta.ClientTools.Localization.lookup("SetupOBJ"), Uniconta.ClientTools.Localization.lookup("Payment"));
-
-#if SILVERLIGHT
-            Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             this.Loaded += CW_Loaded;
         }
         private void CW_Loaded(object sender, RoutedEventArgs e)
@@ -49,7 +45,7 @@ namespace UnicontaClient.Controls.Dialogs
             Dispatcher.BeginInvoke(new Action(() => { cmbBank.Focus(); }));
         }
 
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {

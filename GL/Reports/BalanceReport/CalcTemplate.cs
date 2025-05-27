@@ -124,7 +124,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             AccountName.Visible = AccountNo.Visible = false;
             Text.Visible = true;
-            ((TableView)dgBalanceReport.View).RowStyle = Application.Current.Resources["TemplateRowStyle"] as Style;
+            ((TableView)dgBalanceReport.View).RowStyle = System.Windows.Application.Current.Resources["TemplateRowStyle"] as Style;
             dgBalanceReport.ItemsSource = TemplateReportlist;
             templateReportData = new object[] { items, hdrData, PassedCriteria.ObjBalance, null };
             return newBalance;

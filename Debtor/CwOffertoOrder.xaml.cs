@@ -25,11 +25,9 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "KeepOffer", ResourceType = typeof(InputFieldDataText))]
         public bool KeepOffer { get; set; }
 
-#if !SILVERLIGHT
         protected override int DialogId { get { return DialogTableId; } }
         public int DialogTableId { get; set; }
         protected override bool ShowTableValueButton { get { return true; } }
-#endif
         public CwOffertoOrder()
         {
             this.DataContext = this;
@@ -42,7 +40,7 @@ namespace UnicontaClient.Pages.CustomPage
             Dispatcher.BeginInvoke(new Action(() => { OKButton.Focus(); }));
         }
 
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {

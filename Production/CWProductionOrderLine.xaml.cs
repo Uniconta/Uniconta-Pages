@@ -38,15 +38,16 @@ namespace UnicontaClient.Pages.CustomPage
         public int ProductionTime { get; set; }
 
         public double quantity { get; set; }
+
+        [InputFieldData]
+        [Display(Name = "RecreateProductionLines", ResourceType = typeof(InputFieldDataText))]
         public bool Force { get; set; }
 
         bool isQtyVisible;
 
-#if !SILVERLIGHT
         protected override int DialogId { get { return DialogTableId; } }
         public int DialogTableId { get; set; }
         protected override bool ShowTableValueButton { get { return true; } }
-#endif
         public CWProductionOrderLine(CrudAPI api, bool hideCheckForce): this(api)
         {
             if (hideCheckForce)
@@ -63,9 +64,6 @@ namespace UnicontaClient.Pages.CustomPage
             this.DataContext = this;
             InitializeComponent();
             this.Title = title ?? Uniconta.ClientTools.Localization.lookup("ProductionLines");
-#if SILVERLIGHT
-            UnicontaClient.Utilities.Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             isQtyVisible = isQuantityVisible;
             if (!isQuantityVisible)
                 rowQuantity.Height = new GridLength(0.0d);
@@ -85,7 +83,7 @@ namespace UnicontaClient.Pages.CustomPage
             Dispatcher.BeginInvoke(new Action(() => { storageType.Focus(); }));
         }
 
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {

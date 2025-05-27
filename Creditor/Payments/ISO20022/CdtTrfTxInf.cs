@@ -11,6 +11,7 @@ namespace UnicontaISO20022CreditTransfer
         private readonly double amount;
         private readonly string currencyCode;
         private readonly string chargeBearer;
+        private readonly string instrForDbtrAgt;
 
         private readonly CdtrAgt cdtrAgt;
         private readonly Cdtr cdtr;
@@ -25,6 +26,7 @@ namespace UnicontaISO20022CreditTransfer
         private const string HAMT = "Amt";
         private const string INSTDAMT = "InstdAmt";
         private const string CHRGBR = "ChrgBr";
+        private const string INSTRFORDBTRAGT = "InstrForDbtrAgt";
 
 
         #region Properties
@@ -138,7 +140,7 @@ namespace UnicontaISO20022CreditTransfer
         /// <param name="cdtrAcct">Unambiguous identification of the account of the creditor to which a credit entry will be posted as a result of the payment transaction.</param> 
         /// <param name="rgltryRptg"></param> 
         /// <param name="rmtInf">Information that enables the matching, ie, reconciliation, of a payment with the items that the payment is intended to settle, eg, commercial invoices in an account receivable system.</param> 
-        public CdtTrfTxInf(string paymentInfoIdReference, string instructionId, string endToEndId, double amount, string currencyCode, CdtrAgt cdtrAgt, Cdtr cdtr, CdtrAcct cdtrAcct, RgltryRptg rgltryRptg, RmtInf rmtInf, string chargeBearer = BaseDocument.CHRGBR_SHAR)
+        public CdtTrfTxInf(string paymentInfoIdReference, string instructionId, string endToEndId, double amount, string currencyCode, CdtrAgt cdtrAgt, Cdtr cdtr, CdtrAcct cdtrAcct, RgltryRptg rgltryRptg, RmtInf rmtInf, string instrForDbtrAgt, string chargeBearer = BaseDocument.CHRGBR_SHAR)
         {
             this.paymentInfoIdReference = paymentInfoIdReference;
             this.instructionId = instructionId;
@@ -146,6 +148,7 @@ namespace UnicontaISO20022CreditTransfer
             this.amount = amount;
             this.currencyCode = currencyCode;
             this.chargeBearer = chargeBearer;
+            this.instrForDbtrAgt = instrForDbtrAgt;
             this.cdtrAgt = cdtrAgt;
             this.cdtr = cdtr;
             this.cdtrAcct = cdtrAcct;
@@ -170,6 +173,10 @@ namespace UnicontaISO20022CreditTransfer
             cdtr.Append(baseDoc, doc, cdtTrfTxInf);
             cdtrAcct.Append(baseDoc, doc, cdtTrfTxInf);
             rgltryRptg.Append(baseDoc, doc, cdtTrfTxInf);
+
+            if (!string.IsNullOrEmpty(instrForDbtrAgt))
+                baseDoc.AppendElement(doc, cdtTrfTxInf, INSTRFORDBTRAGT, instrForDbtrAgt);
+
             rmtInf.Append(baseDoc, doc, cdtTrfTxInf);
         }
     }

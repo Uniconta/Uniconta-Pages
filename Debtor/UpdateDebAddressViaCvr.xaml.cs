@@ -187,7 +187,14 @@ namespace UnicontaClient.Pages.CustomPage
                     var address = ci.address;
                     var streetAddress = address.CompleteStreet;
                     if (Equal(ci.life.name, debtor._Name) && Equal(streetAddress, debtor._Address1) && Equal(address.street2, debtor._Address2) &&
-                               Equal(address.zipcode, debtor._ZipCode) && Equal(ci.industrycode?.code, debtor._IndustryCode))
+                               Equal(address.zipcode, debtor._ZipCode))
+                        continue;
+
+                    string code = null;
+                    if (IndustryCodes != null)
+                        code = IndustryCodes.Get(ci.industrycode?.code)?.KeyStr;
+                   
+                    if (code != null && Equal(ci.industrycode?.code, debtor._IndustryCode))
                         continue;
 
                     var newDebtor = debtor;
@@ -197,7 +204,7 @@ namespace UnicontaClient.Pages.CustomPage
                     newDebtor.NewCity = address.cityname;
                     newDebtor.NewName = ci.life.name;
                     if (IndustryCodes != null)
-                        newDebtor.NewIndustryCode = IndustryCodes.Get(ci.industrycode?.code)?.KeyStr;
+                        newDebtor.NewIndustryCode = code;
                     else
                         newDebtor.NewIndustryCode = ci.industrycode?.code;
                     var state = ci.companystatus;

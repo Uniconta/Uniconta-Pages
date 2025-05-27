@@ -36,9 +36,6 @@ namespace UnicontaClient.Pages.CustomPage
             InitializeComponent();
             currentAccountant = accountant;
             this.Title = Uniconta.ClientTools.Localization.lookup("Accountant");
-#if SILVERLIGHT
-            Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             OKButton.Content = string.Format(Uniconta.ClientTools.Localization.lookup("AssignOBJ"), "");
             if (accountant != null)
                 txtCurrentAccountant.Text = string.Concat("(", accountant.Name, ")");
@@ -81,7 +78,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             Dispatcher.BeginInvoke(new Action(() => { OKButton.Focus(); }));
         }
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {

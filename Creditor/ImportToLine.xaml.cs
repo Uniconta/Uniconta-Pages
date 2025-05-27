@@ -44,22 +44,16 @@ namespace UnicontaClient.Pages.CustomPage
 
         CrudAPI Capi;
 
-#if !SILVERLIGHT
         protected override int DialogId { get { return DialogTableId; } }
         public int DialogTableId { get; set; }
         protected override bool ShowTableValueButton { get { return true; } }
-#endif
 
         public ImportToLine(CrudAPI api)
         {
             Capi = api;
             this.DataContext = this;
             InitializeComponent();
-#if !SILVERLIGHT
             this.Title = Uniconta.ClientTools.Localization.lookup("GenerateJournalLines");
-#else
-            Utilities.Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             
             lookupJournal.api =lookupAccount.api= lookupTransType.api = api;
             this.Loaded += CW_Loaded;
@@ -89,7 +83,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {

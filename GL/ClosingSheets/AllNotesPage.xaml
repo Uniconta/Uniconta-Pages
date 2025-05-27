@@ -12,9 +12,6 @@ x:Class="UnicontaClient.Pages.CustomPage.AllNotesPage"
                 <TextBlock FontWeight="Bold" Foreground="{StaticResource StatementAccountHeaderColorForeground}" VerticalAlignment="Center"  Text="{Binding RowData.Row.Account}" />
             </Grid>
         </DataTemplate>
-        <Style x:Key="StyleRow" TargetType="dxg:RowControl">
-            <Setter Property="Height" Value="Auto"/>
-        </Style>
     </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>

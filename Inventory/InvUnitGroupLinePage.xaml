@@ -8,11 +8,6 @@ x:Class="UnicontaClient.Pages.CustomPage.InvUnitGroupLinePage"
         xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
         xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid" 
         xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
-    <UserControl.Resources>
-        <Style x:Key="StyleRow" TargetType="dxg:GridRowContent">
-            <Setter Property="Height" Value="Auto"/>
-        </Style>
-    </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

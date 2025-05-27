@@ -791,7 +791,7 @@ namespace UnicontaClient.Pages.CustomPage
         private BalanceColumn CreateCriteraColumn(SelectedCriteria selectedCriteria, int colno)
         {
             var row = CreateUpdateRow(selectedCriteria, new BalanceColumn());
-            row._ColumnNo = (byte)colno;
+            row._ColumnNo = colno;
             if (balanceCollist == null)
                 balanceCollist = new List<BalanceColumn>();
             balanceCollist.Add(row);

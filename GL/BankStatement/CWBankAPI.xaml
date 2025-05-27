@@ -8,7 +8,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWBankAPI"
            xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
            xmlns:dxinteraction="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
            xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
-           xmlns:enumType ="clr-namespace:Uniconta.DataModel;assembly=Uniconta.WindowsAPI"
+           xmlns:Utilities="clr-namespace:UnicontaClient.Utilities"
            Width="500"  KeyDown="ChildWindow_KeyDown" SizeToContent="Height">
     <Grid x:Name="LayoutRoot" Margin="2" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
@@ -60,7 +60,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWBankAPI"
                     <ClientToolsControls:CorasauLayoutItem x:Name="liBank" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FinancialInstitution}">
                         <CorasauControls:ComboBoxEditor x:Name="cmbBank" Height="25" HorizontalAlignment="Stretch" SelectedIndexChanged="BankAPIBank_SelectedIndexChanged">
                             <dxinteraction:Interaction.Behaviors>
-                                <dxinteraction:EnumItemsSourceBehavior EnumType="{x:Type enumType:Bank}" />
+                                <dxinteraction:EnumItemsSourceBehavior EnumType="{x:Static Utilities:EnumTypeResolver.Bank}" />
                             </dxinteraction:Interaction.Behaviors>
                         </CorasauControls:ComboBoxEditor>
                     </ClientToolsControls:CorasauLayoutItem>

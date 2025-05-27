@@ -41,11 +41,9 @@ namespace UnicontaClient.Controls.Dialogs
         bool Iscreditor = false;
         CrudAPI _api;
 
-#if !SILVERLIGHT
         protected override int DialogId { get { return DialogTableId; } }
         public int DialogTableId { get; set; }
         protected override bool ShowTableValueButton { get { return true; } }
-#endif
 
         public CWOrderFromInvoice(CrudAPI api,bool isCreditor=false)
         {
@@ -67,18 +65,12 @@ namespace UnicontaClient.Controls.Dialogs
 
             this.Title = Uniconta.ClientTools.Localization.lookup("OrderFromInvoice");
             chkReCalPrices.IsChecked = true;
-#if SILVERLIGHT
-            Utilities.Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             this.Loaded += CWOrderFromInvoice_Loaded;
         }
 
         private void CWOrderFromInvoice_Loaded(object sender, RoutedEventArgs e)
         {
             SetAccountSource();
-#if SILVERLIGHT
-            Dispatcher.BeginInvoke(new Action(() => { OKButton.Focus(); }));
-#endif
         }
 
         async private void SetAccountSource()
@@ -94,14 +86,14 @@ namespace UnicontaClient.Controls.Dialogs
 
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
-            Offer = (bool)chkOffer.IsChecked;
-            InverSign = (bool)chkInvertSign.IsChecked;
+            Offer = chkOffer.IsChecked.GetValueOrDefault();
+            InverSign = chkInvertSign.IsChecked.GetValueOrDefault();
             if (chkOtherCustomer.IsChecked == true)
                 Account = leAccount.Text;
             else
                 Account = string.Empty;
-            copyDeliveryAddress = (bool)chkCopyDelAdd.IsChecked;
-            reCalculatePrices = (bool)chkReCalPrices.IsChecked;
+            copyDeliveryAddress = chkCopyDelAdd.IsChecked.GetValueOrDefault();
+            reCalculatePrices = chkReCalPrices.IsChecked.GetValueOrDefault();
             SetDialogResult(true);
         }
 
@@ -120,26 +112,6 @@ namespace UnicontaClient.Controls.Dialogs
             leAccount.Visibility = Visibility.Collapsed;
         }
 
-#if SILVERLIGHT
-
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Escape)
-            {
-                SetDialogResult(false);
-            }
-            else
-                if (e.Key == Key.Enter)
-            {
-                if (OKButton.IsFocused)
-                    OKButton_Click(null, null);
-                else if (CancelButton.IsFocused)
-                    SetDialogResult(false);
-            }
-        }
-
-        
-#endif
     }
 }
 

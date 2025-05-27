@@ -59,9 +59,7 @@ namespace UnicontaClient.Pages
             cmbExternType.SelectedIndex = 0;
             if (!string.IsNullOrWhiteSpace(script))
                 this.txtScript.Text = script;
-#if !SILVERLIGHT
             chkIsCsharp.IsChecked = CWAddFieldValues.isCSharp;
-#endif
         }
 
         void CW_Loaded(object sender, RoutedEventArgs e)
@@ -76,9 +74,7 @@ namespace UnicontaClient.Pages
 
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
-#if !SILVERLIGHT
-            CWAddFieldValues.isCSharp = (bool)this.chkIsCsharp.IsChecked;
-#endif
+            CWAddFieldValues.isCSharp = this.chkIsCsharp.IsChecked.GetValueOrDefault();
             Expr = Compile(api, objType, txtScript.Text, row, CWAddFieldValues.isCSharp, false);
             if (Expr != null)
                 SetDialogResult(true);
@@ -104,7 +100,7 @@ namespace UnicontaClient.Pages
         }
         public static UnicontaCompileResult Compile(CrudAPI api, Type objType, string script, UnicontaBaseEntity row = null, bool isCSharp = false, bool returnValue = false)
         {
-           return UtilDisplay.Compile(api, objType, script, row, isCSharp, returnValue);
+            return UtilDisplay.Compile(api, objType, script, row, isCSharp, returnValue);
         }
 
         private void btnScriptHelper_Click(object sender, RoutedEventArgs e)
@@ -132,28 +128,10 @@ namespace UnicontaClient.Pages
 
         private void Compile_Click(object sender, RoutedEventArgs e)
         {
-#if !SILVERLIGHT
-            CWAddFieldValues.isCSharp = (bool)this.chkIsCsharp.IsChecked;
-#endif
+            CWAddFieldValues.isCSharp = this.chkIsCsharp.IsChecked.GetValueOrDefault();
             Expr = Compile(api, objType, txtScript.Text, row, CWAddFieldValues.isCSharp, false);
             if (Expr != null)
-                UnicontaMessageBox.Show(Expr.expr?.ToString() ?? Uniconta.ClientTools.Localization.lookup("ok"),Uniconta.ClientTools.Localization.lookup("Message"));
+                UnicontaMessageBox.Show(Expr.expr?.ToString() ?? Uniconta.ClientTools.Localization.lookup("ok"), Uniconta.ClientTools.Localization.lookup("Message"));
         }
-#if SILVERLIGHT
-        private void txtScript_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Tab)
-            {
-                var olSelectionStart = txtScript.SelectionStart;
-                txtScript.Text = txtScript.Text.Insert(txtScript.SelectionStart, "    ");
-
-                txtScript.Focus();
-                txtScript.SelectionStart = olSelectionStart + 4;
-                txtScript.Select(txtScript.SelectionStart, 0);
-                txtScript.Focus();
-                e.Handled = true;
-            }
-        }
-#endif
     }
 }

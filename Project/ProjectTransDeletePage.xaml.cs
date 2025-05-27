@@ -189,14 +189,14 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var projectClient = (sender as Image).Tag as ProjectClient;
+            var projectClient = (sender as System.Windows.Controls.Image).Tag as ProjectClient;
             if (projectClient != null)
                 AddDockItem(TabControls.UserDocsPage, dgProjectGrid.syncEntity);
         }
 
         private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var projectClient = (sender as Image).Tag as ProjectClient;
+            var projectClient = (sender as System.Windows.Controls.Image).Tag as ProjectClient;
             if (projectClient != null)
                 AddDockItem(TabControls.UserNotesPage, dgProjectGrid.syncEntity);
         }

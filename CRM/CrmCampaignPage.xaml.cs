@@ -51,7 +51,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void InitPage(UnicontaBaseEntity master)
         {
             InitializeComponent();
-            ((TableView)dgCrmCampaignGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
+            ((TableView)dgCrmCampaignGrid.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
             dgCrmCampaignGrid.UpdateMaster(master);
             localMenu.dataGrid = dgCrmCampaignGrid;
             dgCrmCampaignGrid.api = api;

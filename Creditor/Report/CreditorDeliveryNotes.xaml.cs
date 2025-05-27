@@ -314,6 +314,7 @@ namespace UnicontaClient.Pages.CustomPage
         StandardPrintReportPage standardPrintPreviewPage;
         private async Task<IPrintReport> PrintPacknote(CreditorDeliveryNoteLocal creditorInvoice)
         {
+            IPrintReport iprintReport = null;
             var creditorPrint = new UnicontaClient.Pages.CreditorPrintReport(creditorInvoice, api, Uniconta.DataModel.CompanyLayoutType.PurchasePacknote);
 
             if (hasLookups)
@@ -326,21 +327,24 @@ namespace UnicontaClient.Pages.CustomPage
                     creditorPrint.CompanyLogo, creditorPrint.ReportName, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.PurchasePackNote, creditorPrint.CreditorMessage);
 
                 var standardReports = new[] { standardCreditorInvoice };
-                IPrintReport iprintReport = new StandardPrintReport(api, standardReports, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.PurchasePackNote);
+                iprintReport = new StandardPrintReport(api, standardReports, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.PurchasePackNote);
                 await iprintReport.InitializePrint();
-                if (iprintReport?.Report != null)
-                    return iprintReport;
 
-                //Call LayoutInvoice
-                var layoutReport = new LayoutPrintReport(api, creditorInvoice, Uniconta.DataModel.CompanyLayoutType.PurchasePacknote);
-                layoutReport.SetupLayoutPrintFields(creditorPrint);
-                if (hasLookups)
-                    layoutReport.SetLookUpForDebtorMessageClients(messagesLookup);
+                if (iprintReport?.Report == null)
+                {
+                    //Call LayoutInvoice
+                    iprintReport = new LayoutPrintReport(api, creditorInvoice, Uniconta.DataModel.CompanyLayoutType.PurchasePacknote);
+                    if (iprintReport is LayoutPrintReport layoutReport)
+                    {
+                        layoutReport.SetupLayoutPrintFields(creditorPrint);
+                        if (hasLookups)
+                            layoutReport.SetLookUpForDebtorMessageClients(messagesLookup);
+                    }
 
-                await layoutReport.InitializePrint();
-                return layoutReport;
+                    await iprintReport.InitializePrint();
+                }
             }
-            return null;
+            return iprintReport;
         }
 
         /// <summary>

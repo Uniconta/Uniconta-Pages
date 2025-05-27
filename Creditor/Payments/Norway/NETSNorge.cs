@@ -44,7 +44,6 @@ namespace UnicontaClient.Creditor.Payments
             sb.Clear();
         }
 
-#if !SILVERLIGHT
         public static void GenerateJournalLines(CrudAPI api, Uniconta.DataModel.GLDailyJournal jour, string filename)
         {
             try
@@ -133,7 +132,6 @@ namespace UnicontaClient.Creditor.Payments
                 api.ReportException(ex, string.Format("NETSForge GenerateJournalLines, CompanyId={0}", api.CompanyId));
             }
         }
-#endif
     }
 }
 

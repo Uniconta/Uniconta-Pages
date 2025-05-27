@@ -66,6 +66,7 @@ namespace UnicontaClient.Pages.CustomPage
                 frmRibbon.DisableButtons( "Delete" );
                 editrow =CreateNew() as BankStatementClient;
                 editrow._DaysSlip = 3;
+                editrow._BankAsOffset = true;
                 editrow._BankConnect2Journal = false;
             }
             if (crudapi.CompanyEntity._DirectDebit == false)

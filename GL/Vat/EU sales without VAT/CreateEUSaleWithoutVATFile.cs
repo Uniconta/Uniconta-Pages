@@ -34,7 +34,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         #region Variables
         private CrudAPI api;
-        private string companyRegNo;
+        public string companyRegNo;
         private CountryCode companyCountryId;
         public bool validateVIES;
         private Dictionary<string, bool> dictVatNumber;

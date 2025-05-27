@@ -249,10 +249,8 @@ namespace UnicontaISO20022CreditTransfer
                 case CompanyBankENUM.BankData:
                 case CompanyBankENUM.BEC:
                 case CompanyBankENUM.SDC:
-                    if (paymentMethod == PaymentTypes.IBAN) 
+                    if (paymentMethod == PaymentTypes.IBAN || paymentMethod == PaymentTypes.VendorBankAccount) 
                         return ISOPaymType == ISO20022PaymentTypes.DOMESTIC ? "ONCL" : "IN";
-                    else if (paymentMethod == PaymentTypes.VendorBankAccount)
-                        return "ONCL";
                     return string.Empty;
                 default:
                     return "ONCL";
@@ -490,6 +488,9 @@ namespace UnicontaISO20022CreditTransfer
                 unstructured = true;
             }
 
+            if (companyBankEnum == CompanyBankENUM.BEC || companyBankEnum == CompanyBankENUM.BankData || companyBankEnum == CompanyBankENUM.SDC)
+                adr1 = adr1 ?? "na"; //adresse skal mindst være en karakter lang for at undgå fejl i banken
+
             if (zipCode != null && !unstructured)
             {
                 creditorAddress.ZipCode = zipCode;
@@ -504,7 +505,7 @@ namespace UnicontaISO20022CreditTransfer
                 creditorAddress.Unstructured = true;
             }
 
-            creditorAddress.CountryId = ((CountryISOCode)creditor._Country).ToString();
+            creditorAddress.CountryId = creditor._Country == CountryCode.Unknown ? companyCountryId : ((CountryISOCode)creditor._Country).ToString();
 
             return creditorAddress;
         }
@@ -641,6 +642,57 @@ namespace UnicontaISO20022CreditTransfer
                 return true;
 
             return false;
+        }
+
+        /// <summary>
+        ///BEC - rettet efter vejledning fra BEC se ticket #124706
+        ///Foreign Transfer: Used for bank individual transfertypes(2 char) :
+        ///BEC Benytter nedenstående koder:
+        ///00 (betaling samme dag)
+        ///01 (Ekspresbetaling)
+        ///02 (Normal betaling)
+        ///03 (Økonomioverførsel)
+        ///04 (Koncernoverførsel)
+        ///97 (SEPA transfer)
+        ///99 (Nationalbank transfer)
+        ///
+        ///  
+        ///BankData Benytter nedenstående koder: Modtaget af Henrik fra JyskeBank d. 07-05-2025
+        ///På udenlandske betalinger anvender vi koderne:
+        ///53 – standard overførsel
+        ///57 – ekspres overførsel
+        ///97 – SEPA overførsel
+        /// 
+        ///På betalinger fra konti i et udenlandsk pengeinstitut anvender vi disse koder:
+        ///83 – almindelig overførsel
+        ///84 – ekspres overførsel
+        ///85 – overførsel til egen konto i Danmark
+        ///86 – koncern overførsel
+        /// </summary>
+        public override string InstrForDbtrAgt(ISO20022PaymentTypes ISOPaymType, CountryCode creditorBankDetailsCountryId)
+        {
+            if (companyBankEnum == CompanyBankENUM.BEC)
+            {
+                if (ISOPaymType == ISO20022PaymentTypes.SEPA)
+                    return "97";
+                else if (ISOPaymType == ISO20022PaymentTypes.CROSSBORDER)
+                    return "02";
+            }
+            else if (companyBankEnum == CompanyBankENUM.BankData)
+            {
+                if (ISOPaymType == ISO20022PaymentTypes.SEPA)
+                    return "97";
+                else if (ISOPaymType == ISO20022PaymentTypes.CROSSBORDER)
+                {
+                    if (creditorBankDetailsCountryId == CountryCode.Denmark)
+                        return "53";
+                    else
+                        return "83";
+                }
+            }
+            //TODO:Mangler dokumentation fra SDC!!
+
+            return null;
         }
     }
 }

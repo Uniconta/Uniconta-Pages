@@ -30,9 +30,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             this.DataContext = this;
             InitializeComponent();
-#if !SILVERLIGHT
             this.Title = Uniconta.ClientTools.Localization.lookup("AccountingPeriod");
-#endif 
             API = api;
             ModifiedRow = accountYears;
             LoadedRow = StreamingManager.Clone((UnicontaBaseEntity)ModifiedRow);
@@ -44,7 +42,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             Dispatcher.BeginInvoke(new Action(() => { btnSave.Focus(); }));
         }
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {
@@ -80,13 +78,8 @@ namespace UnicontaClient.Pages.CustomPage
             var cmb = sender as ComboBoxEditor;
             var value = e.NewValue as string;
             if (value == AppEnums.GLFinancePeriodeState.Values[3])
-#if !SILVERLIGHT
                 if (UnicontaMessageBox.Show(string.Format("{0}. {1}", Uniconta.ClientTools.Localization.lookup("ConfirmClosing"), Uniconta.ClientTools.Localization.lookup("AreYouSureToContinue")), Uniconta.ClientTools.Localization.lookup("Message"), MessageBoxButton.YesNo) == MessageBoxResult.No)
                 {
-#else
-                if (UnicontaMessageBox.Show(string.Format("{0}. {1}", Uniconta.ClientTools.Localization.lookup("ConfirmClosing"), Uniconta.ClientTools.Localization.lookup("AreYouSureToContinue")), Uniconta.ClientTools.Localization.lookup("Message"), MessageBoxButton.OKCancel) == MessageBoxResult.Cancel)
-                {
-#endif
                     cmb.SelectedItem = e.OldValue;
                     e.Handled = true;
                 }

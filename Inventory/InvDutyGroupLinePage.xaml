@@ -6,11 +6,6 @@ x:Class="UnicontaClient.Pages.CustomPage.InvDutyGroupLinePage"
              xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage" 
              xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid" 
              xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
-    <UserControl.Resources>
-        <Style x:Key="StyleRow" TargetType="dxg:GridRowContent">
-            <Setter Property="Height" Value="Auto"/>
-        </Style>
-    </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -33,7 +28,32 @@ x:Class="UnicontaClient.Pages.CustomPage.InvDutyGroupLinePage"
                     <local:ComboBoxColumnClient x:Name="DutyShow" Width="150" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Sales" Width="70" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Purchase" Width="70" />
+                    <local:CorasauDataGridForeignKeyColumnClient x:Name="SalesAccount">
+                        <local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.SalesAccount,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"></TextBlock>
+                            </ControlTemplate>
+                        </local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                        <local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <local:CorasauGridLookupEditorClient HasCustomLookUp="true"  GotFocus="SalesAccount_GotFocus" x:Name="PART_Editor" ItemsSource="{Binding DataContext.RowData.Row.SalesAccountSource,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                            </DataTemplate>
+                        </local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                    </local:CorasauDataGridForeignKeyColumnClient>
+                    <local:CorasauDataGridForeignKeyColumnClient x:Name="SalesGroup">
+                        <local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.SalesGroup,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"></TextBlock>
+                            </ControlTemplate>
+                        </local:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                        <local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <local:CorasauGridLookupEditorClient HasCustomLookUp="true"  GotFocus="SalesGroup_GotFocus" x:Name="PART_Editor" ItemsSource="{Binding DataContext.RowData.Row.SalesGroupSource,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                            </DataTemplate>
+                        </local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                    </local:CorasauDataGridForeignKeyColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="IncludeInCostprice" Width="100" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PriceFromItem" Width="100"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="ValidFrom" Width="70" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="ValidTo" Width="70" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="DeliveryDate" Width="100"/>

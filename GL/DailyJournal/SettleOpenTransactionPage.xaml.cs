@@ -70,7 +70,7 @@ namespace UnicontaClient.Pages.CustomPage
             else if (selectedLine is BankStatementLineClient)
                 SelectedBankStatemenLine = selectedLine as BankStatementLineClient;
 
-            ((DevExpress.Xpf.Grid.TableView)dgOpenTransactionGrid.View).RowStyle = Application.Current.Resources["DisableStyleRow"] as Style;
+            ((DevExpress.Xpf.Grid.TableView)dgOpenTransactionGrid.View).RowStyle = System.Windows.Application.Current.Resources["DisableStyleRow"] as Style;
             InitGridView(markedList);
         }
 
@@ -237,7 +237,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgOpenTransactionGrid.SetSource(listSource);
         }
 
-        private void SettleOpenTransactionPage_KeyDown(object sender, KeyEventArgs e)
+        private void SettleOpenTransactionPage_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Enter || e.Key == Key.F8)
             {
@@ -563,7 +563,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void CheckBox_Click(object sender, RoutedEventArgs e)
         {
-            CheckBoxClicked((sender as CheckBox).Tag);
+            CheckBoxClicked((sender as System.Windows.Controls.CheckBox).Tag);
         }
 
         private void CheckBoxClicked(object selectedItem)

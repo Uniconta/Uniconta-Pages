@@ -276,9 +276,9 @@ namespace UnicontaClient.Pages.CustomPage
         void SetBackGroundColor(NumericUpDownEditor txtHours, int dayStatus)
         {
             if (dayStatus == 1)
-                txtHours.Background = new SolidColorBrush((Color)Application.Current.Resources["YellowColor"]);
+                txtHours.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Application.Current.Resources["YellowColor"]);
             else if (dayStatus == 2)
-                txtHours.Background = new SolidColorBrush((Color)Application.Current.Resources["GreenColor"]);
+                txtHours.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Application.Current.Resources["GreenColor"]);
         }
 
         async void SetProjectTask()

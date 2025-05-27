@@ -31,11 +31,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             this.DataContext = this;
             InitializeComponent();
-#if SILVERLIGHT
-            Utility.SetThemeBehaviorOnChildWindow(this);
-#else
              this.Title = Uniconta.ClientTools.Localization.lookup("Company");
-#endif
             this.Loaded += CWSelectCompany_Loaded;
         }
 
@@ -58,7 +54,7 @@ namespace UnicontaClient.Pages.CustomPage
                 _CompanyObj = cbCompany.SelectedItem as Company;              
             }
         }
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {

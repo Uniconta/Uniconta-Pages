@@ -80,8 +80,9 @@ Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNe
                             </ControlTemplate>
                         </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="LastBankTrans" Visible="False" Width="90"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="LastPosting" Visible="False"  Width="90"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="LastBankTrans" Visible="False" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="LastPosting" Visible="False"  Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="LastOpen" Visible="False"  Width="80"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Created" Width="90" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="ScanEmail" Width="250"  />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Country" Visible="False" />

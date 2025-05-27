@@ -40,7 +40,7 @@ namespace UnicontaClient.Pages.CustomPage
             : base(API, string.Empty)
         {
             InitializeComponent();
-            ((TableView)dgCompanyLogGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
+            ((TableView)dgCompanyLogGrid.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
             dgCompanyLogGrid.api = api;
             dgCompanyLogGrid.BusyIndicator = busyIndicator;
             SetRibbonControl(localMenu, dgCompanyLogGrid);

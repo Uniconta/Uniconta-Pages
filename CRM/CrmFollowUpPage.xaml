@@ -15,9 +15,6 @@ x:Class="UnicontaClient.Pages.CustomPage.CrmFollowUpPage"
         <Util:RowIndexConverter x:Key="RowIndexConverter" />
         <Util:VisibilityTextConverter x:Key="VisibilityTextConverter" />
         <Util:VisibilityBoolConverter x:Key="VisibilityBoolConverter" />
-        <Style x:Key="StyleRow" TargetType="dxg:RowControl">
-            <Setter Property="Height" Value="Auto"/>
-        </Style>
     </UserControl.Resources>
 
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">

@@ -140,9 +140,6 @@ namespace UnicontaClient.Pages.CustomPage
         [ForeignKeyAttribute(ForeignKeyTable = typeof(Debtor))]
         public string FromAccount { get; set; }
 
-        [ForeignKeyAttribute(ForeignKeyTable = typeof(Debtor))]
-        public string ToAccount { get; set; }
-
         SQLCache accountCache;
         ItemBase ibase, ibaseCurrent;
 
@@ -201,7 +198,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 string header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Statement"), key);
                 SetHeader(header);
-                FromAccount = ToAccount = key;
+                FromAccount = key;
             }
         }
         public static void SetDefaultDateTime()
@@ -219,7 +216,7 @@ namespace UnicontaClient.Pages.CustomPage
             this.DataContext = this;
             InitializeComponent();
             SetDebtorFilterUserFields();
-            cmbFromAccount.api = cmbToAccount.api = api;
+            cmbAccounts.api = api;
             SetRibbonControl(localMenu, dgDebtorTrans);
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
             dgDebtorTrans.OnPrintClick += DgDebtorTrans_OnPrintClick;
@@ -286,7 +283,7 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
             detailView.ShowSearchPanelMode = ShowSearchPanelMode.Never;
             detailView.SearchPanelHighlightResults = true;
-            BindingOperations.SetBinding(detailView, DataViewBase.SearchStringProperty, new Binding("SearchText") { Source = ribbonControl.SearchControl });
+            BindingOperations.SetBinding(detailView, DataViewBase.SearchStringProperty, new System.Windows.Data.Binding("SearchText") { Source = ribbonControl.SearchControl });
         }
 
         TableView GetDetailView(int rowHandle)
@@ -407,8 +404,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (_master != null)
             {
-                cmbFromAccount.EditValue = _master._Account;
-                cmbToAccount.EditValue = _master._Account;
+                cmbAccounts.EditValue = _master._Account;
                 return LoadDCTrans();
             }
             return null;
@@ -674,8 +670,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         void SendMail()
         {
-            var fromAccount = Convert.ToString(cmbFromAccount.EditValue);
-            var toAccount = Convert.ToString(cmbToAccount.EditValue);
+            var fromAccount = txtAccount.Text; ;
+            var toAccount = string.Empty;
             var lstDebtorTransLst = (IEnumerable<DebtorStatementList>)dgDebtorTrans.ItemsSource;
             var VisibleItems = dgDebtorTrans.VisibleItems;
 
@@ -861,15 +857,8 @@ namespace UnicontaClient.Pages.CustomPage
             printIntPreview = cmbPrintintPreview.SelectedIndex;
             transaction = cmbTrasaction.SelectedIndex;
             includedJournals = cmbJournals.Text;
-            string fromAccount = null, toAccount = null;
-            var accountObj = cmbFromAccount.EditValue;
-            if (accountObj != null)
-                fromAccount = accountObj.ToString();
-
-            accountObj = cmbToAccount.EditValue;
-            if (accountObj != null)
-                toAccount = accountObj.ToString();
-
+            string fromAccount = txtAccount.Text;
+            string toAccount = null;
             busyIndicator.IsBusy = true;
             var transApi = new ReportAPI(api);
             var listTrans = (DebtorTransClientTotal[])await transApi.GetTransWithPrimo(new DebtorTransClientTotal(), fromDate, toDate, fromAccount, toAccount, OnlyOpen, null, debtorFilterValues, OnlyDue, includedJournals);
@@ -999,9 +988,9 @@ namespace UnicontaClient.Pages.CustomPage
             dgDebtorTrans.PageBreak = (cbxPageBreak.IsChecked == true);
         }
 
-        private void cmbFromAccount_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
+        private void cmbAccounts_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
         {
-            cmbToAccount.SelectedItem = cmbFromAccount.SelectedItem;
+            txtAccount.Text += $"{cmbAccounts.EditValue};";
         }
 
         int dataRowCount;
@@ -1038,7 +1027,7 @@ namespace UnicontaClient.Pages.CustomPage
             this.HasPageBreak = HasPageBreak;
         }
 
-        public override IDataNode CreateMasterDetailPrintingNode(NodeContainer container, RowNode rowNode, IDataNode node, int index, Size pageSize)
+        public override IDataNode CreateMasterDetailPrintingNode(NodeContainer container, RowNode rowNode, IDataNode node, int index, System.Windows.Size pageSize)
         {
             return new CustomGridMasterDetailPrintingNode(HasPageBreak, 1, container, rowNode, this, node, index, pageSize);
         }
@@ -1056,6 +1045,6 @@ namespace UnicontaClient.Pages.CustomPage
                 return base.fIndex > 0;
             }
         }
-        public CustomGridMasterDetailPrintingNode(bool HasPageBreak, int groupLevel, NodeContainer parentContainer, RowNode rowNode, GridPrintingDataTreeBuilder treeBuilder, IDataNode parent, int index, Size pageSize) : base(parentContainer, rowNode, treeBuilder, parent, index, pageSize) { this.HasPageBreak = HasPageBreak; }
+        public CustomGridMasterDetailPrintingNode(bool HasPageBreak, int groupLevel, NodeContainer parentContainer, RowNode rowNode, GridPrintingDataTreeBuilder treeBuilder, IDataNode parent, int index, System.Windows.Size pageSize) : base(parentContainer, rowNode, treeBuilder, parent, index, pageSize) { this.HasPageBreak = HasPageBreak; }
     }
 }

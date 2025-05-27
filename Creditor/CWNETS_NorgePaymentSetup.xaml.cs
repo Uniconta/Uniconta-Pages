@@ -36,24 +36,19 @@ namespace UnicontaClient.Pages.CustomPage
             StreamingManager.Copy(paymentFormat, paymentFormatNet);
             this.DataContext = paymentFormatNet;
             this.Title = string.Format(Uniconta.ClientTools.Localization.lookup("SetupOBJ"), Uniconta.ClientTools.Localization.lookup("Payment"));
-#if SILVERLIGHT
-            Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             this.Loaded += CW_Loaded;
         }
         private void CW_Loaded(object sender, RoutedEventArgs e)
         {
             Dispatcher.BeginInvoke(new Action(() => 
             {
-#if !SILVERLIGHT
                 if (string.IsNullOrWhiteSpace(txtDataAvsender.Text))
                     txtDataAvsender.Focus();
                 else
-#endif
                     OKButton.Focus();
             }));
         }
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {

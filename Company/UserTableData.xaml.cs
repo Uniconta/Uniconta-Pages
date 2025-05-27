@@ -298,7 +298,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (def._Delete || def._Hide)
                     continue;
-                var b = new Binding();
+                var b = new System.Windows.Data.Binding();
                 b.Converter = (RowIndexConverter)this.Resources["RowIndexConverter"];
                 b.ConverterParameter = def;
                 b.Path = Path;

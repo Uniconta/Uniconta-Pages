@@ -28,9 +28,6 @@ namespace UnicontaClient.Pages.CustomPage
             DataContext = this;
             InitializeComponent();
             Title = string.Format(Uniconta.ClientTools.Localization.lookup("JoinTwoOBJ"), Uniconta.ClientTools.Localization.lookup("Dimensions"));
-#if SILVERLIGHT
-            UnicontaClient.Utilities.Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             crudApi = api;
             dim = dimension;
             cmbFromDimension.api = cmbToDimension.api = api;
@@ -72,7 +69,7 @@ namespace UnicontaClient.Pages.CustomPage
             SetDialogResult(false);
         }
 
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {

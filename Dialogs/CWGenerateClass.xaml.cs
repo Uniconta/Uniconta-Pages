@@ -23,7 +23,7 @@ namespace UnicontaClient.Controls.Dialogs
             KeyDown += CWGenerateClass_KeyDown;
         }
 
-        private void CWGenerateClass_KeyDown(object sender, KeyEventArgs e)
+        private void CWGenerateClass_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
                 CancelButton_Click(null, null);
@@ -33,24 +33,15 @@ namespace UnicontaClient.Controls.Dialogs
 
         private void CWGenerateClass_Loaded(object sender, RoutedEventArgs e)
         {
-#if !SILVERLIGHT
             //txtEditControl.ReplaceService<ISyntaxHighlightService>(new CustomSyntaxHighlightService(this.txtEditControl));
             txtEditControl.Text = _displayString;
-#else
-            txtEditControl.Selection.Text = _displayString;
-#endif
         }
 
         private void CopyButton_Click(object sender, RoutedEventArgs e)
         {
             string copyToClipBoard = string.Empty;
-#if !SILVERLIGHT
             copyToClipBoard = string.IsNullOrEmpty(txtEditControl.Selection) ? _displayString : txtEditControl.Selection;
-#else
-            copyToClipBoard = _displayString;
-
-#endif
-            Clipboard.SetText(copyToClipBoard);
+            System.Windows.Clipboard.SetText(copyToClipBoard);
             SetDialogResult(true);
         }
 

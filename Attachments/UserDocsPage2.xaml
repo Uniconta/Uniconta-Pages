@@ -6,7 +6,7 @@ x:Class="UnicontaClient.Pages.CustomPage.UserDocsPage2"
            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
            xmlns:dxinteraction="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
-           xmlns:enumType ="clr-namespace:Uniconta.Common;assembly=Uniconta.WindowsAPI"
+           xmlns:Utilities="clr-namespace:UnicontaClient.Utilities"
            xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
            mc:Ignorable="d"
            d:DesignWidth="640" d:DesignHeight="480">
@@ -31,7 +31,7 @@ x:Class="UnicontaClient.Pages.CustomPage.UserDocsPage2"
                         <CorasauControls:CorasauLayoutItem FieldName="DocumentType" x:Name="liDocumentType" Visibility="Collapsed">
                             <CorasauControls:ComboBoxEditor x:Name="cmbDocType" EditValue="{Binding DocumentType,Mode=TwoWay}" EditValueChanged="cmbDocType_EditValueChanged">
                                 <dxinteraction:Interaction.Behaviors>
-                                    <dxinteraction:EnumItemsSourceBehavior EnumType="{x:Type enumType:FileextensionsTypes}" />
+                                <dxinteraction:EnumItemsSourceBehavior EnumType="{x:Static Utilities:EnumTypeResolver.FileextensionsTypes}" />
                                 </dxinteraction:Interaction.Behaviors>
                             </CorasauControls:ComboBoxEditor>
                         </CorasauControls:CorasauLayoutItem>

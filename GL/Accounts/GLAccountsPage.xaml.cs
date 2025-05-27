@@ -79,7 +79,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             dgGLTable.BusyIndicator = busyIndicator;
             ribbonControl.DisableButtons(new string[] { "AddRow", "CopyRow", "DeleteRow", "UndoDelete" ,"SaveGrid" });
-            ((TableView)dgGLTable.View).RowStyle = Application.Current.Resources["RowStyle"] as Style;
+            ((TableView)dgGLTable.View).RowStyle = System.Windows.Application.Current.Resources["RowStyle"] as Style;
         }
 
         protected override void OnLayoutLoaded()
@@ -288,14 +288,14 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var glAccount = (sender as Image).Tag as GLAccountClient;
+            var glAccount = (sender as System.Windows.Controls.Image).Tag as GLAccountClient;
             if(glAccount!=null)
                 AddDockItem(TabControls.UserDocsPage, dgGLTable.syncEntity);
         }
 
         private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var glAccount = (sender as Image).Tag as GLAccountClient;
+            var glAccount = (sender as System.Windows.Controls.Image).Tag as GLAccountClient;
             if (glAccount != null)
                 AddDockItem(TabControls.UserNotesPage, dgGLTable.syncEntity);
         }

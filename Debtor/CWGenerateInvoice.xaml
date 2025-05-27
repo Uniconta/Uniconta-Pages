@@ -23,7 +23,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWGenerateInvoice"
         <Grid x:Name="gridLayout" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
             <ClientToolsControls:CorasauLayoutControl Orientation="Horizontal" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
                 <ClientToolsControls:CorasauLayoutGroup x:Name="lgPrimary"  Orientation="Vertical"  Header="" HorizontalAlignment="Stretch">
-                    <ClientToolsControls:CorasauLayoutGroup x:Name="lgAccount"  View="GroupBox" GroupBoxDisplayMode="Light" IsCollapsible="False" HorizontalAlignment="Stretch" ClientToolsControls:CorasauLayoutControl.AllowHorizontalSizing="True">
+                    <ClientToolsControls:CorasauLayoutGroup x:Name="lgAccount" Orientation="Vertical" View="GroupBox" GroupBoxDisplayMode="Light" IsCollapsible="False" HorizontalAlignment="Stretch" ClientToolsControls:CorasauLayoutControl.AllowHorizontalSizing="True">
                         <ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
                             <DataTemplate>
                                 <Image Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/group-user_16x16.svg, UsePalette=True}" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}" Width="16" Height="16" Stretch="UniformToFill" HorizontalAlignment="Left" />
@@ -31,6 +31,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CWGenerateInvoice"
                         </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
                         <ClientToolsControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Account}" LabelTemplate="{StaticResource PrimaryLableTemplate}">
                             <TextBlock x:Name="txtAccountName"  />
+                        </ClientToolsControls:CorasauLayoutItem>
+                        <ClientToolsControls:CorasauLayoutItem x:Name="liAllowSkipCreditMax" Visibility="Collapsed" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AllowSkipCreditMax}" LabelTemplate="{StaticResource PrimaryLableTemplate}">
+                            <ClientToolsControls:CheckEditor x:Name="chkAllowSkipCreditMax" IsChecked="{Binding AllowSkipCreditMax,Mode=TwoWay}" />
                         </ClientToolsControls:CorasauLayoutItem>
                     </ClientToolsControls:CorasauLayoutGroup>
                     <ClientToolsControls:CorasauLayoutGroup x:Name="lgImportant" IsCollapsible="False" GroupBoxDisplayMode="Light"  View="GroupBox" Orientation="Vertical" ClientToolsControls:CorasauLayoutControl.AllowHorizontalSizing="True"  Header="QuestionMark" HorizontalAlignment="Stretch">
@@ -65,7 +68,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWGenerateInvoice"
                             </DataTemplate>
                         </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
                         <ClientToolsControls:CorasauLayoutItem FieldName="AdditionalOrders" x:Name="liAdditionalOrders" LabelTemplate="{StaticResource PrimaryLableTemplate}">
-                            <ClientToolsControls:DimComboBoxEditor x:Name="cbOrders" DisplayMember="KeyStr" EditValue="{Binding AdditionalOrders}">
+                            <ClientToolsControls:DimComboBoxEditor x:Name="cbOrders" DisplayMember="KeyStr" EditValue="{Binding AdditionalOrders,UpdateSourceTrigger=PropertyChanged}">
                                 <ClientToolsControls:DimComboBoxEditor.StyleSettings>
                                     <editor:CheckedComboBoxStyleSettings  />
                                 </ClientToolsControls:DimComboBoxEditor.StyleSettings>

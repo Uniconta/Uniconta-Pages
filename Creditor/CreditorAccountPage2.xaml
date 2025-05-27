@@ -135,20 +135,23 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorAccountPage2"
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpPayment" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Payment}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
+                        <CorasauControls:CorasauLayoutItem FieldName="CreditorBankApprovement" x:Name="liCreditorBankApprovement">
+                        <CorasauControls:TextEditor x:Name="leCreditorBankApprovement" IsReadOnly="True" Text="{Binding CreditorBankApprovement,Mode=OneWay}" Template="{StaticResource CreditorBankStatusTemplate}" />
+                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="PaymentMethod" x:Name="liPaymentMethod">
                             <CorasauControls:ComboBoxEditor SelectedItem="{Binding PaymentMethod,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="SWIFT" x:Name="liSWIFT">
-                            <CorasauControls:TextEditor Text="{Binding SWIFT,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="PaymentId" x:Name="liPaymentId">
-                            <CorasauControls:TextEditor Text="{Binding PaymentId,Mode=TwoWay}"/>
+                            <CorasauControls:TextEditor Text="{Binding PaymentId,Mode=TwoWay}" x:Name="txtPaymentId"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="SWIFT" x:Name="liSWIFT">
+                        <CorasauControls:TextEditor Text="{Binding SWIFT,Mode=TwoWay}" x:Name="txtSWIFT"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="BankMessage" x:Name="liBankMessage">
                             <CorasauControls:TextEditor  x:Name="txtBankMessage" Text="{Binding BankMessage,Mode=TwoWay}"  />
                         </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="RefInPayment" x:Name="liRefInPayment">
-                            <CorasauControls:TextEditor Text="{Binding RefInPayment,Mode=TwoWay}" />
+                        <CorasauControls:CorasauLayoutItem FieldName="AllowMergePayment" x:Name="liAllowMergePayment">
+                            <CorasauControls:CheckEditor x:Name="leAllowMergePayment" IsChecked="{Binding AllowMergePayment,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="PaymentFormat" x:Name="liPaymentFormat">
                             <CorasauControls:LookupEditor x:Name="lePaymtFormat" Text="{Binding PaymentFormat,Mode=TwoWay}" />
@@ -156,7 +159,10 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorAccountPage2"
                         <CorasauControls:CorasauLayoutItem FieldName="Payment" x:Name="liPayment">
                             <CorasauControls:LookupEditor x:Name="Paymentlookupeditior" Text="{Binding Payment,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
-                    </CorasauControls:CorasauLayoutGroup>
+                        <CorasauControls:CorasauLayoutItem FieldName="RefInPayment" x:Name="liRefInPayment">
+                            <CorasauControls:TextEditor Text="{Binding RefInPayment,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="lastGroup">
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="crmGroup" Visibility="Collapsed"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CRM}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">

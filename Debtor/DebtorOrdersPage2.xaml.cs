@@ -25,7 +25,6 @@ using Uniconta.ClientTools.Controls;
 using DevExpress.Xpf.Editors;
 using System.ComponentModel;
 using Uniconta.Common.Utility;
-using FromXSDFile.OIOUBL.ExportImport.eDelivery;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -259,11 +258,12 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (cmbEditor.SelectedIndex != 0)
             {
-                if (editrow.OneTimeDebtor == null)
-                    editrow.OneTimeDebtor = api.CompanyEntity.CreateUserType<DebtorClient>();
-
                 var debtor = editrow.OneTimeDebtor;
-                debtor._Country = (CountryCode)api.CompanyEntity._Country;
+                if (debtor == null)
+                {
+                    debtor = api.CompanyEntity.CreateUserType<DebtorClient>();
+                    debtor._Country = (CountryCode)api.CompanyEntity._Country;
+                }
                 var debtorAccountPage2 = dockCtrl.AddDockItem(TabControls.DebtorAccountPage2, this.ParentControl, new object[2] { debtor, true }, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), "Add_16x16") as DebtorAccountPage2;
                 debtorAccountPage2.DoNotSave = true;
                 oneTimeDebtor = true;
@@ -285,16 +285,25 @@ namespace UnicontaClient.Pages.CustomPage
                 if (args[2] == this.ParentControl)
                 {
                     leAccount.LoadItemSource();
-                    var dc = args[3] as UnicontaBaseEntity;
+                    var dc = args[3] as DebtorClient;
                     if (oneTimeDebtor)
                     {
-                        editrow.OneTimeDebtor = dc as DebtorClient;
-                        CopyFromDebtor(editrow.OneTimeDebtor);
+                        if ((Int32)args[0] == 1)
+                        {
+                            editrow.OneTimeDebtor = dc;
+                            CopyFromDebtor(dc);
+                        }
+                        else
+                        {
+                            editrow.OneTimeDebtor = null;
+                            oneTimeDebtor = false;
+                        }
                     }
                     else
-                        editrow.SetMaster(args[3] as UnicontaBaseEntity);
+                        editrow.SetMaster(dc);
+
                     if (string.IsNullOrEmpty(leAccount.EditValue as string))
-                        leAccount.SelectedItem = args[3];
+                        leAccount.SelectedItem = dc;
                 }
             }
 
@@ -304,7 +313,13 @@ namespace UnicontaClient.Pages.CustomPage
                 args = argument as object[];
                 var voucher = args[0] as VouchersClient;
                 if (voucher != null)
-                    editrow.DocumentRef = voucher.RowId;
+                {
+                    var openedFrom = args[1];
+                    if (openedFrom == this.ParentControl)
+                    {
+                        editrow.DocumentRef = voucher.RowId;
+                    }
+                }
             }
 
             if (screenName == TabControls.ContactPage2 && argument != null)
@@ -642,7 +657,7 @@ namespace UnicontaClient.Pages.CustomPage
             row.DeliveryCountry = country;
         }
 
-        private void cmbContactName_KeyDown(object sender, KeyEventArgs e)
+        private void cmbContactName_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             var selectedItem = cmbContactName.SelectedItem as Contact;
             GoToContact(selectedItem, e.Key);

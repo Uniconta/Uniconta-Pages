@@ -327,7 +327,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void chkGrdTtlCol_Checked(object sender, RoutedEventArgs e)
         {
-            var value = (bool)chkGrdTtlCol.IsChecked;
+            var value = chkGrdTtlCol.IsChecked.GetValueOrDefault();
             pivotDgDebtorInvoiceSum.ShowColumnGrandTotalHeader = value;
             pivotDgDebtorInvoiceSum.ShowColumnGrandTotals = value;
             pivotDgDebtorInvoiceSum.ShowColumnTotals = value;

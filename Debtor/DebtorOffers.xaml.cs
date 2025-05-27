@@ -398,6 +398,8 @@ namespace UnicontaClient.Pages.CustomPage
 
             CWGenerateInvoice GenrateOfferDialog = new CWGenerateInvoice(false, CompanyLayoutType.Offer.ToString(), askForEmail: true, showNoEmailMsg: !showSendByMail, debtorName: debtorName, isDebtorOrder: true);
             GenrateOfferDialog.DialogTableId = 2000000006;
+            GenrateOfferDialog.ShowAllowCredMax(debtor._CreditMax != 0);
+
             GenrateOfferDialog.Closed += async delegate
             {
                 if (GenrateOfferDialog.DialogResult == true)
@@ -406,6 +408,9 @@ namespace UnicontaClient.Pages.CustomPage
                     invoicePostingResult.SetUpInvoicePosting(dbOrder, null, CompanyLayoutType.Offer, GenrateOfferDialog.GenrateDate, null, true, GenrateOfferDialog.ShowInvoice, GenrateOfferDialog.PostOnlyDelivered,
                         GenrateOfferDialog.InvoiceQuickPrint, GenrateOfferDialog.NumberOfPages, GenrateOfferDialog.SendByEmail, GenrateOfferDialog.SendByOutlook, GenrateOfferDialog.sendOnlyToThisEmail,
                         GenrateOfferDialog.Emails, false, null, false);
+                    if (api.CompanyEntity.AllowSkipCreditMax)
+                        invoicePostingResult.SetAllowCreditMax(GenrateOfferDialog.AllowSkipCreditMax);
+
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
                     busyIndicator.IsBusy = true;
                     var result = await invoicePostingResult.Execute();
@@ -472,14 +477,14 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var offer = (sender as Image).Tag as DebtorOfferClient;
+            var offer = (sender as System.Windows.Controls.Image).Tag as DebtorOfferClient;
             if (offer != null)
                 AddDockItem(TabControls.UserDocsPage, dgDebtorOffers.syncEntity);
         }
 
         private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var offer = (sender as Image).Tag as DebtorOfferClient;
+            var offer = (sender as System.Windows.Controls.Image).Tag as DebtorOfferClient;
             if (offer != null)
                 AddDockItem(TabControls.UserNotesPage, dgDebtorOffers.syncEntity);
         }

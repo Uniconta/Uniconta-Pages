@@ -13,9 +13,6 @@ x:Class="UnicontaClient.Pages.CustomPage.PartnerProspectFollowUpPage"
       xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools">
     <UserControl.Resources>
         <Util:RowIndexConverter x:Key="RowIndexConverter" />
-        <Style x:Key="StyleRow" TargetType="dxg:RowControl">
-            <Setter Property="Height" Value="Auto"/>
-        </Style>
     </UserControl.Resources>
 
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">

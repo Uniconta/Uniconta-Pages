@@ -204,6 +204,8 @@ namespace UnicontaClient.Pages.CustomPage
                 Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
             CostPrice.Visible = CostPrice.ShowInColumnChooser = false;
             }
+            if (!company.UnitConversion)
+                UnitGroup.Visible = UnitGroup.ShowInColumnChooser = false;
         }
 
         Uniconta.API.DebtorCreditor.FindPrices SetPriceLookup(CreditorOrderLineClient rec)

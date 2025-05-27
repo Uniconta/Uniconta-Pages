@@ -24,9 +24,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Resources;
 using System.Windows.Shapes;
 using System.Windows;
-#if !SILVERLIGHT
 using UnicontaClient.Controls;
-#endif
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -37,7 +35,6 @@ namespace UnicontaClient.Pages.CustomPage
         {
             get { return TabControls.InvoiceSubscriptionPage.ToString(); }
         }
-#if !SILVERLIGHT
         public InvoiceSubscription(SubscriptionInvDetails InvDetails) : base(null, false)
         {
             InitializeComponent();
@@ -61,8 +58,6 @@ namespace UnicontaClient.Pages.CustomPage
                 report.PrinterName = session.User._Printer;
             report.CreateDocument(true);
         }
-
-#endif
     }
 
 }

@@ -62,7 +62,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOfferLineReport"
                         <local:CorasauDataGridTemplateColumnClient.CellTemplate>
 
                             <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" GotFocus="SerieBatch_GotFocus" ValueMember="Number"  DisplayMember="DisplayText" ItemsSource="{Binding DataContext.RowData.Row.SerieBatches, Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" />
+                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" GotFocus="SerieBatch_GotFocus" ValueMember="DisplayText"  DisplayMember="DisplayText" ItemsSource="{Binding DataContext.RowData.Row.SerieBatches, Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" EditValueChanged="SerialBatch_EditValueChanged" />
                             </DataTemplate>
                         </local:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </local:CorasauDataGridTemplateColumnClient>

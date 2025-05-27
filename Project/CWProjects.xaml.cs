@@ -33,6 +33,8 @@ namespace UnicontaClient.Pages.CustomPage
         public bool AllLines { get; set; }
 
         public bool ShowAllLines;
+
+        public string Label;
         public CWProjects(CrudAPI api, string title = null)
         {
             InitializeComponent();
@@ -48,6 +50,8 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (ShowAllLines)
                 chkAllLines.Visibility = txtAllLines.Visibility = Visibility.Visible;
+            if (!string.IsNullOrEmpty(Label))
+                lblProject.Text = Label;
             Dispatcher.BeginInvoke(new Action(() => { leProject.Focus(); }));
         }
         private void OKButton_Click(object sender, RoutedEventArgs e)
@@ -58,6 +62,11 @@ namespace UnicontaClient.Pages.CustomPage
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             SetDialogResult(false);
+        }
+
+        private void imgClearProject_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            leProject.EditValue = null;
         }
     }
 }

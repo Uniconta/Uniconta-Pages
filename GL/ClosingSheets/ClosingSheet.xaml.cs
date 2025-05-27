@@ -107,14 +107,14 @@ namespace UnicontaClient.Pages.CustomPage
         }
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var debtorAccount = (sender as Image).Tag as GLClosingSheetClient;
+            var debtorAccount = (sender as System.Windows.Controls.Image).Tag as GLClosingSheetClient;
             if (debtorAccount != null)
                 AddDockItem(TabControls.UserDocsPage, dgClosingSheet.syncEntity);
         }
 
         private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var debtorAccount = (sender as Image).Tag as GLClosingSheetClient;
+            var debtorAccount = (sender as System.Windows.Controls.Image).Tag as GLClosingSheetClient;
             if (debtorAccount != null)
                 AddDockItem(TabControls.UserNotesPage, dgClosingSheet.syncEntity);
         }

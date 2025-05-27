@@ -63,7 +63,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgDebCredGDPRClnUp.Visibility = Visibility.Visible;
             busyIndicator.IsBusy = false;
         }
-        private void DebtorCreditorGDPRTextCleanUp_PreviewKeyDown(object sender, KeyEventArgs e)
+        private void DebtorCreditorGDPRTextCleanUp_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.F6 )
             {

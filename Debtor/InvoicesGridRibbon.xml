@@ -36,7 +36,6 @@
     <RibbonItem Action="SendAsOutlook" LocalizedNameKey="SendInvoiceInOutLook" LargeGlyph="Posted_Journal_32x32" />
   </RibbonItem>
   <RibbonItem  LocalizedNameKey="eInvoice">
-	  <!--<RibbonItem Action="EDeliveryMapping" LocalizedNameKey="EDeliveryMapping" LargeGlyph="Settings_32x32"/>-->
 	  <RibbonItem Action="SendUBL" LocalizedNameKey="SendInvoicebyUBL"  Module="_OIOUBLSendOnServer" LargeGlyph="SendInvoiceMail_32x32" />
 	  <RibbonItem Action="DocSendLog" LocalizedNameKey="Log" ControlName="DocsSendLogGridPage" LargeGlyph="Server_Count_32x32" />
       <RibbonItem Action="ExportUBL" LocalizedNameKey="ExportOBJ" Parameter="einvoice" LargeGlyph="Import_32x32"/>
@@ -48,6 +47,6 @@
     <RibbonItem Action="PreviousAddresses" LocalizedNameKey="PreviousAddresses" LargeGlyph="CopyUserTable_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="InvPackagingTrans" LocalizedNameKey="PackagingTrans" LargeGlyph="Transactions_32x32"/>
+    <RibbonItem Action="ProducerResponsibility" LocalizedNameKey="ProducerResponsibility" LargeGlyph="Transactions_32x32"/>
   </RibbonItem>
 </root>

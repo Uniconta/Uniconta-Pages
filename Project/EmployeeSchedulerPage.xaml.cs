@@ -152,8 +152,8 @@ namespace UnicontaClient.Pages.CustomPage
             schedulerDataSource.AppointmentLabelsSource = _projectList.ToArray();
 
             var taskTypeLst = new List<TaskType>();
-            taskTypeLst.Add(new TaskType { Id = "1", LineType = Uniconta.ClientTools.Localization.lookup("Budget"), Brush = Brushes.Red });
-            taskTypeLst.Add(new TaskType { Id = "2", LineType = Uniconta.ClientTools.Localization.lookup("Actual"), Brush = Brushes.Yellow });
+            taskTypeLst.Add(new TaskType { Id = "1", LineType = Uniconta.ClientTools.Localization.lookup("Budget"), Brush = System.Drawing.Brushes.Red });
+            taskTypeLst.Add(new TaskType { Id = "2", LineType = Uniconta.ClientTools.Localization.lookup("Actual"), Brush = System.Drawing.Brushes.Yellow });
             schedulerDataSource.AppointmentStatusesSource = taskTypeLst.ToArray();
             schedulerDataSource.AppointmentsSource = _empSchedulerLinesLst;
             schedulerDataSource.ResourcesSource = taskTypeLst.ToArray();
@@ -497,7 +497,7 @@ namespace UnicontaClient.Pages.CustomPage
             return timeDiff > 0.0 ? timeDiff : 0d;
         }
 
-        private Brush GetColorForStatus(string name)
+        private System.Windows.Media.Brush GetColorForStatus(string name)
         {
             var hashCode = name.GetHashCode();
 
@@ -505,26 +505,26 @@ namespace UnicontaClient.Pages.CustomPage
                 hashCode *= -1;
 
             byte[] bytes = BitConverter.GetBytes(hashCode);
-            var color = Color.FromArgb(bytes[0], bytes[1], bytes[2], bytes[3]);
+            var color = System.Windows.Media.Color.FromArgb(bytes[0], bytes[1], bytes[2], bytes[3]);
             var brush = new SolidColorBrush(color);
 
             return brush;
         }
 
-        private Color GetColorForLabel(int factor)
+        private System.Drawing.Color GetColorForLabel(int factor)
         {
             byte[] values = BitConverter.GetBytes(factor);
 
             if (!BitConverter.IsLittleEndian)
                 Array.Reverse(values);
 
-            return Color.FromArgb(values[0], values[1], values[2], values[3]);
+            return System.Drawing.Color.FromArgb(values[0], values[1], values[2], values[3]);
         }
     }
 
     public class ProjectLocal : ProjectClient
     {
-        public Color Color { get; set; }
+        public System.Drawing.Color Color { get; set; }
 
         public string ProjectName
         {
@@ -543,7 +543,7 @@ namespace UnicontaClient.Pages.CustomPage
     public class TaskType
     {
         public string Id { get; set; }
-        public Brush Brush { get; set; }
+        public System.Drawing.Brush Brush { get; set; }
         public string LineType { get; set; }
     }
 

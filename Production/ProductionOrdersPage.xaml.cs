@@ -341,27 +341,39 @@ namespace UnicontaClient.Pages.CustomPage
             else
                 UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NoLinesFound"), Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.OK);
         }
+
+        DateTime PostedDate;
+        string Comment, Txt;
         private void PostProduction(ProductionOrder dbOrder)
         {
-            CWInvPosting invpostingDialog = new CWInvPosting(api, "ReportAsFinished", true);
-            invpostingDialog.DialogTableId = 2000000041;
-            invpostingDialog.Closed += async delegate
+            CWInvPosting postingDialog = new CWInvPosting(api, "ReportAsFinished", true)
             {
-                if (invpostingDialog.DialogResult == true)
+                DialogTableId = 2000000041,
+                Date = this.PostedDate,
+                Comment = this.Comment,
+                Text = this.Txt
+            };
+            postingDialog.Closed += async delegate
+            {
+                if (postingDialog.DialogResult == true)
                 {
+                    this.PostedDate = postingDialog.Date;
+                    this.Comment = postingDialog.Comment;
+                    this.Txt = postingDialog.Text;
+
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
                     busyIndicator.IsBusy = true;
                     var papi = new Uniconta.API.Inventory.ProductionAPI(api);
-                    var postingResult = await papi.ReportAsFinished(dbOrder, invpostingDialog.Date, invpostingDialog.Text, invpostingDialog.TransType,
-                        invpostingDialog.Comment, invpostingDialog.FixedVoucher, invpostingDialog.Simulation, new GLTransClientTotal(), 0, invpostingDialog.NumberSeries,
-                        invpostingDialog.IsPartlyFinished ? invpostingDialog.Quantity : 0);
+                    var postingResult = await papi.ReportAsFinished(dbOrder, postingDialog.Date, postingDialog.Text, postingDialog.TransType,
+                        postingDialog.Comment, postingDialog.FixedVoucher, postingDialog.Simulation, new GLTransClientTotal(), 0, postingDialog.NumberSeries,
+                        postingDialog.IsPartlyFinished ? postingDialog.Quantity : 0);
                     busyIndicator.IsBusy = false;
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LoadingMsg");
                     if (postingResult == null)
                         return;
                     if (postingResult.Err != ErrorCodes.Succes)
                         Utility.ShowJournalError(postingResult, dgProductionOrders, goToLinesMsg: false);
-                    else if (invpostingDialog.Simulation)
+                    else if (postingDialog.Simulation)
                     {
                         if (postingResult.SimulatedTrans != null)
                             AddDockItem(TabControls.SimulatedTransactions, postingResult.SimulatedTrans, Uniconta.ClientTools.Localization.lookup("SimulatedTransactions"), null, true);
@@ -374,11 +386,15 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     else
                     {
-                        if (!invpostingDialog.IsPartlyFinished)
+                        this.PostedDate = DateTime.MinValue;
+                        this.Txt = null;
+                        this.Comment = null;
+
+                        if (!postingDialog.IsPartlyFinished)
                             dgProductionOrders.UpdateItemSource(3, dbOrder);
                         else
                         {
-                            dbOrder._ProdQty -= invpostingDialog.Quantity;
+                            dbOrder._ProdQty -= postingDialog.Quantity;
                             dgProductionOrders.UpdateItemSource(2, dbOrder);
                         }
 
@@ -391,7 +407,7 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                 }
             };
-            invpostingDialog.Show();
+            postingDialog.Show();
         }
 
         void CreateOrderLines(ProductionOrderClient productionOrder)
@@ -440,31 +456,21 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        private Task Filter(IEnumerable<PropValuePair> propValuePair)
-        {
-            return dgProductionOrders.Filter(propValuePair);
-        }
-
         void setDim()
         {
             UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
         }
 
-        private Task BindGrid()
-        {
-            return dgProductionOrders.Filter(null);
-        }
-
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var order = (sender as Image).Tag as ProductionOrderClient;
+            var order = (sender as System.Windows.Controls.Image).Tag as ProductionOrderClient;
             if (order != null)
                 AddDockItem(TabControls.UserDocsPage, dgProductionOrders.syncEntity);
         }
 
         private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var order = (sender as Image).Tag as ProductionOrderClient;
+            var order = (sender as System.Windows.Controls.Image).Tag as ProductionOrderClient;
             if (order != null)
                 AddDockItem(TabControls.UserNotesPage, dgProductionOrders.syncEntity);
         }

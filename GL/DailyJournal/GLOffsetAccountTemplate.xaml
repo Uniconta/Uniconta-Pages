@@ -10,11 +10,6 @@ x:Class="UnicontaClient.Pages.CustomPage.GLOffsetAccountTemplate"
       xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"     
       xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
        xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid">
-    <UserControl.Resources>
-        <Style x:Key="StyleRow" TargetType="dxg:RowControl">
-            <Setter Property="Height" Value="Auto"/>
-        </Style>
-    </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>

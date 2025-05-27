@@ -66,7 +66,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgUserCompaniesGridClient.Loaded += DgUserCompaniesGridClient_Loaded;
         }
 
-        protected override void OnPreviewKeyDown(KeyEventArgs e)
+        protected override void OnPreviewKeyDown(System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
             {
@@ -77,7 +77,7 @@ namespace UnicontaClient.Pages.CustomPage
                 base.OnPreviewKeyDown(e);
         }
 
-        static Point position = new Point();
+        static System.Windows.Point position = new System.Windows.Point();
         static double pageHeight = 600.0d, pageWidth = 900.0d;
         protected override void OnLayoutLoaded()
         {
@@ -87,7 +87,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (currPanel != null && currPanel.IsFloating)
                 {
                     SetFloatGroup();
-                    currPanel.Parent.FloatSize = new Size(pageWidth, pageHeight);
+                    currPanel.Parent.FloatSize = new System.Windows.Size(pageWidth, pageHeight);
                     currPanel.SizeChanged += CurrPanel_SizeChanged;
                     currPanel.UpdateLayout();
                 }
@@ -128,7 +128,7 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.SearchControl.Focus();
         }
 
-        private void SearchControl_KeyUp(object sender, KeyEventArgs e)
+        private void SearchControl_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Down)
             {

@@ -1,0 +1,85 @@
+<Pages:ControlBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+   xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.InventoryItemOnHand"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+     xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+    xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
+    xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
+    xmlns:utilityfunction="clr-namespace:UnicontaClient.Utilities"
+    mc:Ignorable="d"
+    d:DesignHeight="200" d:DesignWidth="300">
+    <UserControl.Resources>
+        <Util:MaskConverter x:Key="MaskConverter" />
+    </UserControl.Resources>
+    <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="0" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
+        <Grid  x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Vertical" VerticalAlignment="Stretch" Grid.Row="2" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="640">
+                <CorasauControls:CorasauLayoutGroup View="GroupBox"  x:Name="grpDescription" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}"  Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutGroup.GroupBoxStyle>
+                        <Style TargetType="dxlc:GroupBox">
+                            <Setter Property="TitleVisibility" Value="Collapsed" />
+                        </Style>
+                    </CorasauControls:CorasauLayoutGroup.GroupBoxStyle>
+                    <CorasauControls:CorasauLayoutItem FieldName="Item" x:Name="liItem">
+                        <CorasauControls:TextEditor Text="{Binding Item,Mode=TwoWay}" x:Name="txtItem"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Name" x:Name="liName" VerticalAlignment="Top" VerticalContentAlignment="Top" LabelVerticalAlignment="Top">
+                        <CorasauControls:TextEditor Text="{Binding Name,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  TextWrapping="Wrap" AcceptsReturn="True"  MinHeight="45" Width="{Binding ActualWidth, ElementName=txtItem}" VerticalContentAlignment="Top"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+                <CorasauControls:CorasauLayoutGroup View="GroupBox"  x:Name="grpQty" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Qty}"  Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutGroup.GroupBoxStyle>
+                        <Style TargetType="dxlc:GroupBox">
+                            <Setter Property="TitleVisibility" Value="Collapsed" />
+                        </Style>
+                    </CorasauControls:CorasauLayoutGroup.GroupBoxStyle>
+                    <CorasauControls:CorasauLayoutItem FieldName="QtyOnStock" x:Name="liQtyOnStock">
+                        <StackPanel Orientation="Horizontal">
+                            <CorasauControls:DoubleEditor Text="{Binding QtyOnStock,Mode=OneWay}" BindningIsSet="True"
+                       Mask="{Binding Decimals,Converter={StaticResource MaskConverter},ConverterParameter=Decimals}"
+                       MaskUseAsDisplayFormat="True" MaskType="Numeric" IsReadOnly="True" />
+                        </StackPanel>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="QtyReserved" x:Name="liQtyReserved">
+                        <StackPanel Orientation="Horizontal">
+                            <CorasauControls:DoubleEditor Text="{Binding QtyReserved, Mode=OneWay}" BindningIsSet="True"
+                       Mask="{Binding Decimals,Converter={StaticResource MaskConverter},ConverterParameter=Decimals}"
+                       MaskUseAsDisplayFormat="True" MaskType="Numeric" IsReadOnly="True" />
+                        </StackPanel>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="QtyOrdered" x:Name="liQtyOrdered">
+                        <StackPanel Orientation="Horizontal">
+                            <CorasauControls:DoubleEditor Text="{Binding QtyOrdered, Mode=OneWay}" BindningIsSet="True"
+                       Mask="{Binding Decimals,Converter={StaticResource MaskConverter},ConverterParameter=Decimals}"
+                       MaskUseAsDisplayFormat="True" MaskType="Numeric" IsReadOnly="True" />
+                        </StackPanel>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Available" x:Name="liAvailable">
+                        <StackPanel Orientation="Horizontal">
+                            <CorasauControls:DoubleEditor Text="{Binding Available, Mode=OneWay}" BindningIsSet="True"
+                       Mask="{Binding Decimals,Converter={StaticResource MaskConverter},ConverterParameter=Decimals}"
+                       MaskUseAsDisplayFormat="True" MaskType="Numeric" IsReadOnly="True" />
+                        </StackPanel>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="AvailableForReservation" x:Name="liAvailableForReservation">
+                        <StackPanel Orientation="Horizontal">
+                            <CorasauControls:DoubleEditor Text="{Binding AvailableForReservation, Mode=OneWay}" BindningIsSet="True"
+                       Mask="{Binding Decimals,Converter={StaticResource MaskConverter},ConverterParameter=Decimals}"
+                       MaskUseAsDisplayFormat="True" MaskType="Numeric" IsReadOnly="True" />
+                        </StackPanel>
+                    </CorasauControls:CorasauLayoutItem>
+
+                </CorasauControls:CorasauLayoutGroup>
+            </CorasauControls:CorasauLayoutControl>
+        </Grid>
+    </CorasauControls:BusyIndicator>
+</Pages:ControlBasePage>

@@ -49,7 +49,7 @@ namespace Uniconta.Client.Pages
             Close();
         }
 
-        private void LayoutRoot_KeyDown(object sender, KeyEventArgs e)
+        private void LayoutRoot_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
                 Close();

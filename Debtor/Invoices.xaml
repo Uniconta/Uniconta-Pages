@@ -107,6 +107,9 @@ x:Class="UnicontaClient.Pages.CustomPage.Invoices"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="NumberSerie" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="VoucherX" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="IsOneTimeDebtor" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CreditnoteDate" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceInterval" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryTime" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" ShowInColumnChooser="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim2" Width="70" FieldName="Dimension2" ShowInColumnChooser="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim3" Width="70" FieldName="Dimension3" ShowInColumnChooser="False"/>

@@ -22,7 +22,6 @@ using Uniconta.ClientTools.Util;
 using System.ComponentModel.DataAnnotations;
 using Uniconta.DataModel;
 using Uniconta.Common.Utility;
-using dk.gov.oiosi.logging;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -156,6 +155,8 @@ namespace UnicontaClient.Pages.CustomPage
             dgClosingSheetLine.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
             this.BeforeClose += ClosingSheetLines_BeforeClose;
             var Comp = api.CompanyEntity;
+            VatCache = Comp.GetCache(typeof(Uniconta.DataModel.GLVat));
+            TextTypes = Comp.GetCache(typeof(Uniconta.DataModel.GLTransType));
             RoundTo100 = Comp.RoundTo100;
             if (RoundTo100)
                 Debit.HasDecimals = Credit.HasDecimals = Amount.HasDecimals = false;
@@ -312,8 +313,10 @@ namespace UnicontaClient.Pages.CustomPage
         SQLCache TextTypes, VatCache;
         protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
-            VatCache = api.GetCache(typeof(Uniconta.DataModel.GLVat)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLVat)).ConfigureAwait(false);
-            TextTypes = api.GetCache(typeof(Uniconta.DataModel.GLTransType)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLTransType)).ConfigureAwait(false);
+            if (VatCache == null)
+                VatCache = await api.LoadCache(typeof(Uniconta.DataModel.GLVat)).ConfigureAwait(false);
+            if (TextTypes == null)
+                TextTypes = await api.LoadCache(typeof(Uniconta.DataModel.GLTransType)).ConfigureAwait(false);
         }
 
         void DataControl_CurrentItemChanged(object sender, DevExpress.Xpf.Grid.CurrentItemChangedEventArgs e)
@@ -486,7 +489,7 @@ namespace UnicontaClient.Pages.CustomPage
                             if (line._DocumentRef != 0)
                                 _refferedVouchers.Add(line._DocumentRef);
                         var parameters = new List<BasePage.ValuePair>() { new BasePage.ValuePair() { Name = "ShowAll", Value = "1" } };
-                        dockCtrl.AddDockItem(null, TabControls.AttachVoucherGridPage, ParentControl, new object[] { _refferedVouchers }, true, null, null, 0, null, new Point(), parameters);
+                        dockCtrl.AddDockItem(null, TabControls.AttachVoucherGridPage, ParentControl, new object[] { _refferedVouchers }, true, null, null, 0, null, new System.Windows.Point(), parameters);
                     }
                     break;
                 case "ViewVoucher":
@@ -738,11 +741,15 @@ namespace UnicontaClient.Pages.CustomPage
                 var selectedLine = dgClosingSheetLine.SelectedItem as GLClosingSheetLineLocal;
                 if (selectedLine != null && vouchersClient != null)
                 {
-                    dgClosingSheetLine.SetLoadedRow(selectedLine);
-                    selectedLine.DocumentRef = vouchersClient.RowId;
-                    if (selectedLine._Text == null && selectedLine._TransType == null)
-                        selectedLine.Text = vouchersClient._Text;
-                    dgClosingSheetLine.SetModifiedRow(selectedLine);
+                    var openedFrom = voucherObj[1];
+                    if (openedFrom == this.ParentControl)
+                    {
+                        dgClosingSheetLine.SetLoadedRow(selectedLine);
+                        selectedLine.DocumentRef = vouchersClient.RowId;
+                        if (selectedLine._Text == null && selectedLine._TransType == null)
+                            selectedLine.Text = vouchersClient._Text;
+                        dgClosingSheetLine.SetModifiedRow(selectedLine);
+                    }
                 }
             }
         }

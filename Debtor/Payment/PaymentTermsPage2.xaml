@@ -47,24 +47,20 @@ x:Class="UnicontaClient.Pages.CustomPage.PaymentTermsPage2"
                         <CorasauControls:LookupEditor x:Name="leOffsetAccount" Text="{Binding OffsetAccount,Mode=TwoWay}">
                         </CorasauControls:LookupEditor>
                     </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="itemPct1" FieldName="Pct1">
+                    <CorasauControls:CorasauLayoutItem FieldName="DebtorAccount" x:Name="liDebtorAccount">
+                        <CorasauControls:LookupEditor x:Name="DebtorAccount" Text="{Binding DebtorAccount,Mode=TwoWay}">
+                        </CorasauControls:LookupEditor>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="liPct1" FieldName="Pct1">
                         <CorasauControls:DoubleEditor FieldName="Pct1"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="liPct2" FieldName="Pct2" >
+                        <CorasauControls:DoubleEditor FieldName="Pct2" />
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="PostOnDC" x:Name="liPostOnDC">
                         <CorasauControls:CheckEditor x:Name="chkPostOnDC"  IsChecked="{Binding PostOnDC,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
-
-                <CorasauControls:CorasauLayoutGroup x:Name="grpDebtor" Visibility="Collapsed" View="GroupBox"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Options}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
-                    <CorasauControls:CorasauLayoutItem FieldName="DebtorAccount" x:Name="liDebtorAccount">
-                        <CorasauControls:LookupEditor x:Name="DebtorAccount" Text="{Binding DebtorAccount,Mode=TwoWay}">
-                        </CorasauControls:LookupEditor>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="Pct2" x:Name="liPct2">
-                        <CorasauControls:DoubleEditor FieldName="Pct2" />
-                    </CorasauControls:CorasauLayoutItem>
-                </CorasauControls:CorasauLayoutGroup>
-
                 <CorasauControls:CorasauLayoutGroup x:Name="grpDays" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Days}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem FieldName="Days" x:Name="liDays">
                         <CorasauControls:IntegerEditor EditValue="{Binding Days,Mode=TwoWay}" SetMask="false"/>

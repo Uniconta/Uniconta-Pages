@@ -9,7 +9,7 @@ x:Class="UnicontaClient.Pages.CustomPage.Profile"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
     xmlns:utilityfunction="clr-namespace:UnicontaClient.Utilities"
                     xmlns:dxinteraction="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
-                    xmlns:enumType ="clr-namespace:Uniconta.Common;assembly=Uniconta.WindowsAPI"
+                    xmlns:Utilities="clr-namespace:UnicontaClient.Utilities"
     mc:Ignorable="d"
     d:DesignHeight="300" d:DesignWidth="400">
 
@@ -44,7 +44,7 @@ x:Class="UnicontaClient.Pages.CustomPage.Profile"
                     <CorasauControls:CorasauLayoutItem FieldName="Nationality" x:Name="liNationality">
                         <CorasauControls:ComboBoxEditor x:Name="cbUserNationality" EditValue="{Binding Nationality,Mode=TwoWay}">
                             <dxinteraction:Interaction.Behaviors>
-                                <dxinteraction:EnumItemsSourceBehavior EnumType="{x:Type enumType:CountryCode}" />
+                                <dxinteraction:EnumItemsSourceBehavior EnumType="{x:Static Utilities:EnumTypeResolver.CountryCode}" />
                             </dxinteraction:Interaction.Behaviors>
                         </CorasauControls:ComboBoxEditor>
                     </CorasauControls:CorasauLayoutItem>
@@ -89,6 +89,9 @@ x:Class="UnicontaClient.Pages.CustomPage.Profile"
                     <CorasauControls:CorasauLayoutItem FieldName="AutoDropDown" x:Name="liAutoDropDown">
                         <CorasauControls:CheckEditor IsChecked="{Binding AutoDropDown,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="AutoDropDownBigData" x:Name="liAutoDropDownBigData">
+                        <CorasauControls:CheckEditor IsChecked="{Binding AutoDropDownBigData,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="ClosePageOnEsc" x:Name="liClosePageOnEsc">
                         <CorasauControls:CheckEditor IsChecked="{Binding ClosePageOnEsc,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
@@ -101,6 +104,9 @@ x:Class="UnicontaClient.Pages.CustomPage.Profile"
                     <CorasauControls:CorasauLayoutItem FieldName="ColumnFilter" x:Name="liColumnFilter">
                         <CorasauControls:CheckEditor IsChecked="{Binding ColumnFilter,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="HighlightRow" x:Name="liHighlightRow">
+                        <CorasauControls:CheckEditor IsChecked="{Binding HighlightRow,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="ConfirmDelete" x:Name="liConfirmDelete">
                         <CorasauControls:CheckEditor IsChecked="{Binding ConfirmDelete,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
@@ -108,7 +114,7 @@ x:Class="UnicontaClient.Pages.CustomPage.Profile"
                         <CorasauControls:CheckEditor IsChecked="{Binding UseDefaultBrowser,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="CompaniesOverview" x:Name="liCompaniesOverview">
-                        <CorasauControls:CheckEditor IsChecked="{Binding CompaniesOverview,Mode=TwoWay}"/>
+                        <CorasauControls:CheckEditor IsChecked="{Binding CompaniesOverview,Mode=TwoWay}"/> 
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="Marketing" x:Name="liMarketing">
                         <CorasauControls:CheckEditor IsChecked="{Binding Marketing,Mode=TwoWay}"/>

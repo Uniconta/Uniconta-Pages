@@ -12,9 +12,6 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrderLineReport"
              xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
              xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools">
     <UserControl.Resources>
-        <Style x:Key="StyleRow" TargetType="dxg:RowControl">
-            <Setter Property="Height" Value="Auto"/>
-        </Style>
         <Util:RowIndexConverter x:Key="RowIndexConverter" />
         <Util:MaskConverter x:Key="MaskConverter" />
     </UserControl.Resources>
@@ -72,7 +69,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrderLineReport"
                         <local:CorasauDataGridTemplateColumnClient.CellTemplate>
 
                             <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" GotFocus="SerieBatch_GotFocus" ValueMember="Number"  DisplayMember="DisplayText" ItemsSource="{Binding DataContext.RowData.Row.SerieBatches, Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" />
+                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" GotFocus="SerieBatch_GotFocus" ValueMember="DisplayText" DisplayMember="DisplayText" ItemsSource="{Binding DataContext.RowData.Row.SerieBatches, Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" EditValueChanged="SerialBatch_EditValueChanged" />
                             </DataTemplate>
                         </local:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </local:CorasauDataGridTemplateColumnClient>

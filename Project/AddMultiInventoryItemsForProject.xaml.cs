@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web.Caching;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -60,7 +59,7 @@ namespace UnicontaClient.Pages.CustomPage
             DXSerializerHandler.AvoidSaveHeader(false);
         }
 
-        private void AddMultipleInventoryItemPage_KeyDown(object sender, KeyEventArgs e)
+        private void AddMultipleInventoryItemPage_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.F8)
                 Generate();

@@ -38,12 +38,7 @@ namespace UnicontaClient.Pages.CustomPage
             InitializeComponent();
             lePaymentFormat.api = api;
             SetPaymentFormat();
-#if !SILVERLIGHT
             this.Title = Uniconta.ClientTools.Localization.lookup("Validate");
-#endif
-#if SILVERLIGHT
-            Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             this.Loaded += CW_Loaded;
         }
 
@@ -75,7 +70,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {

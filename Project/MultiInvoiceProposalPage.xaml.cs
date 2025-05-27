@@ -180,7 +180,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void GenerateInvoice()
         {
-            UnicontaClient.Pages.CWGenerateInvoice GenrateInvoiceDialog = new UnicontaClient.Pages.CWGenerateInvoice(true, string.Empty, false, true, true, isOrderOrQuickInv: true, isQuickPrintVisible: true, isPageCountVisible: false, isDebtorOrder: true);
+            bool isOrderOrQuickInv = api.CompanyEntity._CountryId == CountryCode.Germany ? false : true;
+            var GenrateInvoiceDialog = new UnicontaClient.Pages.CWGenerateInvoice(true, string.Empty, false, true, true, isOrderOrQuickInv: isOrderOrQuickInv, isQuickPrintVisible: true, isPageCountVisible: false, isDebtorOrder: true);
             GenrateInvoiceDialog.DialogTableId = 2000000011;
             GenrateInvoiceDialog.HideOutlookOption(true);
             GenrateInvoiceDialog.SetInvPrintPreview(printPreview);
@@ -221,8 +222,8 @@ namespace UnicontaClient.Pages.CustomPage
 
             string debtorName = debtor?.Name ?? dbOrder._DCAccount;
             bool invoiceInXML = debtor != null && debtor.IsPeppolSupported && debtor._einvoice;
-
-            UnicontaClient.Pages.CWGenerateInvoice GenrateInvoiceDialog = new UnicontaClient.Pages.CWGenerateInvoice(true, string.Empty, false, true, true, showNoEmailMsg: !showSendByMail, debtorName: debtorName, isDebtorOrder: true, isOrderOrQuickInv: true, InvoiceInXML: invoiceInXML);
+            bool isOrderOrQuickInv = api.CompanyEntity._CountryId == CountryCode.Germany ? false : true;
+            var GenrateInvoiceDialog = new UnicontaClient.Pages.CWGenerateInvoice(true, string.Empty, false, true, true, showNoEmailMsg: !showSendByMail, debtorName: debtorName, isDebtorOrder: true, isOrderOrQuickInv: isOrderOrQuickInv, InvoiceInXML: invoiceInXML);
             GenrateInvoiceDialog.DialogTableId = 2000000013;
             if (!api.CompanyEntity._DeactivateSendNemhandel)
                 GenrateInvoiceDialog.SentByEInvoice(api, UtilCommon.GetEndPoint(dbOrder, debtor, api));

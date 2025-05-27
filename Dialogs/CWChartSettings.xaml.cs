@@ -77,11 +77,11 @@ namespace UnicontaClient.Pages
 
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
-            ChartSelectionOnly = (bool)ceChartSelectionOnly.IsChecked;
-            ChartProvideColumnGrandTotals = (bool)ceChartShowColumnGrandTotals.IsChecked;
-            ChartProvideRowGrandTotals = (bool)ceChartShowRowGrandTotals.IsChecked;
+            ChartSelectionOnly = ceChartSelectionOnly.IsChecked.GetValueOrDefault();
+            ChartProvideColumnGrandTotals = ceChartShowColumnGrandTotals.IsChecked.GetValueOrDefault();
+            ChartProvideRowGrandTotals = ceChartShowRowGrandTotals.IsChecked.GetValueOrDefault();
             SeriesIndex = cbChartType.SelectedIndex;
-            IsChartVisible = (bool)ceEnableChart.IsChecked;
+            IsChartVisible = ceEnableChart.IsChecked.GetValueOrDefault();
             SetDialogResult(true);
         }
 

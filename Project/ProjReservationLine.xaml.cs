@@ -97,7 +97,7 @@ namespace UnicontaClient.Pages.CustomPage
                 lst = new List<ProjectReservationLineClient>();
                 foreach (var _it in copyFromRows)
                 {
-                    double qty = (double)_it.GetType().GetProperty("Qty").GetValue(_it, null);
+                    double qty = Convert.ToDouble(_it.GetType().GetProperty("Qty").GetValue(_it, null));
                     var it = (InvItemClient)_it;
                     lst.Add(CreateNewReservationLine(it._Item, qty, null, 0d, 0d, 0d, 0d, null, null, null, null, null, 0, DateTime.MinValue, 0, null, null, null));
                 }
@@ -166,7 +166,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             InitializeComponent();
             company = api.CompanyEntity;
-            ((TableView)dgProjReservationLineGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
+            ((TableView)dgProjReservationLineGrid.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
             localMenu.dataGrid = dgProjReservationLineGrid;
             SetRibbonControl(localMenu, dgProjReservationLineGrid);
             dgProjReservationLineGrid.api = api;
@@ -181,7 +181,7 @@ namespace UnicontaClient.Pages.CustomPage
             this.KeyDown += Page_KeyDown;
         }
 
-        private void Page_KeyDown(object sender, KeyEventArgs e)
+        private void Page_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.F8)
                 ribbonControl.PerformRibbonAction("AddItems");
@@ -634,7 +634,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "CreateFromInvoice":
                     try
                     {
-                        AddDockItem(TabControls.CreateOrderFromQuickInvoice, new object[4] { api, ord._DCAccount, true, ord }, true, String.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), Uniconta.ClientTools.Localization.lookup("Invoice")), null, new Point(250, 200));
+                        AddDockItem(TabControls.CreateOrderFromQuickInvoice, new object[4] { api, ord._DCAccount, true, ord }, true, String.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), Uniconta.ClientTools.Localization.lookup("Invoice")), null, new System.Windows.Point(250, 200));
                     }
                     catch (Exception ex)
                     {
@@ -700,7 +700,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             try
             {
-                AddDockItem(TabControls.CopyOfferLines, new object[2] { api, Order }, true, String.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), Uniconta.ClientTools.Localization.lookup("OfferLine")), null, new Point(250, 200));
+                AddDockItem(TabControls.CopyOfferLines, new object[2] { api, Order }, true, String.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), Uniconta.ClientTools.Localization.lookup("OfferLine")), null, new System.Windows.Point(250, 200));
             }
             catch (Exception ex)
             {
@@ -709,7 +709,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
         void CopyLinesFromBudget()
         {
-            AddDockItem(TabControls.CopyBudgetLines, new object[2] { api, Order }, true, String.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), Uniconta.ClientTools.Localization.lookup("ProjectEstimate")), null, new Point(250, 200));
+            AddDockItem(TabControls.CopyBudgetLines, new object[2] { api, Order }, true, String.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), Uniconta.ClientTools.Localization.lookup("ProjectEstimate")), null, new System.Windows.Point(250, 200));
         }
         async void RefreshGrid()
         {

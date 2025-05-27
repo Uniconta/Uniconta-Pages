@@ -651,7 +651,7 @@ namespace UnicontaClient.Pages.CustomPage
         async Task CopyBaseData()
         {
             CompanyAPI comApi = new CompanyAPI(api);
-            ErrorCodes res = await comApi.CopyBaseData(fromCompany, editrow, (bool)chkDimensions.IsChecked, (bool)chkTransType.IsChecked, (bool)chkNumberSerei.IsChecked, (bool)chkPayments.IsChecked, (bool)chkJournal.IsChecked, (bool)chkGroups.IsChecked, (bool)chkGlAccount.IsChecked, (bool)chkVat.IsChecked, CopyProject: (bool)chkProject.IsChecked);
+            ErrorCodes res = await comApi.CopyBaseData(fromCompany, editrow, chkDimensions.IsChecked.GetValueOrDefault(), chkTransType.IsChecked.GetValueOrDefault(), chkNumberSerei.IsChecked.GetValueOrDefault(), chkPayments.IsChecked.GetValueOrDefault(), chkJournal.IsChecked.GetValueOrDefault(), chkGroups.IsChecked.GetValueOrDefault(), chkGlAccount.IsChecked.GetValueOrDefault(), chkVat.IsChecked.GetValueOrDefault(), CopyProject: chkProject.IsChecked.GetValueOrDefault());
             Thread.Sleep(2 * 1000);
             editrow.ClearCache(typeof(GLVat));
             editrow.ClearCache(typeof(GLAccount));
@@ -769,7 +769,7 @@ namespace UnicontaClient.Pages.CustomPage
                             }
                         }
                         if (string.IsNullOrWhiteSpace(editrow._Name))
-                            editrow._Name = ci.life.name;
+                            editrow.CompanyName = ci.life.name;
 
                         if (!string.IsNullOrEmpty(ci.contact?.phone))
                             editrow.Phone = ci.contact.phone;

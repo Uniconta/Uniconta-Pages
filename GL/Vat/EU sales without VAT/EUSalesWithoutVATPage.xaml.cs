@@ -90,6 +90,7 @@ namespace UnicontaClient.Pages.CustomPage
             txtDateFrm.DateTime = DefaultFromDate;
             SetDateTime(txtDateFrm, txtDateTo);
             checkVIES.IsChecked = DefaultVIES;
+            txtRegistrarRegNo.Text = companyRegNo;
 
             glVatCache = api.GetCache<Uniconta.DataModel.GLVat>();
             glVatTypeCache = api.GetCache<Uniconta.DataModel.GLVatType>();
@@ -485,6 +486,13 @@ namespace UnicontaClient.Pages.CustomPage
             euSalesHelper.ClearVIESCache();
             DefaultVIES = checkVIES.IsChecked.GetValueOrDefault();
             euSalesHelper.validateVIES = DefaultVIES;
+        }
+
+        private void TxtRegistrarRegNo_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
+        {
+            var registerNo = txtRegistrarRegNo.Text;
+            if (euSalesHelper != null)
+                euSalesHelper.companyRegNo = Regex.Replace(registerNo ?? string.Empty, "[^0-9]", "");
         }
     }
 }

@@ -8,9 +8,6 @@ x:Class="UnicontaClient.Pages.CustomPage.PartInvItemsPage"
     xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
     xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid">
     <UserControl.Resources>
-        <Style x:Key="StyleRow" TargetType="dxg:RowControl">
-            <Setter Property="Height" Value="Auto"/>
-        </Style>
         <Util:MaskConverter x:Key="MaskConverter" />
         <Util:VisibilityBoolConverter x:Key="VisibilityBoolConverter" />
         <Util:RowIndexConverter x:Key="RowIndexConverter" />

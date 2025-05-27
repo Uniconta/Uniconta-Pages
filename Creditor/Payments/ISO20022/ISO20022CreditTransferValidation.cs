@@ -11,12 +11,12 @@ using System.Text.RegularExpressions;
 using UnicontaISO20022CreditTransfer;
 using System.Text;
 using UnicontaClient.Pages;
-using System.Windows;
 using Uniconta.ClientTools.Page;
 using UnicontaClient.Pages.Creditor.Payments;
 using Uniconta.Common.Utility;
 using Uniconta.API.System;
 using System.Threading.Tasks;
+using Uniconta.ClientTools;
 
 namespace ISO20022CreditTransfer
 {
@@ -39,6 +39,7 @@ namespace ISO20022CreditTransfer
 
         protected string creditorIBAN = string.Empty;
         protected string creditorSWIFT = string.Empty;
+        private CreditorPaymentAccount creditorBank;
 
 
         List<CheckError> checkErrors = new List<CheckError>();
@@ -143,8 +144,9 @@ namespace ISO20022CreditTransfer
 
             glJournalGenerated = journalGenerated;
             var bankAccount = (BankStatement)bankAccountCache.Get(credPaymFormat._BankAccount);
-            var credCache = company.GetCache(typeof(Uniconta.DataModel.Creditor));
-            var creditor = (Creditor)credCache.Get(trans.Account);
+            var credCache = company.GetCache(typeof(Creditor));
+            var credBankCache = company.GetCache(typeof(Uniconta.DataModel.CreditorPaymentAccount)) ?? await company.LoadCache(typeof(Uniconta.DataModel.CreditorPaymentAccount), crudAPI);
+            var creditor = (CreditorClient)credCache.Get(trans.Account);
             if (creditor == null && !glJournalGenerated)
             {
                 CheckError.Add(new CheckError(String.Format("{0} : {1}",
@@ -163,6 +165,15 @@ namespace ISO20022CreditTransfer
             checkErrors.Clear();
 
             //Validations >>
+            if (company.CreditorBankApprovement)
+            {
+                creditorBank = (CreditorPaymentAccount)credBankCache.Get(creditor._Account);
+                if (creditorBank != null && !creditorBank._Approved)
+                {
+                    checkErrors.Add(new CheckError(Localization.lookup("CreditorBankNotApproved")));
+                    return new XMLDocumentGenerateResult(dummyDoc, CheckError.Count > 0, 0, CheckError);
+                }
+            }
 
             RequestedExecutionDate(trans._PaymentDate, company);
             PaymentCurrency(trans.CurrencyLocalStr, trans._PaymentMethod, trans._PaymentId, trans.SWIFT);
@@ -177,6 +188,7 @@ namespace ISO20022CreditTransfer
 
             if (trans.MergePaymId == Uniconta.ClientTools.Localization.lookup("Excluded") && trans.PaymentAmount <= 0)
                 checkErrors.Add(new CheckError(string.Concat(Uniconta.ClientTools.Localization.lookup("PaymentAmount"), "< 0")));
+
 
             var countryCode = glJournalGenerated ? (CountryCode)company._Country : creditor._Country;
             ISOPaymentType(trans.CurrencyLocalStr, bankAccount._IBAN, trans._PaymentMethod, UnicontaCountryToISO(countryCode));
@@ -209,7 +221,8 @@ namespace ISO20022CreditTransfer
                     PaymentMethodFIK04(trans._PaymentId);
                     break;
             }
-          
+
+            CreditorBankApproved(trans, creditor);
             await RegulatoryReporting(trans);
             
             //Validations <<
@@ -226,8 +239,9 @@ namespace ISO20022CreditTransfer
             companyIBAN = companyIBAN ?? string.Empty;
             companyCountryId = companyCountryId ?? string.Empty;
             creditorCountryId = creditorCountryId ?? string.Empty;
+            CountryCode creditorBankDetailsCountryId = creditorBank?._Country ?? CountryCode.Unknown;
 
-            isoPaymentType = BankSpecificSettings.ISOPaymentType(paymentCcy, companyIBAN, creditorIBAN, creditorSWIFT, creditorCountryId, companyCountryId);
+            isoPaymentType = BankSpecificSettings.ISOPaymentType(paymentCcy, companyIBAN, creditorIBAN, creditorSWIFT, creditorCountryId, companyCountryId, creditorBankDetailsCountryId);
 
             if (credPaymFormat._ExportFormat == (byte)ExportFormatType.ISO20022_DK && (CompanyBankEnum == CompanyBankENUM.DanskeBank || CompanyBankEnum == CompanyBankENUM.Nordea_DK || CompanyBankEnum == CompanyBankENUM.Nordea_NO || CompanyBankEnum == CompanyBankENUM.Nordea_SE))
             {
@@ -380,14 +394,14 @@ namespace ISO20022CreditTransfer
         /// <summary>
         /// Validate Payment method IBAN
         /// </summary>
-        private void PaymentMethodIBAN(Creditor creditor, Company company, string iban)
+        private void PaymentMethodIBAN(CreditorClient creditor, Company company, string iban)
         {
             //Estonia and Switzerland: PaymentId can be used for Payment Reference when PaymentType = IBAN 
             //IBAN will be retrieved from Creditor
             if (exportFormat == ExportFormatType.ISO20022_EE || exportFormat == ExportFormatType.ISO20022_CH)
             {
                 var paymRefNumber = iban;
-                iban = glJournalGenerated ? string.Empty : creditor._PaymentId ?? string.Empty;
+                iban = glJournalGenerated ? string.Empty : creditor.PaymentId ?? string.Empty;
 
                 //Validate Creditor IBAN >>
                 if (iban == string.Empty)
@@ -451,14 +465,14 @@ namespace ISO20022CreditTransfer
         /// <summary>
         /// Validate Payment method BBAN
         /// </summary>
-        private void PaymentMethodBBAN(Creditor creditor, Company company, String bban)
+        private void PaymentMethodBBAN(CreditorClient creditor, Company company, String bban)
         {
             //Norway: PaymentId can be used for Kid-No when PaymentType = VendorBankAccount 
             //BBAN will be retrieved from Creditor
 
             if (exportFormat == ExportFormatType.ISO20022_SE)
             {
-                bban = glJournalGenerated ? string.Empty : creditor._PaymentId ?? string.Empty;
+                bban = glJournalGenerated ? string.Empty : creditor.PaymentId ?? string.Empty;
 
                 //Validate Creditor BBAN >>
                 if (bban == string.Empty)
@@ -476,7 +490,7 @@ namespace ISO20022CreditTransfer
             else if (exportFormat == ExportFormatType.ISO20022_NO)
             {
                 var kidNo = bban ?? string.Empty;
-                bban = glJournalGenerated ? string.Empty : creditor._PaymentId ?? string.Empty;
+                bban = glJournalGenerated ? string.Empty : creditor.PaymentId ?? string.Empty;
 
                 //Validate Creditor BBAN >>
                 if (bban == string.Empty)
@@ -539,11 +553,10 @@ namespace ISO20022CreditTransfer
         /// </summary>
         private async Task RegulatoryReporting(CreditorTransPayment trans)
         {
+            var transCcy = trans.Currency ?? company._CurrencyId;
             if (exportFormat == ExportFormatType.ISO20022_NO && (isoPaymentType == ISO20022PaymentTypes.CROSSBORDER || isoPaymentType == ISO20022PaymentTypes.SEPA))
             {
                 double paymAmount = 0;
-                var transCcy = trans.Currency ?? company._CurrencyId;
-
                 if (transCcy != Currencies.NOK)
                 {
                     var rate = await crudAPI.session.ExchangeRate(transCcy, Currencies.NOK, trans.Date, company);
@@ -560,10 +573,10 @@ namespace ISO20022CreditTransfer
                         checkErrors.Add(new CheckError(string.Concat("Regulatory reporting: supplementary text concerning the purpose is required (Payment amount > ", RGLTRYRPTGLIMITAMOUNT_NOK, " NOK")));
                 }
             }
-            else if (exportFormat == ExportFormatType.ISO20022_SE && (isoPaymentType == ISO20022PaymentTypes.CROSSBORDER || isoPaymentType == ISO20022PaymentTypes.SEPA))
+            else if (exportFormat == ExportFormatType.ISO20022_SE && (isoPaymentType == ISO20022PaymentTypes.CROSSBORDER || isoPaymentType == ISO20022PaymentTypes.SEPA || 
+                (isoPaymentType == ISO20022PaymentTypes.DOMESTIC && transCcy != Currencies.SEK))) //Domestic payments Currency <> SEK are subject to regulatory reporting
             {
                 double paymAmount = 0;
-                var transCcy = trans.Currency ?? company._CurrencyId;
                 if (transCcy != Currencies.SEK)
                 {
                     var rate = await crudAPI.session.ExchangeRate(transCcy, Currencies.SEK, trans.Date, company);
@@ -584,12 +597,12 @@ namespace ISO20022CreditTransfer
         /// <summary>
         /// Validate Payment method FIK71
         /// </summary>
-        private Boolean PaymentMethodFIK71(Creditor creditor, string ocrLine)
+        private Boolean PaymentMethodFIK71(CreditorClient creditor, string ocrLine)
         {
             if (exportFormat == ExportFormatType.ISO20022_SE)
             {
                 //Validate Creditor BBAN >>
-                var bban = creditor._PaymentId;
+                var bban = creditor.PaymentId;
                 if (bban == null)
                 { 
                     checkErrors.Add(new CheckError(Uniconta.ClientTools.Localization.lookup("CredBBANMissing")));
@@ -707,12 +720,12 @@ namespace ISO20022CreditTransfer
         /// <summary>
         /// Validate Payment method FIK75
         /// </summary>
-        private Boolean PaymentMethodFIK75(Creditor creditor, string ocrLine)
+        private Boolean PaymentMethodFIK75(CreditorClient creditor, string ocrLine)
         {
             if (exportFormat == ExportFormatType.ISO20022_SE)
             {
                 //Validate Creditor BBAN >>
-                var bban = creditor._PaymentId;
+                var bban = creditor.PaymentId;
                 if (bban == null)
                 {
                     checkErrors.Add(new CheckError(Uniconta.ClientTools.Localization.lookup("CredBBANMissing")));
@@ -850,6 +863,46 @@ namespace ISO20022CreditTransfer
             return true;
         }
 
+        private void CreditorBankApproved(CreditorTransPayment trans, Creditor creditor)
+        {
+            if (company.CreditorBankApprovement)
+            {
+                string paymentId = null;
+                string transPaymentId = trans._PaymentId;
+                string swift = creditorBank?._SWIFT ?? creditor._SWIFT;
+                string paymMethodText = Localization.lookup(trans.PaymentMethod);
+                swift = swift != null ? swift.Replace(" ", "") : null;
+                var transSwift = trans.SWIFT != null ? trans.SWIFT.Replace(" ", "") : null;
+                switch (trans._PaymentMethod)
+                {
+                    case PaymentTypes.VendorBankAccount:
+                        paymentId = creditorBank?._BankAccount ?? creditor._PaymentId;
+                        break;
+                    case PaymentTypes.IBAN:
+                        paymentId = creditorBank?._IBAN ?? creditor._PaymentId;
+                        break;
+                    case PaymentTypes.PaymentMethod3:
+                    case PaymentTypes.PaymentMethod4:
+                    case PaymentTypes.PaymentMethod5:
+                    case PaymentTypes.PaymentMethod6:
+                        paymMethodText = Localization.lookup("FICreditorNumber");
+                        StandardPaymentFunctions.ParseOcr(transPaymentId, out transPaymentId, out string _);
+                        if (creditorBank == null)
+                            StandardPaymentFunctions.ParseOcr(creditor._PaymentId, out paymentId, out string _);
+                        else
+                            paymentId = creditorBank._FIK;
+                        break;
+                }
+
+                var cleanPaymentId = paymentId == null ? string.Format("<{0}>", Localization.lookup("Missing")) : trans._PaymentMethod == PaymentTypes.IBAN ? paymentId.Replace(" ", "") : Regex.Replace(paymentId, @"[^\d]", "");
+                transPaymentId = transPaymentId != null ? trans._PaymentMethod == PaymentTypes.IBAN ? transPaymentId.Replace(" ", "") : Regex.Replace(transPaymentId, @"[^\d]", "") : null;
+
+                if (transPaymentId != cleanPaymentId)
+                    checkErrors.Add(new CheckError(string.Format(Localization.lookup("NotMatchApprovedOBJ"), paymMethodText, paymentId)));
+                else if (transSwift != null && transSwift != swift)
+                    checkErrors.Add(new CheckError(string.Format(Localization.lookup("NotMatchApprovedOBJ"), "SWIFT", swift)));
+            }
+        }
 
         /// <summary>
         /// Modulus 10 check digit validation

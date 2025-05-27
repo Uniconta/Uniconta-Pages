@@ -40,12 +40,7 @@ namespace UnicontaClient.Pages.CustomPage
             InitializeComponent();
             lookupBanks.api = Capi;
             SetBanks();
-#if !SILVERLIGHT
             this.Title = Uniconta.ClientTools.Localization.lookup("CreatePaymentsFile");
-#endif
-#if SILVERLIGHT
-            Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             this.Loaded += CW_Loaded;
         }
 
@@ -53,7 +48,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             Dispatcher.BeginInvoke(new Action(() => { cbImportOption.Focus(); }));
         }
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {

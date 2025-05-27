@@ -469,7 +469,7 @@ namespace UnicontaClient.Pages.CustomPage
             vc.Vat = leVat.Text;
             vc.VatOperation = leVatOpenration.Text;
             vc.TransType = leTransType.Text;
-            vc._Approved = (bool)chkApproved.IsChecked;
+            vc._Approved = chkApproved.IsChecked.GetValueOrDefault();
             vc._Approver1 = leApprover1.Text;
             vc._Approver2 = leApprover2.Text;
             vc.PaymentId = txtPaymentId.Text;
@@ -599,7 +599,7 @@ namespace UnicontaClient.Pages.CustomPage
         /// Load files when outlook mail dropped
         /// </summary>
         /// <param name="dataObject">Dropped data object</param>
-        public void LoadPageOnOutlookMailDrop(IDataObject dataObject)
+        public void LoadPageOnOutlookMailDrop(System.Windows.IDataObject dataObject)
         {
             try
             {
@@ -608,8 +608,8 @@ namespace UnicontaClient.Pages.CustomPage
                 var selectedFileInfo = UtilDisplay.CreateSelectedFileInfo(dataObject, out error);
                 if (string.IsNullOrEmpty(error) && selectedFileInfo != null)
                 {
-                    txedVoucherComments.Text = selectedFileInfo.FileName;
-                    browseControl.SelectedFileInfos = new SelectedFileInfo[] { selectedFileInfo };
+                    txedVoucherComments.Text = selectedFileInfo.Length > 1 ? string.Empty : selectedFileInfo.SingleOrDefault()?.FileName;
+                    browseControl.SelectedFileInfos = selectedFileInfo;
                 }
                 else
                     UnicontaMessageBox.Show(error, Uniconta.ClientTools.Localization.lookup("Error"));

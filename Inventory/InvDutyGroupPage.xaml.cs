@@ -47,7 +47,7 @@ namespace UnicontaClient.Pages.CustomPage
         void Init()
         {
             InitializeComponent();
-            ((TableView)dgInvDutyGroupGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
+            ((TableView)dgInvDutyGroupGrid.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
             localMenu.dataGrid = dgInvDutyGroupGrid;
             SetRibbonControl(localMenu, dgInvDutyGroupGrid);
             dgInvDutyGroupGrid.api = api;
@@ -133,14 +133,14 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var row = (sender as Image).Tag as InvDutyGroupClient;
+            var row = (sender as System.Windows.Controls.Image).Tag as InvDutyGroupClient;
             if (row != null)
                 AddDockItem(TabControls.UserDocsPage, dgInvDutyGroupGrid.syncEntity);
         }
 
         private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var row = (sender as Image).Tag as InvDutyGroupClient;
+            var row = (sender as System.Windows.Controls.Image).Tag as InvDutyGroupClient;
             if (row != null)
                 AddDockItem(TabControls.UserNotesPage, dgInvDutyGroupGrid.syncEntity);
         }

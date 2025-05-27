@@ -35,7 +35,7 @@
   </RibbonItem>
   <RibbonItem>
     <!--RibbonItem LocalizedNameKey="ShowAmount" Action="ShowAmount" LargeGlyph="Budget_32x32"/-->
-    <RibbonItem LocalizedNameKey="Zugriff gültig bis" StatusValue=""></RibbonItem>
+    <RibbonItem LocalizedNameKey="DATEV Anmeldung" StatusValue=""></RibbonItem>
     <RibbonItem LocalizedNameKey="ToTime" StatusValue="a" />
     <RibbonItem LocalizedNameKey="Service" StatusValue="b" />
     <RibbonItem LocalizedNameKey="User" StatusValue="c" />

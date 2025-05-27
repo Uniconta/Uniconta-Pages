@@ -17,13 +17,8 @@ using Uniconta.ClientTools;
 using Uniconta.ClientTools.DataModel;
 using UnicontaClient.Controls;
 
-#if !SILVERLIGHT 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
-#elif SILVERLIGHT 
-using UnicontaClient.Pages;
-namespace UnicontaClient.Pages.CustomPage
-#endif
 {
     /// <summary>
     /// Interaction logic for CWGeneratePickingList.xaml
@@ -62,32 +57,25 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "SendByOutlook", ResourceType = typeof(InputFieldDataText))]
         public bool SendByOutlook { get; set; }
 
-#if !SILVERLIGHT
         protected override int DialogId { get { return DialogTableId; } }
         public int DialogTableId { get; set; }
         protected override bool ShowTableValueButton { get { return true; } }
-#endif
         public CWGeneratePickingList(bool showquickPrint = true, bool showEmail = true)
         {
             this.DataContext = this;
             InitializeComponent();
             Title = string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("Generate"), Uniconta.ClientTools.Localization.lookup("PickingList"));
-#if !SILVERLIGHT
             if (!showquickPrint && !showEmail)
                 lgSecondary.Visibility = Visibility.Collapsed;
             else if (!showEmail)
                 lgEmail.Visibility = Visibility.Collapsed;
             else if (!showquickPrint)
                 lgPrint.Visibility = Visibility.Collapsed;
-#else
-            tbShEmail.Visibility = showEmail ? Visibility.Visible : Visibility.Collapsed;
-            txtEmail.Visibility = showEmail ? Visibility.Visible : Visibility.Collapsed;
-#endif
         }
 
        
 
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
                 SetDialogResult(false);
@@ -112,7 +100,6 @@ namespace UnicontaClient.Pages.CustomPage
             SetDialogResult(false);
         }
 
-#if !SILVERLIGHT
 
         public CWGeneratePickingList(string accountName, bool showQuickPrint, bool showEmail, string debtorName, bool hasEmail) : this(showQuickPrint, showEmail)
         {
@@ -164,6 +151,5 @@ namespace UnicontaClient.Pages.CustomPage
         {
             chkSendEmail.IsChecked = false;
         }
-#endif
     }
 }

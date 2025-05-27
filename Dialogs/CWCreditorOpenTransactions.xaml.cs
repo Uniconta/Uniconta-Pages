@@ -34,9 +34,6 @@ namespace UnicontaClient.Controls.Dialogs
         {
             this.DataContext = this;
             InitializeComponent();
-#if SILVERLIGHT
-            Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             this.Title = Uniconta.ClientTools.Localization.lookup("SettleOpenTransactions");
             settlement = string.Empty;
             selectedInvoices = new List<long>();
@@ -82,7 +79,7 @@ namespace UnicontaClient.Controls.Dialogs
         public double RemainingAmt = 0d;
         private void CheckBox_Click(object sender, RoutedEventArgs e)
         {
-            var chkBox = sender as CheckBox;
+            var chkBox = sender as System.Windows.Controls.CheckBox;
             var row = chkBox.Tag as CreditorTransOpenClient;
             if (row == null) return;
 
@@ -99,24 +96,6 @@ namespace UnicontaClient.Controls.Dialogs
                 RemainingAmt -= row.AmountOpen;
             }
         }
-
-#if SILVERLIGHT
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Escape)
-            {
-                SetDialogResult(false);
-            }
-            else
-                if (e.Key == Key.Enter)
-            {
-                if (OKButton.IsFocused)
-                    OKButton_Click(null, null);
-                else if (CancelButton.IsFocused)
-                    SetDialogResult(false);
-            }
-        }
-#endif
 
     }
 }

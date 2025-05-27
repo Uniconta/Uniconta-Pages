@@ -1096,9 +1096,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void chkGrdTtlRow_Checked(object sender, RoutedEventArgs e)
         {
-            var value = (bool)chkGrdTtlRow.IsChecked;
-            pivotDgProjectPlanning.ShowRowGrandTotalHeader = value;
-            pivotDgProjectPlanning.ShowRowGrandTotals = value;
+            pivotDgProjectPlanning.ShowRowGrandTotalHeader = 
+            pivotDgProjectPlanning.ShowRowGrandTotals = chkGrdTtlRow.IsChecked.GetValueOrDefault();
         }
 
         private void chkGrdTtlCol_Checked(object sender, RoutedEventArgs e)

@@ -114,7 +114,7 @@ namespace UnicontaClient.Pages.CustomPage
             cmbContactName.ItemsSource = cache != null ? new ContactCacheFilter(cache, 1, debtor._Account) : null;
         }
 
-        private void cmbContactName_KeyDown(object sender, KeyEventArgs e)
+        private void cmbContactName_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             var selectedItem = cmbContactName.SelectedItem as Contact;
             GoToContact(selectedItem, e.Key);

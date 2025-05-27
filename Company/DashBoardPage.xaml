@@ -7,7 +7,8 @@ x:Class="UnicontaClient.Pages.CustomPage.DashBoardPage"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
         xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
-        xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools">
+        xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools" 
+        xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors">
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -24,7 +25,12 @@ x:Class="UnicontaClient.Pages.CustomPage.DashBoardPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="AllCompanies"  />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Comment" Width="300" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="ForSubId"  />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="colUserId" FieldName="Uid" /> 
+                    <local:CorasauDataGridTemplateColumnClient x:Name="colUserId" FieldName="Uid" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="colUpdatedAt" FieldName="UpdatedAt" IsSmart="True">
+                        <local:CorasauDataGridTemplateColumnClient.EditSettings>
+                            <editor:TextEditSettings DisplayFormat="g" MaskType="DateTime" />
+                        </local:CorasauDataGridTemplateColumnClient.EditSettings>
+                    </local:CorasauDataGridTemplateColumnClient>
                 </local:DashBoardPageGrid.Columns>
             </local:DashBoardPageGrid>
         </UnicontaControls:BusyIndicator>

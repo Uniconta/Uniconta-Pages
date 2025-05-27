@@ -92,7 +92,7 @@ namespace UnicontaClient.Pages.CustomPage
             AllJournals = (journal != null) && journal.IndexOf('*') >= 0;
         }
     }
-    public partial class CriteriaControl : UserControl
+    public partial class CriteriaControl : System.Windows.Controls.UserControl
     {
         CrudAPI api;
         public CrudAPI API
@@ -128,12 +128,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         public void Highlight()
         {
-            this.CriteriaBorder.BorderBrush = Application.Current.Resources["HighlightBorderColor"] as SolidColorBrush;
+            this.CriteriaBorder.BorderBrush = System.Windows.Application.Current.Resources["HighlightBorderColor"] as SolidColorBrush;
         }
 
         public void Unhighlight()
         {
-            this.CriteriaBorder.BorderBrush = Application.Current.Resources["LightBoxBorderColor"] as SolidColorBrush;
+            this.CriteriaBorder.BorderBrush = System.Windows.Application.Current.Resources["LightBoxBorderColor"] as SolidColorBrush;
         }
         public List<Company> companyList = null;
        
@@ -284,7 +284,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             setDateTime(sender, "FromDate");
         }
-        Brush defaultTextColor;
+        System.Windows.Media.Brush defaultTextColor;
         private void setDateTime(object sender, string valueFor)
         {
             DateEditor de = (DateEditor)sender;

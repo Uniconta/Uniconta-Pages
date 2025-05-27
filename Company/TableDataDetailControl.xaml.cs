@@ -19,7 +19,7 @@ using System.Windows;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
-    public partial class TableDataDetailControl : UserControl
+    public partial class TableDataDetailControl : System.Windows.Controls.UserControl
     {
         public TableDataDetailControl()
         {

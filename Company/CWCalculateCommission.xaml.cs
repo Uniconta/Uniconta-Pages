@@ -60,7 +60,7 @@ namespace UnicontaClient.Pages.CustomPage
             SetDialogResult(false);
         }
 
-        private void CWCalculateCommission_OnKeyDown(object sender, KeyEventArgs e)
+        private void CWCalculateCommission_OnKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {

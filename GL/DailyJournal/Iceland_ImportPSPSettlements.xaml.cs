@@ -19,7 +19,9 @@ using System.Text;
 using Uniconta.ClientTools;
 using Rapyd.CreditCard.Settlement;
 using static Rapyd.CreditCard.Settlement.Rapyd_CreditCardClient;
+#if !UNICORE
 using log4net.Layout;
+#endif
 using Straumur.CreditCard.Settlement;
 
 using UnicontaClient.Pages;
@@ -49,8 +51,8 @@ namespace UnicontaClient.Pages.CustomPage
         public string MerchantID { get; set; }
         public string SettlementNumber { get; set; }
         public DateTime FromDate { get { return txtfromDate.DateTime; } set { txtfromDate.EditValue = value; } }
-        public bool AllTrans { get { return (bool)chkallTrans.IsChecked; } set { chkallTrans.IsChecked = value; } }
-        public bool AlreadyBooked { get { return (bool)chkalreadybooked.IsChecked; } set { chkalreadybooked.IsChecked = value; } }
+        public bool AllTrans { get { return chkallTrans.IsChecked.GetValueOrDefault(); } set { chkallTrans.IsChecked = value; } }
+        public bool AlreadyBooked { get { return chkalreadybooked.IsChecked.GetValueOrDefault(); } set { chkalreadybooked.IsChecked = value; } }
         public string CodeRent { get; set; }
 
         public CrudAPI Api = null;

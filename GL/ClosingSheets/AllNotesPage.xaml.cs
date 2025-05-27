@@ -86,7 +86,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgGLAccount.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             GetMenuItem();
-            ((TableView)childDgUserNotes.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
+            ((TableView)childDgUserNotes.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
         }
 
         void GetMenuItem()

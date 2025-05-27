@@ -213,6 +213,7 @@ namespace UnicontaClient.Pages.CustomPage
             UnicontaClient.Pages.CWGenerateInvoice GenrateInvoiceDialog = new UnicontaClient.Pages.CWGenerateInvoice(true, string.Empty, false, true, true, false, isQuickPrintVisible: false);
             GenrateInvoiceDialog.DialogTableId = 2000000000;
             GenrateInvoiceDialog.HideOutlookOption(true);
+            GenrateInvoiceDialog.ShowAllowCredMax(api.CompanyEntity.AllowSkipCreditMax);
             GenrateInvoiceDialog.Closed += async delegate
             {
                 if (GenrateInvoiceDialog.DialogResult == true)
@@ -227,6 +228,9 @@ namespace UnicontaClient.Pages.CustomPage
                         var postingprintGenerator = new InvoicePostingPrintGenerator(api, this);
                         postingprintGenerator.SetUpInvoicePosting(crVisibleOrders, GenrateInvoiceDialog.GenrateDate, GenrateInvoiceDialog.IsSimulation, CompanyLayoutType.PurchaseInvoice, false, false, false,
                             GenrateInvoiceDialog.SendByEmail, GenrateInvoiceDialog.sendOnlyToThisEmail, GenrateInvoiceDialog.Emails, false);
+                        if(api.CompanyEntity.AllowSkipCreditMax)
+                            postingprintGenerator.SetAllowCreditMax(GenrateInvoiceDialog.AllowSkipCreditMax);
+
                         await postingprintGenerator.Execute();
                         busyIndicator.IsBusy = false;
                     }
@@ -256,6 +260,8 @@ namespace UnicontaClient.Pages.CustomPage
             var generateDoc = new CWGenerateInvoice(false, documentType.ToString(), false, true, true, false, isQuickPrintVisible: false, isShowUpdateInv: showUpdateInv);
             generateDoc.DialogTableId = 2000000000;
             generateDoc.HideOutlookOption(true);
+            generateDoc.ShowAllowCredMax(api.CompanyEntity.AllowSkipCreditMax);
+
             generateDoc.Closed += async delegate
              {
                  if (generateDoc.DialogResult == true)
@@ -270,6 +276,8 @@ namespace UnicontaClient.Pages.CustomPage
                          var invoicePostingPrintGenerator = new InvoicePostingPrintGenerator(api, this);
                          invoicePostingPrintGenerator.SetUpInvoicePosting(crVisibleOrders, generateDoc.GenrateDate, !generateDoc.UpdateInventory, documentType, false, false, false,
                              generateDoc.SendByEmail, generateDoc.sendOnlyToThisEmail, generateDoc.Emails, false);
+                         if(api.CompanyEntity.AllowSkipCreditMax)
+                             invoicePostingPrintGenerator.SetAllowCreditMax(generateDoc.AllowSkipCreditMax);
 
                          await invoicePostingPrintGenerator.Execute();
                          busyIndicator.IsBusy = false;
@@ -340,11 +348,15 @@ namespace UnicontaClient.Pages.CustomPage
                     var attachedVoucher = voucherObj[0] as VouchersClient;
                     if (attachedVoucher != null)
                     {
-                        var selectedItem = dgMultiInvGrid.SelectedItem as CreditorOrderClient;
-                        if (selectedItem != null)
+                        var openedFrom = voucherObj[1];
+                        if (openedFrom == this.ParentControl)
                         {
-                            selectedItem.DocumentRef = attachedVoucher.RowId;
-                            UpdateVoucher(attachedVoucher, selectedItem);
+                            var selectedItem = dgMultiInvGrid.SelectedItem as CreditorOrderClient;
+                            if (selectedItem != null)
+                            {
+                                selectedItem.DocumentRef = attachedVoucher.RowId;
+                                UpdateVoucher(attachedVoucher, selectedItem);
+                            }
                         }
                     }
                 }

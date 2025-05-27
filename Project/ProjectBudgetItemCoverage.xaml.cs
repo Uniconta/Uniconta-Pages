@@ -121,7 +121,7 @@ namespace UnicontaClient.Pages.CustomPage
         Uniconta.DataModel.Project Proj;
         void InitPage(UnicontaBaseEntity master)
         {
-            ((TableView)dgPrjBugtItmCov.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
+            ((TableView)dgPrjBugtItmCov.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
             localMenu.dataGrid = dgPrjBugtItmCov;
             dgPrjBugtItmCov.api = api;
             dgPrjBugtItmCov.UpdateMaster(master);

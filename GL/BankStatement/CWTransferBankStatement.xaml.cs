@@ -102,7 +102,7 @@ namespace UnicontaClient.Pages.CustomPage
             lookupJournal.SelectedItem = cache.Get(Journal ?? lclJournal);
         }
 
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {
@@ -119,9 +119,9 @@ namespace UnicontaClient.Pages.CustomPage
         }
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
-            lclIsMarkLine = (bool)chkLine.IsChecked;
-            lclAddVouNo = (bool)cbkAssignVouNo.IsChecked;
-            lclHasVoucher = (bool)cbkHasVoucherNo.IsChecked;
+            lclIsMarkLine = chkLine.IsChecked.GetValueOrDefault();
+            lclAddVouNo = cbkAssignVouNo.IsChecked.GetValueOrDefault();
+            lclHasVoucher = cbkHasVoucherNo.IsChecked.GetValueOrDefault();
             SelectedBankAccPosIndex = cbBankAccountPos.SelectedIndex;
             lclJournal = Journal;
             SetDialogResult(true);

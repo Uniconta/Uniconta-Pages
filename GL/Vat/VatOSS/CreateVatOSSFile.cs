@@ -293,7 +293,7 @@ namespace UnicontaClient.Pages.CustomPage
             c = string.Compare(x.Vat, y.Vat);
             if (c != 0)
                 return false;
-            c = (int)x.Country - (int)y.Country;
+            c = (int)x.Country.GetValueOrDefault() - (int)y.Country.GetValueOrDefault();
             if (c != 0)
                 return false;
             c = (int)x._BusinessCountry - (int)y._BusinessCountry;

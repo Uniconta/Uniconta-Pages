@@ -27,9 +27,6 @@ namespace UnicontaClient.Controls.Dialogs
         {
             this.DataContext = this;
             InitializeComponent();
-#if SILVERLIGHT
-            Utilities.Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             this.Title = string.Format(Uniconta.ClientTools.Localization.lookup("EditOBJ"), Uniconta.ClientTools.Localization.lookup("Variant"));
             api = Api;
             transactionEntity = sourcedata as InvTrans;
@@ -39,11 +36,7 @@ namespace UnicontaClient.Controls.Dialogs
 
         private void CWModifyVariants_Loaded(object sender, RoutedEventArgs e)
         {
-#if SILVERLIGHT
-            leVariant.Context = transactionEntity;
-#else
             leVariant.DataContext = transactionEntity;
-#endif        
             Dispatcher.BeginInvoke(new Action(() => { leVariant.Focus(); }));
         }
 
@@ -67,23 +60,7 @@ namespace UnicontaClient.Controls.Dialogs
             SetDialogResult(false);
         }
 
-#if SILVERLIGHT
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Escape)
-            {
-                SetDialogResult(false);
-            }
-            else
-                if (e.Key == Key.Enter)
-            {
-                if (OKButton.IsFocused)
-                    OKButton_Click(null, null);
-                else if (CancelButton.IsFocused)
-                    SetDialogResult(false);
-            }
-        }
-#endif
+
     }
 }
 

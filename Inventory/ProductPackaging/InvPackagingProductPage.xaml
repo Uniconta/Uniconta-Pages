@@ -16,14 +16,29 @@ x:Class="UnicontaClient.Pages.CustomPage.InvPackagingProductPage"
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <local:InvPackagingProductPageGrid x:Name="dgInvPackagingProductGrid" AutoGenerateColumns="None">
                 <local:InvPackagingProductPageGrid.Columns>
+                    <local:ComboBoxColumnClient FieldName="ReportingType" x:Name="colReportingType" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Item" Visible="False" />
-                    <local:ComboBoxColumnClient x:Name="Category" />
-                    <local:ComboBoxColumnClient x:Name="PackagingType" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Category">
+                        <local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" SelectedItem="{Binding DataContext.RowData.Row.Category,Mode=TwoWay}" ItemsSource="{Binding DataContext.RowData.Row.CategorySource,Mode= OneWay,RelativeSource={RelativeSource TemplatedParent}, UpdateSourceTrigger=PropertyChanged}" GotFocus="PART_Editor_GotFocus"/>
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                        <!--<local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Category,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" />
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>-->
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:ComboBoxColumnClient x:Name="PackagingType"/>
                     <local:ComboBoxColumnClient x:Name="WasteSorting" />
                     <local:ComboBoxColumnClient x:Name="PackagingRateLevel" />
                     <local:ComboBoxColumnClient x:Name="PackagingConsumer" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Weight" AllowThousandMask="True" Mask="N4"/>
+                    <local:ComboBoxColumnClient x:Name="PrimaryKeyId" Width="60" Visible="false" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Unit" Width="50" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Qty" AllowThousandMask="True" Mask="N4"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Text" Width="300" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="NoReporting" />
                 </local:InvPackagingProductPageGrid.Columns>
             </local:InvPackagingProductPageGrid>
         </CorasauControls:BusyIndicator>

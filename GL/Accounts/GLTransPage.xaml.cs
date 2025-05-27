@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Datev.Cloud.Authentication;
 using DevExpress.Xpf.Grid;
 using Newtonsoft.Json;
 using Uniconta.API.System;
@@ -26,6 +25,8 @@ using Uniconta.DataModel;
 using UnicontaClient.Models;
 using UnicontaClient.Pages.GL.ChartOfAccount.Reports;
 using System.Text.RegularExpressions;
+using Duende.IdentityModel.Client;
+using Duende.IdentityModel.OidcClient;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -161,7 +162,7 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         if ((!string.IsNullOrEmpty(DatevDetails.AccessToken) && DatevDetails.Tokenvalidto > DateTime.Now))
                         {
-                            if (UnicontaMessageBox.Show(String.Format("Sollen die {0} markierten Belege hochgeladen werden? Bitte beachten Sie: nachdem Sie das Hochladen best�tigt haben, werden die Belege im Hintergrund hochgeladen. Bleiben Sie auf dieser Seite bis eine weitere Mitteilung erfolgt ist.", makR), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+                            if (UnicontaMessageBox.Show(String.Format("Sollen die {0} markierten Belege hochgeladen werden? Bitte beachten Sie: nachdem Sie das Hochladen besttigt haben, werden die Belege im Hintergrund hochgeladen. Bleiben Sie auf dieser Seite bis eine weitere Mitteilung erfolgt ist.", makR), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OKCancel) == MessageBoxResult.OK)
                             {
                                 DatevEntity.SendDocToDatev(api, markedRows, glTransExported);
 
@@ -174,7 +175,7 @@ namespace UnicontaClient.Pages.CustomPage
                             return;
                         }
                         else
-                            UnicontaMessageBox.Show("Der DATEV Zugangstoken ist ung�ltig oder abgelaufen", "Fehler", MessageBoxButton.OK);
+                            UnicontaMessageBox.Show("Der DATEV Zugangstoken ist ungltig oder abgelaufen", "Fehler", MessageBoxButton.OK);
                     }
                     else
                         UnicontaMessageBox.Show("Es sind keine Belege markiert, die an DATEV hochgeladen werden sollen", "Fehler", MessageBoxButton.OK);
@@ -221,7 +222,7 @@ namespace UnicontaClient.Pages.CustomPage
             var AccountLength = (Accounts.GetRecords as GLAccount[])[0]._Account.Length;
             if (AccountLength > 8 || AccountLength < 4)
             {
-                UnicontaMessageBox.Show("Ung�ltige Kontol�nge mind. eines Sachkontos", "", MessageBoxButton.OK);
+                UnicontaMessageBox.Show("Ungltige Kontolnge mind. eines Sachkontos", "", MessageBoxButton.OK);
                 return false;
             }
 
@@ -311,7 +312,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             if (datev.FiscalYearBegin == DateTime.MinValue)
             {
-                UnicontaMessageBox.Show("In DATEV-Informationen ist kein Anfang des Gesch�ftsjahres angegeben", Uniconta.ClientTools.Localization.lookup("Exception"));
+                UnicontaMessageBox.Show("In DATEV-Informationen ist kein Anfang des Geschftsjahres angegeben", Uniconta.ClientTools.Localization.lookup("Exception"));
                 return;
             }
             if (String.IsNullOrEmpty(datev.Consultant))
@@ -331,7 +332,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             if (String.IsNullOrEmpty(datev.DefaultAccount))
             {
-                UnicontaMessageBox.Show("In DATEV-Informationen ist kein Konto f�r fehlende Gegenkonten angegeben", Uniconta.ClientTools.Localization.lookup("Exception"));
+                UnicontaMessageBox.Show("In DATEV-Informationen ist kein Konto fr fehlende Gegenkonten angegeben", Uniconta.ClientTools.Localization.lookup("Exception"));
                 return;
             }
 
@@ -432,6 +433,8 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var dh = new DatevHeader();
             var err = await api.Read(dh);
+            if (err != ErrorCodes.Succes)
+                UtilDisplay.ShowErrorCode(err);
             return dh;
         }
 
@@ -448,6 +451,7 @@ namespace UnicontaClient.Pages.CustomPage
             public string Consultant, Client, Path, DefaultAccount, LanguageId;
             public DateTime FiscalYearBegin;
             public bool Active;
+            public int Dim1, Dim2;
 
             public override int TableId { get { return 10923852; } }
             public override int DataVersion { get { return 1; } }
@@ -465,6 +469,12 @@ namespace UnicontaClient.Pages.CustomPage
                     LanguageId = "de-DE";
                 FiscalYearBegin = Streaming.readSmallDate(r);
                 Active = r.readBoolean();
+                var i = r.readByteCheck();
+                if (i >= 0)
+                {
+                    Dim1 = i;
+                    Dim2 = r.readByte();
+                }
             }
 
             public override void SaveData(CustomWriter w)
@@ -476,6 +486,8 @@ namespace UnicontaClient.Pages.CustomPage
                 w.write(LanguageId);
                 Streaming.writeSmallDate(FiscalYearBegin, w);
                 w.write(Active);
+                w.writeByte((byte)Dim1);
+                w.writeByte((byte)Dim2);
             }
         }
 
@@ -586,7 +598,7 @@ namespace UnicontaClient.Pages.CustomPage
                 header.DataCategory = 16;
                 header.FormatName = "Debitoren/Kreditoren";
                 header.FormatVersion = 5;
-                string CustomerVendorHeadline = "Konto;Name (Adressattyp Unternehmen);Unternehmensgegenstand;Name (Adressattyp nat�rl. Person);Vorname (Adressattyp nat�rl. Person);Name (Adressattyp keine Angabe);Adressattyp;Kurzbezeichnung;EU-Land;EU-UStID;Anrede;Titel/Akad. Grad;Adelstitel;Namensvorsatz;Adressart;Stra�e;Postfach;Postleitzahl;Ort;Land;Versandzusatz;Adresszusatz;Abweichende Anrede;Abw. Zustellbezeichnung 1;Abw. Zustellbezeichnung 2;Kennz. Korrespondenzadresse;Adresse G�ltig von;Adresse G�ltig bis;Telefon;Bemerkung (Telefon);Telefon GL;Bemerkung (Telefon GL);E-Mail;Bemerkung (E-Mail);Internet;Bemerkung (Internet);Fax;Bemerkung (Fax);Sonstige;Bemerkung (Sonstige);Bankleitzahl 1;Bankbezeichnung 1;Bank-Kontonummer 1;L�nderkennzeichen 1;IBAN-Nr. 1;IBAN1 korrekt;SWIFT-Code 1;Abw. Kontoinhaber 1;Kennz. Hauptbankverb. 1;Bankverb 1 G�ltig von;Bankverb 1 G�ltig bis;Bankleitzahl 2;Bankbezeichnung 2;Bank-Kontonummer 2;L�nderkennzeichen 2;IBAN-Nr. 2;IBAN2 korrekt;SWIFT-Code 2;Abw. Kontoinhaber 2;Kennz. Hauptbankverb. 2;Bankverb 2 G�ltig von;Bankverb 2 G�ltig bis;Bankleitzahl 3;Bankbezeichnung 3;Bank-Kontonummer 3;L�nderkennzeichen 3;IBAN-Nr. 3;IBAN3 korrekt;SWIFT-Code 3;Abw. Kontoinhaber 3;Kennz. Hauptbankverb. 3;Bankverb 3 G�ltig von;Bankverb 3 G�ltig bis;Bankleitzahl 4;Bankbezeichnung 4;Bank-Kontonummer 4;L�nderkennzeichen 4;IBAN-Nr. 4;IBAN4 korrekt;SWIFT-Code 4;Abw. Kontoinhaber 4;Kennz. Hauptbankverb. 4;Bankverb 4 G�ltig von;Bankverb 4 G�ltig bis;Bankleitzahl 5;Bankbezeichnung 5;Bank-Kontonummer 5;L�nderkennzeichen 5;IBAN-Nr. 5;IBAN5 korrekt;SWIFT-Code 5;Abw. Kontoinhaber 5;Kennz. Hauptbankverb. 5;Bankverb 5 G�ltig von;Bankverb 5 G�ltig bis;Leerfeld;Briefanrede;Gru�formel;Kundennummer;Steuernummer;Sprache;Ansprechpartner;Vertreter;Sachbearbeiter;Diverse-Konto;Ausgabeziel;W�hrungssteuerung;Kreditlimit (Debitor);Zahlungsbedingung;F�lligkeit in Tagen (Debitor);Skonto in Prozent (Debitor);Kreditoren-Ziel 1 Tg.;Kreditoren-Skonto 1 %;Kreditoren-Ziel 2 Tg.;Kreditoren-Skonto 2 %;Kreditoren-Ziel 3 Brutto Tg.;Kreditoren-Ziel 4 Tg.;Kreditoren-Skonto 4 %;Kreditoren-Ziel 5 Tg.;Kreditoren-Skonto 5 %;Mahnung;Kontoauszug;Mahntext 1;Mahntext 2;Mahntext 3;Kontoauszugstext;Mahnlimit Betrag;Mahnlimit %;Zinsberechnung;Mahnzinssatz 1;Mahnzinssatz 2;Mahnzinssatz 3;Lastschrift;Verfahren;Mandantenbank;Zahlungstr�ger;Indiv. Feld 1;Indiv. Feld 2;Indiv. Feld 3;Indiv. Feld 4;Indiv. Feld 5;Indiv. Feld 6;Indiv. Feld 7;Indiv. Feld 8;Indiv. Feld 9;Indiv. Feld 10;Indiv. Feld 11;Indiv. Feld 12;Indiv. Feld 13;Indiv. Feld 14;Indiv. Feld 15;Abweichende Anrede (Rechnungsadresse);Adressart (Rechnungsadresse);Stra�e (Rechnungsadresse);Postfach (Rechnungsadresse);Postleitzahl (Rechnungsadresse);Ort (Rechnungsadresse);Land (Rechnungsadresse);Versandzusatz (Rechnungsadresse);Adresszusatz (Rechnungsadresse);Abw. Zustellbezeichnung 1 (Rechnungsadresse);Abw. Zustellbezeichnung 2 (Rechnungsadresse);Adresse G�ltig von (Rechnungsadresse);Adresse G�ltig bis (Rechnungsadresse);Bankleitzahl 6;Bankbezeichnung 6;Bank-Kontonummer 6;L�nderkennzeichen 6;IBAN-Nr. 6;IBAN6 korrekt;SWIFT-Code 6;Abw. Kontoinhaber 6;Kennz. Hauptbankverb. 6;Bankverb 6 G�ltig von;Bankverb 6 G�ltig bis;Bankleitzahl 7;Bankbezeichnung 7;Bank-Kontonummer 7;L�nderkennzeichen 7;IBAN-Nr. 7;IBAN7 korrekt;SWIFT-Code 7;Abw. Kontoinhaber 7;Kennz. Hauptbankverb. 7;Bankverb 7 G�ltig von;Bankverb 7 G�ltig bis;Bankleitzahl 8;Bankbezeichnung 8;Bank-Kontonummer 8;L�nderkennzeichen 8;IBAN-Nr. 8;IBAN8 korrekt;SWIFT-Code 8;Abw. Kontoinhaber 8;Kennz. Hauptbankverb. 8;Bankverb 8 G�ltig von;Bankverb 8 G�ltig bis;Bankleitzahl 9;Bankbezeichnung 9;Bank-Kontonummer 9;L�nderkennzeichen 9;IBAN-Nr. 9;IBAN9 korrekt;SWIFT-Code 9;Abw. Kontoinhaber 9;Kennz. Hauptbankverb. 9;Bankverb 9 G�ltig von;Bankverb 9 G�ltig bis;Bankleitzahl 10;Bankbezeichnung 10;Bank-Kontonummer 10;L�nderkennzeichen 10;IBAN-Nr. 10;IBAN10 korrekt;SWIFT-Code 10;Abw. Kontoinhaber 10;Kennz. Hauptbankverb. 10;Bankverb 10 G�ltig von;Bankverb 10 G�ltig bis;Nummer Fremdsystem;Insolvent;Mandatsreferenz 1;Mandatsreferenz 2;Mandatsreferenz 3;Mandatsreferenz 4;Mandatsreferenz 5;Mandatsreferenz 6;Mandatsreferenz 7;Mandatsreferenz 8;Mandatsreferenz 9;Mandatsreferenz 10;Verkn�pftes OPOS-Konto;Mahnsperre bis;Lastschriftsperre bis;Zahlungssperre bis;Geb�hrenberechnung;Mahngeb�hr 1;Mahngeb�hr 2;Mahngeb�hr 3;Pauschalenberechnung;Verzugspauschale 1;Verzugspauschale 2;Verzugspauschale 3;Alternativer Suchname;Status;Anschrift manuell ge�ndert(Korrespondenzadresse);Anschrift individuell(Korrespondenzadresse;Anschrift manuell ge�ndert(Rechnungsadresse;Anschrift individuell (Rechnungsadresse);Fristberechnung bei Debitor;Mahnfrist 1;Mahnfrist 2;Mahnfrist 3;Letzte Frist";
+                string CustomerVendorHeadline = "Konto;Name (Adressattyp Unternehmen);Unternehmensgegenstand;Name (Adressattyp natrl. Person);Vorname (Adressattyp natrl. Person);Name (Adressattyp keine Angabe);Adressattyp;Kurzbezeichnung;EU-Land;EU-UStID;Anrede;Titel/Akad. Grad;Adelstitel;Namensvorsatz;Adressart;Strae;Postfach;Postleitzahl;Ort;Land;Versandzusatz;Adresszusatz;Abweichende Anrede;Abw. Zustellbezeichnung 1;Abw. Zustellbezeichnung 2;Kennz. Korrespondenzadresse;Adresse Gltig von;Adresse Gltig bis;Telefon;Bemerkung (Telefon);Telefon GL;Bemerkung (Telefon GL);E-Mail;Bemerkung (E-Mail);Internet;Bemerkung (Internet);Fax;Bemerkung (Fax);Sonstige;Bemerkung (Sonstige);Bankleitzahl 1;Bankbezeichnung 1;Bank-Kontonummer 1;Lnderkennzeichen 1;IBAN-Nr. 1;IBAN1 korrekt;SWIFT-Code 1;Abw. Kontoinhaber 1;Kennz. Hauptbankverb. 1;Bankverb 1 Gltig von;Bankverb 1 Gltig bis;Bankleitzahl 2;Bankbezeichnung 2;Bank-Kontonummer 2;Lnderkennzeichen 2;IBAN-Nr. 2;IBAN2 korrekt;SWIFT-Code 2;Abw. Kontoinhaber 2;Kennz. Hauptbankverb. 2;Bankverb 2 Gltig von;Bankverb 2 Gltig bis;Bankleitzahl 3;Bankbezeichnung 3;Bank-Kontonummer 3;Lnderkennzeichen 3;IBAN-Nr. 3;IBAN3 korrekt;SWIFT-Code 3;Abw. Kontoinhaber 3;Kennz. Hauptbankverb. 3;Bankverb 3 Gltig von;Bankverb 3 Gltig bis;Bankleitzahl 4;Bankbezeichnung 4;Bank-Kontonummer 4;Lnderkennzeichen 4;IBAN-Nr. 4;IBAN4 korrekt;SWIFT-Code 4;Abw. Kontoinhaber 4;Kennz. Hauptbankverb. 4;Bankverb 4 Gltig von;Bankverb 4 Gltig bis;Bankleitzahl 5;Bankbezeichnung 5;Bank-Kontonummer 5;Lnderkennzeichen 5;IBAN-Nr. 5;IBAN5 korrekt;SWIFT-Code 5;Abw. Kontoinhaber 5;Kennz. Hauptbankverb. 5;Bankverb 5 Gltig von;Bankverb 5 Gltig bis;Leerfeld;Briefanrede;Gruformel;Kundennummer;Steuernummer;Sprache;Ansprechpartner;Vertreter;Sachbearbeiter;Diverse-Konto;Ausgabeziel;Whrungssteuerung;Kreditlimit (Debitor);Zahlungsbedingung;Flligkeit in Tagen (Debitor);Skonto in Prozent (Debitor);Kreditoren-Ziel 1 Tg.;Kreditoren-Skonto 1 %;Kreditoren-Ziel 2 Tg.;Kreditoren-Skonto 2 %;Kreditoren-Ziel 3 Brutto Tg.;Kreditoren-Ziel 4 Tg.;Kreditoren-Skonto 4 %;Kreditoren-Ziel 5 Tg.;Kreditoren-Skonto 5 %;Mahnung;Kontoauszug;Mahntext 1;Mahntext 2;Mahntext 3;Kontoauszugstext;Mahnlimit Betrag;Mahnlimit %;Zinsberechnung;Mahnzinssatz 1;Mahnzinssatz 2;Mahnzinssatz 3;Lastschrift;Verfahren;Mandantenbank;Zahlungstrger;Indiv. Feld 1;Indiv. Feld 2;Indiv. Feld 3;Indiv. Feld 4;Indiv. Feld 5;Indiv. Feld 6;Indiv. Feld 7;Indiv. Feld 8;Indiv. Feld 9;Indiv. Feld 10;Indiv. Feld 11;Indiv. Feld 12;Indiv. Feld 13;Indiv. Feld 14;Indiv. Feld 15;Abweichende Anrede (Rechnungsadresse);Adressart (Rechnungsadresse);Strae (Rechnungsadresse);Postfach (Rechnungsadresse);Postleitzahl (Rechnungsadresse);Ort (Rechnungsadresse);Land (Rechnungsadresse);Versandzusatz (Rechnungsadresse);Adresszusatz (Rechnungsadresse);Abw. Zustellbezeichnung 1 (Rechnungsadresse);Abw. Zustellbezeichnung 2 (Rechnungsadresse);Adresse Gltig von (Rechnungsadresse);Adresse Gltig bis (Rechnungsadresse);Bankleitzahl 6;Bankbezeichnung 6;Bank-Kontonummer 6;Lnderkennzeichen 6;IBAN-Nr. 6;IBAN6 korrekt;SWIFT-Code 6;Abw. Kontoinhaber 6;Kennz. Hauptbankverb. 6;Bankverb 6 Gltig von;Bankverb 6 Gltig bis;Bankleitzahl 7;Bankbezeichnung 7;Bank-Kontonummer 7;Lnderkennzeichen 7;IBAN-Nr. 7;IBAN7 korrekt;SWIFT-Code 7;Abw. Kontoinhaber 7;Kennz. Hauptbankverb. 7;Bankverb 7 Gltig von;Bankverb 7 Gltig bis;Bankleitzahl 8;Bankbezeichnung 8;Bank-Kontonummer 8;Lnderkennzeichen 8;IBAN-Nr. 8;IBAN8 korrekt;SWIFT-Code 8;Abw. Kontoinhaber 8;Kennz. Hauptbankverb. 8;Bankverb 8 Gltig von;Bankverb 8 Gltig bis;Bankleitzahl 9;Bankbezeichnung 9;Bank-Kontonummer 9;Lnderkennzeichen 9;IBAN-Nr. 9;IBAN9 korrekt;SWIFT-Code 9;Abw. Kontoinhaber 9;Kennz. Hauptbankverb. 9;Bankverb 9 Gltig von;Bankverb 9 Gltig bis;Bankleitzahl 10;Bankbezeichnung 10;Bank-Kontonummer 10;Lnderkennzeichen 10;IBAN-Nr. 10;IBAN10 korrekt;SWIFT-Code 10;Abw. Kontoinhaber 10;Kennz. Hauptbankverb. 10;Bankverb 10 Gltig von;Bankverb 10 Gltig bis;Nummer Fremdsystem;Insolvent;Mandatsreferenz 1;Mandatsreferenz 2;Mandatsreferenz 3;Mandatsreferenz 4;Mandatsreferenz 5;Mandatsreferenz 6;Mandatsreferenz 7;Mandatsreferenz 8;Mandatsreferenz 9;Mandatsreferenz 10;Verknpftes OPOS-Konto;Mahnsperre bis;Lastschriftsperre bis;Zahlungssperre bis;Gebhrenberechnung;Mahngebhr 1;Mahngebhr 2;Mahngebhr 3;Pauschalenberechnung;Verzugspauschale 1;Verzugspauschale 2;Verzugspauschale 3;Alternativer Suchname;Status;Anschrift manuell gendert(Korrespondenzadresse);Anschrift individuell(Korrespondenzadresse;Anschrift manuell gendert(Rechnungsadresse;Anschrift individuell (Rechnungsadresse);Fristberechnung bei Debitor;Mahnfrist 1;Mahnfrist 2;Mahnfrist 3;Letzte Frist";
 
                 fileStream.WriteLine(header.getHeaderString());
                 fileStream.WriteLine(CustomerVendorHeadline);
@@ -631,7 +643,7 @@ namespace UnicontaClient.Pages.CustomPage
                 header.DataCategory = 21;
                 header.FormatName = "Buchungsstapel";
                 header.FormatVersion = 12; //PG fra 9 til 12
-                string EntriesHeadline = "Umsatz (ohne Soll/Haben-Kz);Soll/Haben-Kennzeichen;WKZ Umsatz;Kurs;Basis-Umsatz;WKZ Basis-Umsatz;Konto;Gegenkonto (ohne BU-Schl�ssel);BU-Schl�ssel;Belegdatum;Belegfeld 1;Belegfeld 2;Skonto;Buchungstext;Postensperre;Diverse Adressnummer;Gesch�ftspartnerbank;Sachverhalt;Zinssperre;Beleglink;Beleginfo - Art 1;Beleginfo - Inhalt 1;Beleginfo - Art 2;Beleginfo - Inhalt 2;Beleginfo - Art 3;Beleginfo - Inhalt 3;Beleginfo - Art 4;Beleginfo - Inhalt 4;Beleginfo - Art 5;Beleginfo - Inhalt 5;Beleginfo - Art 6;Beleginfo - Inhalt 6;Beleginfo - Art 7;Beleginfo - Inhalt 7;Beleginfo - Art 8;Beleginfo - Inhalt 8;KOST1 - Kostenstelle;KOST2 - Kostenstelle;Kost-Menge;EU-Land u. UStID;EU-Steuersatz;Abw. Versteuerungsart;Sachverhalt L+L;Funktionserg nzung L+L;BU 49 Hauptfunktionstyp;BU 49 Hauptfunktionsnummer;BU 49 Funktionserg nzung;Zusatzinformation - Art 1;Zusatzinformation- Inhalt 1;Zusatzinformation - Art 2;Zusatzinformation- Inhalt 2;Zusatzinformation - Art 3;Zusatzinformation- Inhalt 3;Zusatzinformation - Art 4;Zusatzinformation- Inhalt 4;Zusatzinformation - Art 5;Zusatzinformation- Inhalt 5;Zusatzinformation - Art 6;Zusatzinformation- Inhalt 6;Zusatzinformation - Art 7;Zusatzinformation- Inhalt 7;Zusatzinformation - Art 8;Zusatzinformation- Inhalt 8;Zusatzinformation - Art 9;Zusatzinformation- Inhalt 9;Zusatzinformation - Art 10;Zusatzinformation- Inhalt 10;Zusatzinformation - Art 11;Zusatzinformation- Inhalt 11;Zusatzinformation - Art 12;Zusatzinformation- Inhalt 12;Zusatzinformation - Art 13;Zusatzinformation- Inhalt 13;Zusatzinformation - Art 14;Zusatzinformation- Inhalt 14;Zusatzinformation - Art 15;Zusatzinformation- Inhalt 15;Zusatzinformation - Art 16;Zusatzinformation- Inhalt 16;Zusatzinformation - Art 17;Zusatzinformation- Inhalt 17;Zusatzinformation - Art 18;Zusatzinformation- Inhalt 18;Zusatzinformation - Art 19;Zusatzinformation- Inhalt 19;Zusatzinformation - Art 20;Zusatzinformation- Inhalt 20;St ck;Gewicht;Zahlweise;Forderungsart;Veranlagungsjahr;Zugeordnete F lligkeit;Skontotyp;Auftragsnummer;Buchungstyp;Ust-Schl ssel (Anzahlungen);EU-Land (Anzahlungen);Sachverhalt L+L (Anzahlungen);EU-Steuersatz (Anzahlungen);Erl skonto (Anzahlungen);Herkunft-Kz;Leerfeld;KOST-Datum;Mandatsreferenz;Skontosperre;Gesellschaftername;Beteiligtennummer;Identifikationsnummer;Zeichnernummer;Postensperre bis;Bezeichnung SoBil-Sachverhalt;Kennzeichen SoBil-Buchung;Festschreibung;Leistungsdatum;Datum Zuord.Steuerperiode;F lligkeit;Generalumkehr (GU);Steuersatz;Land;Abrechnungsreferenz;BVV-Position;EU-Land u. UStID (Ursprung);EU-Steuersatz (Ursprung)";  //PG Datev 4 Neue
+                string EntriesHeadline = "Umsatz (ohne Soll/Haben-Kz);Soll/Haben-Kennzeichen;WKZ Umsatz;Kurs;Basis-Umsatz;WKZ Basis-Umsatz;Konto;Gegenkonto (ohne BU-Schlssel);BU-Schlssel;Belegdatum;Belegfeld 1;Belegfeld 2;Skonto;Buchungstext;Postensperre;Diverse Adressnummer;Geschftspartnerbank;Sachverhalt;Zinssperre;Beleglink;Beleginfo - Art 1;Beleginfo - Inhalt 1;Beleginfo - Art 2;Beleginfo - Inhalt 2;Beleginfo - Art 3;Beleginfo - Inhalt 3;Beleginfo - Art 4;Beleginfo - Inhalt 4;Beleginfo - Art 5;Beleginfo - Inhalt 5;Beleginfo - Art 6;Beleginfo - Inhalt 6;Beleginfo - Art 7;Beleginfo - Inhalt 7;Beleginfo - Art 8;Beleginfo - Inhalt 8;KOST1 - Kostenstelle;KOST2 - Kostenstelle;Kost-Menge;EU-Land u. UStID;EU-Steuersatz;Abw. Versteuerungsart;Sachverhalt L+L;Funktionserg nzung L+L;BU 49 Hauptfunktionstyp;BU 49 Hauptfunktionsnummer;BU 49 Funktionserg nzung;Zusatzinformation - Art 1;Zusatzinformation- Inhalt 1;Zusatzinformation - Art 2;Zusatzinformation- Inhalt 2;Zusatzinformation - Art 3;Zusatzinformation- Inhalt 3;Zusatzinformation - Art 4;Zusatzinformation- Inhalt 4;Zusatzinformation - Art 5;Zusatzinformation- Inhalt 5;Zusatzinformation - Art 6;Zusatzinformation- Inhalt 6;Zusatzinformation - Art 7;Zusatzinformation- Inhalt 7;Zusatzinformation - Art 8;Zusatzinformation- Inhalt 8;Zusatzinformation - Art 9;Zusatzinformation- Inhalt 9;Zusatzinformation - Art 10;Zusatzinformation- Inhalt 10;Zusatzinformation - Art 11;Zusatzinformation- Inhalt 11;Zusatzinformation - Art 12;Zusatzinformation- Inhalt 12;Zusatzinformation - Art 13;Zusatzinformation- Inhalt 13;Zusatzinformation - Art 14;Zusatzinformation- Inhalt 14;Zusatzinformation - Art 15;Zusatzinformation- Inhalt 15;Zusatzinformation - Art 16;Zusatzinformation- Inhalt 16;Zusatzinformation - Art 17;Zusatzinformation- Inhalt 17;Zusatzinformation - Art 18;Zusatzinformation- Inhalt 18;Zusatzinformation - Art 19;Zusatzinformation- Inhalt 19;Zusatzinformation - Art 20;Zusatzinformation- Inhalt 20;St ck;Gewicht;Zahlweise;Forderungsart;Veranlagungsjahr;Zugeordnete F lligkeit;Skontotyp;Auftragsnummer;Buchungstyp;Ust-Schl ssel (Anzahlungen);EU-Land (Anzahlungen);Sachverhalt L+L (Anzahlungen);EU-Steuersatz (Anzahlungen);Erl skonto (Anzahlungen);Herkunft-Kz;Leerfeld;KOST-Datum;Mandatsreferenz;Skontosperre;Gesellschaftername;Beteiligtennummer;Identifikationsnummer;Zeichnernummer;Postensperre bis;Bezeichnung SoBil-Sachverhalt;Kennzeichen SoBil-Buchung;Festschreibung;Leistungsdatum;Datum Zuord.Steuerperiode;F lligkeit;Generalumkehr (GU);Steuersatz;Land;Abrechnungsreferenz;BVV-Position;EU-Land u. UStID (Ursprung);EU-Steuersatz (Ursprung)";  //PG Datev 4 Neue
 
                 fileStream.WriteLine(header.getHeaderString());
                 fileStream.WriteLine(EntriesHeadline);
@@ -771,7 +783,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 var Inv1 = (tc._Invoice > 0) ? tc._Invoice : tc._Voucher;
 
-                var Ptext = tc.Text;    //Datev l�nge auf 60
+                var Ptext = tc.Text;    //Datev lnge auf 60
                 if (Ptext != null)
                 {
                     Ptext = Ptext.Replace("\"", "");
@@ -796,7 +808,7 @@ namespace UnicontaClient.Pages.CustomPage
                     DueDate = DueDate,
                     Date = tc._Date,
                     ExchangeRate = tc._AmountCurCent == 0 || tc._AmountCent == 0 ? 0d : Math.Round((Math.Abs(tc._AmountCurCent) / (double)Math.Abs(tc._AmountCent)), 6),
-                    PostingText = Ptext,                    //Datev l�nge auf 60                    
+                    PostingText = Ptext,                    //Datev lnge auf 60                    
                     cID = tc.CompanyId,  //DT Per
                     Exported = Exportdate
 
@@ -814,7 +826,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (tc._DCType == GLTransRefType.Debtor)
                     {
                         arr = this.debInvoice;
-                        entry.DocumentRef = tc.Invoice; //PG Guid p� Debitor poster!
+                        entry.DocumentRef = tc.Invoice; //PG Guid p Debitor poster!
                     }
                     else if (tc._DCType == GLTransRefType.Creditor)
                         arr = this.creInvoice;
@@ -935,25 +947,42 @@ namespace UnicontaClient.Pages.CustomPage
                 int confl = 0;
                 int DocRef = 0;
                 var clientId = UtilDisplay.GetKey("DatevClientId");
+                var clientSecret = UtilDisplay.GetKey("DatevClientSecret");
                 var datev = await CreateDatevHeader(crud);
                 var doubinv = new List<String>();
                 int numboinv = 0;
-                string authority = @"https://login.datev.de/openid";
+                string authority = "https://login.datev.de/openid";
                 string clientScopes = "openid profile email accounting:documents datev:accounting:clients datev:accounting:extf-files-import";
-                ushort clientRedirectPort = 58455;
-                var clientSecret = UtilDisplay.GetKey("DatevClientSecretTest");
+                var datevEndpointBaseAddresses = new List<string>(2)
+                {
+                    "https://login.datev.de",
+                    "https://api.datev.de"
+                };
 
-                var options = new ClientOptions(
-                                    authority,
-                                    clientId,
-                                    clientSecret,
-                                    clientScopes,
-                                    clientRedirectPort);
+                var options = new OidcClientOptions()
+                {
+                    Authority = authority,
+                    ClientId = clientId,
+                    ClientSecret = clientSecret,
+                    Scope = clientScopes, // Scope for Online API accounting:clients
+                    Policy = new Policy()
+                    {
+                        Discovery = new DiscoveryPolicy()
+                        {
+                            AdditionalEndpointBaseAddresses = datevEndpointBaseAddresses
+                        }
+                    },
+                    TokenClientCredentialStyle = ClientCredentialStyle.AuthorizationHeader, // credentials not in body
+                    RefreshTokenInnerHttpHandler = new HttpClientHandler()
+                    // usage of own httpclienthandler possible (i. e. for http-proxys)
+                };
 
-                var clientr = new Datev.Cloud.Authentication.Client(options);
+                var client = new OidcClient(options);
 
-                RefreshTokenHandler refreshTokenHandler = new RefreshTokenHandler(clientr, Convert.ToString(DatevDetails.RefreshToken), Convert.ToString(DatevDetails.AccessToken));
-                var apiClient = new HttpClient(refreshTokenHandler);
+                var apiClient = new HttpClient(new RefreshHandler(client,
+                    Convert.ToString(DatevDetails.AccessToken),
+                    Convert.ToString(DatevDetails.RefreshToken),
+                    new DateTimeOffset(DatevDetails.Tokenvalidto)));
 
                 foreach (var Tr in Trans)
                 {
@@ -1000,34 +1029,41 @@ namespace UnicontaClient.Pages.CustomPage
                             var content = new MultipartFormDataContent { { bytec, "file", name + "." + Doc[0].Fileextension } };
                             content.Headers.Add("X-DATEV-Client-Id", clientId);
 
-                            // Metadaten hinzuf�gen  
+                            // Metadaten hinzufgen  
                             var metadataContent = new StringContent(JsonConvert.SerializeObject(metadata));
                             metadataContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
                             content.Add(metadataContent, "metadata");
 
                             var restCon = "";
                             var gemresp = "";
-                            if (Doc[0]._Data.Length < 300000)
-                            {
-                                var apiresult = await apiClient.PutAsync(new Uri("https://accounting-documents.api.datev.de/platform/v2/clients/" + datev.Consultant + "-" + datev.Client + "/documents/" + name), content);
-                                restCon = await apiresult.Content.ReadAsStringAsync();
-                                gemresp = apiresult.StatusCode.ToString();
-                            }
+                            /*if (Doc[0]._Data.Length < 300000)
+                            {*/
+                            var apiresult = await apiClient.PutAsync(new Uri("https://accounting-documents.api.datev.de/platform/v2/clients/" + datev.Consultant + "-" + datev.Client + "/documents/" + name), content);
+                            restCon = await apiresult.Content.ReadAsStringAsync();
+                            gemresp = apiresult.StatusCode.ToString();
+                            /*}
                             else
                             {
                                 gemresp = "Unauthorized";
-                                restCon = "Ein Dokument darf max. 300kb gro� sein";
-                            }
+                                restCon = "Ein Dokument darf max. 300kb gro sein";
+                            }*/
 
                             HTTPConnMethod = "https://accounting-documents.api.datev.de/platform/v2/clients/" + Convert.ToInt32(datev.Consultant) + "-" + datev.Client + "/documents/" + name + " Method.Put";
 
                             if (gemresp == "Created")
                             {
                                 statussend = 1;
-                                pd = pd + 1;
+                                inv = inv + 1;
+                            }
+                            else if (gemresp == "Conflict")
+                            {
+                                statussend = 5;
+                                confl = confl + 1;
                             }
                             else
+                            {
                                 pdinverr = pdinverr + 1;
+                            }
                             if (gemresp == "Conflict")
                             {
                                 statussend = 5;
@@ -1079,7 +1115,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 var content = new MultipartFormDataContent { { bytec, "file", name + "." + FileextensionsTypes.PDF } };
                                 content.Headers.Add("X-DATEV-Client-Id", clientId);
 
-                                // Metadaten hinzuf�gen 
+                                // Metadaten hinzufgen 
                                 var metadataContent = new StringContent(JsonConvert.SerializeObject(metadata));
                                 metadataContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
                                 content.Add(metadataContent, "metadata");
@@ -1087,17 +1123,17 @@ namespace UnicontaClient.Pages.CustomPage
                                 var restCon = "";
                                 var gemresp = "";
 
-                                if (invoicePdf.Length < 300000)
-                                {
-                                    var apiresult = await apiClient.PutAsync(new Uri("https://accounting-documents.api.datev.de/platform/v2/clients/" + datev.Consultant + "-" + datev.Client + "/documents/" + name), content);
-                                    restCon = await apiresult.Content.ReadAsStringAsync();
-                                    gemresp = apiresult.StatusCode.ToString();
-                                }
+                                /*if (invoicePdf.Length < 300000)
+                                {*/
+                                var apiresult = await apiClient.PutAsync(new Uri("https://accounting-documents.api.datev.de/platform/v2/clients/" + datev.Consultant + "-" + datev.Client + "/documents/" + name), content);
+                                restCon = await apiresult.Content.ReadAsStringAsync();
+                                gemresp = apiresult.StatusCode.ToString();
+                                /*}
                                 else
                                 {
                                     gemresp = "BadRequest";
-                                    restCon = "Ein Dokument darf max. 300kb gro� sein";
-                                }
+                                    restCon = "Ein Dokument darf max. 300kb gro sein";
+                                }*/
 
                                 HTTPConnMethod = "https://accounting-documents.api.datev.de/platform/v2/clients/" + Convert.ToInt32(datev.Consultant) + "-" + datev.Client + "/documents/" + name + " Method.Put";
 
@@ -1106,14 +1142,16 @@ namespace UnicontaClient.Pages.CustomPage
                                     statussend = 1;
                                     inv = inv + 1;
                                 }
-                                else
-                                    pdinverr = pdinverr + 1;
-                                if (gemresp == "Conflict")
+                                else if (gemresp == "Conflict")
                                 {
                                     statussend = 5;
                                     confl = confl + 1;
-                                    pdinverr = pdinverr - 1;
                                 }
+                                else
+                                {
+                                    pdinverr = pdinverr + 1;
+                                }
+
                                 if (gemresp == "Unauthorized")
                                     statussend = 3;
                                 if (gemresp == "BadRequest")
@@ -1243,7 +1281,7 @@ namespace UnicontaClient.Pages.CustomPage
                 line[15] = AddSingleQuotes(FirstN(dcAccount._Address1, 36));
                 line[17] = AddSingleQuotes(dcAccount._ZipCode);
                 line[18] = AddSingleQuotes(dcAccount._City);
-                line[19] = AddSingleQuotes(TwoLetterISOLanguageName); //Datev  L�nderkennzeichnung in Gro�buchstaben
+                line[19] = AddSingleQuotes(TwoLetterISOLanguageName); //Datev  Lnderkennzeichnung in Grobuchstaben
                 line[44] = AddSingleQuotes(dcAccount._PaymentId);
                 line[46] = AddSingleQuotes(dcAccount._SWIFT);
 
@@ -1305,7 +1343,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             private HashSet<int> dataCategories = new HashSet<int>() { 21, 65, 67, 20, 47, 16, 44, 46, 48, 63, 62 };
             private HashSet<string> formatNames = new HashSet<string>() { "Buchungsstapel", "Wiederkehrende Buchungen", "Buchungstextkonstanten", "Kontenbeschriftungen", "Debitoren/Kreditoren",
-                                                                "Textschl�ssel", "Zahlungsbedingungen", "Diverse Adressen", "Anlagenbuchf�hrung ? Buchungssatzvorlagen", "Anlagenbuchf�hrung ? Filialen"};
+                                                                "Textschlssel", "Zahlungsbedingungen", "Diverse Adressen", "Anlagenbuchfhrung ? Buchungssatzvorlagen", "Anlagenbuchfhrung ? Filialen"};
             private HashSet<int> formatVersions = new HashSet<int>() { 1, 2, 5, };
 
             public string getHeaderString()
@@ -1362,10 +1400,65 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void HasVoucherImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var gLTransClient = (sender as Image).Tag as GLTransClient;
+            var gLTransClient = (sender as System.Windows.Controls.Image).Tag as GLTransClient;
             if (gLTransClient != null)
                 DebtorTransactions.ShowVoucher(dgAccountsTransGrid.syncEntity, api, busyIndicator);
         }
 
+        class RefreshHandler : DelegatingHandler
+        {
+            private readonly OidcClient client;
+            private string accessToken;
+            private string refreshToken;
+
+            private DateTimeOffset expires;
+
+            public RefreshHandler(OidcClient client, string accessToken, string refreshToken,
+                DateTimeOffset AccessTokenExpiration)
+                : base(new HttpClientHandler())
+            {
+                this.client = client;
+                this.accessToken = accessToken;
+                this.refreshToken = refreshToken;
+                expires = AccessTokenExpiration;
+            }
+
+            protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
+                CancellationToken cancellationToken)
+            {
+                // Refresh access token 1 minute before expiry to avoid problems with incorrect system time
+                var nowPlus1Min = DateTimeOffset.Now + new TimeSpan(0, 1, 0);
+
+                if (nowPlus1Min > expires)
+                {
+                    //Console.WriteLine("refresh necessary");
+                    var refreshResult = await client.RefreshTokenAsync(refreshToken);
+                    if (refreshResult.IsError)
+                    {
+                        throw new Exception(
+                            $"error during refresh: {refreshResult.Error} {refreshResult.ErrorDescription}");
+                    }
+
+                    accessToken = refreshResult.AccessToken;
+                    refreshToken = refreshResult.RefreshToken;
+                    expires = DateTimeOffset.Now + TimeSpan.FromSeconds(refreshResult.ExpiresIn);
+
+                    //Console.WriteLine($"refresh successful, new Access Token\n{accessToken}");
+                    //Console.WriteLine($"new Refresh Token\n{refreshToken}");
+                    //Console.WriteLine($"new Access Token expires at {expires}");
+                }
+
+                if (request.Headers.Contains("Authorization"))
+                {
+                    request.Headers.Remove("Authorization");
+                }
+
+                request.Headers.Add("Authorization", "Bearer " + accessToken);
+
+                var result = await base.SendAsync(request, cancellationToken);
+
+                return result;
+            }
+        }
     }
 }

@@ -11,16 +11,9 @@ using Uniconta.DataModel;
 using Uniconta.API.GeneralLedger;
 using Uniconta.ClientTools;
 using static UnicontaClient.Pages.NewImportPhysicalVouchersPage;
-
-
-
-#if WPF
 using UnicontaClient.Pages;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
-#else
-namespace ImportVoucher.Utility
-#endif
 {
     public class ImportVoucher
     {

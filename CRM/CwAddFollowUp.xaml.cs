@@ -35,12 +35,10 @@ namespace UnicontaClient.Pages.CustomPage
             InitializeComponent();
             this.Title = string.Format(Uniconta.ClientTools.Localization.lookup("AddOBJ"), Uniconta.ClientTools.Localization.lookup("FollowUp"));
             leGroup.api = leEmployee.api =  api;
-#if !SILVERLIGHT
             FocusManager.SetFocusedElement(txtText, txtText);
-#endif
         }
 
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {

@@ -13,6 +13,7 @@ using System.Globalization;
 using Uniconta.ClientTools.Controls;
 using Uniconta.Common.Utility;
 using Uniconta.API.System;
+using Uniconta.ClientTools.DataModel;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
@@ -80,7 +81,13 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
                     }
                     //Validate payments <<
 
-                    var creditor = (Uniconta.DataModel.Creditor)credCache.Get(rec.Account);
+                    var creditor = (CreditorClient)credCache.Get(rec.Account);
+
+                    if (!creditor._AllowMergePayment)
+                    {
+                        rec.MergePaymId = MERGEID_SINGLEPAYMENT;
+                        continue;
+                    }
 
                     string creditorNumber = creditor._Account;
                     string paymGrpVal = string.Empty;
@@ -103,7 +110,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
                     switch (rec._PaymentMethod)
                     {
                         case PaymentTypes.VendorBankAccount:
-                            creditorAcc = bankSpecific.CreditorBBAN(rec._PaymentId, creditor._PaymentId, rec._SWIFT);
+                            creditorAcc = bankSpecific.CreditorBBAN(rec._PaymentId, creditor.PaymentId, rec._SWIFT);
                             creditorOCRPaymentId = bankSpecific.CreditorRefNumber(rec._PaymentId);
                             creditorBIC = bankSpecific.CreditorBIC(rec._SWIFT);
                             if (creditorOCRPaymentId != string.Empty && creditorBIC != string.Empty)
@@ -118,7 +125,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
                             break;
 
                         case PaymentTypes.IBAN:
-                            creditorAcc = bankSpecific.CreditorIBAN(rec._PaymentId, creditor._PaymentId, company._CountryId, creditor._Country);
+                            creditorAcc = bankSpecific.CreditorIBAN(rec._PaymentId, creditor.PaymentId, company._CountryId, creditor._Country);
                             creditorBIC = bankSpecific.CreditorBIC(rec._SWIFT);
                             creditorOCRPaymentId = bankSpecific.CreditorRefNumberIBAN(rec._PaymentId, company._CountryId, creditor._Country);
 
@@ -131,7 +138,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
                             break;
 
                         case PaymentTypes.PaymentMethod3: //FIK71
-                            var tuple71 = bankSpecific.CreditorFIK71(rec._PaymentId, creditor._PaymentId);
+                            var tuple71 = bankSpecific.CreditorFIK71(rec._PaymentId, creditor.PaymentId);
                             creditorOCRPaymentId = tuple71.Item1;
                             creditorAcc = tuple71.Item2;
 
@@ -139,7 +146,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
                             break;
 
                         case PaymentTypes.PaymentMethod5: //FIK75
-                            var tuple75 = bankSpecific.CreditorFIK75(rec._PaymentId, creditor._PaymentId);
+                            var tuple75 = bankSpecific.CreditorFIK75(rec._PaymentId, creditor.PaymentId);
                             creditorOCRPaymentId = tuple75.Item1;
                             creditorAcc = tuple75.Item2;
 

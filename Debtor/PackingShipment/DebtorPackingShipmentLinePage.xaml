@@ -6,6 +6,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorPackingShipmentLinePage"
              xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
              xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
              xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
+             xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
@@ -17,7 +18,11 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorPackingShipmentLinePage"
             <local:DebtorPackingShipmentLineGrid x:Name="dgDebtorPackingShipmentLineGrid" AutoGenerateColumns="None">
                 <local:DebtorPackingShipmentLineGrid.Columns>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Model" Visible="False" />
-                    <local:ComboBoxColumnClient x:Name="Category" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Category" IsEditSettingSet="True">
+                        <local:CorasauDataGridTemplateColumnClient.EditSettings>
+                            <editor:ComboBoxEditSettings x:Name="cbCategory" AutoComplete="True"/>
+                        </local:CorasauDataGridTemplateColumnClient.EditSettings>
+                    </local:CorasauDataGridTemplateColumnClient>
                     <local:ComboBoxColumnClient x:Name="PackagingType" />
                     <local:ComboBoxColumnClient x:Name="WasteSorting" />
                     <local:ComboBoxColumnClient x:Name="PackagingRateLevel" />

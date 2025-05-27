@@ -13,11 +13,12 @@ using RSK.Vsk;
 
 namespace RSK
 {
-      public class VskClient : IDisposable
-        {
-            private VaskurServices_PortTypeClient Client { get; }
+    public class VskClient : IDisposable
+    {
+#if !UNICORE
+        private VaskurServices_PortTypeClient Client { get; }
 
-            private const string VersionID = "UnicontaVSK V1.0";
+        private const string VersionID = "UnicontaVSK V1.0";
             private const string EndpointUri = "https://thjonusta.rsk.is:443/ws/SkatturWeb.wsd:VaskurServices/SkatturWeb_wsd_VaskurServices_Port";
             
             public VskClient (string username, string password)
@@ -37,8 +38,8 @@ namespace RSK
                     Client.ClientCredentials.UserName.UserName = username;
                     Client.ClientCredentials.UserName.Password = password;
                 }
-            }
-            
+        }
+
             public async Task<string> NaIVSKNumerAsync(
                 string kt)
             {
@@ -120,7 +121,7 @@ namespace RSK
                     serializer.Serialize(textWriter, request);
                     s = textWriter.ToString(); 
                 }
-                MessageBox.Show(s);
+                System.Windows.MessageBox.Show(s);
             }
 
             public async Task<EydaSkyrsluIProfunResponse> ResetTestAsync(string kennitala, DateTime toDate, string vskNr)
@@ -222,12 +223,15 @@ namespace RSK
                 };
                 return faersla;
             }
-
-
-
             public void Dispose()
             {
                 ((IDisposable) Client)?.Dispose();
             }
         }
+#else
+        public void Dispose()
+        {
+        }
+    }
+#endif
 }

@@ -417,7 +417,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (masterClient != null)
                 Hdr.ReportName = string.Format("{0}:{1}", actStatement, masterClient.AccountNumber);
             Hdr.CurDateTime = DateTime.Now.ToString("g");
-            Hdr.HeaderParameterTemplateStyle = Application.Current.Resources["AccountStatementPageHeaderStyle"] as Style;
+            Hdr.HeaderParameterTemplateStyle = System.Windows.Application.Current.Resources["AccountStatementPageHeaderStyle"] as Style;
             Hdr.FromDate = txtDateFrm.Text == string.Empty ? string.Empty : txtDateFrm.DateTime.ToShortDateString();
             Hdr.ToDate = txtDateTo.Text == string.Empty ? string.Empty : txtDateTo.DateTime.ToShortDateString();
             Hdr.AccountName = string.Format("{0} {1}", masterClient._Account, masterClient._Name);

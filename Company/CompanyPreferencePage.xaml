@@ -73,6 +73,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CompanyPreferencePage"
                         <CorasauControls:CorasauLayoutItem FieldName="AutoScanVoucher">
                             <CorasauControls:CheckEditor IsChecked="{Binding AutoScanVoucher,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="ScanPaymentData">
+                            <CorasauControls:CheckEditor IsChecked="{Binding ScanPaymentData,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="lastGroup">
@@ -143,6 +146,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CompanyPreferencePage"
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="DeactivateSendNemhandel">
                             <CorasauControls:CheckEditor IsChecked="{Binding DeactivateSendNemhandel,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem x:Name="liNemhandelUpdateBankDetails" FieldName="NemhandelUpdateBankDetails">
+                            <CorasauControls:CheckEditor IsChecked="{Binding NemhandelUpdateBankDetails,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>

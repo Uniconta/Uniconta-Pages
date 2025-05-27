@@ -258,5 +258,27 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
 
             return result;
         }
+
+        public static void ParseOcr(string ocr, out string fiCreditor, out string fiMask, bool isGIRO04 = false)
+        {
+            fiCreditor = null;
+            fiMask = null;
+
+            if (string.IsNullOrWhiteSpace(ocr))
+                return;
+
+            ocr = ocr.Trim().TrimStart('+');
+            var idx = ocr.IndexOf('+');
+            if (idx != -1)
+            {
+                fiCreditor = Regex.Replace(ocr.Substring(idx), @"[^\d]", "");
+                fiMask = Regex.Replace(ocr.Substring(0, idx), @"^.*?<", "").Trim();
+            }
+            else if (ocr.Length > 0)
+            {
+                fiCreditor = Regex.Replace(ocr, @"[^\d]", "");
+                fiCreditor = !isGIRO04 && fiCreditor.Length != 8 ? null : fiCreditor;
+            }
+        }
     }
 }

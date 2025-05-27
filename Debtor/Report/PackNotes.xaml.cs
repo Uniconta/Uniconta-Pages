@@ -132,7 +132,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void localMenu_OnItemClicked(string ActionType)
         {
             var selectedItem = dgPackNotesGrid.SelectedItem as DebtorDeliveryNoteClient;
-            
+
             switch (ActionType)
             {
                 case "EditRow":
@@ -323,6 +323,7 @@ namespace UnicontaClient.Pages.CustomPage
         StandardPrintReportPage standardViewerPrintPage;
         private async Task<IPrintReport> PrintPacknote(DebtorInvoiceClient debtorInvoice)
         {
+            IPrintReport iprintReport = null;
             var debtorQcpPrint = new UnicontaClient.Pages.DebtorInvoicePrintReport(debtorInvoice, api, CompanyLayoutType.Packnote);
 
             //In case of Multple invoices we create a lookup for Previous Address Clients
@@ -336,22 +337,24 @@ namespace UnicontaClient.Pages.CustomPage
                     debtorQcpPrint.CompanyLogo, debtorQcpPrint.ReportName, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.PackNote, messageClient: debtorQcpPrint.MessageClient);
 
                 var standardReports = new[] { standardDebtorPackNote };
-                IPrintReport iprintReport = new StandardPrintReport(api, standardReports, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.PackNote);
+                iprintReport = new StandardPrintReport(api, standardReports, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.PackNote);
                 await iprintReport.InitializePrint();
-                if (iprintReport.Report != null)
-                    return iprintReport;
 
-                //Call Invoice Layout
-                var layoutPrint = new LayoutPrintReport(api, debtorInvoice, CompanyLayoutType.Packnote);
-                layoutPrint.SetupLayoutPrintFields(debtorQcpPrint);
+                if (iprintReport?.Report == null)
+                {
+                    //Call Invoice Layout
+                    iprintReport = new LayoutPrintReport(api, debtorInvoice, CompanyLayoutType.Packnote);
+                    if (iprintReport is LayoutPrintReport layoutPrint) // Invoke Special Methods for LayoutPrint Report
+                    {
+                        layoutPrint.SetupLayoutPrintFields(debtorQcpPrint);
 
-                if (hasLookups)
-                    FillLookUps(layoutPrint);
-
-                await layoutPrint.InitializePrint();
-                return layoutPrint;
+                        if (hasLookups)
+                            FillLookUps(layoutPrint);
+                    }
+                    await iprintReport.InitializePrint();
+                }
             }
-            return null;
+            return iprintReport;
         }
 
         public override bool IsDataChaged => isGeneratingPacknote;

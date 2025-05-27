@@ -122,7 +122,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (selected == 0)
                 return;
 
-            var result = MessageBox.Show(CompanyClientText.AutoSaveCreditors + "?",
+            var result = System.Windows.MessageBox.Show(CompanyClientText.AutoSaveCreditors + "?",
                 Uniconta.ClientTools.Localization.lookup("DocumentScannersPay"), MessageBoxButton.YesNo);
 
             editrow._PaperFlowSaveCreditors = result == MessageBoxResult.Yes;

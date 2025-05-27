@@ -42,6 +42,7 @@
   <RibbonItem>
     <RibbonItem Action="CheckJournal" LocalizedNameKey="CheckJournal" LargeGlyph="Check_Journal_32x32"/>
     <RibbonItem Action="PostJournal" LocalizedNameKey="PostJournal" LargeGlyph="Posted_Journal_32x32"/>
+    <RibbonItem Action="ProjectFilter" LocalizedNameKey="FilterOBJ" Parameter="Project" LargeGlyph="Filter_32x32"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="UpdatePrices" LocalizedNameKey="RecalculatePrices" LargeGlyph="Calculator_32x32"/>

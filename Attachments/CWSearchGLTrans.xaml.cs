@@ -66,7 +66,7 @@ namespace UnicontaClient.Pages.CustomPage
                 txtBox.Text = "0";
         }
 
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {

@@ -76,7 +76,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void InitPage(UnicontaBaseEntity master)
         {
-            ((TableView)dgProjectOnAccountInvoiceLineGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
+            ((TableView)dgProjectOnAccountInvoiceLineGrid.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
             dgProjectOnAccountInvoiceLineGrid.api = api;
             Project = master as ProjectClient;
             var masterRecord = master as Uniconta.DataModel.Project;

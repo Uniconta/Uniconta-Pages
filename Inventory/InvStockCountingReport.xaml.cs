@@ -175,7 +175,7 @@ namespace UnicontaClient.Pages.CustomPage
             InitializeComponent();
             Utility.SetupVariants(api, colVariant, VariantName, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
             dgInvStockStatus.UpdateMaster(_master);
-            ((TableView)dgInvStockStatus.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
+            ((TableView)dgInvStockStatus.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
             SetRibbonControl(localMenu, dgInvStockStatus);
             dgInvStockStatus.api = api;
             dgInvStockStatus.BusyIndicator = busyIndicator;

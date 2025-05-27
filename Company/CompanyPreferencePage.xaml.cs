@@ -51,6 +51,8 @@ namespace UnicontaClient.Pages.CustomPage
                 liChkWarehouse.Visibility = Visibility.Collapsed;
             if (api.CompanyEntity.DocumentScanner == 0)
                 clgDocumentScanner.Visibility = Visibility.Collapsed;
+            if (!api.CompanyEntity.CreditorBankApprovement)
+                liNemhandelUpdateBankDetails.Visibility = Visibility.Collapsed;
         }
 
         private void frmRibbon_OnItemClicked(string ActionType)

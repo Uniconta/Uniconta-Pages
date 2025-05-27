@@ -133,7 +133,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override bool IsAutoSave { get { return false; } }
         public override bool CanDelete { get { return false; } }
         public override bool CanInsert { get { return false; } }
-        protected override void OnPreviewKeyDown(KeyEventArgs e)
+        protected override void OnPreviewKeyDown(System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Delete && Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
             {
@@ -192,6 +192,8 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgCreditorTranOpenGrid);
             dgCreditorTranOpenGrid.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
+            dgCreditorTranOpenGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
+
             dgCreditorTranOpenGrid.ShowTotalSummary();
             if (toDate == DateTime.MinValue)
                 toDate = txtDateTo.DateTime.Date;
@@ -1243,7 +1245,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 rec.thisPage = this;
 
-                var cred = (Uniconta.DataModel.Creditor)CreditorCache.Get(rec.Account);
+                var cred = (CreditorClient)CreditorCache.Get(rec.Account);
                 if (cred == null)
                     continue;
 
@@ -1279,7 +1281,7 @@ namespace UnicontaClient.Pages.CustomPage
                             else if ((cred._PaymentMethod == PaymentTypes.PaymentMethod3 || cred._PaymentMethod == PaymentTypes.PaymentMethod5) && CountryId == CountryCode.Sweden)
                                 creditorPaymId = string.Empty; //Norway PaymentId is used for OCR-No when PaymentType=PaymentMethod3   //TODO:Undersøg disse - skal stå til NULL
                             else
-                                creditorPaymId = cred._PaymentId;
+                                creditorPaymId = cred.PaymentId;
 
                             rec._PaymentMethod = cred._PaymentMethod;
                             rec._PaymentId = creditorPaymId;
@@ -1299,10 +1301,10 @@ namespace UnicontaClient.Pages.CustomPage
                         if (rec._PaymentId == null) // no paymentId on line, we need to take both values from Creditor.
                         {
                             rec._PaymentMethod = cred._PaymentMethod;
-                            rec._PaymentId = cred._PaymentId;
+                            rec._PaymentId = cred.PaymentId;
                         }
 
-                        creditorPaymId = cred._PaymentId;
+                        creditorPaymId = cred.PaymentId;
                     }
                     else
                         creditorPaymId = null;
@@ -1315,8 +1317,8 @@ namespace UnicontaClient.Pages.CustomPage
                         rec._PaymentId = (creditorPaymId != transPaymentId && transPaymentId != null) ? transPaymentId : creditorPaymId;
                 }
 
-                if (rec._SWIFT == null)
-                    rec._SWIFT = cred._SWIFT;
+                if (rec._SWIFT == null && rec._PaymentMethod == PaymentTypes.IBAN)
+                    rec._SWIFT = cred.SWIFT;
 
                 rec._Message = StandardPaymentFunctions.ExternalMessage(paymFormatClient, rec, company, cred, true);
 
@@ -1367,6 +1369,55 @@ namespace UnicontaClient.Pages.CustomPage
             if (pos >= 0 && pos < this.Vouchers.Length)
                 return this.Vouchers[pos];
             return null;
+        }
+
+        void DataControl_CurrentItemChanged(object sender, DevExpress.Xpf.Grid.CurrentItemChangedEventArgs e)
+        {
+            var oldselectedItem = e.OldItem as CreditorTransPayment;
+            if (oldselectedItem != null)
+                oldselectedItem.PropertyChanged -= PaymentsGrid_PropertyChanged;
+            var selectedItem = e.NewItem as CreditorTransPayment;
+            if (selectedItem != null)
+                selectedItem.PropertyChanged += PaymentsGrid_PropertyChanged;
+        }
+
+        private void PaymentsGrid_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            var rec = sender as CreditorTransPayment;
+            switch (e.PropertyName)
+            {
+                case "PaymentMethod":
+                    if (!api.CompanyEntity.CreditorBankApprovement)
+                        return;
+                    var cred = (CreditorClient)CreditorCache.Get(rec.Account);
+                    if (cred != null && cred.CreditorPaymentAccountRef != null)
+                    {
+                        var paymFormat = (CreditorPaymentFormat)PaymentFormatCache?.Get(rec._PaymentFormat);
+                        if (paymFormat == null || (paymFormat._ExportFormat == (byte)ExportFormatType.ISO20022_SE || paymFormat._ExportFormat == (byte)ExportFormatType.ISO20022_NO || paymFormat._ExportFormat == (byte)ExportFormatType.ISO20022_EE || paymFormat._ExportFormat == (byte)ExportFormatType.ISO20022_CH))
+                            return;
+
+                        var credPaymAccount = cred.CreditorPaymentAccountRef;
+                        rec.SWIFT = null;
+                        switch (rec._PaymentMethod)
+                        {
+                            case PaymentTypes.VendorBankAccount:
+                                rec.PaymentId = credPaymAccount.BankAccount;
+                                break;
+                            case PaymentTypes.IBAN:
+                                rec.PaymentId = credPaymAccount.IBAN;
+                                rec.SWIFT = credPaymAccount.SWIFT;
+                                break;
+                            case PaymentTypes.PaymentMethod3:
+                            case PaymentTypes.PaymentMethod4:
+                            case PaymentTypes.PaymentMethod5:
+                            case PaymentTypes.PaymentMethod6:
+                                var paymentId =  string.Concat(credPaymAccount.FIKMask, " +", credPaymAccount.FICreditorNumber);
+                                BuildPaymentIdFIK(rec, null, paymentId);
+                                break;
+                        }
+                    }
+                    break;
+            }
         }
     }
 }

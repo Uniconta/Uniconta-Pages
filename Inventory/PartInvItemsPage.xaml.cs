@@ -124,7 +124,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             InitializeComponent();
-            ((TableView)dgPartInvItemsGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
+            ((TableView)dgPartInvItemsGrid.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
             localMenu.dataGrid = dgPartInvItemsGrid;
             SetRibbonControl(localMenu, dgPartInvItemsGrid);
             dgPartInvItemsGrid.api = api;
@@ -456,14 +456,14 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var invBOM = (sender as Image).Tag as InvBOMClient;
+            var invBOM = (sender as System.Windows.Controls.Image).Tag as InvBOMClient;
             if (invBOM != null)
                 AddDockItem(TabControls.UserDocsPage, invBOM);
         }
 
         private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var invBOM = (sender as Image).Tag as InvBOMClient;
+            var invBOM = (sender as System.Windows.Controls.Image).Tag as InvBOMClient;
             if (invBOM != null)
                 AddDockItem(TabControls.UserNotesPage, invBOM);
         }

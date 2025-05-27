@@ -21,6 +21,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -159,6 +160,16 @@ namespace UnicontaClient.Pages.CustomPage
                 crmGroup.Visibility = Visibility.Collapsed;
             else
                 crmGroup.Visibility = Visibility.Visible;
+
+            if (Comp.CreditorBankApprovement)
+            {
+                txtSWIFT.IsReadOnly = true;
+                txtPaymentId.IsReadOnly = true;
+            }
+            else
+            {
+                liCreditorBankApprovement.Visibility = Visibility.Collapsed;
+            }
         }
 
         public override bool BeforeSetUserField(ref CorasauLayoutGroup parentGroup)

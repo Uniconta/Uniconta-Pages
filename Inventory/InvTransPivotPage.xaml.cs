@@ -194,14 +194,13 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void chkGrdTtlRow_Checked(object sender, RoutedEventArgs e)
         {
-            var value = (bool)chkGrdTtlRow.IsChecked;
-            pivotDgInvTrans.ShowRowGrandTotalHeader = value;
-            pivotDgInvTrans.ShowRowGrandTotals = value;
+            pivotDgInvTrans.ShowRowGrandTotalHeader =
+            pivotDgInvTrans.ShowRowGrandTotals = chkGrdTtlRow.IsChecked.GetValueOrDefault();
         }
 
         private void chkGrdTtlCol_Checked(object sender, RoutedEventArgs e)
         {
-            var value = (bool)chkGrdTtlCol.IsChecked;
+            var value = chkGrdTtlCol.IsChecked.GetValueOrDefault();
             pivotDgInvTrans.ShowColumnGrandTotalHeader = value;
             pivotDgInvTrans.ShowColumnGrandTotals = value;
             pivotDgInvTrans.ShowColumnTotals = value;

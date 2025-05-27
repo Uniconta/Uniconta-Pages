@@ -195,8 +195,8 @@ namespace UnicontaClient.Pages.CustomPage
         void InitPage()
         {
             InitializeComponent();
-            ((TableView)dgTMJournalLineTransRegGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
-            ((TableView)dgTMJournalLineGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
+            ((TableView)dgTMJournalLineTransRegGrid.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
+            ((TableView)dgTMJournalLineGrid.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
             postingApi = new UnicontaAPI.Project.API.PostingAPI(api);
             localMenu.dataGrid = dgTMJournalLineGrid;
             SetRibbonControl(localMenu, dgTMJournalLineGrid);
@@ -305,9 +305,9 @@ namespace UnicontaClient.Pages.CustomPage
             var approveDte = employee._TMApproveDate == DateTime.MinValue ? GetSystemDefaultDate().AddYears(-1) : employee._TMApproveDate;
             var specialDates = new ObservableCollection<MySpecialDate>();
             for (DateTime date = emplCalStart; date.Date <= approveDte; date = date.AddDays(1))
-                specialDates.Add(new MySpecialDate { Date = date, Color = Brushes.Green });
+                specialDates.Add(new MySpecialDate { Date = date, Color = System.Windows.Media.Brushes.Green });
             for (DateTime date = approveDte.AddDays(1); date.Date <= employee._TMCloseDate; date = date.AddDays(1))
-                specialDates.Add(new MySpecialDate { Date = date, Color = Brushes.Yellow });
+                specialDates.Add(new MySpecialDate { Date = date, Color = System.Windows.Media.Brushes.Yellow });
             txtDateTo.MySpecialDates = specialDates;
         }
 
@@ -405,8 +405,8 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (e.CollectionName == "TotalSummary")
             {
-                var col = e.Collection as GridSummaryItemCollection;
-                var summary = e.CollectionItem as GridSummaryItem;
+                var col = e.Collection as DevExpress.Xpf.Grid.GridSummaryItemCollection;
+                var summary = e.CollectionItem as DevExpress.Xpf.Grid.GridSummaryItem;
                 col.Remove(summary);
                 var newItem = new SumColumn();
                 col.Add(newItem);
@@ -451,7 +451,7 @@ namespace UnicontaClient.Pages.CustomPage
             return true;
         }
 
-        protected override void OnPreviewKeyDown(KeyEventArgs e)
+        protected override void OnPreviewKeyDown(System.Windows.Input.KeyEventArgs e)
         {
             bool keyAllowed = true;
 
@@ -474,7 +474,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void SetSummaryLayoutStyle()
         {
-            foreach (GridSummaryItem item in dgTMJournalLineGrid.TotalSummary)
+            foreach (DevExpress.Xpf.Grid.GridSummaryItem item in dgTMJournalLineGrid.TotalSummary)
             {
                 if (item is SumColumn)
                 {
@@ -1686,9 +1686,12 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (e.SummaryProcess == CustomSummaryProcess.Start)
             {
-                var tagName = ((SumColumn)e.Item).SerializableTag as string;
-                if (tagName == "Sum")
-                    e.TotalValue = Uniconta.ClientTools.Localization.lookup("Mileage");
+                if (e.Item is SumColumn sumColumn)
+                {
+                    var tagName = sumColumn.SerializableTag;
+                    if (tagName == "Sum")
+                        e.TotalValue = Uniconta.ClientTools.Localization.lookup("Mileage");
+                }
             }
         }
 
@@ -1698,72 +1701,74 @@ namespace UnicontaClient.Pages.CustomPage
                 SetSummaryLayoutStyle();
 
             GetGridColumnsSum();
-            var fieldName = ((SumColumn)e.Item).FieldName;
-            var tagName = ((SumColumn)e.Item).SerializableTag as string;
-            if (e.SummaryProcess == CustomSummaryProcess.Start)
+            if (e.Item is SumColumn sumColumn)
             {
-                switch (fieldName)
+                var fieldName = sumColumn.FieldName;
+                var tagName = sumColumn.SerializableTag;
+                if (e.SummaryProcess == CustomSummaryProcess.Start)
                 {
-                    case "Project":
-                        if (tagName == "Sum")
-                            e.TotalValue = Uniconta.ClientTools.Localization.lookup("RegisteredHours");
-                        else if (tagName == "NormHours")
-                            e.TotalValue = Uniconta.ClientTools.Localization.lookup("NormHours");
-                        else if (tagName == "Total")
-                            e.TotalValue = Uniconta.ClientTools.Localization.lookup("Dif");
-                        break;
-                    case "Day1":
-                        if (tagName == "HoursDay1")
-                            e.TotalValue = normHoursDay1;
-                        else if (tagName == "TotalDay1")
-                            e.TotalValue = day1Sum - normHoursDay1;
-                        break;
-                    case "Day2":
-                        if (tagName == "HoursDay2")
-                            e.TotalValue = normHoursDay2;
-                        else if (tagName == "TotalDay2")
-                            e.TotalValue = day2Sum - normHoursDay2;
-                        break;
-                    case "Day3":
-                        if (tagName == "HoursDay3")
-                            e.TotalValue = normHoursDay3;
-                        else if (tagName == "TotalDay3")
-                            e.TotalValue = day3Sum - normHoursDay3;
-                        break;
-                    case "Day4":
-                        if (tagName == "HoursDay4")
-                            e.TotalValue = normHoursDay4;
-                        else if (tagName == "TotalDay4")
-                            e.TotalValue = day4Sum - normHoursDay4;
-                        break;
-                    case "Day5":
-                        if (tagName == "HoursDay5")
-                            e.TotalValue = normHoursDay5;
-                        else if (tagName == "TotalDay5")
-                            e.TotalValue = day5Sum - normHoursDay5;
-                        break;
-                    case "Day6":
-                        if (tagName == "HoursDay6")
-                            e.TotalValue = normHoursDay6;
-                        else if (tagName == "TotalDay6")
-                            e.TotalValue = day6Sum - normHoursDay6;
-                        break;
-                    case "Day7":
-                        if (tagName == "HoursDay7")
-                            e.TotalValue = normHoursDay7;
-                        else if (tagName == "TotalDay7")
-                            e.TotalValue = day7Sum - normHoursDay7;
-                        break;
-                    case "Total":
-                        if (tagName == "EmpNormHoursSum")
-                            e.TotalValue = normHoursTotal;
-                        else if (tagName == "TotalSum")
-                            e.TotalValue = totalSum - normHoursTotal;
-                        break;
+                    switch (fieldName)
+                    {
+                        case "Project":
+                            if (tagName == "Sum")
+                                e.TotalValue = Uniconta.ClientTools.Localization.lookup("RegisteredHours");
+                            else if (tagName == "NormHours")
+                                e.TotalValue = Uniconta.ClientTools.Localization.lookup("NormHours");
+                            else if (tagName == "Total")
+                                e.TotalValue = Uniconta.ClientTools.Localization.lookup("Dif");
+                            break;
+                        case "Day1":
+                            if (tagName == "HoursDay1")
+                                e.TotalValue = normHoursDay1;
+                            else if (tagName == "TotalDay1")
+                                e.TotalValue = day1Sum - normHoursDay1;
+                            break;
+                        case "Day2":
+                            if (tagName == "HoursDay2")
+                                e.TotalValue = normHoursDay2;
+                            else if (tagName == "TotalDay2")
+                                e.TotalValue = day2Sum - normHoursDay2;
+                            break;
+                        case "Day3":
+                            if (tagName == "HoursDay3")
+                                e.TotalValue = normHoursDay3;
+                            else if (tagName == "TotalDay3")
+                                e.TotalValue = day3Sum - normHoursDay3;
+                            break;
+                        case "Day4":
+                            if (tagName == "HoursDay4")
+                                e.TotalValue = normHoursDay4;
+                            else if (tagName == "TotalDay4")
+                                e.TotalValue = day4Sum - normHoursDay4;
+                            break;
+                        case "Day5":
+                            if (tagName == "HoursDay5")
+                                e.TotalValue = normHoursDay5;
+                            else if (tagName == "TotalDay5")
+                                e.TotalValue = day5Sum - normHoursDay5;
+                            break;
+                        case "Day6":
+                            if (tagName == "HoursDay6")
+                                e.TotalValue = normHoursDay6;
+                            else if (tagName == "TotalDay6")
+                                e.TotalValue = day6Sum - normHoursDay6;
+                            break;
+                        case "Day7":
+                            if (tagName == "HoursDay7")
+                                e.TotalValue = normHoursDay7;
+                            else if (tagName == "TotalDay7")
+                                e.TotalValue = day7Sum - normHoursDay7;
+                            break;
+                        case "Total":
+                            if (tagName == "EmpNormHoursSum")
+                                e.TotalValue = normHoursTotal;
+                            else if (tagName == "TotalSum")
+                                e.TotalValue = totalSum - normHoursTotal;
+                            break;
+                    }
                 }
             }
         }
-
         static string getHeader(DateTime dt)
         {
             return dt.ToString("ddd", Thread.CurrentThread.CurrentCulture) + " " + dt.ToString("dd.MM");
@@ -1950,7 +1955,7 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         string header = string.Format("{0} : {1} ({2}: {3} {4}: {5})", Uniconta.ClientTools.Localization.lookup("RemainingBudget"), selectedItem?._Project, Uniconta.ClientTools.Localization.lookup("WorkSpace"),
                                                                              selectedItem?._WorkSpace, Uniconta.ClientTools.Localization.lookup("Task"), selectedItem?._Task);
-                        AddDockItem(TabControls.RemainingBudgetLine, dgTMJournalLineGrid.syncEntity, true, header, null, new Point() { X = 25, Y = 350 });
+                        AddDockItem(TabControls.RemainingBudgetLine, dgTMJournalLineGrid.syncEntity, true, header, null, new System.Windows.Point() { X = 25, Y = 350 });
                     }
                     break;
                 case "CrmFollowUp":
@@ -1969,7 +1974,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "Planning":
                     if (this.employee != null)
-                        AddDockItem(TabControls.ProjectTransBudgetPivotPage, employee, string.Format("{0} : {1}",Uniconta.ClientTools.Localization.lookup("Planning"), employee._Name), null, true, null);
+                        AddDockItem(TabControls.ProjectTransBudgetPivotPage, employee, string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("Planning"), employee._Name), null, true, null);
                     break;
                 case "KmRegnskab":
                     var Parameters = new List<BasePage.ValuePair> { new BasePage.ValuePair("Dashboard", "UCDK-std-Km-Regnskab") };
@@ -2774,7 +2779,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 else if (cntWarningLinesTime != 0)
                 {
-                    var confirmationMsgBox = UnicontaMessageBox.Show(string.Format("{0}.\n{1}", string.Concat(Uniconta.ClientTools.Localization.lookup("Warning"),": ", string.Format(Uniconta.ClientTools.Localization.lookup("IsClosedOBJ"), Uniconta.ClientTools.Localization.lookup("Workspace"))), Uniconta.ClientTools.Localization.lookup("ProceedConfirmation")), Uniconta.ClientTools.Localization.lookup("Confirmation"), MessageBoxButton.OKCancel);
+                    var confirmationMsgBox = UnicontaMessageBox.Show(string.Format("{0}.\n{1}", string.Concat(Uniconta.ClientTools.Localization.lookup("Warning"), ": ", string.Format(Uniconta.ClientTools.Localization.lookup("IsClosedOBJ"), Uniconta.ClientTools.Localization.lookup("Workspace"))), Uniconta.ClientTools.Localization.lookup("ProceedConfirmation")), Uniconta.ClientTools.Localization.lookup("Confirmation"), MessageBoxButton.OKCancel);
                     if (confirmationMsgBox != MessageBoxResult.OK)
                         return false;
                 }

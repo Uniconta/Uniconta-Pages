@@ -32,9 +32,14 @@
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="Contacts" LocalizedNameKey="Contacts" ControlName="ContactPage" Module="Contacts" LargeGlyph="Contacts_32x32" ShortcutKey=""/>
+    <RibbonItem Action="DeliveryAddresses" LocalizedNameKey="DeliveryAddresses" ControlName="WorkInstallationPage" Module="DeliveryAddress" LargeGlyph="Delivery_32x32" ShortcutKey=""/>
     <RibbonItem Action="ClientItemNumber" LocalizedNameKey="VendorItemNumber" ControlName="LanguageItemTextPage" Module="InvClientName" LargeGlyph="Item_Number_32x32" ShortcutKey=""/>
     <RibbonItem Action="Prices" LocalizedNameKey="PurchasePricesAndDiscounts" ControlName="CustomerPriceListLinePage" Module="CreditorPrice" LargeGlyph="PriceTag_32x32" ShortcutKey=""/>
     <RibbonItem Action="FollowUp" LocalizedNameKey="FollowUp" ControlName="CrmFollowUpPage" Module="CRM" LargeGlyph="CrmFollowUp" ShortcutKey=""/>
+	<RibbonItem Module="CreditorBankApprovement" LocalizedNameKey="BankDetails" LargeGlyph="Bank_Statement_32x32">
+	    <RibbonItem Action="CreditorBankAccount" LocalizedNameKey="BankAccount" Glyph="Account-statement_32x32" />
+		<RibbonItem Action="BankApprove" LocalizedNameKey="Approve"  Glyph="Tick_16x16" />
+	</RibbonItem> 
     <RibbonItem Module="Attachments" LocalizedNameKey="Attachments" LargeGlyph="Attachments_32x32">
       <RibbonItem Action="AddNote" ShortcutKey="Alt+N" LocalizedNameKey="Note" ControlName="UserNotesPage" Glyph="Note_16x16" />
       <RibbonItem Action="AddDoc" LocalizedNameKey="Document" ControlName="UserDocsPage" Glyph="Document_Attachment_16x16" />

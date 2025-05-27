@@ -16,40 +16,29 @@ x:Class="UnicontaClient.Pages.CustomPage.TextInHtmlPage"
             <RowDefinition Height="*" />
             <RowDefinition Height="40" />
         </Grid.RowDefinitions>
-        <CorasauControls:RichTextEditorControl Grid.Row="0" x:Name="txtHtmlControl"  ActiveViewType="Simple" CommandBarStyle="Ribbon"
-                              ShowBorder="False" 
-                              HorizontalScrollBarVisibility="Visible"
-                              VerticalScrollBarVisibility="Visible" 
-                              HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="2,0,2,2"
-                              Content="{Binding Path=Description, Converter={StaticResource htmlToContentConverter}, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" AutoCorrect="txtHtmlControl_AutoCorrect" UnhandledException="txtHtmlControl_UnhandledException">
+        <CorasauControls:RichTextEditorControl Grid.Row="0" x:Name="txtHtmlControl"  ActiveViewType="Simple" CommandBarStyle="Ribbon" ShowBorder="False" HorizontalScrollBarVisibility="Visible"
+                              VerticalScrollBarVisibility="Visible" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="2,0,2,2" 
+                                               Content="{Binding HtmlContent, Converter={StaticResource htmlToContentConverter}, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"  
+                                               AutoCorrect="txtHtmlControl_AutoCorrect" UnhandledException="txtHtmlControl_UnhandledException">
             <dxre:RichEditControl.RibbonActions>
                 <dxb:InsertAction Index="2" ContainerName="{x:Static dxre:DefaultBarItemNames.RibbonPage_Home}">
                     <dxr:RibbonPageGroup Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Properties}">
                         <dxb:BarEditItem x:Name="cmbExternType" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Type}" EditWidth="100" EditValueChanged="cmbExternType_EditValueChanged"  >
                             <dxb:BarEditItem.EditSettings>
-                                <CorasauControls:ComboBoxEditSettingsCustom ItemsSource="{Binding ExternTypes}"  >
-                                </CorasauControls:ComboBoxEditSettingsCustom>
+                                <CorasauControls:ComboBoxEditSettingsCustom ItemsSource="{Binding ExternTypes}" />
                             </dxb:BarEditItem.EditSettings>
                         </dxb:BarEditItem>
-                        <dxb:BarEditItem x:Name="cmbProperties" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Properties}" EditWidth="100"  EditValueChanged="cmbProperties_EditValueChanged"  >
+                        <dxb:BarEditItem x:Name="cmbProperties" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Properties}" EditWidth="100"  >
                             <dxb:BarEditItem.EditSettings>
-                                <CorasauControls:ComboBoxEditSettingsCustom  ItemsSource="{Binding Properties}">
-                                </CorasauControls:ComboBoxEditSettingsCustom>
+                                <CorasauControls:ComboBoxEditSettingsCustom ItemsSource="{Binding Properties}" />
                             </dxb:BarEditItem.EditSettings>
                         </dxb:BarEditItem>
-                        <dxb:BarButtonItem x:Name="btn" >
-                            <dxb:BarButtonItem.ContentTemplate>
-                                <DataTemplate>
-                                    <Button Margin="10,0,0,0" Click="Button_Click">
-                                        <Button.Content>
-                                            <Image Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/Right_Arrow_16x16.svg, UsePalette=True}" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}" HorizontalAlignment="Left"/>
-                                        </Button.Content>
-                                    </Button>
-                                </DataTemplate>
-                            </dxb:BarButtonItem.ContentTemplate>
-                        </dxb:BarButtonItem>
+                        <dxb:BarButtonItem x:Name="btnAdd" LargeGlyph="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/Right_Arrow_Down_32x32.svg, UsePalette=True}" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}"
+                                           ItemClick="btnAdd_ItemClick" />
                     </dxr:RibbonPageGroup>
                 </dxb:InsertAction>
+                <dxb:UpdateAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonControl}" PropertyName="ToolbarShowMode" Value="Hide" />
+                <dxb:UpdateAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonControl}" PropertyName="RibbonTitleBarVisibility" Value="Collapsed" />
                 <dxb:UpdateAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonPage_Home}" PropertyName="IsSelected"  Value="True"/>
                 <dxb:RemoveAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonCategory_HeaderFooterTools}"  />
                 <dxb:RemoveAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonCategory_TableTools}" />
@@ -65,9 +54,7 @@ x:Class="UnicontaClient.Pages.CustomPage.TextInHtmlPage"
                 <dxb:UpdateAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonPage_View}" PropertyName="IsVisible" Value="False" />
                 <dxb:UpdateAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonPage_Insert}" PropertyName="IsVisible" Value="False" />
                 <dxb:UpdateAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonPage_File}" PropertyName="IsVisible" Value="False" />
-                <dxb:UpdateAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonControl}"
-                                      Property="{x:Static dxr:RibbonControl.ToolbarShowModeProperty}"
-                                      Value="Hide" />
+                <dxb:UpdateAction ElementName="{x:Static dxre:DefaultBarItemNames.RibbonControl}" Property="{x:Static dxr:RibbonControl.ToolbarShowModeProperty}" Value="Hide" />
             </dxre:RichEditControl.RibbonActions>
         </CorasauControls:RichTextEditorControl>
         <Button x:Name="CancelButton" IsCancel="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=Cancel}" Click="CancelButton_Click"  Width="75" Height="23" 

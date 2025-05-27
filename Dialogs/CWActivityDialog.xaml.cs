@@ -71,8 +71,8 @@ namespace UnicontaClient.Controls.Dialogs
                 Category = employeeRegistrationLineClient.Activity;
                 StartDate = employeeRegistrationLineClient.FromTime.Date;
                 ToDate = employeeRegistrationLineClient.ToTime.Date;
-                StartTime = new TimeSpan(employeeRegistrationLineClient.FromTime.Ticks);
-                EndTime = new TimeSpan(employeeRegistrationLineClient.ToTime.Ticks);
+                StartTime = employeeRegistrationLineClient.FromTime.TimeOfDay;
+                EndTime = employeeRegistrationLineClient.ToTime.TimeOfDay;
                 Comment = employeeRegistrationLineClient.Text;
             }
 

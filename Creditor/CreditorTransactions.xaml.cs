@@ -117,22 +117,18 @@ namespace UnicontaClient.Pages.CustomPage
             Text.ReadOnly = Invoice.ReadOnly = PostType.ReadOnly = TransType.ReadOnly = showFields;
             if (showFields)
             {
-                Open.Visible = false;
                 RibbonBase rb = (RibbonBase)localMenu.DataContext;
                 UtilDisplay.RemoveMenuCommand(rb, "SaveGrid");
             }
+            Open.Visible = !showFields;
             var credMaster = master as Uniconta.DataModel.Creditor;
             if (credMaster != null)
             {
-#if !SILVERLIGHT
                 FromDebtor.Visible =
-#endif
                 dgCreditorTrans.Readonly = (credMaster._D2CAccount != null);
             }
             else
-            {
                 dgCreditorTrans.Readonly = showFields;
-            }
         }
 
         private void localMenu_OnItemClicked(string ActionType)

@@ -9,9 +9,6 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateOrderFromQuickInvoice"
            xmlns:docking="http://schemas.devexpress.com/winfx/2008/xaml/docking"
            xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" KeyDown="ChildWindow_KeyDown">
     <UserControl.Resources>
-        <Style x:Key="StyleRow" TargetType="dxg:RowControl">
-            <Setter Property="Height" Value="Auto"/>
-        </Style>
         <Util:RowIndexConverter x:Key="RowIndexConverter" />
         <Util:MaskConverter x:Key="MaskConverter" />
     </UserControl.Resources>

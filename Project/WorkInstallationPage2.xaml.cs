@@ -69,8 +69,19 @@ namespace UnicontaClient.Pages.CustomPage
                 if (dc != null)
                     editrow._Country = dc._Country;
             }
+            if (master is CreditorClient)
+            {
+                liCreditorAccount.Visibility = Visibility.Visible;
+                liDCAccount.Visibility = Visibility.Collapsed;
+                leCreditorAccount.api = crudapi;
+            }
+            else
+            {
+                liCreditorAccount.Visibility = Visibility.Collapsed;
+                liDCAccount.Visibility = Visibility.Visible;
+                leDCAccount.api = crudapi;
+            }
             leWorkStationGroup.api = leDeliveryTerm.api = crudapi;
-            leDCAccount.api = crudapi;
             cbCountry.ItemsSource= Enum.GetValues(typeof(Uniconta.Common.CountryCode));
             layoutItems.DataContext = editrow;
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
@@ -189,7 +200,6 @@ namespace UnicontaClient.Pages.CustomPage
                     onlyRunOnce = false;
             }
         }
-#if !SILVERLIGHT
         private void Email_ButtonClicked(object sender)
         {
             var txtEmail = ((CorasauLayoutItem)sender).Content as TextEditor;
@@ -206,6 +216,5 @@ namespace UnicontaClient.Pages.CustomPage
             var location = editrow._Address1 + "+" + editrow._Address2 + "+" + editrow._Address3 + "+" + editrow._ZipCode + "+" + editrow._City + "+" + editrow.Country;
             Utility.OpenGoogleMap(location);
         }
-#endif
     }
 }

@@ -12,9 +12,6 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectTaskGridPage"
               xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
     <UserControl.Resources>
         <Util:VisibilityBoolConverter x:Key="VisibilityBoolConverter" />
-        <Style x:Key="StyleRow" TargetType="dxg:RowControl">
-            <Setter Property="Height" Value="Auto"/>
-        </Style>
         <Util:RowIndexConverter x:Key="RowIndexConverter" />
     </UserControl.Resources>
         <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">

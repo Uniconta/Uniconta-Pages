@@ -1,39 +1,27 @@
 using Uniconta.API.System;
 using UnicontaClient.Models;
-using UnicontaClient.Utilities;
-using Uniconta.ClientTools;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
-using Uniconta.DataModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 using Uniconta.ClientTools.Util;
 using System.Windows;
-using DevExpress.Xpf.Editors.Controls;
 using Uniconta.ClientTools.Controls;
 using Uniconta.API.DebtorCreditor;
 using UnicontaClient.Pages.GL.ChartOfAccount.Reports;
-using System.Text.RegularExpressions;
-using System.Collections;
 using System.Text;
-using UnicontaClient.Pages;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
     public partial class DebtorEmailSetupPage2 : FormBasePage
     {
-        DebtorEmailSetupClient editrow;
+        private DebtorEmailSetupClient editrow;
+        private bool? isSMTPValidated;
 
         public override void OnClosePage(object[] RefreshParams)
         {
@@ -44,6 +32,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override Type TableType { get { return typeof(DebtorEmailSetupClient); } }
         public override UnicontaBaseEntity ModifiedRow { get { return editrow; } set { editrow = (DebtorEmailSetupClient)value; } }
         //For Edit
+
         public DebtorEmailSetupPage2(UnicontaBaseEntity sourceData, bool isEdit) : base(sourceData, isEdit)
         {
             InitializeComponent();
@@ -72,10 +61,8 @@ namespace UnicontaClient.Pages.CustomPage
             leCompanySMTP.api = api;
             cmbExternType.ItemsSource = new List<string> { "Debtor", "DebtorInvoice", "Creditor", "CreditorInvoice", "Employee", "Contact" };
             cmbExternType.SelectedIndex = 0;
-            layoutProp.Label = string.Format(Uniconta.ClientTools.Localization.lookup("AddOBJ"), Uniconta.ClientTools.Localization.lookup("Properties"));
-#if !SILVERLIGHT
+            layoutProp.Label = $"{Uniconta.ClientTools.Localization.lookup("AddOBJ")} {Uniconta.ClientTools.Localization.lookup("Properties")}";
             liTextinHtml.Label = Uniconta.ClientTools.Localization.lookup("TextInHtml");
-#endif
             txtSmptPwd.Text = editrow._smtpPassword;
         }
 
@@ -84,9 +71,8 @@ namespace UnicontaClient.Pages.CustomPage
             if (screenName == TabControls.TextInHtmlPage)
             {
                 var html = argument as byte[];
-                if (html.Length > 0)
+                if (html?.Length > 0)
                 {
-                    editrow.Body = string.Empty;
                     var htmlBody = Encoding.UTF8.GetString(html, 0, html.Length);
                     editrow.Body = htmlBody?.Replace("\t", string.Empty);
                     editrow.Html = true;
@@ -100,67 +86,10 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "TestMail":
-                    CWCommentsDialogBox dialog = new CWCommentsDialogBox(Uniconta.ClientTools.Localization.lookup("VerifyPOP3"), Uniconta.ClientTools.Localization.lookup("Email"));
-                    dialog.DialogTableId = 2000000043;
-                    dialog.SizeToContent = SizeToContent.WidthAndHeight;
-                    dialog.Closing += async delegate
-                    {
-                        if (dialog.DialogResult == true)
-                        {
-                            if (!string.IsNullOrEmpty(dialog.Comments) && Utilities.Utility.EmailValidation(dialog.Comments))
-                            {
-                                InvoiceAPI invapi = new InvoiceAPI(api);
-                                busyIndicator.IsBusy = true;
-                                var err = await invapi.TestSMTP(editrow, dialog.Comments);
-                                if (err == ErrorCodes.Succes)
-                                {
-                                    UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("SendEmailMsgOBJ"), Uniconta.ClientTools.Localization.lookup("Email")),
-                                        Uniconta.ClientTools.Localization.lookup("Message"));
-                                    isSMTPValidated = true;
-                                    itemHost.IsEnabled = false;
-                                    itemPort.IsEnabled = false;
-                                    itemSmtpUser.IsEnabled = false;
-                                    itemSmtpPassword.IsEnabled = false;
-                                    itemUseSSL.IsEnabled = false;
-                                }
-                                else
-                                    ShowErrorMsg(err, editrow._host);
-                                busyIndicator.IsBusy = false;
-                            }
-                            else
-                                UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("InvalidValue"), Uniconta.ClientTools.Localization.lookup("Email"), dialog.Comments), Uniconta.ClientTools.Localization.lookup("Error"));
-                        }
-                    };
-                    dialog.Show();
+                    TestMailAsync();
                     break;
                 case "SetUpEMail":
-                    var objWizardWindow = new WizardWindow(new UnicontaClient.Pages.EmailSetupWizard(), string.Format(Uniconta.ClientTools.Localization.lookup("CreateOBJ"),
-                    Uniconta.ClientTools.Localization.lookup("EmailSetup")));
-                    objWizardWindow.SizeToContent = SizeToContent.WidthAndHeight;
-                    objWizardWindow.MinHeight = 120.0d;
-                    objWizardWindow.MinWidth = 300.0d;
-
-                    objWizardWindow.Closed += delegate
-                  {
-                      if (objWizardWindow.DialogResult == true)
-                      {
-                          var emailSetup = objWizardWindow.WizardData as ServerInformation;
-                          if (!string.IsNullOrEmpty(emailSetup?.User) && Utilities.Utility.EmailValidation(emailSetup?.User))
-                          {
-                              editrow.Host = emailSetup.Host;
-                              editrow.SmtpUser = emailSetup.User;
-                              editrow._smtpPassword = txtSmptPwd.Text = emailSetup.Password;
-                              editrow.Port = emailSetup.Port;
-                              editrow.UseSSL = emailSetup.SSL;
-                          }
-                          else
-                          {
-                              UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("InvalidValue"), Uniconta.ClientTools.Localization.lookup("Email"), emailSetup.User),
-                                  Uniconta.ClientTools.Localization.lookup("Warning"));
-                          }
-                      }
-                  };
-                    objWizardWindow.Show();
+                    SetUpEmail();
                     break;
                 case "Save":
                     if (ValidateSMTP())
@@ -171,35 +100,98 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
             }
         }
-        bool? isSMTPValidated;
-        bool ValidateSMTP()
+
+        private void TestMailAsync()
         {
-            object element;
-            element = FocusManager.GetFocusedElement(UtilDisplay.GetCurentWindow());
-            if (element is Control)
+            var dialog = new CWCommentsDialogBox(Uniconta.ClientTools.Localization.lookup("VerifyPOP3"), Uniconta.ClientTools.Localization.lookup("Email"))
             {
-                var ctrl = element as Control;
-                TraversalRequest tReq = new TraversalRequest(FocusNavigationDirection.Down);
-                ctrl.MoveFocus(tReq);
-            }
+                DialogTableId = 2000000043,
+                SizeToContent = SizeToContent.WidthAndHeight
+            };
+
+            dialog.Closing += async delegate
+            {
+                if (dialog.DialogResult == true)
+                {
+                    if (!string.IsNullOrEmpty(dialog.Comments) && Utilities.Utility.EmailValidation(dialog.Comments))
+                    {
+                        var invapi = new InvoiceAPI(api);
+                        busyIndicator.IsBusy = true;
+                        var err = await invapi.TestSMTP(editrow, dialog.Comments);
+                        if (err == ErrorCodes.Succes)
+                        {
+                            UnicontaMessageBox.Show($"{Uniconta.ClientTools.Localization.lookup("SendEmailMsgOBJ")} {Uniconta.ClientTools.Localization.lookup("Email")}",
+                                Uniconta.ClientTools.Localization.lookup("Message"));
+                            isSMTPValidated = true;
+                            DisableSMTPFields();
+                        }
+                        else
+                        {
+                            ShowErrorMsg(err, editrow._host);
+                        }
+                        busyIndicator.IsBusy = false;
+                    }
+                    else
+                    {
+                        UnicontaMessageBox.Show($"{Uniconta.ClientTools.Localization.lookup("InvalidValue")} {Uniconta.ClientTools.Localization.lookup("Email")} {dialog.Comments}", Uniconta.ClientTools.Localization.lookup("Error"));
+                    }
+                }
+            };
+            dialog.Show();
+        }
+
+        private void SetUpEmail()
+        {
+            var objWizardWindow = new WizardWindow(new UnicontaClient.Pages.EmailSetupWizard(), $"{Uniconta.ClientTools.Localization.lookup("CreateOBJ")} {Uniconta.ClientTools.Localization.lookup("EmailSetup")}")
+            {
+                SizeToContent = SizeToContent.WidthAndHeight,
+                MinHeight = 120.0d,
+                MinWidth = 300.0d
+            };
+
+            objWizardWindow.Closed += delegate
+            {
+                if (objWizardWindow.DialogResult == true)
+                {
+                    var emailSetup = objWizardWindow.WizardData as ServerInformation;
+                    if (!string.IsNullOrEmpty(emailSetup?.User) && Utilities.Utility.EmailValidation(emailSetup?.User))
+                    {
+                        editrow.Host = emailSetup.Host;
+                        editrow.SmtpUser = emailSetup.User;
+                        editrow._smtpPassword = txtSmptPwd.Text = emailSetup.Password;
+                        editrow.Port = emailSetup.Port;
+                        editrow.UseSSL = emailSetup.SSL;
+                    }
+                    else
+                    {
+                        UnicontaMessageBox.Show($"{Uniconta.ClientTools.Localization.lookup("InvalidValue")} {Uniconta.ClientTools.Localization.lookup("Email")} {emailSetup.User}",
+                            Uniconta.ClientTools.Localization.lookup("Warning"));
+                    }
+                }
+            };
+            objWizardWindow.Show();
+        }
+
+        private bool ValidateSMTP()
+        {
+            MoveFocusToNextControl();
 
             if (isSMTPValidated == true)
                 return true;
-            if (editrow._host == string.Empty)
+
+            if (string.IsNullOrEmpty(editrow._host))
                 editrow._host = null;
-            if (editrow._smtpUser == string.Empty)
+            if (string.IsNullOrEmpty(editrow._smtpUser))
                 editrow._smtpUser = null;
             if (string.IsNullOrEmpty(editrow._smtpPassword))
-            {
                 editrow._smtpPassword = null;
-            }
-            var loadedRow = this.LoadedRow as DebtorEmailSetupClient;
+
+            var loadedRow = LoadedRow as DebtorEmailSetupClient;
             if (loadedRow == null && !string.IsNullOrEmpty(editrow._host))
                 isSMTPValidated = false;
-            else if (loadedRow != null && ((editrow._host != null && editrow._host != loadedRow._host) || (editrow._port != 0 && editrow._port != loadedRow._port) || (editrow._smtpUser != null && editrow._smtpUser != loadedRow._smtpUser) || (editrow._smtpPassword != null && editrow._smtpPassword != loadedRow._smtpPassword)
-                || (editrow.AllowDifferentSender == true && editrow.AllowDifferentSender != loadedRow.AllowDifferentSender)
-                || (editrow.AllowDifferentSender == true && editrow.EmailSendFrom != loadedRow.EmailSendFrom)))
+            else if (loadedRow != null && IsSMTPSettingsChanged(loadedRow))
                 isSMTPValidated = false;
+
             if (isSMTPValidated == false)
             {
                 if (UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("SMTPVerifyMsg"), Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.YesNo) == MessageBoxResult.Yes)
@@ -216,20 +208,38 @@ namespace UnicontaClient.Pages.CustomPage
             return true;
         }
 
-        private bool ContainsHTML(string CheckString)
+        private void MoveFocusToNextControl()
         {
-            if (string.IsNullOrEmpty(CheckString) || string.IsNullOrWhiteSpace(CheckString)) return false;
-            var HtmlString = CheckString.Replace("\r\n", string.Empty);
-            Regex tagRegex = new Regex(@"<\s*([^ >]+)[^>]*>.*?<\s*/\s*\1\s*>");
-            return tagRegex.IsMatch(HtmlString);
+            var element = FocusManager.GetFocusedElement(UtilDisplay.GetCurentWindow()) as System.Windows.Controls.Control;
+            element?.MoveFocus(new TraversalRequest(FocusNavigationDirection.Down));
         }
+
+        private bool IsSMTPSettingsChanged(DebtorEmailSetupClient loadedRow)
+        {
+            return (editrow._host != null && editrow._host != loadedRow._host) ||
+                   (editrow._port != 0 && editrow._port != loadedRow._port) ||
+                   (editrow._smtpUser != null && editrow._smtpUser != loadedRow._smtpUser) ||
+                   (editrow._smtpPassword != null && editrow._smtpPassword != loadedRow._smtpPassword) ||
+                   (editrow.AllowDifferentSender == true && editrow.AllowDifferentSender != loadedRow.AllowDifferentSender) ||
+                   (editrow.AllowDifferentSender == true && editrow.EmailSendFrom != loadedRow.EmailSendFrom);
+        }
+
+        private void DisableSMTPFields()
+        {
+            itemHost.IsEnabled = false;
+            itemPort.IsEnabled = false;
+            itemSmtpUser.IsEnabled = false;
+            itemSmtpPassword.IsEnabled = false;
+            itemUseSSL.IsEnabled = false;
+        }
+
         private void InsertProperty_ButtonClicked(object sender, RoutedEventArgs e)
         {
             var selectedText = Convert.ToString(cmbProperties.SelectedItem);
-            string propName = string.Concat("{", cmbExternType.SelectedItem, ".", selectedText, "}");
-
+            var propName = $"{{{cmbExternType.SelectedItem}.{selectedText}}}";
             InsertIntoBody(propName);
         }
+
         private void cmbExternType_SelectedIndexChanged(object sender, RoutedEventArgs e)
         {
             Type type;
@@ -266,22 +276,19 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void btnTextInHtml_Click(object sender, RoutedEventArgs e)
         {
-            var param = new object[1];
-            param[0] = editrow._Body;
-            AddDockItem(TabControls.TextInHtmlPage, param, true, Uniconta.ClientTools.Localization.lookup("TextInHtml"), null, new Point(250, 200));
+            var param = new object[1] { editrow._Body };
+            AddDockItem(TabControls.TextInHtmlPage, param, true, Uniconta.ClientTools.Localization.lookup("TextInHtml"), null, new System.Windows.Point(250, 150));
         }
 
         public static async void ShowErrorMsg(ErrorCodes errorCode, string host)
         {
             var lastErrors = await BasePage.session.GetErrors(errorCode);
-            string errMsg = UtilDisplay.GetFormattedErrorCode(errorCode, lastErrors);
-            string hyperlink;
-            if (host != null && host.Contains("gmail"))
-                hyperlink = "https://www.uniconta.com/unipedia-global/gmail-settings-to-send-mail-in-uniconta/";
-            else if (BasePage.session.User._Language == (byte)Uniconta.Common.Language.da)
-                hyperlink = "https://www.uniconta.com/da/unipedia/mail_server/";
-            else
-                hyperlink = "https://www.uniconta.com/unipedia-global/mail-server-set-up/";
+            var errMsg = UtilDisplay.GetFormattedErrorCode(errorCode, lastErrors);
+            var hyperlink = host?.Contains("gmail") == true
+                ? "https://www.uniconta.com/unipedia-global/gmail-settings-to-send-mail-in-uniconta/"
+                : BasePage.session.User._Language == (byte)Uniconta.Common.Language.da
+                    ? "https://www.uniconta.com/da/unipedia/mail_server/"
+                    : "https://www.uniconta.com/unipedia-global/mail-server-set-up/";
 
             UnicontaHyperLinkMessageBox.Show(errMsg, hyperlink,
                 lastErrors != null && lastErrors.Length > 0 ? Uniconta.ClientTools.Localization.lookup("Error") : Uniconta.ClientTools.Localization.lookup("Message"));
@@ -290,10 +297,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void InsertIntoBody(string inputText)
         {
             var olSelectionStart = txtEmailBody.SelectionStart;
-            if (string.IsNullOrEmpty(txtEmailBody.Text))
-                txtEmailBody.Text = inputText;
-            else
-                txtEmailBody.Text = txtEmailBody.Text.Insert(txtEmailBody.SelectionStart, inputText);
+            txtEmailBody.Text = string.IsNullOrEmpty(txtEmailBody.Text) ? inputText : txtEmailBody.Text.Insert(txtEmailBody.SelectionStart, inputText);
             txtEmailBody.Focus();
             txtEmailBody.SelectionStart = olSelectionStart + inputText.Length;
             txtEmailBody.Select(txtEmailBody.SelectionStart, 0);
@@ -302,13 +306,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void Email_ButtonClicked(object sender)
         {
-            var txtEmail = ((CorasauLayoutItem)sender).Content as TextEditor;
-            if (txtEmail == null)
-                return;
-            var mail = string.Concat("mailto:", txtEmail.Text);
-            System.Diagnostics.Process proc = new System.Diagnostics.Process();
-            proc.StartInfo.FileName = mail;
-            proc.Start();
+            if (sender is CorasauLayoutItem layoutItem && layoutItem.Content is TextEditor txtEmail)
+            {
+                var mail = $"mailto:{txtEmail.Text}";
+                var proc = new System.Diagnostics.Process { StartInfo = { FileName = mail } };
+                proc.Start();
+            }
         }
 
         private void InsertMobilePay_ButtonClicked(object sender, RoutedEventArgs e)
@@ -325,11 +328,10 @@ namespace UnicontaClient.Pages.CustomPage
                         return;
                     }
 
-                    string mobilePayUrl = @"https://mobilepay.dk/erhverv/betalingslink/betalingslink-svar?phone=" + phoneNumber +
-                                          @"&amount={DebtorInvoice.TotalAmount.0.00}&comment=Faktura{DebtorInvoice.InvoiceNumber}&lock=1";
+                    var mobilePayUrl = $"https://mobilepay.dk/erhverv/betalingslink/betalingslink-svar?phone={phoneNumber}&amount={{DebtorInvoice.TotalAmount.0.00}}&comment=Faktura{{DebtorInvoice.InvoiceNumber}}&lock=1";
                     if (editrow._Html)
-                        mobilePayUrl = @"<a href=" + mobilePayUrl + ">Mobilepay</a>";
-                        
+                        mobilePayUrl = $"<a href={mobilePayUrl}>Mobilepay</a>";
+
                     InsertIntoBody(mobilePayUrl);
                 }
             };

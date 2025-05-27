@@ -23,7 +23,7 @@ namespace UnicontaClient.Pages.CustomPage
     /// <summary>
     /// Interaction logic for ProjectDetailControl.xaml
     /// </summary>
-    public partial class ProjectDetailControl : UserControl
+    public partial class ProjectDetailControl : System.Windows.Controls.UserControl
     {
         public ProjectDetailControl()
         {

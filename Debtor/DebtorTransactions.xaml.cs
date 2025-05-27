@@ -109,10 +109,10 @@ namespace UnicontaClient.Pages.CustomPage
             Text.ReadOnly = Invoice.ReadOnly = PostType.ReadOnly = TransType.ReadOnly = showFields;
             if (showFields)
             {
-                Open.Visible = false;
                 RibbonBase rb = (RibbonBase)localMenu.DataContext;
                 UtilDisplay.RemoveMenuCommand(rb, "SaveGrid");
             }
+            Open.Visible = !showFields;
             dgDebtorTran.Readonly = showFields;
             FromCreditor.Visible = ((master as Uniconta.DataModel.Debtor)?._D2CAccount != null);
         }
@@ -243,7 +243,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var reportName = Uniconta.ClientTools.Localization.lookup("CollectionLetter");
 
                     var debtor = debtorCache.Get(post.debtorTransopen.Trans._Account) as DebtorClient;
-                    var showOnlySelectedRec = UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("ShowOBJ"), Uniconta.ClientTools.Localization.lookup("AllTransactions")), 
+                    var showOnlySelectedRec = UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("ShowOBJ"), Uniconta.ClientTools.Localization.lookup("AllTransactions")),
                         Uniconta.ClientTools.Localization.lookup("Message"), System.Windows.MessageBoxButton.YesNo) == System.Windows.MessageBoxResult.Yes ? false : true;
                     printReport = await Utility.GenerateStandardCollectionReport(post.debtorTransopen, debtor, post.debtorTransopen.Trans._Date, DebtorEmailType.Collection, crudapi, showOnlySelectedRec);
                     DockInvoiceVoucher(UnicontaTabs.StandardPrintReportPage, new object[] { new IPrintReport[] { printReport }, reportName },
@@ -316,6 +316,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         public static async Task<IPrintReport> StandardPrint(DebtorInvoiceClient debtorInvoice, CrudAPI crudapi)
         {
+            IPrintReport iprintReport = null;
             var debtorInvoicePrint = new UnicontaClient.Pages.DebtorInvoicePrintReport(debtorInvoice, crudapi);
             var isInitializedSuccess = await debtorInvoicePrint.InstantiateFields();
             if (isInitializedSuccess)
@@ -323,22 +324,26 @@ namespace UnicontaClient.Pages.CustomPage
                 var standardDebtorInvoice = new DebtorInvoiceReportClient(debtorInvoicePrint.Company, debtorInvoicePrint.Debtor, debtorInvoicePrint.DebtorInvoice, debtorInvoicePrint.InvTransInvoiceLines, debtorInvoicePrint.DebtorOrder,
                     debtorInvoicePrint.CompanyLogo, debtorInvoicePrint.ReportName, isCreditNote: debtorInvoicePrint.IsCreditNote, messageClient: debtorInvoicePrint.MessageClient);
 
-                var iprintReport = new StandardPrintReport(crudapi, new[] { standardDebtorInvoice }, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.Invoice) { UseReportCache = true };
+                iprintReport = new StandardPrintReport(crudapi, new[] { standardDebtorInvoice }, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.Invoice) { UseReportCache = true };
                 await iprintReport.InitializePrint();
-                if (iprintReport.Report != null)
-                    return iprintReport;
 
-                //Call LayoutInvoice
-                var layoutReport = new LayoutPrintReport(crudapi, debtorInvoice);
-                layoutReport.SetupLayoutPrintFields(debtorInvoicePrint);
-                await layoutReport.InitializePrint();
-                return layoutReport;
+                if (iprintReport?.Report == null)
+                {
+                    //Call LayoutInvoice
+                    iprintReport = new LayoutPrintReport(crudapi, debtorInvoice);
+
+                    if (iprintReport is LayoutPrintReport layoutReport)
+                        layoutReport.SetupLayoutPrintFields(debtorInvoicePrint);
+
+                    await iprintReport.InitializePrint();
+                }
             }
-            return null;
+            return iprintReport;
         }
 
         private static async Task<IPrintReport> StandardPrint(CreditorInvoiceClient creditorInvoice, CrudAPI crudApi)
         {
+            IPrintReport iprintReport = null; 
             var creditorInvoicePrint = new UnicontaClient.Pages.CreditorPrintReport(creditorInvoice, crudApi);
             var isInitializedSuccess = await creditorInvoicePrint.InstantiateFields();
             if (isInitializedSuccess)
@@ -346,16 +351,16 @@ namespace UnicontaClient.Pages.CustomPage
                 var standardCreditorInvoice = new CreditorStandardReportClient(creditorInvoicePrint.Company, creditorInvoicePrint.Creditor, creditorInvoicePrint.CreditorInvoice, creditorInvoicePrint.InvTransInvoiceLines, creditorInvoicePrint.CreditorOrder,
                     creditorInvoicePrint.CompanyLogo, creditorInvoicePrint.ReportName, (int)Uniconta.ClientTools.Controls.Reporting.StandardReports.PurchaseInvoice, creditorInvoicePrint.CreditorMessage, creditorInvoicePrint.IsCreditNote);
 
-                var iprintReport = new StandardPrintReport(crudApi, new[] { standardCreditorInvoice }, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.PurchaseInvoice) { UseReportCache = true };
+                iprintReport = new StandardPrintReport(crudApi, new[] { standardCreditorInvoice }, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.PurchaseInvoice) { UseReportCache = true };
                 await iprintReport.InitializePrint();
-                if (iprintReport.Report != null)
-                    return iprintReport;
 
-                var layoutReport = new LayoutPrintReport(crudApi, creditorInvoice);
-                await layoutReport.InitializePrint();
-                return layoutReport;
+                if (iprintReport?.Report == null)
+                {
+                    iprintReport = new LayoutPrintReport(crudApi, creditorInvoice);
+                    await iprintReport.InitializePrint();
+                }
             }
-            return null;
+            return iprintReport;
         }
     }
 }

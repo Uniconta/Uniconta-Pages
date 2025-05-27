@@ -78,7 +78,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void InitPage(UnicontaBaseEntity _master)
         {
-            ((TableView)dgProjectTaskGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
+            ((TableView)dgProjectTaskGrid.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
             SetRibbonControl(localMenu, dgProjectTaskGrid);
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
             dgProjectTaskGrid.api = api;
@@ -474,14 +474,14 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var glAccount = (sender as Image).Tag as ProjectTaskClient;
+            var glAccount = (sender as System.Windows.Controls.Image).Tag as ProjectTaskClient;
             if (glAccount != null)
                 AddDockItem(TabControls.UserDocsPage, dgProjectTaskGrid.syncEntity);
         }
 
         private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var glAccount = (sender as Image).Tag as ProjectTaskClient;
+            var glAccount = (sender as System.Windows.Controls.Image).Tag as ProjectTaskClient;
             if (glAccount != null)
                 AddDockItem(TabControls.UserNotesPage, dgProjectTaskGrid.syncEntity);
         }

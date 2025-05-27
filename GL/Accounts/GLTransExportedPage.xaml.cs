@@ -1,21 +1,27 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using System.Web.Script.Serialization;
+using Newtonsoft.Json;
 using System.Windows;
-using Datev.Cloud.Authentication;
+using Duende.IdentityModel;
+using Duende.IdentityModel.Client;
+using Duende.IdentityModel.OidcClient;
 using Uniconta.API.Service;
 using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
+using UnicontaClient.Controls.Dialogs;
 using UnicontaClient.Models;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -56,7 +62,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 setShowHideGreen(true);
                 GetUser(null, Convert.ToString(API.CompanyId), DatevDetails.AccessToken);
-                clientId = UtilDisplay.GetKey("DatevClientId");
+                string clientId = UtilDisplay.GetKey("DatevClientId");
                 SetStatusText();
             }
             else
@@ -144,10 +150,10 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Upload":
                     if (!string.IsNullOrEmpty(DatevDetails.AccessToken) && DatevDetails.Tokenvalidto > DateTime.Now)
                     {
-                        if (UnicontaMessageBox.Show(String.Format("Möchten Sie {0:d} - {1:d} Version {3} ({2}) zu DATEV hochladen?", selectedItem._FromDate, selectedItem._ToDate, selectedItem.Comment, selectedItem._SuppVersion), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+                        if (UnicontaMessageBox.Show(String.Format("Möchten Sie {0:d} - {1:d} Version {3} ({2}) zu DATEV hochladen?", selectedItem._FromDate, selectedItem._ToDate, selectedItem.Comment, selectedItem._SuppVersion), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.YesNoCancel) == MessageBoxResult.Yes)
                         {
                             if ((!string.IsNullOrEmpty(selectedItem._SendToDatevDOC)) || (!string.IsNullOrEmpty(selectedItem.SendToDatevEXTF)))
-                                if (UnicontaMessageBox.Show(String.Format("Sie haben {0:d} - {1:d} Version {3} ({2}) bereits zu DATEV hochgeladen. Möchten Sie noch einmal hochladen?", selectedItem._FromDate, selectedItem._ToDate, selectedItem.Comment, selectedItem._SuppVersion), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+                                if (UnicontaMessageBox.Show(String.Format("Sie haben {0:d} - {1:d} Version {3} ({2}) bereits zu DATEV hochgeladen. Möchten Sie noch einmal hochladen?", selectedItem._FromDate, selectedItem._ToDate, selectedItem.Comment, selectedItem._SuppVersion), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                                 {
                                     FilUpload(selectedItem);
                                     break;
@@ -221,9 +227,7 @@ namespace UnicontaClient.Pages.CustomPage
             else
             {
                 var Output = responseu.Content.ReadAsStringAsync().Result;
-                var serializeru = new JavaScriptSerializer();
-
-                var User = serializeru.Deserialize<Root>(Output);
+                var User = JsonConvert.DeserializeObject<Root>(Output);
                 DatevDetails.User = User.name;
                 status = 1;
                 SetStatusText();
@@ -264,26 +268,27 @@ namespace UnicontaClient.Pages.CustomPage
 
             try
             {
-                string connectionResult = await Connect();
-                if (connectionResult == null)
-                    return;
-                var array = connectionResult.Split(',');
-                if (array[4] == "True")
+                var loginResult = await LoginToDatev(api);
+                if (loginResult == null)
                 {
-                    DatevDetails.AccessToken = array[0];
-                    DatevDetails.IdentityToken = array[1];
-                    DatevDetails.RefreshToken = array[2];
-                    DatevDetails.SendToDatevStatus = "";
-                    DateTime valdTok = Convert.ToDateTime(array[3]);
-                    valdTok = valdTok.AddMinutes(11);
-                    DatevDetails.Tokenvalidto = valdTok;
+                    setShowHideGreen(false);
+                    UnicontaMessageBox.Show("Fehler beim Anmelden an DATEV", "Fehler", MessageBoxButton.OK);
                     status = 1;
-
+                }
+                else if (!loginResult.IsError)
+                {
+                    DatevDetails.AccessToken = loginResult.AccessToken;
+                    DatevDetails.IdentityToken = loginResult.IdentityToken; // ???
+                    DatevDetails.RefreshToken = loginResult.RefreshToken;
+                    DatevDetails.SendToDatevStatus = "";
+                    DatevDetails.Tokenvalidto = loginResult.AccessTokenExpiration.DateTime.AddMinutes(-1);
+                    status = 1;
                 }
                 else
                 {
                     setShowHideGreen(false);
-                    UnicontaMessageBox.Show("Fehler beim Anmelden an DATEV " + array[5], "Fehler", MessageBoxButton.OK);
+                    UnicontaMessageBox.Show("Fehler beim Anmelden an DATEV " + loginResult.Error, "Fehler",
+                        MessageBoxButton.OK);
                     status = 1;
                 }
             }
@@ -292,8 +297,11 @@ namespace UnicontaClient.Pages.CustomPage
                 setShowHideGreen(false);
                 UnicontaMessageBox.Show("Fehler beim Anmelden an DATEV " + e.Message, "Fehler", MessageBoxButton.OK);
                 status = 1;
-                busyIndicator.IsBusy = false;
 
+            }
+            finally
+            {
+                busyIndicator.IsBusy = false;
             }
             if (string.IsNullOrEmpty(DatevDetails.AccessToken))
             {
@@ -306,6 +314,10 @@ namespace UnicontaClient.Pages.CustomPage
             InsDatevLog(selectedItem, DateTime.Now, "Anmeldung an https://login.datev.de/openid", "", "", status, "");
 
         }
+
+        private string clientId = "";
+        private string clientSecret = "";
+
         public async void Revoke(GLTransExportedClient selectedItem, string CompID)
         {
 
@@ -378,60 +390,206 @@ namespace UnicontaClient.Pages.CustomPage
                 ibase.LargeGlyph = Utilities.Utility.GetGlyph("datevconnectb");
             }
         }
-        string clientId = "";
-        string clientSecret = "";
 
-        async Task<string> Connect()
+
+        public async Task<LoginResult> LoginToDatev(BaseAPI api)
         {
             var Sandbox = false;
-            string authority = "";
-
+            string authority;
+            string clientId = "";
+            string clientSecret = "";
+            var datevEndpointBaseAddresses = new List<string>(2);
 
             if (Sandbox)
             {
-                authority = @"https://login.datev.de/openidsandbox";
+                authority = "https://login.datev.de/openidsandbox";
                 clientId = UtilDisplay.GetKey("DatevClientIdTest");
                 clientSecret = UtilDisplay.GetKey("DatevClientSecretTest");
+                datevEndpointBaseAddresses.Add("https://login.datev.de/");
+                datevEndpointBaseAddresses.Add("https://sandbox-api.datev.de");
             }
             else
             {
-                authority = @"https://login.datev.de/openid";
+                authority = "https://login.datev.de/openid";
                 clientId = UtilDisplay.GetKey("DatevClientId");
                 clientSecret = UtilDisplay.GetKey("DatevClientSecret");
+                datevEndpointBaseAddresses.Add("https://login.datev.de/");
+                datevEndpointBaseAddresses.Add("https://api.datev.de");
             }
+
             string clientScopes = "openid profile email accounting:documents datev:accounting:clients datev:accounting:extf-files-import";
-            ushort clientRedirectPort = 58455;
 
-            var options = new ClientOptions(
-                    authority,
-                    clientId,
-                    clientSecret,
-                    clientScopes,
-                    clientRedirectPort);
+            int GetRandomUnusedPort()
+            {
+                var listener = new TcpListener(IPAddress.Loopback, 0);
+                listener.Start();
+                var port = ((IPEndPoint)listener.LocalEndpoint).Port;
+                listener.Stop();
+                return port;
+            }
+            var clientRedirectPort = GetRandomUnusedPort();
 
+            var options = new OidcClientOptions()
+            {
+                Authority = authority,
+                ClientId = clientId,
+                ClientSecret = clientSecret,
+                Scope = clientScopes, // Scope for Online API accounting:clients
+                RedirectUri = $"http://localhost:{clientRedirectPort}/redirect/{Guid.NewGuid()}/", // Redirect URI with random path to avoid collisions on multi user environments like WTS
+                Policy = new Policy()
+                {
+                    Discovery = new DiscoveryPolicy()
+                    {
+                        AdditionalEndpointBaseAddresses = datevEndpointBaseAddresses
+                    }
+                },
+                TokenClientCredentialStyle = ClientCredentialStyle.AuthorizationHeader, // credentials not in body
+                RefreshTokenInnerHttpHandler = new HttpClientHandler() // usage of own httpclienthandler possible (i. e. for http-proxys)
+            };
+
+            string GenerateNonce()
+            {
+                var rnd = new CryptoRandom(typeof(GLTransExportedPage).GetHashCode());
+                return $"{rnd.Next(100_000_000, 1_000_000_000):D9}{rnd.Next(100_000_000, 1_000_000_000):D9}{rnd.Next(100_000, 1_000_000):D6}";
+            }
+
+            var tokenSource = new CancellationTokenSource();
+            CWBrowserDialog dialog = null;
             try
             {
-                var client = new Datev.Cloud.Authentication.Client(options);
-                var loginResult = await client.LoginAsync();
-                var result = loginResult.AccessToken + "," + loginResult.IdentityToken + "," + loginResult.RefreshToken + "," + DateTime.Now + "," + loginResult.Success + "," + loginResult.Error;
+                short timeoutInSeconds = 100; // after this timeout, login will be canceled
+                tokenSource.CancelAfter(TimeSpan.FromSeconds(timeoutInSeconds));
+                var client = new OidcClient(options);
+                var nonce = GenerateNonce();
+                var state = await client.PrepareLoginAsync(new Parameters()
+                {
+                    {OidcConstants.AuthorizeRequest.Nonce, nonce}, // add missing mandatory parameter
+                    {OidcConstants.AuthorizeRequest.ResponseMode, "query"}, // add missing parameter, because otherwise we need to parse request body, so we get the auth details as query parameter
+                }, cancellationToken: tokenSource.Token);
+                if (state.IsError)
+                {
+                    throw new Exception($"Cannot preprocess login: {state.Error} - {state.ErrorDescription}");
+                }
 
-                return result;
+                using (var http = new HttpListener())
+                {
+                    // automatically stop the http listener after timeout
+                    Task.Delay(TimeSpan.FromSeconds(timeoutInSeconds), tokenSource.Token)
+                        .ContinueWith(_ =>
+                        {
+                            if (http?.IsListening == true)
+                                http.Stop();
+                        });
+
+                    http.Prefixes.Add(client.Options.RedirectUri);
+                    http.Start();
+                    Console.WriteLine("Listening for Browser Redirect...");
+                    string startUrlWithSuffix = state.StartUrl
+                        // replace reponse_type, because otherwise it gets appended and we have two times this parameter
+                        .Replace($"{OidcConstants.AuthorizeRequest.ResponseType}=code", $"{OidcConstants.AuthorizeRequest.ResponseType}=code%20id_token")
+                        // Parameter enableWindowsSso for login.datev.de:
+                        // if you have DATEV-software with Kommunikationsserver installed, you can login with DATEV-Benutzer (DID).
+                        + "&enableWindowsSso=true";
+                    //var startInfo = new ProcessStartInfo(startUrlWithSuffix);
+                    //startInfo.UseShellExecute = true;
+                    Console.WriteLine($"Start browser with URL '{startUrlWithSuffix}'");
+                    dialog = new CWBrowserDialog(startUrlWithSuffix, "DATEV Login");
+
+                    Dispatcher.BeginInvoke((Action)(() => dialog.Show()));
+                    //Process.Start(startInfo);
+
+                    var context = await http.GetContextAsync();
+                    // handle OPTIONS request (PNA / CORS preflight request)
+                    if (context.Request.HttpMethod == "OPTIONS")
+                    {
+                        //Console.WriteLine($"Request with {context.Request.HttpMethod} instead of expected GET");
+                        var optionsResponse = context.Response;
+                        var requestHeaders = context.Request.Headers;
+                        var origin = requestHeaders["Origin"];
+                        if (origin != null && origin.EndsWith(".datev.de"))
+                        {
+                            optionsResponse.AppendHeader("Access-Control-Allow-Headers", "Content-Type, Accept");
+                            optionsResponse.AppendHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+                            optionsResponse.AppendHeader("Access-Control-Max-Age", "86400");
+                            optionsResponse.AppendHeader("Access-Control-Allow-Origin", origin);
+                            if (requestHeaders["Access-Control-Request-Private-Network"] != null)
+                            {
+                                optionsResponse.AppendHeader("Access-Control-Allow-Private-Network", "true");
+                            }
+                        }
+
+                        optionsResponse.StatusCode = 204;
+                        optionsResponse.Close();
+                        context = await http.GetContextAsync();
+                    }
+
+                    // sends an HTTP response to the browser.
+                    var response = context.Response;
+                    var redirectServerUrl = "https://web.uniconta.com/datev.html";
+                    response.RedirectLocation = redirectServerUrl;
+                    response.StatusCode = 307; // temporary redirect
+                    string responseString = $"<html lang=\"en\"><head><title>DATEV Login finished</title><meta http-equiv=\"refresh\" content=\"0; url={redirectServerUrl}\" /><script type=\"text/javascript\">window.location.href = \"{redirectServerUrl}\"</script></head><body>Please return to Uniconta.</body></html>";
+                    var buffer = Encoding.UTF8.GetBytes(responseString);
+                    response.ContentLength64 = buffer.Length;
+                    var responseOutput = response.OutputStream;
+                    await responseOutput.WriteAsync(buffer, 0, buffer.Length, tokenSource.Token);
+                    responseOutput.Close();
+                    var query = context.Request.Url?.Query;
+                    Console.WriteLine($"Query: {query}");
+                    var result = await client.ProcessResponseAsync(query, state, cancellationToken: tokenSource.Token);
+                    if (result.IsError)
+                    {
+                        throw new Exception($"Error: {result.Error} - {result.ErrorDescription}");
+                    }
+
+                    // check nonce
+                    var jwtTokenHandler = new JwtSecurityTokenHandler();
+                    var jwt = jwtTokenHandler.ReadJwtToken(result.IdentityToken);
+                    if (!nonce.Equals(jwt.Payload.Nonce))
+                    {
+                        throw new ApplicationException("Nonce is wrong, could not login");
+                    }
+
+                    Console.WriteLine($"Access token:\n{result.AccessToken}, expires {result.AccessTokenExpiration}");
+                    if (!string.IsNullOrWhiteSpace(result.RefreshToken))
+                    {
+                        Console.WriteLine($"Refresh token:\n{result.RefreshToken}");
+                    }
+
+                    // we are finished, so we can stop our http listener
+                    http.Stop();
+
+                    // Close the browser dialog automatically after 5 seconds (only on success)
+                    await Task.Delay(TimeSpan.FromSeconds(5)).ContinueWith(_ =>
+                        Dispatcher.BeginInvoke((Action)(() => dialog?.Close()))
+                    );
+
+                    return result;
+                }
+
             }
-            catch (InvalidOperationException)
-            { }
             catch (Exception ex)
             {
-                api.ReportException(ex, "Fehler bei der Verbindung mit login.datev.de");
+                // try to close dialog on any error
+                try
+                {
+                    Dispatcher.BeginInvoke((Action)(() => dialog?.Close()));
+                }
+                catch (Exception) { }
 
+                if (ex is ApplicationException || ex is TaskCanceledException || ex is HttpListenerException)
+                    throw new ApplicationException("Anmeldevorgang abgebrochen", ex);
+                api.ReportException(ex, "Fehler bei der Verbindung mit login.datev.de");
             }
-            busyIndicator.IsBusy = false;
+            finally
+            {
+                tokenSource.Cancel();
+            }
             return null;
         }
         async Task<GLTransPage.DatevHeader> CreateDatevHeader()
         {
-            var dh = await UnicontaClient.Pages.GLTransPage.CreateDatevHeader(api);
-            var err = await api.Read(dh);
-            return dh;
+            return await UnicontaClient.Pages.GLTransPage.CreateDatevHeader(api);
         }
 
         public async void TestUpload(GLTransExportedClient selectedItem)
@@ -474,9 +632,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             var Output = response.Content.ReadAsStringAsync().Result;
 
-            var serializer = new JavaScriptSerializer();
-
-            var myclient = serializer.Deserialize<Root>(Output);
+            var myclient = JsonConvert.DeserializeObject<Root>(Output);
 
             if (myclient.consultant_number != Convert.ToInt32(datev.Consultant) || (myclient.id != Convert.ToInt32(datev.Consultant) + "-" + datev.Client))
             {
@@ -521,9 +677,7 @@ namespace UnicontaClient.Pages.CustomPage
             var responseu = await clientu.SendAsync(requestu);
             responseu.EnsureSuccessStatusCode();
             Output = responseu.Content.ReadAsStringAsync().Result;
-            var serializeru = new JavaScriptSerializer();
-
-            var User = serializeru.Deserialize<Root>(Output);
+            var User = JsonConvert.DeserializeObject<Root>(Output);
             DatevDetails.ToTime = DatevDetails.Tokenvalidto.ToString("dd.MM.yy HH:mm:ss");
             DatevDetails.ToService = UCServiceText;
             DatevDetails.User = User.name;
@@ -675,13 +829,13 @@ namespace UnicontaClient.Pages.CustomPage
                         if (DatevDetails.UCService == 2 || DatevDetails.UCService == 3)
                         {
                             UpText = "Die Belege werden vom Server hochgeladen. Sie können diese Seite verlassen, mit Uniconta an anderer Stelle weiterarbeiten. ";
+                            selectedItem._SendToDatevDOC = "";
                         }
                         if (DatevDetails.UCService == 1 || DatevDetails.UCService == 3)
                         {
                             UpTextEXTF = String.Format("{0} Dateien (Stammdaten und Buchungen) gesendet. {1} ohne Fehler. {2} - {3}", anz, DatevDetails.SendOK, err, DateTime.Now);
                         }
                         selectedItem._SendToDatevEXTF = UpTextEXTF;
-                        selectedItem._SendToDatevDOC = "";
                         selectedItem._DatevService = Convert.ToByte(DatevDetails.UCService);
                         await api.Update(selectedItem);
                         busyIndicator.IsBusy = false;
@@ -750,9 +904,7 @@ namespace UnicontaClient.Pages.CustomPage
                 var response = clientc.SendAsync(request).Result;
                 var contentStream = response.Content.ReadAsStringAsync().Result;
 
-                var serializer = new JavaScriptSerializer();
-
-                var respfiles = serializer.Deserialize<Extf>(contentStream);
+                var respfiles = JsonConvert.DeserializeObject<Extf>(contentStream);
 
                 var Status = Convert.ToString(response.StatusCode);
 

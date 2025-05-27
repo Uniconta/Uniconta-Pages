@@ -33,7 +33,6 @@ using UnicontaClient.Pages;
 using Uniconta.Common.Utility;
 using Uniconta.API.Service;
 using Localization = Uniconta.ClientTools.Localization;
-using DevExpress.Xpf.Core.Native;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -43,7 +42,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-            tableView.RowStyle = Application.Current.Resources["MatchingRowStyle"] as Style;
+            tableView.RowStyle = System.Windows.Application.Current.Resources["MatchingRowStyle"] as System.Windows.Style;
         }
         public override Type TableType { get { return typeof(BankStatementLineGridClient); } }
         public override IComparer GridSorting { get { return new BankStatementLineSort(); } }
@@ -59,7 +58,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-            tableView.RowStyle = Application.Current.Resources["MatchingRowStyle"] as Style;
+            tableView.RowStyle = System.Windows.Application.Current.Resources["MatchingRowStyle"] as System.Windows.Style;
         }
         public override bool Readonly { get { return false; } }
         public override bool CanInsert { get { return false; } }
@@ -82,7 +81,7 @@ namespace UnicontaClient.Pages.CustomPage
         string showAmountType;
         GLTransClientTotalBank[] GlTransList;
         BankStatementLineGridClient[] BankList;
-        Orientation orient;
+        System.Windows.Controls.Orientation orient;
         List<BankStatementAPI.BankRemoveJournal> _JournalsRemoved;
 
         string bankStatCaption;
@@ -132,7 +131,7 @@ namespace UnicontaClient.Pages.CustomPage
             Mark.Visible = MarkCol.Visible = true;
             GetShowHideGreenMenuItem();
 
-            orient = api.session.Preference.BankStatementHorisontal ? Orientation.Horizontal : Orientation.Vertical;
+            orient = api.session.Preference.BankStatementHorisontal ? System.Windows.Controls.Orientation.Horizontal : System.Windows.Controls.Orientation.Vertical;
             lGroup.Orientation = orient;
 
             this.showAmountType = Localization.lookup("All");
@@ -141,11 +140,7 @@ namespace UnicontaClient.Pages.CustomPage
             ribbonControl.UpperSearchNullText = bankStatCaption;
             ribbonControl.LowerSearchNullText = transactionCaption;
 
-#if SILVERLIGHT
-            Application.Current.RootVisual.KeyDown += RootVisual_KeyDown;
-#else
             this.PreviewKeyDown += RootVisual_KeyDown;
-#endif
             this.BeforeClose += BankStatementLinePage_BeforeClose;
             this.layOutTrans.Caption = string.Empty;
             this.layOutBankStat.Caption = string.Empty;
@@ -197,16 +192,11 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void BankStatementLinePage_BeforeClose()
         {
-#if SILVERLIGHT
-            Application.Current.RootVisual.KeyDown -= RootVisual_KeyDown;
-#else
             this.PreviewKeyDown -= RootVisual_KeyDown;
-#endif
         }
 
-        private void RootVisual_KeyDown(object sender, KeyEventArgs e)
+        private void RootVisual_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
-#if !SILVERLIGHT
             if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift) || Keyboard.Modifiers.HasFlag(ModifierKeys.Alt))
             {
                 if (dgBankStatementLine.CurrentColumn.Name == "HasOffsetAccounts" && e.Key == Key.Down)
@@ -216,7 +206,6 @@ namespace UnicontaClient.Pages.CustomPage
                         CallOffsetAccount(currentRow);
                 }
             }
-#endif
 
             if (e.Key == Key.F8)
             {
@@ -442,7 +431,7 @@ namespace UnicontaClient.Pages.CustomPage
             isChildGridExist = true;
         }
 
-        public async override Task InitQuery()
+        public async override System.Threading.Tasks.Task InitQuery()
         {
             busyIndicator.IsBusy = true;
 
@@ -711,7 +700,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "ChangeOrientation":
                     orient = 1 - orient;
                     lGroup.Orientation = orient;
-                    api.session.Preference.BankStatementHorisontal = (orient == Orientation.Horizontal);
+                    api.session.Preference.BankStatementHorisontal = (orient == System.Windows.Controls.Orientation.Horizontal);
                     break;
                 case "ShowHideGreenLines":
                     hideGreen = !hideGreen;
@@ -956,24 +945,28 @@ namespace UnicontaClient.Pages.CustomPage
                 var voucher = voucherObj[0] as VouchersClient;
                 if (voucher != null)
                 {
-                    var selectedItem = dgBankStatementLine.SelectedItem as BankStatementLineGridClient;
-                    if (selectedItem != null && voucher.RowId != 0)
+                    var openedFrom = voucherObj[1];
+                    if (openedFrom == this.ParentControl)
                     {
-                        dgBankStatementLine.SetLoadedRow(selectedItem);
-                        selectedItem.DocumentRef = voucher.RowId;
-                        if (voucher._Invoice != null)
-                            selectedItem.Invoice = voucher._Invoice;
-                        if (voucher._Dim1 != null)
-                            selectedItem.Dimension1 = voucher._Dim1;
-                        if (voucher._Dim2 != null)
-                            selectedItem.Dimension2 = voucher._Dim2;
-                        if (voucher._Dim3 != null)
-                            selectedItem.Dimension3 = voucher._Dim3;
-                        if (voucher._Dim4 != null)
-                            selectedItem.Dimension4 = voucher._Dim4;
-                        if (voucher._Dim5 != null)
-                            selectedItem.Dimension5 = voucher._Dim5;
-                        dgBankStatementLine.SetModifiedRow(selectedItem);
+                        var selectedItem = dgBankStatementLine.SelectedItem as BankStatementLineGridClient;
+                        if (selectedItem != null && voucher.RowId != 0)
+                        {
+                            dgBankStatementLine.SetLoadedRow(selectedItem);
+                            selectedItem.DocumentRef = voucher.RowId;
+                            if (voucher._Invoice != null)
+                                selectedItem.Invoice = voucher._Invoice;
+                            if (voucher._Dim1 != null)
+                                selectedItem.Dimension1 = voucher._Dim1;
+                            if (voucher._Dim2 != null)
+                                selectedItem.Dimension2 = voucher._Dim2;
+                            if (voucher._Dim3 != null)
+                                selectedItem.Dimension3 = voucher._Dim3;
+                            if (voucher._Dim4 != null)
+                                selectedItem.Dimension4 = voucher._Dim4;
+                            if (voucher._Dim5 != null)
+                                selectedItem.Dimension5 = voucher._Dim5;
+                            dgBankStatementLine.SetModifiedRow(selectedItem);
+                        }
                     }
                 }
             }
@@ -1150,11 +1143,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         int AutoReconciliationOne2One(List<BankStatementLineGridClient> bstList, List<GLTransClientTotalBank> actList, int slip)
         {
-            int cnt = 0;
-            bool MatchText = true;
-            bool FoundMatch = false;
-            
-            Rerun:
+            int cnt = 0, i;
+            var ch = new[] { ' ', ':' };
             for (int OffsetDays = 0; (OffsetDays <= slip); OffsetDays++)
             {
                 for (var b = 0; (b < bstList.Count); b++)
@@ -1168,10 +1158,16 @@ namespace UnicontaClient.Pages.CustomPage
                         MaxDate = MaxDate.AddDays(OffsetDays);
                     }
                     var Amount = bst._AmountCent;
-                    string Text = MatchText ? bst.Text : null;
+                    string Text = bst.Text;
+                    string[] Split = null;
+                    bool TrySplit = true;
+                    GLTransClientTotalBank act;
+
+                    int acFound = -1;
+                    int TextFound = 0;
                     for (var a = 0; (a < actList.Count); a++)
                     {
-                        var act = actList[a];
+                        act = actList[a];
                         if (act._Date > MaxDate)
                             break;
 
@@ -1181,33 +1177,98 @@ namespace UnicontaClient.Pages.CustomPage
                             if (bst._AccountType > 0 && bst.Account != null && act.DCAccount != null && bst.Account != act.DCAccount) // we have a different DC. we cannot match
                                 continue;
 
-                            if (Text != null && Text != act._Text)
+                            if (Text != null && act._Text != null)
                             {
-                                FoundMatch = true;
-                                continue;
-                            }
+                                if (Text == act._Text)
+                                {
+                                    if (TextFound == 10)
+                                    {
+                                        acFound = -1;
+                                        break;
+                                    }
+                                    TextFound = 10;
+                                    acFound = a;
+                                    continue;
+                                }
 
-                            Join(bst, act);
-                            bst.Trans = new List<GLTransClientTotalBank>(1) { act };
-                            act._Reconciled = true;
-                            act.Mark = false;
-                            act._IsMatched = true;
-                            act.StatementLines = new List<BankStatementLineGridClient>(1) { bst };
-                            act.UpdateState();
-                            cnt++;
-                            bstList.RemoveAt(b);
-                            b--;
-                            actList.RemoveAt(a);
-                            break;
+                                string s;
+                                if (TrySplit && TextFound == 0)
+                                {
+                                    TrySplit = false;
+                                    Split = Text.Split(ch);
+                                    if (Split.Length == 1)
+                                        Split = null;
+                                    else
+                                    {
+                                        bool any = false;
+                                        for (i = 0; i < Split.Length; i++)
+                                        {
+                                            s = Split[i];
+                                            if (s.Length >= 5) // some save a OrderNumber or InvoiceNumber inside text. Here we see if some numbers match
+                                            {
+                                                for (int j = 0; j < s.Length; j++)
+                                                {
+                                                    if (!char.IsDigit(s[j]))
+                                                    {
+                                                        Split[i] = null;
+                                                        break;
+                                                    }
+                                                }
+                                                if (Split[i] != null)
+                                                    any = true;
+                                            }
+                                            else
+                                                Split[i] = null;
+                                        }
+                                        if (!any)
+                                            Split = null;
+                                    }
+                                }
+
+                                if (Split != null)
+                                {
+                                    var t = act._Text;
+                                    int nFound = 0;
+                                    for (i = 0; i < Split.Length; i++)
+                                    {
+                                        s = Split[i];
+                                        if (s != null && t.IndexOf(s) >= 0)
+                                            nFound++;
+                                    }
+                                    if (nFound > TextFound)
+                                    {
+                                        TextFound = nFound;
+                                        acFound = a;
+                                    }
+                                    if (nFound > 0)
+                                        continue;
+                                }
+                            }
+                            if (acFound < 0)
+                                acFound = a;
+                            else if (TextFound == 0)
+                            {
+                                acFound = -1;
+                                break;
+                            }
                         }
                     }
+                    if (acFound >= 0)
+                    {
+                        act = actList[acFound];
+                        Join(bst, act);
+                        bst.Trans = new List<GLTransClientTotalBank>(1) { act };
+                        act._Reconciled = true;
+                        act.Mark = false;
+                        act._IsMatched = true;
+                        act.StatementLines = new List<BankStatementLineGridClient>(1) { bst };
+                        act.UpdateState();
+                        cnt++;
+                        bstList.RemoveAt(b);
+                        b--;
+                        actList.RemoveAt(acFound);
+                    }
                 }
-            }
-            if (FoundMatch && MatchText) // we found a match, but not on Text, lets run without text match
-            {
-                MatchText = false;
-                FoundMatch = false;
-                goto Rerun;
             }
             return cnt;
         }
@@ -1948,7 +2009,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void HasOffSetAccount_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            CallOffsetAccount((sender as Image).Tag as BankStatementLineGridClient);
+            CallOffsetAccount((sender as System.Windows.Controls.Image).Tag as BankStatementLineGridClient);
         }
 
         void CallOffsetAccount(BankStatementLineGridClient line)

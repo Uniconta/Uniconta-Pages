@@ -103,7 +103,7 @@ namespace UnicontaClient.Pages.CustomPage
         void InitPage(UnicontaBaseEntity masterRecord)
         {
             dgLanguageItemTextPageGrid.UpdateMaster(masterRecord);
-            ((TableView)dgLanguageItemTextPageGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
+            ((TableView)dgLanguageItemTextPageGrid.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
             dgLanguageItemTextPageGrid.api = api;
             SetRibbonControl(localMenu, dgLanguageItemTextPageGrid);
             dgLanguageItemTextPageGrid.BusyIndicator = busyIndicator;

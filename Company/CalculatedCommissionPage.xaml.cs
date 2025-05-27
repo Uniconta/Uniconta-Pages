@@ -169,7 +169,7 @@ namespace UnicontaClient.Pages.CustomPage
                     itemFilterValues = null;
                     break;
                 case "Aggregate":
-                    Aggregate((bool)cbxItem.IsChecked, (bool)cbxInvGrp.IsChecked, (bool)cbxAccount.IsChecked, (bool)cbxAccountGrp.IsChecked, (bool) cbxInvoiceNumber.IsChecked);
+                    Aggregate(cbxItem.IsChecked.GetValueOrDefault(), cbxInvGrp.IsChecked.GetValueOrDefault(), cbxAccount.IsChecked.GetValueOrDefault(), cbxAccountGrp.IsChecked.GetValueOrDefault(), cbxInvoiceNumber.IsChecked.GetValueOrDefault());
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);

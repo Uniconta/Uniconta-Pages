@@ -73,7 +73,7 @@ namespace UnicontaClient.Pages.CustomPage
             Products.Visible = Products.ShowInColumnChooser = Comp.CRM;
         }
 
-        private void RootVisual_KeyDown(object sender, KeyEventArgs e)
+        private void RootVisual_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.F8 && Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
             {
@@ -125,7 +125,10 @@ namespace UnicontaClient.Pages.CustomPage
 
             dgDebtorAccountGrid.Readonly = true;
             if (!Comp.InvPackaging)
+            {
                 PackagingConsumer.Visible = PackagingConsumer.ShowInColumnChooser = false;
+                MicroEnterprise.Visible = MicroEnterprise.ShowInColumnChooser = false;
+            }
             var rb = (RibbonBase)localMenu.DataContext;
             if (rb != null)
             {
@@ -219,7 +222,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "Offers":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.DebtorOffers, dgDebtorAccountGrid.syncEntity);
+                        AddDockItem(TabControls.DebtorOffers, dgDebtorAccountGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Offer"), selectedItem._Name));
                     break;
                 case "Invoices":
                     if (selectedItem != null)
@@ -511,14 +514,14 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var debtorAccount = (sender as Image).Tag as DebtorClient;
+            var debtorAccount = (sender as System.Windows.Controls.Image).Tag as DebtorClient;
             if (debtorAccount != null)
                 AddDockItem(TabControls.UserDocsPage, dgDebtorAccountGrid.syncEntity);
         }
 
         private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var debtorAccount = (sender as Image).Tag as DebtorClient;
+            var debtorAccount = (sender as System.Windows.Controls.Image).Tag as DebtorClient;
             if (debtorAccount != null)
                 AddDockItem(TabControls.UserNotesPage, dgDebtorAccountGrid.syncEntity);
         }

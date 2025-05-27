@@ -31,9 +31,7 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "Comment", ResourceType = typeof(InputFieldDataText))]
         public static string Comment { get; set; }
 
-#if !SILVERLIGHT
          protected override bool ShowTableValueButton { get { return false; } }
-#endif
 
         public CwPostWIP(CrudAPI crudApi)
         {
@@ -45,7 +43,7 @@ namespace UnicontaClient.Pages.CustomPage
             leNumberSerie.api= leTransType.api = crudApi;
         }
 
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {

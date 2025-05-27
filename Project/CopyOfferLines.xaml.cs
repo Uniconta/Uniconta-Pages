@@ -36,7 +36,7 @@ namespace UnicontaClient.Pages.CustomPage
         public bool IsDeleteLines { get; set; }
         public override string NameOfControl => TabControls.CopyOfferLines;
         static double pageHeight = 650.0d, pageWidth = 850.0d;
-        static Point position = new Point();
+        static System.Windows.Point position = new System.Windows.Point();
         public override void PageClosing()
         {
             if (OfferLines != null && createbuttonclicked)
@@ -76,8 +76,8 @@ namespace UnicontaClient.Pages.CustomPage
                 fromReservation = true;
                 chkDelete.Visibility = Visibility.Collapsed;
             }
-            ((TableView)dgOffersGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
-            ((TableView)dgOfferLinesGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
+            ((TableView)dgOffersGrid.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
+            ((TableView)dgOfferLinesGrid.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
             var comp = crudApi.CompanyEntity;
             dgOffersGrid.BusyIndicator = busyIndicator;
             dgOffersGrid.api = crudApi;
@@ -135,7 +135,7 @@ namespace UnicontaClient.Pages.CustomPage
             busyIndicator.IsBusy = false;
         }
 
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {

@@ -149,9 +149,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var prodOrder = new ProductionOrderClient() { _ProdItem = fromProductionPosted._Item, _ProdQty = fromProductionPosted._Qty };
             var cwProductionOrderLine = new CWProductionOrderLine(prodOrder, api, true, Uniconta.ClientTools.Localization.lookup("ProductionOrder"));
-#if !SILVERLIGHT
             cwProductionOrderLine.DialogTableId = 2000000079;
-#endif
             cwProductionOrderLine.Closed += async delegate
             {
                 if (cwProductionOrderLine.DialogResult == true)
@@ -163,13 +161,8 @@ namespace UnicontaClient.Pages.CustomPage
                         Uniconta.ClientTools.Util.UtilDisplay.ShowErrorCode(result);
                     else
                     {
-#if !SILVERLIGHT
-                        if (UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("GoTo"),Uniconta.ClientTools.Localization.lookup("ProductionLines")), 
-                        Uniconta.ClientTools.Localization.lookup("Message"), MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-#elif SILVERLIGHT
                         if (UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("GoTo"), Uniconta.ClientTools.Localization.lookup("ProductionLines")),
-                        Uniconta.ClientTools.Localization.lookup("Message"), MessageBoxButton.OKCancel) == MessageBoxResult.OK)
-#endif
+                        Uniconta.ClientTools.Localization.lookup("Message"), MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                             AddDockItem(TabControls.ProductionOrderLines, prodOrder);
                     }
                 }
@@ -185,7 +178,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var pp = (sender as Image).Tag as ProductionPostedClient;
+            var pp = (sender as System.Windows.Controls.Image).Tag as ProductionPostedClient;
             if (pp != null)
                 AddDockItem(TabControls.UserDocsPage, dgProductionPostedGrid.syncEntity);
         }

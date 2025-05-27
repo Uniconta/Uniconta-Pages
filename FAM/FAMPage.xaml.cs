@@ -362,14 +362,14 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var FamAccount = (sender as Image).Tag as FamClient;
+            var FamAccount = (sender as System.Windows.Controls.Image).Tag as FamClient;
             if (FamAccount != null)
                 AddDockItem(TabControls.UserDocsPage, dgFAMGrid.syncEntity);
         }
 
         private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var FamAccount = (sender as Image).Tag as FamClient;
+            var FamAccount = (sender as System.Windows.Controls.Image).Tag as FamClient;
             if (FamAccount != null)
                 AddDockItem(TabControls.UserNotesPage, dgFAMGrid.syncEntity);
         }

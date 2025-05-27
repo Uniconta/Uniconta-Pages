@@ -82,19 +82,23 @@ namespace UnicontaClient.Pages.CustomPage
                     switch (moduleIdx)
                     {
                         case 0:
-                            if (comp.ShowLedger)
+                            if (comp.ShowLedger && comp.Ledger)
+                                moduleWiseList.AddRange(grp);
+                            break;
+                        case 2:
+                            if (comp.FixedAsset)
                                 moduleWiseList.AddRange(grp);
                             break;
                         case 3:
-                            if (comp.ShowDebtor)
+                            if (comp.ShowDebtor && comp.Debtor)
                                 moduleWiseList.AddRange(grp);
                             break;
                         case 4:
-                            if (comp.ShowCreditor)
+                            if (comp.ShowCreditor && comp.Creditor)
                                 moduleWiseList.AddRange(grp);
                             break;
                         case 5:
-                            if (comp.ShowProject)
+                            if (comp.ShowProject && comp.Project)
                                 moduleWiseList.AddRange(grp);
                             break;
                         case 6:
@@ -102,11 +106,11 @@ namespace UnicontaClient.Pages.CustomPage
                                 moduleWiseList.AddRange(grp);
                             break;
                         case 7:
-                            if (comp.ShowCrm)
+                            if (comp.ShowCrm && comp.CRM)
                                 moduleWiseList.AddRange(grp);
                             break;
                         case 8:
-                            if (comp.ShowInventory)
+                            if (comp.ShowInventory && comp.Inventory)
                                 moduleWiseList.AddRange(grp);
                             break;
                         case 9:
@@ -129,7 +133,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 var dashBoardClient = new DashboardClient[moduleWiseList.Count];
                 int idx = 0;
-                foreach(var item in moduleWiseList)
+                foreach (var item in moduleWiseList)
                 {
                     DashboardClient dashBoard = new DashboardClient();
                     StreamingManager.Copy(item, dashBoard);

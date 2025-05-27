@@ -49,7 +49,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void InitPage(UnicontaBaseEntity master = null)
         {
             InitializeComponent();
-            ((TableView)dgTableHeaderShareGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
+            ((TableView)dgTableHeaderShareGrid.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
             dgTableHeaderShareGrid.api = api;
             dgTableHeaderShareGrid.BusyIndicator = busyIndicator;
             SetRibbonControl(localMenu, dgTableHeaderShareGrid);

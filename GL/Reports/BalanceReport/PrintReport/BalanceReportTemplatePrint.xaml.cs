@@ -176,7 +176,7 @@ namespace UnicontaClient.Pages.CustomPage
         public Visibility Col12Width { get { return hdrData.Col12Width; } }
         public Visibility Col13Width { get { return hdrData.Col13Width; } }
         //New Prop 
-        public FontFamily Font { get; set; }
+        public System.Drawing.FontFamily Font { get; set; }
         public int Masterfontsize;
         public int TextSize { get { return hdrData.AccountNameColWidth; } }
         public int AmountSize { get { return hdrData.AmountSize; } }
@@ -185,12 +185,12 @@ namespace UnicontaClient.Pages.CustomPage
         public int FontSize { get { return (line._FontSize != 0) ? line._FontSize : Masterfontsize; } }
         public Visibility Hide { get { return line._Hide ? Visibility.Collapsed : Visibility.Visible; } }
         public FontWeight IsBold { get { return line._Bold ? FontWeights.Bold : FontWeights.Normal; } }
-        public FontStyle IsItalic { get { return line._Italic ? FontStyles.Italic : FontStyles.Normal; } }
+        public System.Windows.FontStyle IsItalic { get { return line._Italic ? FontStyles.Italic : FontStyles.Normal; } }
         public TextDecorationCollection IsUnderline { get { return line._Underline ? TextDecorations.Underline : null; } }
         public Visibility IsNewline { get { return line._NewLine && !line._NewPage ? Visibility.Visible : Visibility.Collapsed; } }
         public Visibility IsNewPage { get { return line._NewPage ? Visibility.Visible : Visibility.Collapsed; } }
         public byte[] Line { get { return line._Underline == true ? Utilities.Utility.GetImageData("BlackLine.png") : null; } }
-        public Brush LineBackground { get { return line._Underline == true ? new SolidColorBrush(Colors.Black) : new SolidColorBrush(Colors.Transparent); } }
+        public System.Windows.Media.Brush LineBackground { get { return line._Underline == true ? new SolidColorBrush(Colors.Black) : new SolidColorBrush(Colors.Transparent); } }
         public Thickness LineSpace { get { return hdrData.LineSpace; } }
         public Thickness LeftMargin { get { return hdrData.LeftMargin; } }
         //byte[] GetImageData(string imageName)

@@ -1,17 +1,12 @@
-<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
-   xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
-x:Class="UnicontaClient.Pages.CustomPage.DebtorAccountStat"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"
-    xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
-    xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
-
-    <Pages:GridBasePage.Resources>
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
+                    xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.DebtorAccountStat" 
+                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+                    xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" 
+                    xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools" 
+                    xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
     
-    </Pages:GridBasePage.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
@@ -30,9 +25,9 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccountStat"
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FromDate}" Grid.Column="0" />
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FromDate}" Grid.Column="0" VerticalAlignment="Bottom" Margin="0,3,0,0"/>
             <CorasauControls:DateEditor x:Name="txtDateFrm" Grid.Column="2" Margin="0,3,3,3"/>
-            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ToDate}" Grid.Column="4"/>
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ToDate}" Grid.Column="4" VerticalAlignment="Bottom"/>
             <CorasauControls:DateEditor x:Name="txtDateTo" Grid.Column="6" Margin="0,3,3,3"/>
         </Grid>
         <Rectangle Height="1" Fill="{StaticResource BorderColor}" Grid.Row="2" />

@@ -99,7 +99,7 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgProjectTransClientInvoiceGrid.ShowTotalSummary();
             localMenu.DisableButtons(new string[] { "Aggregate", "GenerateInvoice", "MarkAsInvoice" });
-            ((DevExpress.Xpf.Grid.TableView)dgProjectTransClientInvoiceGrid.View).RowStyle = Application.Current.Resources["DisableStyleRow"] as Style;
+            ((DevExpress.Xpf.Grid.TableView)dgProjectTransClientInvoiceGrid.View).RowStyle = System.Windows.Application.Current.Resources["DisableStyleRow"] as Style;
             Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
             if (master is Uniconta.DataModel.Project)

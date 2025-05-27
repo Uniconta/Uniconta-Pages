@@ -123,8 +123,7 @@ namespace UnicontaClient.Pages.CustomPage
                 var totalHrs = employeeRegActivities.Sum(p => p.AmountOfWork);
 
                 txtDuration.Text = $"{(int)(totalHrs / 60)}{Uniconta.ClientTools.Localization.lookup("HR")} {totalHrs % 60}{Uniconta.ClientTools.Localization.lookup("Min")}";
-                var weekNum = System.Globalization.CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(currentWeekStartDate,
-                    System.Globalization.CalendarWeekRule.FirstFullWeek, DayOfWeek.Monday);
+                var weekNum = UtilFunctions.GetIso8601WeekOfYear(currentWeekStartDate); 
                 txtWeekNum.Text = string.Concat(weekNum, " ", Uniconta.ClientTools.Localization.lookup("Week"));
                 txtWeekPeriod.Text = string.Format("{0} - {1}", currentWeekStartDate.ToString("dd MMM"), currentWeekStartDate.AddDays(6).ToString("dd MMM"));
 
@@ -170,14 +169,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         private DateTime GetCurrentWeekStartDate(DateTime dateTime)
         {
-            var currentWeekOfYear = System.Globalization.CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(
-                dateTime, System.Globalization.CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+            var currentWeekOfYear = UtilFunctions.GetIso8601WeekOfYear(dateTime);
 
             DateTime jan1 = new DateTime(dateTime.Year, 1, 1);
             int daysOffset = DayOfWeek.Monday - jan1.DayOfWeek;
             DateTime firstMonday = jan1.AddDays(daysOffset);
-            var firstWeek = System.Globalization.CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(jan1,
-                System.Globalization.CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+            var firstWeek = UtilFunctions.GetIso8601WeekOfYear(jan1);
             if (firstWeek <= 1)
                 currentWeekOfYear -= 1;
 

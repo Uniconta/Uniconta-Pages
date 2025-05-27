@@ -2,6 +2,7 @@
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <RibbonItem Action="Attach" LocalizedNameKey="Attach" LargeGlyph="Upload_32x32"/>
+    <RibbonItem Action="ShowAll" LocalizedNameKey="ShowOBJ" Parameter="All" LargeGlyph="Detailed_View_32x32"/>
     <RibbonItem Action="Cancel" LocalizedNameKey="Cancel" Glyph="close-16x16" LargeGlyph="close-32x32"/>
   </RibbonItem>
   <RibbonItem>

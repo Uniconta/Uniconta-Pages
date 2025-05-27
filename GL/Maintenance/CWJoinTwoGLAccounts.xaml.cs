@@ -35,9 +35,6 @@ namespace UnicontaClient.Pages.CustomPage
             LoadCacheInBackGround();
 
             this.Title = Uniconta.ClientTools.Localization.lookup("JoinTwoAccounts");
-#if SILVERLIGHT
-            Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             this.Loaded += CW_Loaded;
 
         }
@@ -56,7 +53,7 @@ namespace UnicontaClient.Pages.CustomPage
             Dispatcher.BeginInvoke(new Action(() => { cmbFromAccount.Focus(); }));
         }
 
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {

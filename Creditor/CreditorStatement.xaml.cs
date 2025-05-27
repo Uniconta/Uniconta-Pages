@@ -121,9 +121,6 @@ namespace UnicontaClient.Pages.CustomPage
         [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.Creditor))]
         public string FromAccount { get; set; }
 
-        [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.Creditor))]
-        public string ToAccount { get; set; }
-
         SQLCache accountCache;
         ItemBase ibase, ibaseCurrent;
 
@@ -167,7 +164,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             _master = syncEntity.Row as Uniconta.DataModel.Creditor;
             if (_master != null)
-            { FromAccount = _master._Account; ToAccount = _master._Account; }
+                FromAccount = _master._Account;
             Init();
             SetHeader();
         }
@@ -183,12 +180,11 @@ namespace UnicontaClient.Pages.CustomPage
         {
             _master = args as Uniconta.DataModel.Creditor;
             if (_master != null)
-            { FromAccount = _master._Account; ToAccount = _master._Account; }
+                FromAccount = _master._Account;
             SetHeader();
             if (_master != null)
             {
-                cmbFromAccount.EditValue = _master._Account;
-                cmbToAccount.EditValue = _master._Account;
+                cmbAccounts.EditValue = _master._Account;
                 LoadDCTrans();
             }
         }
@@ -198,7 +194,7 @@ namespace UnicontaClient.Pages.CustomPage
             this.DataContext = this;
             InitializeComponent();
             SetCreditorFilterUserFields();
-            cmbFromAccount.api = cmbToAccount.api = api;
+            cmbAccounts.api = api;
             SetRibbonControl(localMenu, dgCreditorTrans);
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
             DebtorStatement.SetDefaultDateTime();
@@ -219,8 +215,7 @@ namespace UnicontaClient.Pages.CustomPage
                 Amount.HasDecimals = colSumAmount.HasDecimals = Debit.HasDecimals = Credit.HasDecimals = false;
             if (_master != null)
             {
-                cmbFromAccount.EditValue = _master._Account;
-                cmbToAccount.EditValue = _master._Account;
+                cmbAccounts.EditValue = _master._Account;
                 LoadDCTrans();
             }
             TransactionReport.SetDailyJournal(cmbJournals, api);
@@ -262,7 +257,7 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
             detailView.ShowSearchPanelMode = ShowSearchPanelMode.Never;
             detailView.SearchPanelHighlightResults = true;
-            BindingOperations.SetBinding(detailView, DataViewBase.SearchStringProperty, new Binding("SearchText") { Source = ribbonControl.SearchControl });
+            BindingOperations.SetBinding(detailView, DataViewBase.SearchStringProperty, new System.Windows.Data.Binding("SearchText") { Source = ribbonControl.SearchControl });
         }
 
         TableView GetDetailView(int rowHandle)
@@ -517,8 +512,8 @@ namespace UnicontaClient.Pages.CustomPage
             DateTime fromDate = DebtorStatement.DefaultFromDate, toDate = DebtorStatement.DefaultToDate;
             transaction = cmbTrasaction.SelectedIndex;
             includedJournals = cmbJournals.Text;
-            var fromAccount = Convert.ToString(cmbFromAccount.EditValue);
-            var toAccount = Convert.ToString(cmbToAccount.EditValue);
+            var fromAccount = txtAccount.Text;
+            string toAccount = null;
 
             busyIndicator.IsBusy = true;
             var transApi = new ReportAPI(api);
@@ -634,7 +629,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void cmbFromAccount_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
         {
-            cmbToAccount.SelectedItem = cmbFromAccount.SelectedItem;
+            txtAccount.Text += $"{cmbAccounts.EditValue};";
         }
 
         int dataRowCount;

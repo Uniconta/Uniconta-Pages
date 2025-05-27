@@ -50,8 +50,7 @@ namespace UnicontaClient.Pages.CustomPage
             API = api;
             this.master = StreamingManager.Clone(sourcedata);
             this.masterWithCompanyId = sourcedata;
-            masterList = new List<UnicontaBaseEntity>();
-            masterList.Add(sourcedata);
+            masterList = new List<UnicontaBaseEntity>() { sourcedata };
             listClient = new List<CustomTableFieldsClient>();
             this.Loaded += CWCopyUserFields_Loaded;
             this.Height += 40;
@@ -76,7 +75,7 @@ namespace UnicontaClient.Pages.CustomPage
             await BindCompany();
             Dispatcher.BeginInvoke(new Action(() => { OKButton.Focus(); }));
         }
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {
@@ -142,7 +141,6 @@ namespace UnicontaClient.Pages.CustomPage
         private async System.Threading.Tasks.Task BindCompany()
         {
             Company[] companies = await BasePage.session.GetCompanies();
-            companies = companies.Where(a => a.CompanyId != Utilities.Utility.GetDefaultCompany().CompanyId).ToArray();
             cbCompany.ItemsSource = companies;
             if (companies != null && companies.Length > 0)
                 cbCompany.SelectedIndex = 0;
@@ -166,12 +164,11 @@ namespace UnicontaClient.Pages.CustomPage
                 if (newapi != null)
                 {
                     var arrytbl = await newapi.Query<TableHeaderClient>();
-                    listtbl = arrytbl?.ToList();
-                    cbtable.ItemsSource = listtbl;
-                    if (listtbl?.Count > 0)
+                    cbtable.ItemsSource = arrytbl;
+                    if (arrytbl != null && arrytbl.Length > 0)
                     {
                         if (master != null)
-                            cbtable.SelectedItem = arrytbl?.Where(t => t.Name == (master as TableHeaderClient)?.Name).FirstOrDefault();
+                            cbtable.SelectedItem = arrytbl.Where(t => t.Name == (master as TableHeaderClient)?.Name).FirstOrDefault();
                         else
                             cbtable.SelectedIndex = -1;
                     }
@@ -222,7 +219,6 @@ namespace UnicontaClient.Pages.CustomPage
         private void CheckEditor_Unchecked(object sender, RoutedEventArgs e)
         {
             listClient.ForEach(s => s.IsSelected = false);
-
         }
     }
 }

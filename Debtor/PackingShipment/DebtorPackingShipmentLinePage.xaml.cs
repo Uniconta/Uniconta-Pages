@@ -21,6 +21,7 @@ using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
+using Uniconta.ClientTools;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -48,8 +49,13 @@ namespace UnicontaClient.Pages.CustomPage
             dgDebtorPackingShipmentLineGrid.UpdateMaster(master);
             dgDebtorPackingShipmentLineGrid.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
+            LoadCategories();
         }
-
+        void LoadCategories()
+        {
+            var categorySource = new ArraySegment<string>(AppEnums.PackagingCategory.Values, 0, 17).ToList();
+            cbCategory.ItemsSource = categorySource;
+        }
         private void LocalMenu_OnItemClicked(string ActionType)
         {
             switch (ActionType)

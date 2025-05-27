@@ -7,7 +7,7 @@ x:Class="UnicontaClient.Pages.CustomPage.EditCompany"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
     xmlns:dxinteraction="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
     xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-    xmlns:enumType ="clr-namespace:Uniconta.Common;assembly=Uniconta.WindowsAPI">
+    xmlns:Utilities="clr-namespace:UnicontaClient.Utilities">
     <CorasauControls:BusyIndicator x:Name="busyIndicator" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
         <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
             <Grid.RowDefinitions>
@@ -40,7 +40,7 @@ x:Class="UnicontaClient.Pages.CustomPage.EditCompany"
                             <StackPanel Orientation="Horizontal">
                                 <CorasauControls:ComboBoxEditor x:Name="cmbCountry" EditValue="{Binding Country,Mode=TwoWay}" HorizontalAlignment="Stretch" >
                                     <dxinteraction:Interaction.Behaviors>
-                                        <dxinteraction:EnumItemsSourceBehavior EnumType="{x:Type enumType:CountryCode}" />
+                                        <dxinteraction:EnumItemsSourceBehavior EnumType="{x:Static Utilities:EnumTypeResolver.CountryCode}" />
                                     </dxinteraction:Interaction.Behaviors>
                                 </CorasauControls:ComboBoxEditor>
                                 <TextBlock x:Name="txtCulture" Margin="10 0 0 0"/>

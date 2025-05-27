@@ -485,6 +485,10 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         ChangeAmount(selectedItem);
                     break;
+                case "ChangeAmountCurrency":
+                    if (selectedItem != null)
+                        ChangeAmountCurrency(selectedItem);
+                    break;
                 case "CurrentYear":
                     FilterWithAccountingYear(false);
                     break;
@@ -563,15 +567,58 @@ namespace UnicontaClient.Pages.CustomPage
         }
         void ChangeAmount(GLTransClient selectedItem)
         {
-            var cwObj = new CwChangeAmount(selectedItem, api.CompanyEntity.HasDecimals);
+            var rows = dgAccountsTransGrid.GetVisibleRows() as IEnumerable<GLTransClient>;
+            if (rows == null)
+                return;
+            if (rows.Count() > 4 || (rows.Count() > 2 && rows.All(r => r.Vat == null)))
+            {
+                var cwObj = new CwChangeMultipleAmount(rows);
+                cwObj.Closed += async delegate
+                {
+                    if (cwObj.DialogResult == true)
+                    {
+                        busyIndicator.IsBusy = true;
+                        var errorCodes = await postingApiInv.ChangeAmountOnTrans(rows, cwObj.NewAmounts);
+                        busyIndicator.IsBusy = false;
+                        UtilDisplay.ShowErrorCode(errorCodes);
+                        if (errorCodes == ErrorCodes.Succes)
+                            BindGrid();
+                    }
+                };
+                cwObj.Show();
+            }
+            else
+            {
+                var cwObj = new CwChangeAmount(selectedItem, api.CompanyEntity.HasDecimals);
+                cwObj.Closed += async delegate
+                {
+                    if (cwObj.DialogResult == true)
+                    {
+                        if (SameSign(selectedItem._Amount, cwObj.Amount) || UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("SignIsInverted") + "\n" + Uniconta.ClientTools.Localization.lookup("AreYouSureToContinue"), Uniconta.ClientTools.Localization.lookup("Confirmation"), MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                        {
+                            busyIndicator.IsBusy = true;
+                            var errorCodes = await postingApiInv.ChangeAmountOnTrans(selectedItem, cwObj.Amount, cwObj.Comment);
+                            busyIndicator.IsBusy = false;
+                            UtilDisplay.ShowErrorCode(errorCodes);
+                            if (errorCodes == ErrorCodes.Succes)
+                                BindGrid();
+                        }
+                    }
+                };
+                cwObj.Show();
+            }
+        }
+        void ChangeAmountCurrency(GLTransClient selectedItem)
+        {
+            var cwObj = new CwChangeAmountCurrency(selectedItem);
             cwObj.Closed += async delegate
             {
                 if (cwObj.DialogResult == true)
                 {
-                    if (SameSign(selectedItem._Amount, cwObj.Amount) || UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("SignIsInverted") + "\n" + Uniconta.ClientTools.Localization.lookup("AreYouSureToContinue"), Uniconta.ClientTools.Localization.lookup("Confirmation"), MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                    if (UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("AreYouSureToContinue"), Uniconta.ClientTools.Localization.lookup("Confirmation"), MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                     {
                         busyIndicator.IsBusy = true;
-                        var errorCodes = await postingApiInv.ChangeAmountOnTrans(selectedItem, cwObj.Amount, cwObj.Comment);
+                        var errorCodes = await postingApiInv.ChangeAmountCurOnTrans(selectedItem, cwObj.AmountCur, cwObj._Currency);
                         busyIndicator.IsBusy = false;
                         UtilDisplay.ShowErrorCode(errorCodes);
                         if (errorCodes == ErrorCodes.Succes)
@@ -581,7 +628,6 @@ namespace UnicontaClient.Pages.CustomPage
             };
             cwObj.Show();
         }
-
         static bool SameSign(double num1, double num2)
         {
             return (num1 * num2) >= 0;

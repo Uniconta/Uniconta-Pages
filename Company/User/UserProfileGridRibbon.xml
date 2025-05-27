@@ -26,6 +26,7 @@
 	<RibbonItem>
 		<RibbonItem Action="SetPermissions" LocalizedNameKey="SetPermissions" Glyph="User_Rights_32x32" LargeGlyph="User_Rights_32x32"/>
 		<RibbonItem Action="TableRights" LocalizedNameKey="TableRights" Glyph="" LargeGlyph="CopyUserTable_32x32"/>
+    <RibbonItem Action="FieldRights" LocalizedNameKey="FieldRights" LargeGlyph="UserField_32x32"/>
     <RibbonItem Action="BlockFunctions" LocalizedNameKey="BlockFunctions" Glyph="" LargeGlyph="Add_Menu_32x32"/>
     <RibbonItem Action="BlockReports" LocalizedNameKey="BlockReports" LargeGlyph="Order_Remove_32x32"/>
 	</RibbonItem>

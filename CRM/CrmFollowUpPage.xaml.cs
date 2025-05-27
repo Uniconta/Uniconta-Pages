@@ -79,7 +79,7 @@ namespace UnicontaClient.Pages.CustomPage
             var Comp = api.CompanyEntity;
             LayoutControl = crmDetailControl.layoutItems;
             dgCrmFollowUpGrid.UpdateMaster(master);
-            ((TableView)dgCrmFollowUpGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
+            ((TableView)dgCrmFollowUpGrid.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
             localMenu.dataGrid = dgCrmFollowUpGrid;
             dgCrmFollowUpGrid.api = api;
             dgCrmFollowUpGrid.BusyIndicator = busyIndicator;

@@ -138,7 +138,7 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
             detailView.ShowSearchPanelMode = ShowSearchPanelMode.Never;
             detailView.SearchPanelHighlightResults = true;
-            BindingOperations.SetBinding(detailView, DataViewBase.SearchStringProperty, new Binding("SearchText") { Source = ribbonControl.SearchControl });
+            BindingOperations.SetBinding(detailView, DataViewBase.SearchStringProperty, new System.Windows.Data.Binding("SearchText") { Source = ribbonControl.SearchControl });
         }
 
         TableView GetDetailView(int rowHandle)

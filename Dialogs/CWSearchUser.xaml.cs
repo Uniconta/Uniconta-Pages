@@ -89,7 +89,7 @@ namespace UnicontaClient.Controls.Dialogs
         {
             Dispatcher.BeginInvoke(new Action(() => { txtSearch.Focus(); }));
         }
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {
@@ -107,15 +107,16 @@ namespace UnicontaClient.Controls.Dialogs
         public string SearchedText;
         private async void OKButton_Click(object sender, RoutedEventArgs e)
         {
-            if (lstSetupType.SelectedIndex != 0)
+            if (lstSetupType.SelectedIndex != 0 && !string.IsNullOrEmpty(txtSearch.Text))
             {
                 SearchedText = txtSearch.Text;
                 var selectedUser = cmbUsers.SelectedItem as CompanyUserAccessClient;
                 ErrorCodes err;
+                var expiryDate = txtExpire.DateTime;
                 if (selectedUser == null)
-                    err = await comApi.GiveNewUserAccess(SearchedText, (CompanyPermissions)cmbUserRights.SelectedIndex);
+                    err = await comApi.GiveNewUserAccess(SearchedText, (CompanyPermissions)cmbUserRights.SelectedIndex, expiryDate);
                 else
-                    err = await comApi.GiveNewUserAccess(SearchedText, (CompanyPermissions)selectedUser._Rights);
+                    err = await comApi.GiveNewUserAccess(SearchedText, (CompanyPermissions)selectedUser._Rights, expiryDate);
 
                 if (err != ErrorCodes.Succes)
                     UtilDisplay.ShowErrorCode(err);
@@ -128,7 +129,7 @@ namespace UnicontaClient.Controls.Dialogs
             SetDialogResult(false);
         }
 
-        private void cmbUsers_KeyDown(object sender, KeyEventArgs e)
+        private void cmbUsers_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Delete || e.Key == Key.Back)
             {

@@ -214,14 +214,14 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void chkGrdTtlRow_Checked(object sender, RoutedEventArgs e)
         {
-            var value = (bool)chkGrdTtlRow.IsChecked;
+            var value = chkGrdTtlRow.IsChecked.GetValueOrDefault();
             pivotDgCreditorInvLines.ShowRowGrandTotalHeader = value;
             pivotDgCreditorInvLines.ShowRowGrandTotals = value;
         }
 
         private void chkGrdTtlCol_Checked(object sender, RoutedEventArgs e)
         {
-            var value = (bool)chkGrdTtlCol.IsChecked;
+            var value = chkGrdTtlCol.IsChecked.GetValueOrDefault();
             pivotDgCreditorInvLines.ShowColumnGrandTotalHeader = value;
             pivotDgCreditorInvLines.ShowColumnGrandTotals = value;
             pivotDgCreditorInvLines.ShowColumnTotals = value;
@@ -229,8 +229,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void chkTtlOnFlds_Checked(object sender, RoutedEventArgs e)
         {
-            var value = (bool)chkTtlOnFlds.IsChecked;
-            pivotDgCreditorInvLines.ShowRowTotals = value;
+            pivotDgCreditorInvLines.ShowRowTotals = chkTtlOnFlds.IsChecked.GetValueOrDefault();
         }
     }
 }

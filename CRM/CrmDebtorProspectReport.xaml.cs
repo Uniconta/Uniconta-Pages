@@ -278,12 +278,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            OnClickImage((sender as Image).Tag, TabControls.UserNotesPage);
+            OnClickImage((sender as System.Windows.Controls.Image).Tag, TabControls.UserNotesPage);
         }
 
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            OnClickImage((sender as Image).Tag, TabControls.UserDocsPage);
+            OnClickImage((sender as System.Windows.Controls.Image).Tag, TabControls.UserDocsPage);
         }
 
         private void OnClickImage(object crmView, string page)

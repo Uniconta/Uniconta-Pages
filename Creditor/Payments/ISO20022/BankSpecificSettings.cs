@@ -234,6 +234,14 @@ namespace UnicontaISO20022CreditTransfer
         }
 
         /// <summary>
+        /// Exclude section PmtTpInf
+        /// </summary>
+        public virtual bool ExcludeSectionPmtTpInf()
+        {
+            return false;
+        }
+
+        /// <summary>
         /// Exclude section InitgPty
         /// SEB Sweden
         /// </summary>
@@ -268,6 +276,10 @@ namespace UnicontaISO20022CreditTransfer
             return null;
         }
 
+        public virtual string InstrForDbtrAgt(ISO20022PaymentTypes ISOPaymType, CountryCode creditorBankDetailsCountryId)
+        {
+            return null;
+        }
 
         /// <summary>
         /// Unique and unambiguous way of identifying an organisation or an individual person.
@@ -383,7 +395,7 @@ namespace UnicontaISO20022CreditTransfer
         /// SEPA Payment:
         /// The conditions for a SEPA payment
         /// 1.Creditor payment has currency code 'EUR'
-        /// 2.Sender - Bank og Receiver-Bank has to be member of the  European Economic Area.
+        /// 2.Sender - Bank and Receiver-Bank has to be member of the  European Economic Area.
         /// 3.Creditor account has to be IBAN
         /// 4.Payment must be Non-urgent
         /// 5.Countries where local currency is EUR and payment is in EUR 
@@ -391,30 +403,25 @@ namespace UnicontaISO20022CreditTransfer
         /// CROSS BORDER Payment:
         /// 
         /// </summary>
-        public virtual ISO20022PaymentTypes ISOPaymentType(string paymentCcy, string  companyIBAN, string creditorIBAN, string creditorSWIFT, string creditorCountryId, string companyCountryId)
+        public virtual ISO20022PaymentTypes ISOPaymentType(string paymentCcy, string  companyIBAN, string creditorIBAN, string creditorSWIFT, string creditorCountryId, string companyCountryId, CountryCode creditorBankDetailsCountryId)
         {
-            companyIBAN = companyIBAN ?? string.Empty;
-            creditorIBAN = creditorIBAN ?? string.Empty;
-            creditorSWIFT = creditorSWIFT ?? string.Empty;
-            companyCountryId = companyCountryId ?? string.Empty;
-            creditorCountryId = creditorCountryId ?? string.Empty;
-
             //Company
-            var companyBankCountryId = string.Empty;
-            if (companyIBAN.Length >= 2)
+            string companyBankCountryId = null;
+            if (companyIBAN != null && companyIBAN.Length >= 2)
                 companyBankCountryId = companyIBAN.Substring(0, 2);
             else
                 companyBankCountryId = companyCountryId;
-            
+
             //Creditor
-            var creditorBankCountryId = string.Empty;
-            if (creditorIBAN.Length >= 2)
+            string creditorBankCountryId = null;
+            if (creditorBankDetailsCountryId != CountryCode.Unknown)
+                creditorBankCountryId = ((CountryISOCode)creditorBankDetailsCountryId).ToString();
+            else if (creditorIBAN != null && creditorIBAN.Length >= 2)
                 creditorBankCountryId = creditorIBAN.Substring(0, 2);
-            else if (creditorSWIFT.Length > 6)
+            else if (creditorSWIFT != null && creditorSWIFT.Length > 6)
                 creditorBankCountryId = creditorSWIFT.Substring(4, 2);
             else
                 creditorBankCountryId = creditorCountryId;
-
             
             //SEPA payment:
             if (paymentCcy == BaseDocument.CCYEUR)
@@ -728,7 +735,7 @@ namespace UnicontaISO20022CreditTransfer
                 creditorAddress.Unstructured = true;
             }
 
-            creditorAddress.CountryId = ((CountryISOCode)creditor._Country).ToString();
+            creditorAddress.CountryId = creditor._Country == CountryCode.Unknown ? companyCountryId : ((CountryISOCode)creditor._Country).ToString();
 
             return creditorAddress;
         }

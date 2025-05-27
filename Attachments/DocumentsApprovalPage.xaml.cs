@@ -371,7 +371,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void Offeset_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            CallOffsetAccount((sender as Image).Tag as VouchersClient);
+            CallOffsetAccount((sender as System.Windows.Controls.Image).Tag as VouchersClient);
         }
         private void CallOffsetAccount(VouchersClient vouchersClientLine)
         {

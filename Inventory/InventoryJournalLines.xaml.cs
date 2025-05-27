@@ -617,6 +617,8 @@ namespace UnicontaClient.Pages.CustomPage
             busyIndicator.IsBusy = false;
         }
 
+        DateTime PostedDate;
+        string Comment, Txt;
         void PostJournal()
         {
             api.AllowBackgroundCrud = false;
@@ -627,21 +629,28 @@ namespace UnicontaClient.Pages.CustomPage
             if (source == null || source.Count == 0)
                 return;
 
-            CWInvPosting invpostingDialog = new CWInvPosting(api);
-            invpostingDialog.showCompanyName = true;
-#if !SILVERLIGHT
-            invpostingDialog.DialogTableId = 2000000039;
-#endif
-            invpostingDialog.Closed += async delegate
+            CWInvPosting postingDialog = new CWInvPosting(api)
             {
-                if (invpostingDialog.DialogResult == true)
+                DialogTableId = 2000000039,
+                showCompanyName = true,
+                Date = this.PostedDate,
+                Comment = this.Comment,
+                Text = this.Txt
+            };
+            postingDialog.Closed += async delegate
+            {
+                if (postingDialog.DialogResult == true)
                 {
+                    this.PostedDate = postingDialog.Date;
+                    this.Comment = postingDialog.Comment;
+                    this.Txt = postingDialog.Text;
+
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
                     busyIndicator.IsBusy = true;
                     if (savetask != null)
                         await savetask;
                     var postingApi = new Uniconta.API.Inventory.PostingAPI(api);
-                    var postingResult = await postingApi.PostJournal(journal, invpostingDialog.Date, invpostingDialog.Text, invpostingDialog.TransType, invpostingDialog.Comment, invpostingDialog.FixedVoucher, invpostingDialog.Simulation, new GLTransClientTotal(), source.Count);
+                    var postingResult = await postingApi.PostJournal(journal, postingDialog.Date, postingDialog.Text, postingDialog.TransType, postingDialog.Comment, postingDialog.FixedVoucher, postingDialog.Simulation, new GLTransClientTotal(), source.Count);
                     busyIndicator.IsBusy = false;
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LoadingMsg");
 
@@ -651,7 +660,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (postingResult.Err != ErrorCodes.Succes)
                         Utility.ShowJournalError(postingResult, dgInvJournalLine);
 
-                    else if (invpostingDialog.Simulation)
+                    else if (postingDialog.Simulation)
                     {
                         if (postingResult.SimulatedTrans != null)
                             AddDockItem(TabControls.SimulatedTransactions, postingResult.SimulatedTrans, Uniconta.ClientTools.Localization.lookup("SimulatedTransactions"), null, true);
@@ -664,6 +673,10 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     else
                     {
+                        this.PostedDate = DateTime.MinValue;
+                        this.Txt = null;
+                        this.Comment = null;
+
                         string msg;
                         if (postingResult.JournalPostedlId != 0)
                             msg = string.Format("{0} {1}={2}", Uniconta.ClientTools.Localization.lookup("JournalHasBeenPosted"), Uniconta.ClientTools.Localization.lookup("JournalPostedId"), postingResult.JournalPostedlId);
@@ -686,7 +699,7 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                 }
             };
-            invpostingDialog.Show();
+            postingDialog.Show();
         }
 
         protected override async Task<ErrorCodes> saveGrid()

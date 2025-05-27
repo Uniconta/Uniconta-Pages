@@ -20,7 +20,7 @@ using Uniconta.ClientTools.Controls;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
-    public partial class InvItemDetailControl : UserControl
+    public partial class InvItemDetailControl : System.Windows.Controls.UserControl
     {
         CrudAPI _api;
         public CrudAPI api

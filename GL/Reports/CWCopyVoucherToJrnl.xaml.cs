@@ -50,13 +50,14 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "Comment", ResourceType = typeof(InputFieldDataText))]
         public static string Comment { get; set; }
 
+        [InputFieldData]
+        [Display(Name = "CopyVATTrans", ResourceType = typeof(InputFieldDataText))]
+        public static bool CopyVATTrans { get; set; }
         public Uniconta.DataModel.GLDailyJournal GlDailyJournal;
 
-#if !SILVERLIGHT
         protected override int DialogId { get { return DialogTableId; } }
         public int DialogTableId { get; set; }
         protected override bool ShowTableValueButton { get { return true; } }
-#endif
 
         SQLCache JournalCache;
         public CWCopyVoucherToJrnl(CrudAPI api)
@@ -75,7 +76,7 @@ namespace UnicontaClient.Pages.CustomPage
             Dispatcher.BeginInvoke(new Action(() => { leJournal.Focus(); }));
         }
 
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {

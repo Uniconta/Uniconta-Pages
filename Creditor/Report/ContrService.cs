@@ -774,7 +774,7 @@ public partial class GagnaskilServiceClient : System.ServiceModel.ClientBase<IGa
     public GagnaskilServiceClient()
     {
     }
-    
+#if !UNICORE
     public GagnaskilServiceClient(string endpointConfigurationName) : 
             base(endpointConfigurationName)
     {
@@ -789,7 +789,7 @@ public partial class GagnaskilServiceClient : System.ServiceModel.ClientBase<IGa
             base(endpointConfigurationName, remoteAddress)
     {
     }
-    
+#endif
     public GagnaskilServiceClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
             base(binding, remoteAddress)
     {

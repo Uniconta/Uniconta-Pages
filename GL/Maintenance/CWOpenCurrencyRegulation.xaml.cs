@@ -67,11 +67,9 @@ namespace UnicontaClient.Pages.CustomPage
 
         CrudAPI api;
 
-#if !SILVERLIGHT
         protected override int DialogId { get { return DialogTableId; } }
         public int DialogTableId { get; set; }
         protected override bool ShowTableValueButton { get { return true; } }
-#endif
         public CWOpenCurrencyRegulation(CrudAPI crudapi)
         {
             this.DataContext = this;
@@ -81,9 +79,6 @@ namespace UnicontaClient.Pages.CustomPage
                 leCreditorAccount.api = leCreditorOffset.api = api;
 
             this.Title = Uniconta.ClientTools.Localization.lookup("CurrencyAdjustment");
-#if SILVERLIGHT
-            Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             date.DateTime = Uniconta.ClientTools.Page.BasePage.GetSystemDefaultDate();
             this.Loaded += CW_Loaded;
             LoadCacheInBackGround();
@@ -94,7 +89,7 @@ namespace UnicontaClient.Pages.CustomPage
             Dispatcher.BeginInvoke(new Action(() => { leJournal.Focus(); }));
         }
 
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {

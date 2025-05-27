@@ -66,7 +66,7 @@ namespace UnicontaClient.Pages.CustomPage
             this.BeforeClose += DebtorAccount_BeforeClose;
         }
 
-        private void RootVisual_KeyDown(object sender, KeyEventArgs e)
+        private void RootVisual_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.F8 && Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
                 ribbonControl.PerformRibbonAction("InvTrans");
@@ -411,9 +411,12 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         ViewDocument(UnicontaTabs.UserDocsPage3, dgInventoryItemsGrid.syncEntity, string.Format(Uniconta.ClientTools.Localization.lookup("ViewOBJ"), Uniconta.ClientTools.Localization.lookup("Url")), ViewerType.Url);
                     break;
-                case "Packaging":
+                case "ProducerResponsibility":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.InvPackagingProductPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Packaging"), selectedItem._Item));
+                        AddDockItem(TabControls.InvPackagingProductPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ProducerResponsibility"), selectedItem._Item));
+                    break;
+                case "InStock":
+                    AddDockItem(TabControls.InventoryItemOnHand, dgInventoryItemsGrid.syncEntity, true);
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -551,14 +554,14 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var invItem = (sender as Image).Tag as InvItemClient;
+            var invItem = (sender as System.Windows.Controls.Image).Tag as InvItemClient;
             if (invItem != null)
                 AddDockItem(TabControls.UserDocsPage, dgInventoryItemsGrid.syncEntity);
         }
 
         private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var invItem = (sender as Image).Tag as InvItemClient;
+            var invItem = (sender as System.Windows.Controls.Image).Tag as InvItemClient;
             if (invItem != null)
                 AddDockItem(TabControls.UserNotesPage, dgInventoryItemsGrid.syncEntity);
         }

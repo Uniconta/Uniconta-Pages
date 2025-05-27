@@ -255,13 +255,14 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccountPage2"
                         <CorasauControls:TextEditor x:Name="txtEmail" Text="{Binding DeliveryContactEmail,Mode=TwoWay}" MaskType="RegEx" Mask="{StaticResource EmailValidationRegx}"/>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
-
-                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="ESGGroup" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ESG}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="EPRGroup" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ProducerResponsibility}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
                     <CorasauControls:CorasauLayoutItem FieldName="PackagingConsumer" x:Name="liPackagingConsumer">
                         <CorasauControls:ComboBoxEditor SelectedItem="{Binding PackagingConsumer,Mode=TwoWay}" x:Name="cmbPackagingConsumer"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="MicroEnterprise" x:Name="liMicroEnterprise">
+                        <CorasauControls:CheckEditor x:Name="MicroEnterprise" IsChecked="{Binding MicroEnterprise,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
-
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="usedim" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Dimension}" Orientation="Vertical" Width="400" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                         <CorasauControls:CorasauLayoutItem x:Name="lbldim1">
                             <CorasauControls:LookupEditor x:Name="dim1lookupeditior" Text="{Binding Dimension1,Mode=TwoWay}">

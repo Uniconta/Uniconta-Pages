@@ -38,10 +38,8 @@ namespace UnicontaClient.Pages.CustomPage
             this.DataContext = this;
             this.api = api;
             InitializeComponent();
-#if !SILVERLIGHT
             if (string.IsNullOrWhiteSpace(leAccount.Text))
                 FocusManager.SetFocusedElement(leAccount, leAccount);
-#endif
             leAccount.api = api;
             if (isChangeDimension)
             {
@@ -119,59 +117,43 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 case 0:
                     rowAccount.Height = new GridLength(0);
-#if !SILVERLIGHT
                     lblAccount.Visibility = Visibility.Hidden;
                     leAccount.Visibility = Visibility.Hidden;
-#endif
                     break;
                 case 1:
                     rowDim1.Height = new GridLength(0);
-#if !SILVERLIGHT
                     lblDim1.Visibility = Visibility.Hidden;
                     lookupDim1.Visibility = Visibility.Hidden;
-#endif
                     break;
                 case 2:
                     rowDim2.Height = new GridLength(0);
-#if !SILVERLIGHT
                     lblDim2.Visibility = Visibility.Hidden;
                     lookupDim2.Visibility = Visibility.Hidden;
-#endif
                     break;
                 case 3:
                     rowDim3.Height = new GridLength(0);
-#if !SILVERLIGHT
                     lblDim3.Visibility = Visibility.Hidden;
                     lookupDim3.Visibility = Visibility.Hidden;
-#endif
                     break;
                 case 4:
                     rowDim4.Height = new GridLength(0);
-#if !SILVERLIGHT
                     lblDim4.Visibility = Visibility.Hidden;
                     lookupDim4.Visibility = Visibility.Hidden;
-#endif
                     break;
                 case 5:
                     rowDim5.Height = new GridLength(0);
-#if !SILVERLIGHT
                     lblDim5.Visibility = Visibility.Hidden;
                     lookupDim5.Visibility = Visibility.Hidden;
-#endif
                     break;
                 case 6:
                     rowText.Height = new GridLength(0);
-#if !SILVERLIGHT
                     lblText.Visibility = Visibility.Collapsed;
                     txtText.Visibility = Visibility.Collapsed;
-#endif
                     break;
                 case 7:
                     rowQty.Height = new GridLength(0);
-#if !SILVERLIGHT
                     lblQty.Visibility = Visibility.Hidden;
                     deQuantity.Visibility = Visibility.Hidden;
-#endif
                     break;
             }
         }
@@ -181,7 +163,7 @@ namespace UnicontaClient.Pages.CustomPage
             Dispatcher.BeginInvoke(new Action(() => { leAccount.Focus(); }));
         }
     
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {

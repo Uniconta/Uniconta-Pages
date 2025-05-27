@@ -473,6 +473,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private async Task<IPrintReport> PrintInvoice(CreditorInvoiceClient creditorInvoice)
         {
+            IPrintReport iprintReport = null;
             var creditorInvoicePrint = new CreditorPrintReport(creditorInvoice, api, CompanyLayoutType.PurchaseInvoice);
 
             //In case of Multiple Invoices printing
@@ -486,23 +487,25 @@ namespace UnicontaClient.Pages.CustomPage
                     creditorInvoicePrint.CompanyLogo, creditorInvoicePrint.ReportName, (int)Uniconta.ClientTools.Controls.Reporting.StandardReports.PurchaseInvoice, creditorInvoicePrint.CreditorMessage, creditorInvoicePrint.IsCreditNote);
 
                 var creditorStandardReport = new[] { creditorStandardInvoice };
-                IPrintReport iprintReport = new StandardPrintReport(api, creditorStandardReport, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.PurchaseInvoice);
+                iprintReport = new StandardPrintReport(api, creditorStandardReport, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.PurchaseInvoice);
                 await iprintReport.InitializePrint();
-                if (iprintReport?.Report != null)
-                    return iprintReport;
 
-                //Call LayoutInvoice
-                var layoutPrint = new LayoutPrintReport(api, creditorInvoice, creditorInvoicePrint.IsCreditNote ? CompanyLayoutType.Creditnote : CompanyLayoutType.PurchaseInvoice);
-                layoutPrint.SetupLayoutPrintFields(creditorInvoicePrint);
-                
-                //Setup lookup if has lookup
-                if (hasLookups)
-                    layoutPrint.SetLookUpForDebtorMessageClients(messagesLookup);
+                if (iprintReport?.Report == null)
+                {
+                    //Call LayoutInvoice
+                    iprintReport = new LayoutPrintReport(api, creditorInvoice, creditorInvoicePrint.IsCreditNote ? CompanyLayoutType.Creditnote : CompanyLayoutType.PurchaseInvoice);
+                    if (iprintReport is LayoutPrintReport layoutPrint) // Invoke Special Methods for LayoutPrint Report
+                    {
+                        layoutPrint.SetupLayoutPrintFields(creditorInvoicePrint);
 
-                await layoutPrint.InitializePrint();
-                return layoutPrint;
+                        //Setup lookup if has lookup
+                        if (hasLookups)
+                            layoutPrint.SetLookUpForDebtorMessageClients(messagesLookup);
+                    }
+                    await iprintReport.InitializePrint();
+                }
             }
-            return null;
+            return iprintReport;
         }
 
         async private Task FillLookUps(CreditorPrintReport creditorInvoicePrint)
@@ -515,6 +518,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private async Task<IPrintReport> PrintPackNote(CreditorInvoiceClient creditorInvoice)
         {
+            IPrintReport iprintReport = null;
             var packnote = Uniconta.ClientTools.Controls.Reporting.StandardReports.PurchasePackNote;
             var creditorInvoicePrint = new UnicontaClient.Pages.CreditorPrintReport(creditorInvoice, api, CompanyLayoutType.Packnote);
 
@@ -530,22 +534,24 @@ namespace UnicontaClient.Pages.CustomPage
                     creditorInvoicePrint.CompanyLogo, creditorInvoicePrint.ReportName, (int)packnote, creditorInvoicePrint.CreditorMessage);
 
                 var standardReports = new[] { standardCreditorInvoice };
-                IPrintReport iprintReport = new StandardPrintReport(api, standardReports, (byte)packnote);
+                iprintReport = new StandardPrintReport(api, standardReports, (byte)packnote);
                 await iprintReport.InitializePrint();
-                if (iprintReport?.Report != null)
-                    return iprintReport;
 
-                //Call LayoutInvoice
-                var layoutPrint = new LayoutPrintReport(api, creditorInvoice, CompanyLayoutType.Packnote);
-                layoutPrint.SetupLayoutPrintFields(creditorInvoicePrint);
+                if (iprintReport?.Report == null)
+                {
+                    //Call LayoutInvoice
+                    iprintReport = new LayoutPrintReport(api, creditorInvoice, CompanyLayoutType.Packnote);
+                    if (iprintReport is LayoutPrintReport layoutPrint) // Invoke Special Methods for LayoutPrint Report
+                    {
+                        layoutPrint.SetupLayoutPrintFields(creditorInvoicePrint);
 
-                if (hasLookups)
-                    layoutPrint.SetLookUpForDebtorMessageClients(messagesLookup);
-
-                await layoutPrint.InitializePrint();
-                return layoutPrint;
+                        if (hasLookups)
+                            layoutPrint.SetLookUpForDebtorMessageClients(messagesLookup);
+                    }
+                    await iprintReport.InitializePrint();
+                }
             }
-            return null;
+            return iprintReport;
         }
 
         public override bool IsDataChaged => IsGeneratingDocument;

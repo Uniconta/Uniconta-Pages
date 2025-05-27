@@ -467,7 +467,9 @@ namespace UnicontaClient.Pages.CustomPage
             if (screenName == TabControls.AttachVoucherGridPage && argument != null)
             {
                 var voucherObj = argument as object[];
-                SetAttachedVoucherForJournalLine(voucherObj[0] as VouchersClient);
+                var openedFrom = voucherObj[1];
+                if (openedFrom == this.ParentControl)
+                    SetAttachedVoucherForJournalLine(voucherObj[0] as VouchersClient);
             }
         }
 
@@ -483,7 +485,7 @@ namespace UnicontaClient.Pages.CustomPage
                 masterRecord._NumberOfLines = cnt;
         }
 
-        private void RootVisual_KeyDown(object sender, KeyEventArgs e)
+        private void RootVisual_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.F8)
             {
@@ -946,7 +948,7 @@ namespace UnicontaClient.Pages.CustomPage
                 var propertyInfo = line.GetType().GetProperty("DocumentRef");
                 if (propertyInfo != null)
                 {
-                    int docRef = (int)propertyInfo.GetValue(line, null);
+                    int docRef = Convert.ToInt32(propertyInfo.GetValue(line, null));
                     if (docRef != 0)
                         propertyInfo.SetValue(line, 0, null);
                 }
@@ -1245,6 +1247,8 @@ namespace UnicontaClient.Pages.CustomPage
             Utility.ShowJournalError(postingRes, dgGLDailyJournalLine);
         }
 
+        DateTime PostedDate;
+        string Comment;
         private void PostJournal()
         {
             var source = (ICollection<JournalLineGridClient>)dgGLDailyJournalLine.ItemsSource;
@@ -1273,12 +1277,19 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else
                 dateMsg = null;
-            CWPosting postingDialog = new CWPosting(masterRecord, api.CompanyEntity.Name, dateMsg);
-            postingDialog.DialogTableId = 2000000014;
+            CWPosting postingDialog = new CWPosting(masterRecord, api.CompanyEntity.Name, dateMsg)
+            {
+                DialogTableId = 2000000014,
+                PostedDate = this.PostedDate,
+                comments = this.Comment
+            };
             postingDialog.Closed += async delegate
             {
                 if (postingDialog.DialogResult == true)
                 {
+                    this.PostedDate = postingDialog.PostedDate;
+                    this.Comment = postingDialog.comments;
+
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
                     busyIndicator.IsBusy = true;
 
@@ -1342,6 +1353,9 @@ namespace UnicontaClient.Pages.CustomPage
                     else
                     {
                         // everything was posted fine
+                        this.PostedDate = DateTime.MinValue;
+                        this.Comment = null;
+
                         string msg;
                         if (postingResult.JournalPostedlId != 0)
                             msg = string.Format("{0} {1}={2}", Uniconta.ClientTools.Localization.lookup("JournalHasBeenPosted"), Uniconta.ClientTools.Localization.lookup("JournalPostedId"), NumberConvert.ToString(postingResult.JournalPostedlId));
@@ -2559,15 +2573,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        public class LedgerSQLCacheFilter : SQLCacheFilter
-        {
-            public LedgerSQLCacheFilter(SQLCache cache) : base(cache) { }
-            public override bool IsValid(object rec)
-            {
-                var acc = (GLAccount)rec;
-                return (acc._AccountType == 0 || acc._AccountType > (byte)GLAccountTypes.CalculationExpression) && !acc._BlockedInJournal && !acc._Blocked;
-            }
-        }
+        
 
         CorasauGridLookupEditorClient prevAccount;
         private void Account_GotFocus(object sender, RoutedEventArgs e)
@@ -2721,7 +2727,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void HasOffSetAccount_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            CallOffsetAccount((sender as Image).Tag as JournalLineGridClient);
+            CallOffsetAccount((sender as System.Windows.Controls.Image).Tag as JournalLineGridClient);
         }
 
         void CallOffsetAccount(JournalLineGridClient line)

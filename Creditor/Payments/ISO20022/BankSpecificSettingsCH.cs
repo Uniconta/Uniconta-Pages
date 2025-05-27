@@ -38,6 +38,9 @@ namespace UnicontaISO20022CreditTransfer
                 case chBank.CreditSuisse:
                     companyBankEnum = CompanyBankENUM.CreditSuisse;
                     return companyBankEnum;
+                case chBank.Aargauischen_Kantonalbank:
+                    companyBankEnum = CompanyBankENUM.Aargauischen_Kantonalbank;
+                    return companyBankEnum;
                 default:
                     return CompanyBankENUM.None;
             }
@@ -68,6 +71,7 @@ namespace UnicontaISO20022CreditTransfer
             {
                 case CompanyBankENUM.UBS_SIX:
                 case CompanyBankENUM.CreditSuisse:
+                case CompanyBankENUM.Aargauischen_Kantonalbank:
                     return new UpperCaseUTF8Encoding(false);
                 default:
                     return Encoding.GetEncoding("ISO-8859-1");
@@ -130,6 +134,7 @@ namespace UnicontaISO20022CreditTransfer
             {
                 case CompanyBankENUM.UBS_SIX:
                 case CompanyBankENUM.CreditSuisse:
+                case CompanyBankENUM.Aargauischen_Kantonalbank:
                     return CredPaymFormat.BatchBooking ? TRUE_VALUE : FALSE_VALUE;
                 default:
                     return string.Empty;
@@ -171,6 +176,17 @@ namespace UnicontaISO20022CreditTransfer
         }
 
         /// <summary>
+        /// Exclude section PmtTpInf
+        /// </summary>
+        public override bool ExcludeSectionPmtTpInf()
+        {
+            if (companyBankEnum == CompanyBankENUM.Aargauischen_Kantonalbank)
+                return true;
+            return false;
+        }
+
+
+        /// <summary>
         /// Generate filename
         /// </summary>
         public override string GenerateFileName(int fileID, int companyID)
@@ -183,6 +199,9 @@ namespace UnicontaISO20022CreditTransfer
                     break;
                 case CompanyBankENUM.CreditSuisse:
                     bankName = "CreditSuisse";
+                    break;
+                case CompanyBankENUM.Aargauischen_Kantonalbank:
+                    bankName = "AargauischenKantonalbank";
                     break;
                 default:
                     bankName = null;
@@ -212,6 +231,7 @@ namespace UnicontaISO20022CreditTransfer
             switch (CredPaymFormat.Bank)
             {
                 case chBank.CreditSuisse:
+                case chBank.Aargauischen_Kantonalbank:
                     return null;
                 default: return BaseDocument.INSTRUCTIONPRIORITY_NORM;
             }
@@ -286,7 +306,7 @@ namespace UnicontaISO20022CreditTransfer
 
         public override PostalAddress CreditorAddress(Uniconta.DataModel.Creditor creditor, PostalAddress creditorAddress, ISO20022PaymentTypes paymentType, bool unstructured = false)
         {
-            if (companyBankEnum == CompanyBankENUM.CreditSuisse)
+            if (companyBankEnum == CompanyBankENUM.CreditSuisse || companyBankEnum == CompanyBankENUM.Aargauischen_Kantonalbank)
                 return base.CreditorAddress(creditor, creditorAddress, paymentType, unstructured);
 
             return null;

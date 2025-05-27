@@ -71,9 +71,9 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccount"
                             </ControlTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
-                    <!--<localPage:CorasauDataGridTemplateColumnClient x:Name="LocalClassProp"/>-->
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Account"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Name"/>
+                    <!--<localPage:CorasauDataGridTemplateColumnClient x:Name="Act"/>-->
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CurBalance" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Overdue" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CurBalanceCur" Visible="False" Width="90"/>
@@ -186,6 +186,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccount"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryPhone" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryContactEmail" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PackagingConsumer" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="MicroEnterprise" Visible="False" />
                 </localPage:DebtorAccountGrid.Columns>
                 <localPage:DebtorAccountGrid.TotalSummary>
                     <localPage:SumColumn FieldName="CurBalance" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>

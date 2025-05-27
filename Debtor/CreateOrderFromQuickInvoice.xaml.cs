@@ -49,7 +49,7 @@ namespace UnicontaClient.Pages.CustomPage
         bool disableOrderLineGrid = false;
         Company company;
         static double pageHeight = 650.0d, pageWidth = 700.0d;
-        static Point position = new Point();
+        static System.Windows.Point position = new System.Windows.Point();
         public override string NameOfControl => TabControls.CreateOrderFromQuickInvoice;
         public bool IsDeleteLines { get; set; }
         public override void PageClosing()
@@ -89,8 +89,8 @@ namespace UnicontaClient.Pages.CustomPage
             if (dcOrder is ProjectInvoiceProposalClient)
                 chkDelete.Visibility = Visibility.Visible;
             dcOrderlineGrid.isOrder = isOrder;
-            ((TableView)dgCreateOrderGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
-            ((TableView)dcOrderlineGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
+            ((TableView)dgCreateOrderGrid.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
+            ((TableView)dcOrderlineGrid.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
             company = api.CompanyEntity;
             this.items = company.GetCache(typeof(InvItem));
             this.SetHeader(String.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), Uniconta.ClientTools.Localization.lookup("Invoice")));
@@ -128,7 +128,7 @@ namespace UnicontaClient.Pages.CustomPage
             dcOrderlineGrid.ItemsSource = null;
             busyIndicator.IsBusy = true;
 
-            var lines = await CreateDCOrderLinesFromInvoice(dcOrder, selectedItem, (bool)chkIfCreditNote.IsChecked);
+            var lines = await CreateDCOrderLinesFromInvoice(dcOrder, selectedItem, chkIfCreditNote.IsChecked.GetValueOrDefault());
             if (lines != null)
                 DCOrderLines = lines.Cast<UnicontaBaseEntity>();
             busyIndicator.IsBusy = false;
@@ -141,7 +141,7 @@ namespace UnicontaClient.Pages.CustomPage
             Dispatcher.BeginInvoke(new Action(() => { CreateButton.Focus(); }));
         }
 
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
             {
@@ -255,7 +255,7 @@ namespace UnicontaClient.Pages.CustomPage
             var selectedItem = dgCreateOrderGrid.SelectedItem as DebtorInvoiceClient;
             if (selectedItem != null && !disableOrderLineGrid)
             {
-                double sign = (bool)chkIfCreditNote.IsChecked ? -1d : 1d;
+                double sign = chkIfCreditNote.IsChecked.GetValueOrDefault() ? -1d : 1d;
                 var source = dcOrderlineGrid.ItemsSource as IEnumerable<DebtorCommonOrderLineClient>;
                 if (source != null)
                 {

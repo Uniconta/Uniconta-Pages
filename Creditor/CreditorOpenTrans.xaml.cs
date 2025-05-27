@@ -34,6 +34,9 @@ namespace UnicontaClient.Pages.CustomPage
 
     public partial class CreditorOpenTrans : GridBasePage
     {
+        CreditorTransOpenClient transOpenMaster;
+        List<CreditorTransOpenClient> settles;
+        UnicontaBaseEntity pageMaster;
         public override string NameOfControl
         {
             get { return TabControls.CreditorOpenTransactions.ToString(); }
@@ -60,7 +63,6 @@ namespace UnicontaClient.Pages.CustomPage
         {
             InitPage(master);
         }
-        UnicontaBaseEntity pageMaster;
         private void InitPage(UnicontaBaseEntity master)
         {
             InitializeComponent();
@@ -70,12 +72,7 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgCreditorTranOpenGrid.UpdateMaster(pageMaster = master);
             dgCreditorTranOpenGrid.ShowTotalSummary();
-
-#if SILVERLIGHT
-            Application.Current.RootVisual.KeyDown += CreditorOpenTrans_KeyDown;
-#else
             this.KeyDown += CreditorOpenTrans_KeyDown;
-#endif
             var Comp = api.CompanyEntity;
             if (Comp.RoundTo100)
                 Amount.HasDecimals = AmountOpen.HasDecimals = Debit.HasDecimals = Credit.HasDecimals = false;
@@ -83,7 +80,7 @@ namespace UnicontaClient.Pages.CustomPage
             HideMenuItems();
         }
 
-        private void CreditorOpenTrans_KeyDown(object sender, KeyEventArgs e)
+        private void CreditorOpenTrans_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Space)
                 FlipSelection();
@@ -113,9 +110,6 @@ namespace UnicontaClient.Pages.CustomPage
                 dgCreditorTranOpenGrid.UpdateItemSource(argument);
             }
         }
-        CreditorTransOpenClient transOpenMaster;
-        List<CreditorTransOpenClient> settles;
-
         async void Settle()
         {
             if (transOpenMaster != null && settles != null && settles.Count > 0)
@@ -223,7 +217,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
         private void CheckBox_Click(object sender, RoutedEventArgs e)
         {
-            var rec = (CreditorTransOpenClient)((CheckBox)sender).Tag;
+            var rec = (CreditorTransOpenClient)((System.Windows.Controls.CheckBox)sender).Tag;
             CheckBoxClick(rec);
         }
         private void CheckBoxClick(CreditorTransOpenClient rec)
@@ -261,15 +255,31 @@ namespace UnicontaClient.Pages.CustomPage
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
             var groups = UtilDisplay.GetMenuCommandsByStatus(rb, true);
             double payment = 0d, invoice = 0d;
-            double? paymentCur = 0d, invoiceCur = 0d;
+            double paymentCur = 0d, invoiceCur = 0d;
+            ShowPaymentStatus(true);
             if (transOpenMaster != null)
             {
-                payment = transOpenMaster.AmountOpen;
-                paymentCur = transOpenMaster.AmountOpenCur.GetValueOrDefault();
+                if (transOpenMaster.Currency == null)
+                    payment = transOpenMaster.PartialSettlement != 0 ? transOpenMaster.PartialSettlement : transOpenMaster._AmountOpen;
+                else
+                {
+                    payment = transOpenMaster.AmountOpen;
+                    paymentCur = transOpenMaster.AmountOpenCur.GetValueOrDefault();
+                }
                 if ((settles != null && settles.Count != 0))
                 {
-                    invoice = settles.Sum(s => s.AmountOpen);
-                    invoiceCur = settles.Sum(s => s.AmountOpenCur);
+                    foreach (var settle in settles)
+                    {
+                        if (settle.Currency == null)
+                            invoice += settle.PartialSettlement != 0 ? settle.PartialSettlement : settle._AmountOpen;
+                        else
+                        {
+                            invoiceCur += settle.PartialSettlement != 0 ? settle.PartialSettlement : settle._AmountOpenCur;
+                            invoice += transOpenMaster._AmountOpen;
+                        }
+                    }
+                    if (invoiceCur != 0d)
+                        ShowPaymentCurrencyStatus(true);
                 }
             }
 
@@ -287,11 +297,11 @@ namespace UnicontaClient.Pages.CustomPage
                         grp.StatusValue = invoice != 0d ? (payment + invoice).ToString("N2") : string.Empty;
 
                     if (grp.Caption == Uniconta.ClientTools.Localization.lookup("PaymentCurrency"))
-                        grp.StatusValue = paymentCur.HasValue ? paymentCur.GetValueOrDefault().ToString("N2") : null;
+                        grp.StatusValue = paymentCur != 0 ? paymentCur.ToString("N2") : null;
                     else if (grp.Caption == Uniconta.ClientTools.Localization.lookup("InvoiceCurrency"))
-                        grp.StatusValue = invoiceCur != 0d ? invoiceCur.GetValueOrDefault().ToString("N2") : string.Empty;
+                        grp.StatusValue = invoiceCur != 0d ? invoiceCur.ToString("N2") : string.Empty;
                     else if (grp.Caption == Uniconta.ClientTools.Localization.lookup("TotalCur"))
-                        grp.StatusValue = invoiceCur != 0d ? (paymentCur.GetValueOrDefault() + invoiceCur.GetValueOrDefault()).ToString("N2") : string.Empty;
+                        grp.StatusValue = invoiceCur != 0d ? (paymentCur + invoiceCur).ToString("N2") : string.Empty;
                 }
             }
         }
@@ -322,6 +332,40 @@ namespace UnicontaClient.Pages.CustomPage
         protected override void LoadCacheInBackGround()
         {
             LoadType(new List<Type>(2) { typeof(Uniconta.DataModel.GLVat), typeof(Uniconta.DataModel.PaymentTerm) });
+        }
+        protected override void OnLayoutLoaded()
+        {
+            ShowPaymentStatus(false);
+            ShowPaymentCurrencyStatus(false);
+            base.OnLayoutLoaded();
+        }
+
+        void ShowPaymentStatus(bool val)
+        {
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            var items = UtilDisplay.GetMenuCommandsByStatus(rb, true);
+            SetStatusItemVisibility("Payment", items, val);
+            SetStatusItemVisibility("Invoice", items, val);
+            SetStatusItemVisibility("Sum", items, val, true);
+            var gp = UtilDisplay.GetMenuGroupByItem(rb, Uniconta.ClientTools.Localization.lookup("Payment"));
+            gp.IsVisible = val;
+        }
+
+        void ShowPaymentCurrencyStatus(bool val)
+        {
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            var items = UtilDisplay.GetMenuCommandsByStatus(rb, true);
+            SetStatusItemVisibility("PaymentCurrency", items, val);
+            SetStatusItemVisibility("InvoiceCurrency", items, val);
+            SetStatusItemVisibility("TotalCur", items, val, true);
+            var gp = UtilDisplay.GetMenuGroupByItem(rb, Uniconta.ClientTools.Localization.lookup("PaymentCurrency"));
+            gp.IsVisible = val;
+        }
+        private void SetStatusItemVisibility(string itemName, IEnumerable<ItemBase> items, bool isVisible, bool hideSeperator = false)
+        {
+            var item = items?.FirstOrDefault(i => Convert.ToString(i.Caption) == Uniconta.ClientTools.Localization.lookup(itemName));
+            if (item != null)
+                item.IsModule = isVisible;
         }
     }
 }

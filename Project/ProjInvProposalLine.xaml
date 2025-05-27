@@ -12,9 +12,6 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjInvProposalLine"
         xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
         xmlns:docking="http://schemas.devexpress.com/winfx/2008/xaml/docking">
     <UserControl.Resources>
-        <Style x:Key="StyleRow" TargetType="dxg:RowControl">
-            <Setter Property="Height" Value="Auto"/>
-        </Style>
         <Util:RowIndexConverter x:Key="RowIndexConverter" />
         <Util:MaskConverter x:Key="MaskConverter" />
     </UserControl.Resources>

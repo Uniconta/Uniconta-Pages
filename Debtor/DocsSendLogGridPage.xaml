@@ -8,11 +8,6 @@ x:Class="UnicontaClient.Pages.CustomPage.DocsSendLogGridPage"
              xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
              xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
              xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors">
-    <UserControl.Resources>
-        <Style x:Key="StyleRow" TargetType="dxg:RowControl">
-            <Setter Property="Height" Value="Auto"/>
-        </Style>
-    </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />

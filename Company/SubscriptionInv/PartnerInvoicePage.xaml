@@ -28,6 +28,7 @@ x:Class="UnicontaClient.Pages.CustomPage.PartnerInvoicePage"
                 </local:PartnerInvoiceGrid.Columns>
                 
                 <local:PartnerInvoiceGrid.TotalSummary>
+                    <local:SumColumn FieldName="Clients" SummaryType="Sum"/>
                     <local:SumColumn FieldName="LineAmount" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <local:SumColumn FieldName="VatAmount" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <local:SumColumn FieldName="Total" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>

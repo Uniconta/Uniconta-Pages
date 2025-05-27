@@ -1337,7 +1337,7 @@ public partial class GetLatestSettlementRunNumberResponse
         this.status = status;
     }
 }
-
+#if !UNICORE
 public interface CreditCardChannel : ICreditCard, System.ServiceModel.IClientChannel
 {
 }
@@ -1636,3 +1636,5 @@ public partial class CreditCardClient : System.ServiceModel.ClientBase<ICreditCa
         return base.Channel.PingAsync();
     }
 }
+
+#endif

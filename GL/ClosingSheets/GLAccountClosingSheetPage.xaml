@@ -94,7 +94,15 @@ x:Class="UnicontaClient.Pages.CustomPage.GLAccountClosingSheetPage"
                                 <editor:MemoEditSettings MaxLength="4000"/>
                             </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
                     </localPage:CorasauDataGridTemplateColumnClient>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Comment" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Index" Width="120"  AllowEditing="True" ReadOnly="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Link" Width="120"  AllowEditing="True" ReadOnly="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="WorkPaper" Width="120"  AllowEditing="True" ReadOnly="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SheetComment" Width="50" AllowEditing="True" ReadOnly="False">
+                        <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                            <editor:MemoEditSettings MaxLength="4000"/>
+                        </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Comment" Width="120"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim1" FieldName="Dim1ParmDisplay" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim2" FieldName="Dim2ParmDisplay" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim3" FieldName="Dim3ParmDisplay" Visible="False"/>

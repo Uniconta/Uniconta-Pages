@@ -155,7 +155,7 @@ namespace UnicontaClient.Pages.CustomPage
                         }
 
                         if (string.IsNullOrWhiteSpace(editrow._Name))
-                            editrow._Name = ci.life.name;
+                            editrow.CompanyName = ci.life.name;
                         if (!string.IsNullOrEmpty(ci.contact?.phone))
                             editrow.Phone = ci.contact.phone;
                         if (!string.IsNullOrEmpty(ci.contact?.www))

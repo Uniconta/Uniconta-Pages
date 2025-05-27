@@ -60,7 +60,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var order = (sender as Image).Tag as CompanyFolderClient;
+            var order = (sender as System.Windows.Controls.Image).Tag as CompanyFolderClient;
             if (order != null)
                 AddDockItem(TabControls.UserDocsPage, order, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Documents"), order.Name));
         }

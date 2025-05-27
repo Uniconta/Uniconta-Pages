@@ -211,9 +211,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void chkGrdTtlRow_Checked(object sender, RoutedEventArgs e)
         {
-            var value = (bool)chkGrdTtlRow.IsChecked;
-            pivotDgDebtorInvLines.ShowRowGrandTotalHeader = value;
-            pivotDgDebtorInvLines.ShowRowGrandTotals = value;
+            pivotDgDebtorInvLines.ShowRowGrandTotalHeader = 
+            pivotDgDebtorInvLines.ShowRowGrandTotals = chkGrdTtlRow.IsChecked.GetValueOrDefault(); ;
         }
 
         private void chkGrdTtlCol_Checked(object sender, RoutedEventArgs e)

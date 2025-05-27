@@ -96,7 +96,7 @@ namespace UnicontaClient.Pages.CustomPage
         void InitPage()
         {
             InitializeComponent();
-            ((TableView)dgInvBOMPartOfGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
+            ((TableView)dgInvBOMPartOfGrid.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
             localMenu.dataGrid = dgInvBOMPartOfGrid;
             SetRibbonControl(localMenu, dgInvBOMPartOfGrid);
             dgInvBOMPartOfGrid.api = api;

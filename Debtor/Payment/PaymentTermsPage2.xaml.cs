@@ -42,9 +42,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             InitializeComponent();
             InitPage(crudApi);
-#if !SILVERLIGHT
             FocusManager.SetFocusedElement(txtPayment, txtPayment);
-#endif
         }
         void InitPage(CrudAPI crudapi)
         {
@@ -72,39 +70,39 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void SetVisibility()
         {
-            lItemOffsetAccount.Visibility = itemPct1.Visibility = grpDays.Visibility = grpDebtor.Visibility = grpCashDisCount.Visibility =
+            lItemOffsetAccount.Visibility = liDebtorAccount.Visibility = liPct1.Visibility = liPct2.Visibility = grpDays.Visibility = grpCashDisCount.Visibility =
             grpAccount.Visibility = liPostOnDC.Visibility = Visibility.Visible;
             switch (editrow._PaymentMethod)
             {
                 case PaymentMethodTypes.NetCash:
-                    lItemOffsetAccount.Visibility =
-                    itemPct1.Visibility = grpDays.Visibility = grpDebtor.Visibility = grpCashDisCount.Visibility = Visibility.Collapsed;
+                    lItemOffsetAccount.Visibility = liDebtorAccount.Visibility = liPct2.Visibility =
+                    liPct1.Visibility = grpDays.Visibility = grpCashDisCount.Visibility = Visibility.Collapsed;
                     grpAccount.Visibility = Visibility.Visible;
                     liPostOnDC.Visibility = Visibility.Visible;
                     break;
                 case PaymentMethodTypes.PrePayment:
-                    itemPct1.Visibility = grpDebtor.Visibility = liPostOnDC.Visibility = Visibility.Collapsed;
+                    liPct1.Visibility = liPostOnDC.Visibility = Visibility.Collapsed;
                     lItemOffsetAccount.Visibility =
                     grpDays.Visibility = grpAccount.Visibility = grpCashDisCount.Visibility = Visibility.Visible;
                     break;
                 case PaymentMethodTypes.Creditcard:
-                    lItemOffsetAccount.Visibility = grpDays.Visibility =  liPostOnDC.Visibility = Visibility.Collapsed;
-                    grpDebtor.Visibility = grpAccount.Visibility = itemPct1.Visibility = grpCashDisCount.Visibility = Visibility.Visible;
+                    lItemOffsetAccount.Visibility = grpDays.Visibility = liPct1.Visibility = liPct2.Visibility = grpCashDisCount.Visibility = liPostOnDC.Visibility = Visibility.Collapsed;
+                    grpAccount.Visibility = Visibility.Visible;
                     break;
                 case PaymentMethodTypes.Factoring:
-                    grpDays.Visibility =  liPostOnDC.Visibility = Visibility.Collapsed;
-                    grpDebtor.Visibility = grpAccount.Visibility = itemPct1.Visibility = grpCashDisCount.Visibility = Visibility.Visible;
+                    grpDays.Visibility = liPostOnDC.Visibility = Visibility.Collapsed;
+                    grpAccount.Visibility = liPct1.Visibility = grpCashDisCount.Visibility = Visibility.Visible;
                     break;
                 case PaymentMethodTypes.EndMonth:
-                    grpAccount.Visibility = grpDebtor.Visibility = liPostOnDC.Visibility = Visibility.Collapsed;
+                    grpAccount.Visibility = liPostOnDC.Visibility = Visibility.Collapsed;
                     grpCashDisCount.Visibility = Visibility.Visible;
                     break;
                 case PaymentMethodTypes.NetDays:
-                    grpDebtor.Visibility = grpAccount.Visibility = liPostOnDC.Visibility = Visibility.Collapsed;
+                    grpAccount.Visibility = liPostOnDC.Visibility = Visibility.Collapsed;
                     grpDays.Visibility = grpCashDisCount.Visibility = Visibility.Visible;
                     break;
                 case PaymentMethodTypes.EndWeek:
-                    grpDebtor.Visibility = grpAccount.Visibility = liPostOnDC.Visibility = Visibility.Collapsed;
+                    grpAccount.Visibility = liPostOnDC.Visibility = Visibility.Collapsed;
                     grpDays.Visibility = grpCashDisCount.Visibility = Visibility.Visible;
                     break;
             }

@@ -214,8 +214,10 @@ namespace UnicontaClient.Pages.CustomPage
           CrudAPI crudApi,
           List<VatSumOperationReport> vatSumOperationReports) // Only for test service URI
         {
+#if !UNICORE
             try
             {
+
                 var client = new VskClient(txtKennitala.Text, txtPassword.Text);
                 var result = await client.ResetTestAsync(txtKennitala.Text, ToDate, api.CompanyEntity._VatNumber);
                 if (result.EydaSkyrsluIProfunSvar != null)
@@ -229,6 +231,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 UnicontaMessageBox.Show($"{e.Message} \n\n {e.StackTrace}", "Villa");
             }
+#endif
         }
 
         private async Task<docType_ns_VSKSkyrslaSvar> SendToRSK(
@@ -237,6 +240,7 @@ namespace UnicontaClient.Pages.CustomPage
             docType_ns_VSKSkyrslaSvar response = null;
             try
             {
+#if !UNICORE
                 var client = new VskClient(txtKennitala.Text, txtPassword.Text);
                 long[] longsOrdered = vatSumOperationReports.OrderBy(o => o._Line)
                                                             .Select(i => (long)Math.Round(i._Amount != 0 ? i._Amount : i._AmountBase != 0 ? i._AmountBase : 0))
@@ -253,6 +257,7 @@ namespace UnicontaClient.Pages.CustomPage
                   inn24: longsOrdered[5],
                   inn11: longsOrdered[6]
                 );
+#endif
             }
             catch (MessageSecurityException)
             {
@@ -267,5 +272,5 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
 #endif
-    }
+            }
 }

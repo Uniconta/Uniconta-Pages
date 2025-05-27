@@ -255,9 +255,9 @@ namespace UnicontaClient.Pages.CustomPage
             dgDocsGrid.tableView.FocusedRowHandle = e.TargetRowHandle > 0 ? e.TargetRowHandle - 1 : -1;
             string[] errors = null;
 
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            if (e.Data.GetDataPresent(System.Windows.Forms.DataFormats.FileDrop))
             {
-                var files = e.Data.GetData(DataFormats.FileDrop) as string[];
+                var files = e.Data.GetData(System.Windows.Forms.DataFormats.FileDrop) as string[];
                 if (files == null || files.Length == 0)
                     return;
 
@@ -276,11 +276,11 @@ namespace UnicontaClient.Pages.CustomPage
         private void dgDocsGrid_DragRecordOver(object sender, DevExpress.Xpf.Core.DragRecordOverEventArgs e)
         {
             if (e.Data.GetFormats().Contains("FileName"))
-                e.Effects = DragDropEffects.Copy;
+                e.Effects = System.Windows.DragDropEffects.Copy;
             else if (e.Data.GetFormats().Contains("FileGroupDescriptor"))
-                e.Effects = DragDropEffects.All;
+                e.Effects = System.Windows.DragDropEffects.All;
             else
-                e.Effects = DragDropEffects.None;
+                e.Effects = System.Windows.DragDropEffects.None;
 
             e.Handled = true;
         }

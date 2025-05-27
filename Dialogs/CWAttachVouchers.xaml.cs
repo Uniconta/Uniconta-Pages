@@ -58,7 +58,7 @@ namespace UnicontaClient.Controls.Dialogs
         {
             Dispatcher.BeginInvoke(new Action(() => { AttachButton.Focus(); }));
         }
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {
@@ -150,7 +150,7 @@ namespace UnicontaClient.Controls.Dialogs
             }
         }
 
-        protected override Size ArrangeOverride(Size finalSize)
+        protected override System.Windows.Size ArrangeOverride( System.Windows.Size finalSize)
         {
             var root = VisualTreeHelper.GetChild(this, 0) as FrameworkElement;
 

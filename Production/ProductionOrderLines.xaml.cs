@@ -155,8 +155,8 @@ namespace UnicontaClient.Pages.CustomPage
         public void Init(UnicontaBaseEntity master)
         {
             InitializeComponent();
-            ((TableView)dgProductionOrderLineGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
-            ((TableView)dgInvItemStorageClientGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
+            ((TableView)dgProductionOrderLineGrid.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
+            ((TableView)dgInvItemStorageClientGrid.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
             localMenu.dataGrid = dgProductionOrderLineGrid;
             SetRibbonControl(localMenu, dgProductionOrderLineGrid);
             dgProductionOrderLineGrid.api = api;
@@ -370,16 +370,12 @@ namespace UnicontaClient.Pages.CustomPage
                 case "EAN":
                     UnicontaClient.Pages.DebtorOfferLines.FindOnEAN(rec, this.items, api);
                     break;
-                case "SerieBatch":
-                    var selectedSerieBatch = rec.SerieBatches?.Where(x => x.Number == rec.SerieBatch).FirstOrDefault();
-                    if (selectedSerieBatch != null && api.CompanyEntity.Warehouse)
-                    {
-                        rec.Warehouse = selectedSerieBatch.Warehouse;
-                        if (api.CompanyEntity.Location)
-                            rec.Location = selectedSerieBatch.Location;
-                    }
-                    break;
             }
+        }
+
+        private void SerialBatch_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
+        {
+            DebtorOrderLines.SetSeriBatch(sender as ComboBoxEditor, dgProductionOrderLineGrid, api);
         }
 
         async void setLocation(InvWarehouse master, ProductionOrderLineClient rec)

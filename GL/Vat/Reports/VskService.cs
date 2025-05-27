@@ -3347,16 +3347,17 @@ namespace RSK.Vsk
     public interface VaskurServices_PortTypeChannel : VaskurServices_PortType, System.ServiceModel.IClientChannel
     {
     }
-
+#if !UNICORE
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    public partial class VaskurServices_PortTypeClient : System.ServiceModel.ClientBase<VaskurServices_PortType>, VaskurServices_PortType
+
+  public partial class VaskurServices_PortTypeClient : System.ServiceModel.ClientBase<VaskurServices_PortType>, VaskurServices_PortType
     {
 
         public VaskurServices_PortTypeClient()
         {
         }
-
+       
         public VaskurServices_PortTypeClient(string endpointConfigurationName) :
                 base(endpointConfigurationName)
         {
@@ -3591,4 +3592,5 @@ namespace RSK.Vsk
             return ((VaskurServices_PortType)(this)).EydaSkyrsluIProfunAsync(inValue);
         }
     }
+#endif
 }

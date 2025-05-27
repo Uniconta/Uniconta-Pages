@@ -133,24 +133,16 @@ namespace UnicontaClient.Pages.CustomPage
             dgDebtorTranOpenGrid.ShowTotalSummary();
             GetShowHideStatusInfoSection();
             SetShowHideStatusInfoSection(true);
-#if SILVERLIGHT
-            Application.Current.RootVisual.KeyDown += RootVisual_KeyDown;
-#else
             this.PreviewKeyDown += RootVisual_KeyDown;
-#endif
             this.BeforeClose += DebtorDirectDebit_BeforeClose;
         }
 
         private void DebtorDirectDebit_BeforeClose()
         {
-#if SILVERLIGHT
-            Application.Current.RootVisual.KeyDown -= RootVisual_KeyDown;
-#else
             this.PreviewKeyDown -= RootVisual_KeyDown;
-#endif
         }
 
-        private void RootVisual_KeyDown(object sender, KeyEventArgs e)
+        private void RootVisual_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.R && Keyboard.Modifiers.HasFlag(ModifierKeys.Alt))
             {
@@ -321,7 +313,6 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-#if !SILVERLIGHT
 
         ItemBase ibase;
         bool hideStatusInfoSection = true;
@@ -510,7 +501,6 @@ namespace UnicontaClient.Pages.CustomPage
 
             return true;
         }
-#endif
 
         ItemBase ibaseExpandGroups;
         ItemBase ibaseCollapseGroups;

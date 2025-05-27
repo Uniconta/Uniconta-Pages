@@ -151,13 +151,9 @@ namespace UnicontaClient.Pages.CustomPage
                         AddDockItem(TabControls.ProjectEmployeePage, dgEmployeeGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Projects"), selectedItem._Name));
                     break;
                 case "ChartView":
-#if SILVERLIGHT
-                    UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("SilverlightSupport"), Uniconta.ClientTools.Localization.lookup("Message"), MessageBoxButton.OK);
-#else
                     if (selectedItem != null)
                         AddDockItem(TabControls.ProjectTaskPage, selectedItem, string.Format("{0}({1}): {2}", Uniconta.ClientTools.Localization.lookup("Tasks"), Uniconta.ClientTools.Localization.lookup("EnableChart")
                             , selectedItem._Number));
-#endif
                     break;
 
                 case "GridView":
@@ -176,6 +172,10 @@ namespace UnicontaClient.Pages.CustomPage
                 case "EmployeeRegistrationLinePage":
                     if (selectedItem != null)
                         AddDockItem(TabControls.EmployeeRegistrationLinePage, dgEmployeeGrid.SelectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("WorkingTime"), selectedItem._Name));
+                    break;
+                case "BudgetYear":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.ProjectBudgetYearPage, selectedItem, string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("BudgetYear"), selectedItem._Name));
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -264,19 +264,17 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var employeeClient = (sender as Image).Tag as EmployeeClient;
+            var employeeClient = (sender as System.Windows.Controls.Image).Tag as EmployeeClient;
             if (employeeClient != null)
                 AddDockItem(TabControls.UserDocsPage, dgEmployeeGrid.syncEntity);
         }
 
         private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var employeeClient = (sender as Image).Tag as EmployeeClient;
+            var employeeClient = (sender as System.Windows.Controls.Image).Tag as EmployeeClient;
             if (employeeClient != null)
                 AddDockItem(TabControls.UserNotesPage, dgEmployeeGrid.syncEntity);
         }
-
-#if !SILVERLIGHT
         private void HasEmailImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             var employeeClient = (sender as TextBlock).Tag as EmployeeClient;
@@ -288,7 +286,16 @@ namespace UnicontaClient.Pages.CustomPage
                 proc.Start();
             }
         }
-#endif
+
+        protected override LookUpTable HandleLookupOnLocalPage(LookUpTable lookup, CorasauDataGrid dg)
+        {
+            if (dgEmployeeGrid.CurrentColumn?.FieldName == "Group")
+            {
+                lookup.TableType = typeof(Uniconta.DataModel.EmployeeGroup);
+                return lookup;
+            }
+            return base.HandleLookupOnLocalPage(lookup, dg);
+        }
     }
 }
 

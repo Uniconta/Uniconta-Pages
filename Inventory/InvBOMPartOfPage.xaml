@@ -11,9 +11,6 @@ x:Class="UnicontaClient.Pages.CustomPage.InvBOMPartOfPage"
         xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
         xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid">
     <UserControl.Resources>
-        <Style x:Key="StyleRow" TargetType="dxg:RowControl">
-            <Setter Property="Height" Value="Auto"/>
-        </Style>
         <Util:RowIndexConverter x:Key="RowIndexConverter" />
         <Util:MaskConverter x:Key="MaskConverter" />
     </UserControl.Resources>

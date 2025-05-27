@@ -274,7 +274,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 if (IsZip(stream))
                 {
-                    var zipFile = new ZipFile(stream);
+                    var zipFile = new ICSharpCode.SharpZipLib.Zip.ZipFile(stream);
 
                     foreach (ZipEntry zipEntry in zipFile)
                     {

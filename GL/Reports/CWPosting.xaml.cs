@@ -91,7 +91,7 @@ namespace UnicontaClient.Pages.CustomPage.GL.ChartOfAccount.Reports
             }));
         }
 
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {

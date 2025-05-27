@@ -514,7 +514,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "CollectionLetterLog":
                     if (selectedItem != null)
                     {
-                        string header = string.Format("{0}/{1}", Uniconta.ClientTools.Localization.lookup("CollectionLetterLog"), selectedItem.InvoiceAN);
+                        string header = string.Concat(Uniconta.ClientTools.Localization.lookup("CollectionLetterLog"), "/", selectedItem.InvoiceAN);
                         AddDockItem(TabControls.DebtorTransCollectPage, dgDebtorTranOpenGrid.syncEntity, header);
                     }
                     break;

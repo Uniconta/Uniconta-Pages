@@ -21,7 +21,7 @@ using Uniconta.ClientTools.Util;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
-    public partial class FAMDetailPage : UserControl
+    public partial class FAMDetailPage : System.Windows.Controls.UserControl
     {
         CrudAPI _api;
         public CrudAPI api

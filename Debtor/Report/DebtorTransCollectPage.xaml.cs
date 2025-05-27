@@ -69,7 +69,7 @@ namespace UnicontaClient.Pages.CustomPage
             var invoiceAN = Convert.ToString(invoiceANProp.GetValue(syncMaster, null));
             if (!string.IsNullOrEmpty(invoiceAN))
             {
-                string header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("CollectionLetterLog"), invoiceAN);
+                string header = string.Concat(Uniconta.ClientTools.Localization.lookup("CollectionLetterLog"), "/", invoiceAN);
                 SetHeader(header);
             }
         }

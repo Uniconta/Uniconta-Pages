@@ -36,7 +36,11 @@ namespace UnicontaClient.Pages.CustomPage
             InitializeComponent();
             InitPage(api);
         }
-
+        public GLChargeGroupPage(CrudAPI api, string lookupKey) : base(api, lookupKey)
+        {
+            InitializeComponent();
+            InitPage(api);
+        }
         private void InitPage(CrudAPI api)
         {
             SetRibbonControl(localMenu, dgChargeGroupClient);

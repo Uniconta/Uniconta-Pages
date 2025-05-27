@@ -547,7 +547,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        private void cmbContactName_KeyDown(object sender, KeyEventArgs e)
+        private void cmbContactName_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             var selectedItem = cmbContactName.SelectedItem as Contact;
             GoToContact(selectedItem, e.Key);

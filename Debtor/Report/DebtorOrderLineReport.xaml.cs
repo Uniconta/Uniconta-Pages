@@ -105,16 +105,11 @@ namespace UnicontaClient.Pages.CustomPage
                     if (string.IsNullOrEmpty(rec._Warehouse))
                         rec._Location = null;
                     break;
-                case "SerieBatch":
-                    var selectedSerieBatch = rec.SerieBatches?.Where(x => x.Number == rec.SerieBatch).FirstOrDefault();
-                    if (selectedSerieBatch != null && api.CompanyEntity.Warehouse)
-                    {
-                        rec.Warehouse = selectedSerieBatch.Warehouse;
-                        if (api.CompanyEntity.Location)
-                            rec.Location = selectedSerieBatch.Location;
-                    }
-                    break;
             }
+        }
+        private void SerialBatch_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
+        {
+          DebtorOrderLines.SetSeriBatch(sender as ComboBoxEditor, dgDebtorOrderlineGrid, api);
         }
 
         async void setLocation(InvWarehouse master, DebtorOrderLineClient rec)

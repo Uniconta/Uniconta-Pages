@@ -212,18 +212,35 @@ namespace UnicontaClient.Pages.CustomPage
             cmbProducts.ItemsSource = cache.GetKeyList();
         }
 
-        private async void frmRibbon_OnItemClicked(string ActionType)
+        private void frmRibbon_OnItemClicked(string ActionType)
         {
-            if (ActionType == "Save" && !VaidateEAN(editrow._EAN))
-                return;
-            if (DoNotSave)
+            switch (ActionType)
             {
-                MoveFocus();
-                await ClosePage(1);
-                CloseDockItem();
-                return;
+                case "Save":
+                    if (!VaidateEAN(editrow._EAN))
+                        return;
+                    if (DoNotSave)
+                    {
+                        MoveFocus();
+                        close(1);
+                        return;
+                    }
+                    break;
+                case "Delete":
+                    if (DoNotSave)
+                    {
+                        close(3);
+                        return;
+                    }
+                    break;
             }
             frmRibbon_BaseActions(ActionType);
+        }
+
+        async void close(int action)
+        {
+            await ClosePage(action);
+            CloseDockItem();
         }
 
         bool VaidateEAN(string ean)
@@ -267,7 +284,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (DoNotSave)
                 txtAccount.IsReadOnly = true;
             if (!Comp.InvPackaging)
-                ESGGroup.Visibility = Visibility.Collapsed;
+                EPRGroup.Visibility = Visibility.Collapsed;
         }
 
         public override bool BeforeSetUserField(ref CorasauLayoutGroup parentGroup)

@@ -15,16 +15,18 @@ x:Class="UnicontaClient.Pages.CustomPage.SalesRepCustomerStatPage"
         </Grid.RowDefinitions>
         <UnicontaControls:CorasauRibbonControl x:Name="localMenu" XMLSourcePath=";component/Pages/Inventory/InventoryTotalsRibbon.xml"/>
         <StackPanel Orientation="Horizontal"  Grid.Row="1" Margin="0,12,0,5">
-            <TextBlock x:Name="txtItem" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Item}" Margin="10,0,0,0"/>
-            <CheckBox x:Name="cbxItem" IsEnabled="False" Margin="10,0,0,0"/>
-            <TextBlock x:Name="txtItemGrp" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=InventoryGroup}" Margin="10,0,0,0"/>
-            <CheckBox x:Name="cbxInvGrp" IsEnabled="False" Margin="10,0,0,0"/>
-            <TextBlock x:Name="txtAccount" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Account}" Margin="10,0,0,0"/>
-            <CheckBox x:Name="cbxAccount" IsEnabled="False" Margin="10,0,0,0"/>
-            <TextBlock x:Name="txtAccGrp" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AccountGroup}"  Margin="10,0,0,0"/>
-            <CheckBox x:Name="cbxAccountGrp" IsEnabled="False"  Margin="10,0,0,0"/>
-            <TextBlock x:Name="txtEmpGrp" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Employee}"  Margin="10,0,0,0"/>
-            <CheckBox x:Name="cbxEmpGrp" IsEnabled="False"  Margin="10,0,0,0"/>
+            <TextBlock x:Name="txtItem" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Item}" Margin="12,0,0,0" VerticalAlignment="Center"/>
+            <CheckBox x:Name="cbxItem" IsEnabled="False" Margin="5,0,0,0"/>
+            <TextBlock x:Name="txtItemGrp" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=InventoryGroup}" Margin="12,0,0,0" VerticalAlignment="Center"/>
+            <CheckBox x:Name="cbxInvGrp" IsEnabled="False" Margin="5,0,0,0"/>
+            <TextBlock x:Name="txtStatisticsGrp" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=StatisticsGroup}" Margin="12,0,0,0" VerticalAlignment="Center"/>
+            <CheckBox x:Name="cbxStatisticsGrp" IsEnabled="False" Margin="5,0,0,0"/>
+            <TextBlock x:Name="txtAccount" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Account}" Margin="12,0,0,0" VerticalAlignment="Center"/>
+            <CheckBox x:Name="cbxAccount" IsEnabled="False" Margin="5,0,0,0"/>
+            <TextBlock x:Name="txtAccGrp" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AccountGroup}"  Margin="12,0,0,0" VerticalAlignment="Center"/>
+            <CheckBox x:Name="cbxAccountGrp" IsEnabled="False"  Margin="5,0,0,0"/>
+            <TextBlock x:Name="txtEmpGrp" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Employee}"  Margin="12,0,0,0" VerticalAlignment="Center"/>
+            <CheckBox x:Name="cbxEmpGrp" IsEnabled="False"  Margin="5,0,0,0"/>
         </StackPanel>
         <UnicontaControls:BusyIndicator x:Name="busyIndicator" Grid.Row="2" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
             <local:SalesRepCustomerStatPageGrid x:Name="dgSalesRepCustomerStat" AutoGenerateColumns="None">

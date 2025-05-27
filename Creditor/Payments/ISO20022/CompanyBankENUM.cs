@@ -30,6 +30,7 @@ namespace UnicontaISO20022CreditTransfer
         DanskeBank_SE,
         BankData,
         BEC,
-        SDC
+        SDC,
+        Aargauischen_Kantonalbank
     }
 }

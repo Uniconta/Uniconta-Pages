@@ -33,6 +33,7 @@ using System.Security.Policy;
 using static System.Net.WebRequestMethods;
 using Uniconta.WindowsAPI.GL.Bank.Bank;
 using UnicontaClient.Controls.Dialogs;
+using Uniconta.Common.User;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -91,6 +92,9 @@ namespace UnicontaClient.Pages.CustomPage
         {
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
             var Comp = api.CompanyEntity;
+
+            if (api.session.User._Role < (int)UserRoles.Admin)
+                UtilDisplay.RemoveMenuCommand(rb, new string[] { "AiiaAdmin" });
         }
 
         void dgBankStatement_RowDoubleClick()
@@ -162,6 +166,9 @@ namespace UnicontaClient.Pages.CustomPage
                 case "AiiaHub":
                     if (selectedItem == null) return;
                     BankAiia(6, selectedItem); break;
+                case "AiiaAdmin":
+                    if (selectedItem == null) return;
+                    BankAiia(7, selectedItem); break;
 
                 case "ConnectToND":
                     if (selectedItem == null) return;
@@ -313,6 +320,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case 4: AiiaGetTrans(bankApi, selectedItem); break;
                 case 5: await AiiaAccounts(bankApi); break;
                 case 6: await AiiaHub(bankApi); break;
+                case 7: AiiaAdmin(bankApi, selectedItem); break;
             }
         }
 
@@ -341,6 +349,34 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else
                 UnicontaMessageBox.Show(string.Concat(Uniconta.ClientTools.Localization.lookup("UnableToConnectTo"), " ", Uniconta.ClientTools.Localization.lookup("MCOpenBanking")), Uniconta.ClientTools.Localization.lookup("Information"));
+        }
+
+        void AiiaAdmin(BankStatementAPI bankApi, BankStatementClient selectedItem)
+        {
+            CWBankAPI cwBank = new CWBankAPI(api, selectedItem, 0);
+            cwBank.Closing += async delegate
+            {
+                if (cwBank.DialogResult == true)
+                {
+                    var logText = await bankApi.AiiaAdmin(selectedItem.Account, CWBankAPI.FromDate, CWBankAPI.ToDate);
+                    if (logText != null)
+                    {
+                        var index = logText.IndexOf('\r');
+                        var str = index >= 0 ? logText.Substring(0, index) : logText;
+                        if (!Enum.TryParse(str, true, out ErrorCodes errEnum))
+                            errEnum = ErrorCodes.NoSucces;
+
+                        if (errEnum == 0)
+                        {
+                            CWShowBankAPILog cwLog = new CWShowBankAPILog(logText.Substring(index));
+                            cwLog.Show();
+                        }
+                        else
+                            UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup(errEnum.ToString()), Uniconta.ClientTools.Localization.lookup("Admin"));
+                    }
+                }
+            };
+            cwBank.Show();
         }
 
         async Task AiiaHub(BankStatementAPI bankApi)

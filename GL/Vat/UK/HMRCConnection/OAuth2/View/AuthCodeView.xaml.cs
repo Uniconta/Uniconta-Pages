@@ -34,7 +34,7 @@ namespace UnicontaClient.Pages.CustomPage.GL.Vat.UK.HMRCConnection.OAuth2.View
         {
             if (string.IsNullOrWhiteSpace(txtAuthCode.Text))
             {
-                MessageBox.Show("Please enter a value in the textbox.");
+                System.Windows.MessageBox.Show("Please enter a value in the textbox.");
                 return;
             }
             AuthCode = txtAuthCode.Text;
@@ -44,7 +44,7 @@ namespace UnicontaClient.Pages.CustomPage.GL.Vat.UK.HMRCConnection.OAuth2.View
 
         private void btnCancel_Click(object sender, RoutedEventArgs e)
         {
-            MessageBoxResult result = MessageBox.Show("Are you sure you wish to cancel? You will have to start over if you wish to try again.", "Cancel", MessageBoxButton.YesNo);
+            MessageBoxResult result = System.Windows.MessageBox.Show("Are you sure you wish to cancel? You will have to start over if you wish to try again.", "Cancel", MessageBoxButton.YesNo);
             switch (result)
             {
                 case MessageBoxResult.Yes:

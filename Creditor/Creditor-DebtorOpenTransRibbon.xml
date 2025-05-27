@@ -43,7 +43,7 @@
     <RibbonItem LocalizedNameKey="PaymentCurrency" StatusValue=""></RibbonItem>
     <RibbonItem LocalizedNameKey="InvoiceCurrency" StatusValue="" />
     <RibbonItem LocalizedNameKey="TotalCur" StatusValue="" />
-  </RibbonItem>v
+  </RibbonItem>
 
   <RibbonItem>
     <RibbonItem Action="ReopenAll" LocalizedNameKey="ReopenAll" LargeGlyph="Re_Open_32x32">

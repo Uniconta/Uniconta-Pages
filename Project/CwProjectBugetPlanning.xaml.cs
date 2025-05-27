@@ -158,7 +158,7 @@ namespace UnicontaClient.Pages.CustomPage
             return val;
         }
 
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
                 this.Close();
@@ -210,7 +210,7 @@ namespace UnicontaClient.Pages.CustomPage
                     dc.CustomFields["Category"] = payRollCat._PrCategory;
                 else
                 {
-                    MessageBox.Show(string.Format("'{0}' {1}", payRollCat.KeyStr,Uniconta.ClientTools.Localization.lookup("PrCategoryMessage")));
+                    System.Windows.MessageBox.Show(string.Format("'{0}' {1}", payRollCat.KeyStr,Uniconta.ClientTools.Localization.lookup("PrCategoryMessage")));
                     lePayrollCategory.SelectedItem= null;
                     dc.CustomFields["Category"]= null;
                 }

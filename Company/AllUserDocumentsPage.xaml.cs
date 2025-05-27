@@ -71,11 +71,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                     {
                         string header = string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("View"), Uniconta.ClientTools.Localization.lookup("Documents"));
-#if !SILVERLIGHT
                         ViewDocument(dgDocsGrid.syncEntity, header);
-#else
-                        AddDockItem(TabControls.UserDocsPage3, dgDocsGrid.syncEntity, true, header, "View_16x16");
-#endif
                     }
                     break;
 
@@ -93,7 +89,6 @@ namespace UnicontaClient.Pages.CustomPage
             return lookup;
         }
 
-#if !SILVERLIGHT
         DocumentViewerWindow docViewer;
 
         void ViewDocument(SynchronizeEntity sourceData, string header = null)
@@ -104,7 +99,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 docViewer = new DocumentViewerWindow(api, header);
                 docViewer.InitViewer(sourceData);
-                docViewer.Owner = Application.Current.MainWindow;
+                docViewer.Owner = System.Windows.Application.Current.MainWindow;
                 docViewer.Closed += delegate { docViewer = null; };
             }
             if (DocumentViewerWindow.lastHeight != 0)
@@ -116,6 +111,5 @@ namespace UnicontaClient.Pages.CustomPage
                 docViewer.WindowState = WindowState.Maximized;
             docViewer.Show();
         }
-#endif
     }
 }

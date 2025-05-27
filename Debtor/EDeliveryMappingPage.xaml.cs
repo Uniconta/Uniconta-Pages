@@ -1,15 +1,12 @@
-using DevExpress.Xpf.Grid;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using Uniconta.API.DebtorCreditor;
 using Uniconta.API.Service;
-using Uniconta.ClientTools;
+using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
@@ -20,116 +17,119 @@ using Localization = Uniconta.ClientTools.Localization;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
-    public class EDeliveryMappingGrid : CorasauDataGridClient
+    public class EDeliveryMappingClientExtended : eDeliveryMappingClient
     {
-        public override Type TableType { get { return typeof(EDeliveryMappingClient); } }
-        public override IComparer GridSorting { get { return new EDeliveryMappingSort(); } }
-        public override bool AllowSort { get { return false; } }
-        public override bool Readonly { get { return true; } }
-        public override bool IsAutoSave { get { return true; } }
-        public override bool ShowTreeListView => true;
+        private string _Value;
 
-        public override TreeListView SetTreeListViewFromPage
+        [Display(Name = "Value", ResourceType = typeof(TableFieldsText))]
+        public string Value
         {
-            get
+            get => _Value;
+            set
             {
-                var tv = base.SetTreeListViewFromPage;
-                tv.KeyFieldName = "RowId";
-                tv.ShowIndicator = false;
-                tv.ParentFieldName = "ParentRowId";
-                tv.TreeDerivationMode = TreeDerivationMode.Selfreference;
-                tv.ShowTotalSummary = false;
-                return tv;
+                _Value = value;
+                NotifyPropertyChanged("Value");
             }
         }
+    }
+
+    public class EDeliveryMappingSort : IComparer
+    {
+        public int Compare(object x, object y)
+        {
+            var xTag = ((EDeliveryMappingClientExtended)x).eDeliveryTag.Name;
+            var yTag = ((EDeliveryMappingClientExtended)y).eDeliveryTag.Name;
+            return xTag.CompareTo(yTag);
+        }
+    }
+
+    public class EDeliveryMappingGrid : CorasauDataGridClient
+    {
+        public override Type TableType { get { return typeof(EDeliveryMappingClientExtended); } }
+        public override IComparer GridSorting { get { return new EDeliveryMappingSort(); } }
+        public override bool AllowSort { get { return false; } }
+        public override bool Readonly { get { return false; } }
+        public override bool ClearSelectedItemOnSave { get { return false; } }
+        public override bool AllowSave { get { return true; } }
+        public override bool SingleBufferUpdate { get { return false; } }
     }
 
     public partial class EDeliveryMappingPage : GridBasePage
     {
         public override string NameOfControl { get { return TabControls.EDeliveryMappingPage; } }
-        UnicontaBaseEntity master;
+        private UnicontaBaseEntity entity;
+        private eDeliveryMappingGroupClient master;
+
+        private SQLCache xmlTagsCache;
+        private List<eDeliveryTagTypeClient> unusedXmlTags;
 
         public EDeliveryMappingPage(BaseAPI api) : base(api, string.Empty) => Init();
         public EDeliveryMappingPage(UnicontaBaseEntity entity) : base(null)
         {
-            master = entity;
+            this.entity = entity;
             Init();
-
-            if (entity != null)
-            {
-                // TODO: This need to change when we have support to generate documents for other than OIOUBL
-                if (master is DCInvoice invoice)
-                {
-                    txtInvoice.Text = invoice.InvoiceNum;
-                    cmbDocumentType.SelectedItem = AppEnums.EDeliveryDocumentType.ToString((int)XmlTypeDocument.Invoice);
-                }
-
-                SetHeader();
-            }
         }
 
-        private void SetHeader()
-        {
-            var key = "";
-            if (master != null)
-            {
-                // TODO: This need to change when we have support to generate documents for other than OIOUBL
-                if (master is DCInvoice invoice)
-                    key = string.Format("{0} : {1}", Localization.lookup("Invoice"), invoice.InvoiceNum);
-            }
-
-            if (string.IsNullOrEmpty(key))
-                return;
-
-            var header = string.Format("{0} : {1}", Localization.lookup("EDeliveryMapping"), key);
-            SetHeader(header);
-        }
-
-        void Init()
+        private async void Init()
         {
             InitializeComponent();
-            localMenu.dataGrid = dgEdelivery;
-            dgEdelivery.api = api;
-            SetRibbonControl(localMenu, dgEdelivery);
-            dgEdelivery.BusyIndicator = busyIndicator;
+            localMenu.dataGrid = dgEdeliveryMappingGrid;
+            dgEdeliveryMappingGrid.api = api;
+            SetRibbonControl(localMenu, dgEdeliveryMappingGrid);
+            dgEdeliveryMappingGrid.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
+            layOutEdeliveryMapping.Caption = Localization.lookup("EDeliveryMapping");
 
-            cmbTypeVersion.ItemsSource = AppEnums.EDeliveryTypeVersion.Values;
-            cmbDocumentType.ItemsSource = AppEnums.EDeliveryDocumentType.Values;
+            xmlTagsCache = api.CompanyEntity.GetCache(typeof(eDeliveryTagTypeClient)) ??
+                await api.CompanyEntity.LoadCache(typeof(eDeliveryTagTypeClient), api);
 
-            cmbTypeVersion.SelectedIndex = 0;
+            var mapppingGrpCache = api.CompanyEntity.GetCache(typeof(eDeliveryMappingGroupClient)) ??
+                await api.CompanyEntity.LoadCache(typeof(eDeliveryMappingGroupClient), api);
 
-            dgEdelivery.Loaded += DgEdelivery_Loaded;
-        }
-
-        bool firstLoad;
-        private void DgEdelivery_Loaded(object sender, RoutedEventArgs e)
-        {
-            if (!firstLoad)
+            if (mapppingGrpCache == null || mapppingGrpCache.Count == 0)
+                CreateMappingGroup();
+            else
             {
-                dgEdelivery.treeListView.CollapseAllNodes();
-                firstLoad = true;
+                leMappinggroup.ItemsSource = mapppingGrpCache;
+                leMappinggroup.SelectedItem = mapppingGrpCache.GetNotNullArray
+                    .FirstOrDefault(g => ((eDeliveryMappingGroupClient)g).IsDebtorGroup);
+                if (leMappinggroup.SelectedItem == null)
+                    leMappinggroup.SelectedItem = mapppingGrpCache.First();
             }
         }
 
         void LocalMenu_OnItemClicked(string ActionType)
         {
+            var selectedItem = dgEdeliveryMappingGrid.SelectedItem as EDeliveryMappingClientExtended;
             switch (ActionType)
             {
-                case "RefreshGrid":
-                    RefreshGrid();
+                case "AddRow":
+                    var rowAdd = dgEdeliveryMappingGrid.AddRow() as EDeliveryMappingClientExtended;
+                    rowAdd.Group = ((eDeliveryMappingGroup)leMappinggroup.SelectedItem)?.KeyName;
+                    rowAdd.CompanyId = api.CompanyId;
                     break;
-                case "GenerateOioXml":
+                case "DeleteRow":
+                    if (selectedItem != null)
+                    {
+                        var eDeliveryTag = selectedItem.eDeliveryTag;
+                        if (eDeliveryTag != null)
+                            unusedXmlTags.Add(eDeliveryTag);
+
+                        dgEdeliveryMappingGrid.DeleteRow();
+                    }
                     break;
-                case "SendUBL":
-                    break;
-                case "SaveLayout":
-                    break;
-                case "ExpandAll":
-                    dgEdelivery.treeListView.ExpandAllNodes();
-                    break;
-                case "CollapseAll":
-                    dgEdelivery.treeListView.CollapseAllNodes();
+                case "SaveGrid":
+                    if (dgEdeliveryMappingGrid.ItemsSource is List<EDeliveryMappingClientExtended> mappings &&
+                        mappings != null)
+                    {
+                        if (mappings.Any(m => m.IsMissingValueSet))
+                        {
+                            UnicontaMessageBox.Show(Localization.lookup(ErrorCodes.FieldCannotBeBlank.ToString()), Localization.lookup("Error"));
+                            return;
+                        }
+
+                        gridRibbon_BaseActions(ActionType);
+                    }
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -137,105 +137,172 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        public override async Task InitQuery() => RefreshGrid();
-
-        private void RefreshGrid()
+        private void liMappinggroup_ButtonClicked(object sender) => CreateMappingGroup();
+        private void CreateMappingGroup()
         {
-            UpdateMaster();
-            if (master == null || !(master is DebtorInvoiceClient masterInvoice))
-                masterInvoice = new DebtorInvoiceClient();
-
-            var mappingData = new NHRAPI(api).GetInvoiceOIOUBL(masterInvoice).Result;
-            if (mappingData?.Length == 0)
-                return;
-
-            busyIndicator.IsBusy = true;
-            dgEdelivery.Visibility = Visibility.Hidden;
-            dgEdelivery.ItemsSource = null;
-
-            Array.Sort(mappingData, new EDeliveryMappingSort(mappingData));
-
-            dgEdelivery.MaxId = mappingData.Select(s => s.RowId).Max();
-            dgEdelivery.SetSource(mappingData);
-
-            dgEdelivery.Visibility = Visibility.Visible;
-            busyIndicator.IsBusy = false;
-        }
-
-        private void UpdateMaster()
-        {
-            var invoiceText = txtInvoice?.Text;
-            if (string.IsNullOrEmpty(invoiceText) || !Regex.IsMatch(invoiceText, @"^\d+$"))
-                return;
-
-            var invoiceNumber = Convert.ToInt64(invoiceText);
-            if (master == null || !(master is DebtorInvoiceClient invoice) || invoice._InvoiceNumber != invoiceNumber)
+            /*var cwEDeliveryMapping = new CWeDeliveryMappingDebtorGroupPage(api);
+            cwEDeliveryMapping.Closed += delegate
             {
-                var propValPair = new List<PropValuePair>
+                if (cwEDeliveryMapping.DialogResult == true)
                 {
-                    PropValuePair.GenereteWhereElements("InvoiceNumber", invoiceNumber, CompareOperator.Equal)
-                };
+                    var newMappingGroup = cwEDeliveryMapping.MappingGroup;
+                    if (newMappingGroup == null)
+                        return;
 
-                master = api.Query<DebtorInvoiceClient>(propValPair).Result.First();
-            }
+                    var groups = ((List<eDeliveryMappingGroupClient>)leMappinggroup.ItemsSource) ?? new List<eDeliveryMappingGroupClient>();
+                    if (!groups.Contains(newMappingGroup))
+                        groups.Add(newMappingGroup);
+
+                    var mappings = ((List<EDeliveryMappingClientExtended>)dgEdeliveryMappingGrid.ItemsSource) ?? new List<EDeliveryMappingClientExtended>();
+                    dgEdeliveryMappingGrid.ItemsSource = mappings.Where(m => m.Group == newMappingGroup.Name).ToList();
+                    leMappinggroup.ItemsSource = groups;
+                    leMappinggroup.SelectedItem = newMappingGroup;
+                }
+            };
+            cwEDeliveryMapping.Show();*/
         }
 
-        /*private void SetMasterDataOnSettings(EDeliverySettingWithValueClient[] settings)
+        private async void leMappinggroup_SelectedIndexChanged(object sender, RoutedEventArgs e)
+        {
+            var newMappingGroup = (sender as LookupEditor).SelectedItem as eDeliveryMappingGroupClient;
+            if (newMappingGroup == null || master == newMappingGroup)
+                return;
+
+            master = newMappingGroup;
+            var docType = newMappingGroup._DocType;
+
+            UnicontaBaseEntity[] result = null;
+            if (docType == eDeliveryDocumentType.Invoice || docType == eDeliveryDocumentType.Creditnote)
+            {
+                var compareOp = docType == eDeliveryDocumentType.Invoice ?
+                    CompareOperator.GreaterThan : CompareOperator.LessThan;
+
+                var temp = (await api.Query<DebtorInvoiceClient>(
+                    new PropValuePair[2]
+                    {
+                        PropValuePair.GenereteOrderByElement("Date", true),
+                        //PropValuePair.GenereteWhereElements("LineAmount", 0L, compareOp),
+                        PropValuePair.GenereteTakeN(10),
+                    }))?
+                    .ToList();
+
+                if (temp == null || temp.Count == 0)
+                    return;
+
+                var isValidInvoiceOrCreditNote = entity is DebtorInvoiceClient inv &&
+                    ((docType == eDeliveryDocumentType.Invoice && inv.TotalAmount > 0) ||
+                     (docType == eDeliveryDocumentType.Creditnote && inv.TotalAmount < 0));
+
+                if (isValidInvoiceOrCreditNote)
+                    temp.Add((DebtorInvoiceClient)entity);
+                else
+                    entity = temp?.FirstOrDefault();
+
+                result = temp.ToArray();
+            }
+            if (entity == null)
+                return;
+
+            tbDocumentNum.Text = master.DocType;
+            tbDocumentNum.Visibility = Visibility.Visible;
+
+            leDocumentNum.ItemsSource = result;
+            leDocumentNum.SelectedItem = entity;
+            leDocumentNum.Visibility = Visibility.Visible;
+
+            var mappings = ((List<EDeliveryMappingClientExtended>)dgEdeliveryMappingGrid.ItemsSource) ??
+                new List<EDeliveryMappingClientExtended>();
+
+            dgEdeliveryMappingGrid.ItemsSource = mappings.Where(m => m.Group == master.Name).ToList();
+            unusedXmlTags = xmlTagsCache.GetNotNullArray
+                .Select(r => (eDeliveryTagTypeClient)r)
+                .Where(t => !mappings.Any(m => m.Tag == t.RowId))
+                .Where(t => t._DocVersion == master?._DocVersion && t._DocVersion == master?._DocVersion)
+                .ToList();
+        }
+
+        private void cmbXmlTag_GotFocus(object sender, RoutedEventArgs e) =>
+            ((ComboBoxEditor)sender).ItemsSource = unusedXmlTags?.Select(t => t.Name).OrderBy(x => x)?.ToList();
+
+        private void cmbXmlTag_SelectedIndexChanged(object sender, RoutedEventArgs e)
+        {
+            if (unusedXmlTags == null || unusedXmlTags.Count == 0)
+                return;
+
+            var rec = dgEdeliveryMappingGrid.SelectedItem as EDeliveryMappingClientExtended;
+            var tag = ((ComboBoxEditor)sender).SelectedItem as string;
+            rec.Tag = unusedXmlTags?.FirstOrDefault(t => t.Name == tag)?.RowId ?? 0;
+            if (unusedXmlTags.Count == 1)
+            { 
+                System.Windows.MessageBox.Show("All tags used");
+                unusedXmlTags = new List<eDeliveryTagTypeClient>();
+            }
+            else
+                unusedXmlTags.Remove(rec.eDeliveryTag);
+        }
+
+        private void cbTable_GotFocus(object sender, RoutedEventArgs e) =>
+            ((ComboBoxEditor)sender).ItemsSource = master?.GetTableIdNames()?.Values.OrderBy(x => x)?.ToList();
+
+        bool tableChanged = false;
+        private void cbTable_SelectedIndexChanged(object sender, RoutedEventArgs e)
+        {
+            var row = dgEdeliveryMappingGrid.SelectedItem as EDeliveryMappingClientExtended;
+            row.Table = ((ComboBoxEditor)sender).SelectedItem as string;
+            tableChanged = true;
+        }
+
+        private void cbProperty_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (!tableChanged)
+                return;
+
+            var row = dgEdeliveryMappingGrid.SelectedItem as EDeliveryMappingClientExtended;
+            var values = master.GetTableProperties(api.CompanyEntity, row.Table);
+            if (values != null && values.Count > 0)
+                ((ComboBoxEditor)sender).ItemsSource = values.OrderBy(x => x).ToList();
+
+            tableChanged = false;
+        }
+
+        private void cbProperty_SelectedIndexChanged(object sender, RoutedEventArgs e) =>
+            SetValue((sender as ComboBoxEditor).SelectedItem as string);
+
+        private void leDocumentNum_SelectedIndexChanged(object sender, RoutedEventArgs e)
         {
             if (master == null)
                 return;
 
-            var typeVersion = cmbTypeVersion.Text;
-            var documentType = cmbDocumentType.Text;
-            var masterProperties = master.GetType().GetProperties();
+            var uniEntity = leDocumentNum.SelectedItem as UnicontaBaseEntity;
+            var isValidInvoiceOrCreditNote = uniEntity is DebtorInvoiceClient inv &&
+                              ((master._DocType == eDeliveryDocumentType.Invoice && inv.TotalAmount > 0) ||
+                               (master._DocType == eDeliveryDocumentType.Creditnote && inv.TotalAmount < 0));
 
-            settings
-                .Where(line => line.TypeVersion == typeVersion && line.DocumentType == documentType)
-                .ForEach(line => SetMasterPropertyValueOnSetting(line, masterProperties));
-        }
-
-        private void SetMasterPropertyValueOnSetting(EDeliverySettingWithValueClient setting,
-            PropertyInfo[] masterProperties)
-        {
-            object val = null;
-            masterProperties
-                .Where(p => p.Name == setting.Property)
-                .ForEach(p => val = p.GetValue(master));
-
-            if (val != null)
-                setting.Value = val.ToString();
-
-            if (setting.Value != null && setting.Format != null)
-                setting.Value = string.Format(setting.Format, setting.Value);
-        }*/
-
-        private void Value_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            var selectedItem = dgEdelivery.SelectedItem as EDeliveryMappingClient;
-            var txtblock = sender as TextBlock;
-            if (selectedItem != null && !selectedItem.IsEditable)
+            if (isValidInvoiceOrCreditNote)
             {
-                var tip = new ToolTip
-                {
-                    Content = Localization.lookup("CannotChangeFieldOBJ"),
-                    IsOpen = true,
-                    PlacementTarget = txtblock,
-                    Placement = System.Windows.Controls.Primitives.PlacementMode.Right
-                };
-
-                ToolTipService.SetToolTip(txtblock, tip);
-                return;
+                entity = uniEntity;
+                SetValue(null);
             }
-
-            ToolTipService.SetToolTip(txtblock, null);
         }
 
-        private void Value_PreviewMouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void SetValue(string property)
         {
-            var txtblock = sender as TextBlock;
-            var tooltip = ToolTipService.GetToolTip(txtblock) as ToolTip;
-            if (tooltip != null)
-                tooltip.IsOpen = false;
+            var rec = dgEdeliveryMappingGrid.SelectedItem as EDeliveryMappingClientExtended;
+            if (rec == null)
+                return;
+            if (!string.IsNullOrEmpty(property))
+                rec.Property = property;
+
+            rec.Value = rec.GetTablePropertyValueFromEntity(entity, api.CompanyEntity);
+            Value.Visible = !string.IsNullOrEmpty(rec.Value);
+        }
+
+        private void leDocumentNum_GotFocus(object sender, RoutedEventArgs e)
+        {
+            var lookup = sender as LookupEditor;
+            lookup.PopupContentTemplate = System.Windows.Application.Current.Resources["LookUpUrlInvoiceClientPopupContent"] as ControlTemplate;
+            lookup.ValueMember = "InvoiceNumber";
+            lookup.SelectedIndexChanged += leDocumentNum_SelectedIndexChanged;
         }
     }
 }

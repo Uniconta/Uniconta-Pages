@@ -66,21 +66,9 @@ namespace UnicontaClient.Pages.CustomPage
             InitializeComponent();
             SetRibbonControl(localMenu, dgInvItem);
             localMenu.OnItemClicked += localMenu_OnItemClicked;
-#if SILVERLIGHT
-            childDgInvBom.CurrentItemChanged += ChildDgInvBom_CurrentItemChanged;
-#endif
             GetMenuItem();
             LoadInv();
         }
-
-#if SILVERLIGHT
-        private void ChildDgInvBom_CurrentItemChanged(object sender, DevExpress.Xpf.Grid.CurrentItemChangedEventArgs e)
-        {
-            var detailsSelectedItem = e.NewItem as InvBOMClient;
-            childDgInvBom.SelectedItem = detailsSelectedItem;
-            childDgInvBom.syncEntity.Row = detailsSelectedItem;
-        }
-#endif
 
         public override Task InitQuery()
         {
@@ -167,21 +155,9 @@ namespace UnicontaClient.Pages.CustomPage
                     var selectedItem = childDgInvBom.SelectedItem as InvBOMClient;
                     WizardWindow nestedPropDialog = new WizardWindow(new SelectNestedPropWizardView(childDgInvBom.TableTypeUser, api.CompanyEntity, selectedItem), Uniconta.ClientTools.Localization.lookup("AddNestedProperty"),
                         setHeight: false);
-#if WPF
                     nestedPropDialog.Width = System.Convert.ToDouble(System.Windows.SystemParameters.PrimaryScreenWidth) * 0.35;
                     nestedPropDialog.Height = System.Convert.ToDouble(System.Windows.SystemParameters.PrimaryScreenHeight) * 0.45;
-#else
-                    if (Application.Current.IsRunningOutOfBrowser)
-                    {
-                        nestedPropDialog.Width = Application.Current.Host.Content.ActualWidth * 0.35;
-                        nestedPropDialog.Height = Application.Current.Host.Content.ActualHeight * 0.45;
-                    }
-                    else
-                    {
-                        nestedPropDialog.Width = System.Convert.ToDouble(System.Windows.Browser.HtmlPage.Window.Eval("screen.width")) * 0.35;
-                        nestedPropDialog.Height = System.Convert.ToDouble(System.Windows.Browser.HtmlPage.Window.Eval("screen.height")) * 0.45;
-                    }
-#endif
+
                     nestedPropDialog.MinHeight = 450.0d;
                     nestedPropDialog.MinWidth = 620.0d;
 

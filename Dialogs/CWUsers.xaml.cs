@@ -27,9 +27,6 @@ namespace UnicontaClient.Controls.Dialogs
         {
             this.DataContext = this;
             InitializeComponent();
-#if SILVERLIGHT
-            Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             dgUsers.api = api;
             dgUsers.View.ShowSearchPanel(false);
             this.Title = Uniconta.ClientTools.Localization.lookup("Users");
@@ -57,23 +54,6 @@ namespace UnicontaClient.Controls.Dialogs
         {
             SetDialogResult(false);
         }
-#if SILVERLIGHT
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Escape)
-            {
-                SetDialogResult(false);
-            }
-            else
-                if (e.Key == Key.Enter)
-            {
-                if (OKButton.IsFocused)
-                    OKButton_Click(null, null);
-                else if (CancelButton.IsFocused)
-                    SetDialogResult(false);
-            }
-        }
-#endif
 
     }
 }

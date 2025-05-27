@@ -30,9 +30,8 @@ namespace UnicontaClient.Pages.CustomPage
     {
         BankStatementClient master;
         ItemBase ibase;
-        Orientation orient;
+        System.Windows.Controls.Orientation orient;
         static bool AssignText;
-        int DaysSlip;
         bool ShowCurrency;
         BankStatementAPI bankTransApi;
         DateTime fromDate { get { return BankStatementLinePage.fromDate; } set { BankStatementLinePage.fromDate = value; } }
@@ -63,7 +62,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgVoucherGrid.SelectedItemChanged += dgVoucherGrid_SelectedItemChanged;
             GetMenuItem();
             localMenu.OnChecked += LocalMenu_OnChecked;
-            orient = api.session.Preference.BankStatementHorisontal ? Orientation.Horizontal : Orientation.Vertical;
+            orient = api.session.Preference.BankStatementHorisontal ? System.Windows.Controls.Orientation.Horizontal : System.Windows.Controls.Orientation.Vertical;
             lGroup.Orientation = orient;
             dgBSLinesGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
             State.Header = Uniconta.ClientTools.Localization.lookup("Status");
@@ -76,7 +75,6 @@ namespace UnicontaClient.Pages.CustomPage
         {
             bool RoundTo100;
             var Comp = api.CompanyEntity;
-            DaysSlip = master._DaysSlip;
             if (Comp.SameCurrency(master._Currency))
                 RoundTo100 = Comp.RoundTo100;
             else
@@ -103,7 +101,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             this.PreviewKeyDown -= RootVisual_KeyDown;
         }
-        private void RootVisual_KeyDown(object sender, KeyEventArgs e)
+        private void RootVisual_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift) || Keyboard.Modifiers.HasFlag(ModifierKeys.Alt))
             {
@@ -285,7 +283,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
         private void HasOffSetAccount_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            CallOffsetAccount((sender as Image).Tag as BankStatementLineGridClient);
+            CallOffsetAccount((sender as System.Windows.Controls.Image).Tag as BankStatementLineGridClient);
         }
 
         void CallOffsetAccount(BankStatementLineGridClient line)
@@ -394,7 +392,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "ChangeOrientation":
                     orient = 1 - orient;
                     lGroup.Orientation = orient;
-                    api.session.Preference.BankStatementHorisontal = (orient == Orientation.Horizontal);
+                    api.session.Preference.BankStatementHorisontal = (orient == System.Windows.Controls.Orientation.Horizontal);
                     break;
                 case "Interval":
                     setInterval();
@@ -413,7 +411,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
         void setInterval()
         {
-            CWInterval winInterval = new CWInterval(fromDate, toDate, DaysSlip, hideVoucher: true);
+            CWInterval winInterval = new CWInterval(fromDate, toDate, master._DaysSlip, hideVoucher: true);
             winInterval.Closed += delegate
             {
                 if (winInterval.DialogResult == true)
@@ -474,33 +472,52 @@ namespace UnicontaClient.Pages.CustomPage
             var Lines = dgBSLinesGrid.ItemsSource as IEnumerable<BankStatementLineGridClient>;
             var visibleRowVouchers = dgVoucherGrid.GetVisibleRows() as IEnumerable<VouchersClientLocal>;
             int rowCountUpdate = 0;
-            for (int i = 0; (i < 2); i++)
+            var DaysSlip = this.master._DaysSlip;
+            for (int OffsetDays = 0; (OffsetDays <= DaysSlip); OffsetDays++)
             {
-                foreach (var voucher in visibleRowVouchers)
+                for (int i = 0; (i < 3); i++)
                 {
-                    if (!voucher.IsAttached && voucher._Amount != 0)
+                    foreach (var voucher in visibleRowVouchers)
                     {
-                        DateTime date;
-                        if (i == 0)
-                            date = voucher._PostingDate != DateTime.MinValue ? voucher._PostingDate :
-                                (voucher._DocumentDate != DateTime.MinValue ? voucher._DocumentDate : voucher.Created.Date);
-                        else
-                            date = voucher._PayDate;
-                        if (date != DateTime.MinValue)
+                        if (!voucher.IsAttached && (voucher._Amount != 0 || voucher._Invoice != null))
                         {
-                            var amount = Math.Abs(voucher._Amount);
-                            foreach (var p in Lines)
-                                if (Math.Abs(p.Amount) == amount && p._Date == date)
+                            DateTime date;
+                            if (i == 0)
+                                date = voucher._PostingDate != DateTime.MinValue ? voucher._PostingDate :
+                                    (voucher._DocumentDate != DateTime.MinValue ? voucher._DocumentDate : voucher.Created.Date);
+                            else
+                                date = voucher._PayDate;
+                            if (date != DateTime.MinValue)
+                            {
+                                var MinDate = date.AddDays(-OffsetDays);
+                                var MaxDate = date.AddDays(OffsetDays);
+                                var inv = voucher._Invoice;
+
+                                BankStatementLineGridClient found = null;
+                                var amount = Math.Abs(voucher._Amount);
+                                foreach (var p in Lines)
+                                    if ((Math.Abs(p.Amount) == amount && ((p._Date >= MinDate && p._Date <= MaxDate) || i == 2))
+                                        || (inv != null && inv == p._Invoice))
+                                    {
+                                        if (found == null)
+                                            found = p;
+                                        else
+                                        {
+                                            found = null;
+                                            break;
+                                        }
+                                    }
+
+                                if (found != null)
                                 {
-                                    Attach(voucher, p, true, visibleRowVouchers);
+                                    Attach(voucher, found, true, visibleRowVouchers);
                                     rowCountUpdate++;
-                                    break;
                                 }
+                            }
                         }
                     }
                 }
             }
-
             if (rowCountUpdate > 0)
             {
                 busyIndicator.IsBusy = true;

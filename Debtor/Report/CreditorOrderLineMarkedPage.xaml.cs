@@ -34,7 +34,7 @@ namespace UnicontaClient.Pages.CustomPage
         public CreditorOrderLineMarkedPage(UnicontaBaseEntity orderLine) : base(null)
         {
             InitializeComponent();
-            ((TableView)dgCreditorOrderLineGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
+            ((TableView)dgCreditorOrderLineGrid.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
             debtorOrderLine = orderLine as DCOrderLineClient;
             orderRefLine = debtorOrderLine.OrderRefLine;
             SetHeader();

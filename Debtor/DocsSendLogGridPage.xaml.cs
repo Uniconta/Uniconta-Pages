@@ -72,7 +72,7 @@ namespace UnicontaClient.Pages.CustomPage
             InitializeComponent();
             if (master == null)
                 filterDate = BasePage.GetSystemDefaultDate().AddMonths(-2);
-            ((TableView)dgDocsSendLogDataGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
+            ((TableView)dgDocsSendLogDataGrid.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
             dgDocsSendLogDataGrid.UpdateMaster(master);
             SetRibbonControl(localMenu, dgDocsSendLogDataGrid);
             dgDocsSendLogDataGrid.BusyIndicator = busyIndicator;

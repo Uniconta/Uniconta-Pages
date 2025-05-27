@@ -49,7 +49,7 @@ namespace UnicontaClient.Pages.CustomPage
         public bool OnlyCopyTotals { get; set; }
         public override string NameOfControl => TabControls.CopyBudgetLines;
         static double pageHeight = 650.0d, pageWidth = 850.0d;
-        static Point position = new Point();
+        static System.Windows.Point position = new System.Windows.Point();
         public override void PageClosing()
         {
             if (ProposalLines != null)
@@ -132,7 +132,7 @@ namespace UnicontaClient.Pages.CustomPage
             BusyIndicator.IsBusy = false;
         }
 
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {

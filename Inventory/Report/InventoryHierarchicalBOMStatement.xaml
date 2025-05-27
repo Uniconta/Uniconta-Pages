@@ -8,9 +8,6 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryHierarchicalBOMStatement"
              xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
              xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools">
     <UserControl.Resources>
-        <Style x:Key="StyleRow" TargetType="dxg:GridRowContent">
-            <Setter Property="Height" Value="25"/>
-        </Style>
         <Util:VisibilityBoolConverter x:Key="VisibilityBoolConverter" />
         <Util:ImageNameToImagesourceConverter x:Key="ImageNameToImagesourceConverter" />
     </UserControl.Resources>

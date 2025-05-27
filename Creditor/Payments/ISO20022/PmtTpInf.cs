@@ -11,7 +11,8 @@ namespace UnicontaISO20022CreditTransfer
         private readonly string extCategoryPurpose;
         private readonly string extProprietaryCode;
         private readonly string instructionPriority;
-        
+        private readonly bool excludeSectionPmtTpInf;
+
         private const string HPMTTPINF = "PmtTpInf";
         private const string INSTRPRTY = "InstrPrty";
         private const string HSVCLVL = "SvcLvl";
@@ -59,7 +60,7 @@ namespace UnicontaISO20022CreditTransfer
         /// <param name="paymentInfoId">Unique identification, as assigned by the initiating party, to unambiguously identify the payment.</param> 
         /// <param name="paymentMethod">Specifies the means of payment that will be used to move the amount of money. CHK Cheque TRF CreditTransfer.</param>
         /// <param name="requestedExecutionDate">Date at which the initiating party requests the clearing agent to process the payment..</param>
-        public PmtTpInf(string extServiceCode, string extServicePrtry, string externalLocalInstrument, string extCategoryPurpose, string instructionPriority, string extProprietaryCode)
+        public PmtTpInf(string extServiceCode, string extServicePrtry, string externalLocalInstrument, string extCategoryPurpose, string instructionPriority, string extProprietaryCode, bool excludeSectionPmtTpInf)
         {
             this.instructionPriority = instructionPriority;
             this.extServiceCode = extServiceCode;
@@ -67,11 +68,14 @@ namespace UnicontaISO20022CreditTransfer
             this.externalLocalInstrument = externalLocalInstrument;
             this.extCategoryPurpose = extCategoryPurpose;
             this.extProprietaryCode = extProprietaryCode;
+            this.excludeSectionPmtTpInf = excludeSectionPmtTpInf;
         }
 
 
         internal virtual void Append(BaseDocument baseDoc, XmlDocument doc, XmlElement parent)
         {
+            if (excludeSectionPmtTpInf)
+                return;
             XmlElement pmtTpInf = baseDoc.AppendElement(doc, parent, HPMTTPINF);
 
             if (instructionPriority != null)

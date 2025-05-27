@@ -17,6 +17,7 @@ using System.Windows.Shapes;
 using System.Windows;
 using System.Threading.Tasks;
 using Uniconta.API.Service;
+using Uniconta.DataModel;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -24,7 +25,7 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class DebtorAccountStat : GridBasePage
     {
         ReportAPI reportApi;
-        UnicontaBaseEntity _master;
+        DCAccount _master;
         bool isStatDate = false;
         public DebtorAccountStat(BaseAPI API) : base(API, string.Empty)
         {
@@ -33,15 +34,24 @@ namespace UnicontaClient.Pages.CustomPage
         public DebtorAccountStat(UnicontaBaseEntity master)
             : base(master)
         {
-            _master = master;
+            _master = master as DCAccount;
             Initialize();
         }
         public DebtorAccountStat(object sourceData, bool isDateStat)
             : base(null)
         {
-            _master = (UnicontaBaseEntity)sourceData;
+            _master = sourceData as DCAccount;
             isStatDate = isDateStat;
             Initialize();
+        }
+        byte dctype = 0;
+        public override void SetParameter(IEnumerable<ValuePair> Parameters)
+        {
+            foreach (var par in Parameters)
+            {
+                byte.TryParse(par.Value, out dctype);
+            }
+            base.SetParameter(Parameters);
         }
         private void Initialize()
         {
@@ -77,21 +87,22 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
             }
         }
-      
-         public async override Task InitQuery()
+
+        public async override Task InitQuery()
         {
             if (reportApi == null)
                 reportApi = new ReportAPI(api);
-
+            if (dctype > 0)
+                reportApi.DCType = dctype;
             dgAcStatsGrid.ItemsSource = null;
             busyIndicator.IsBusy = true;
             Task<Statistick[]> tsk;
             if (_master == null)
                 tsk = reportApi.AccountStat(new InvStatistickClient(), txtDateFrm.DateTime, txtDateTo.DateTime);
             else if (_master != null && isStatDate)
-                tsk = reportApi.AccountStatDate(new InvStatistickClient(), txtDateFrm.DateTime, txtDateTo.DateTime, (DebtorClient)_master);
+                tsk = reportApi.AccountStatDate(new InvStatistickClient(), txtDateFrm.DateTime, txtDateTo.DateTime, _master);
             else
-                tsk = reportApi.AccountStat(new InvStatistickClient(), txtDateFrm.DateTime, txtDateTo.DateTime, (DebtorClient)_master);
+                tsk = reportApi.AccountStat(new InvStatistickClient(), txtDateFrm.DateTime, txtDateTo.DateTime, _master);
             dgAcStatsGrid.ItemsSource = await tsk;
             busyIndicator.IsBusy = false;
             dgAcStatsGrid.Visibility = Visibility.Visible;

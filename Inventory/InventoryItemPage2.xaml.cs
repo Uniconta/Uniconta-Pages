@@ -248,7 +248,7 @@ namespace UnicontaClient.Pages.CustomPage
             var lookupEditor = sender as LookupEditor;
             if (!lookupIsSet)
             {
-                lookupEditor.PopupContentTemplate = (Application.Current).Resources["LookUpDocumentClientPopupContent"] as ControlTemplate;
+                lookupEditor.PopupContentTemplate = (System.Windows.Application.Current).Resources["LookUpDocumentClientPopupContent"] as ControlTemplate;
                 lookupEditor.ValueMember = "RowId";
                 lookupEditor.SelectedIndexChanged += LookupEditor_SelectedIndexChanged;
                 lookupIsSet = true;
@@ -275,7 +275,7 @@ namespace UnicontaClient.Pages.CustomPage
             var lookupUrlEditor = sender as LookupEditor;
             if (!isUrlLookupSet)
             {
-                lookupUrlEditor.PopupContentTemplate = (Application.Current).Resources["LookUpUrlDocumentClientPopupContent"] as ControlTemplate;
+                lookupUrlEditor.PopupContentTemplate = (System.Windows.Application.Current).Resources["LookUpUrlDocumentClientPopupContent"] as ControlTemplate;
                 lookupUrlEditor.ValueMember = "RowId";
                 lookupUrlEditor.SelectedIndexChanged += LookupUrlEditor_SelectedIndexChanged;
                 isUrlLookupSet = true;
@@ -321,7 +321,7 @@ namespace UnicontaClient.Pages.CustomPage
             var lookupInvAttachmentEditor = sender as LookupEditor;
             if (!isAttachmentLookupset)
             {
-                lookupInvAttachmentEditor.PopupContentTemplate = (Application.Current).Resources["LookUpDocumentClientPopupContent"] as ControlTemplate;
+                lookupInvAttachmentEditor.PopupContentTemplate = (System.Windows.Application.Current).Resources["LookUpDocumentClientPopupContent"] as ControlTemplate;
                 lookupInvAttachmentEditor.ValueMember = "RowId";
                 lookupInvAttachmentEditor.SelectedIndexChanged += LookupInvAttachmentEditor_SelectedIndexChanged;
                 isAttachmentLookupset = true;

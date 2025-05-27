@@ -46,10 +46,9 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorStatement"
             <CorasauControls:DateEditor x:Name="txtDateFrm" Grid.Column="1" Grid.Row="0" Margin="0,3,3,3"/>
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ToDate}" Grid.Column="0" Grid.Row="1" Margin="3,3,3,3"/>
             <CorasauControls:DateEditor x:Name="txtDateTo" Grid.Column="1" Grid.Row="1" Margin="0,3,3,3"/>
-            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FromAccount}" Grid.Column="0" Grid.Row="2" Margin="3,3,3,3"/>
-            <CorasauControls:LookupEditor x:Name="cmbFromAccount" Grid.Column="1" Grid.Row="2" Margin="0,3,3,3" Text="{Binding FromAccount,Mode=TwoWay}" EditValueChanged="cmbFromAccount_EditValueChanged" />
-            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ToAccount}" Grid.Column="0" Grid.Row="3" Margin="3,3,3,3"/>
-            <CorasauControls:LookupEditor x:Name="cmbToAccount" Grid.Column="1" Grid.Row="3" Margin="0,3,3,3" Text="{Binding ToAccount,Mode=TwoWay}"/>
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Accounts}" Grid.Column="0" Grid.Row="2" Margin="3,3,3,3"/>
+            <CorasauControls:LookupEditor x:Name="cmbAccounts" Grid.Column="1" Grid.Row="2" Margin="0,3,3,3" Text="{Binding FromAccount,Mode=TwoWay}" EditValueChanged="cmbAccounts_EditValueChanged" />
+            <CorasauControls:TextEditor x:Name="txtAccount" Grid.Column="1" Grid.Row="3" Margin="0,3,3,3"/>
 
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Ascending}" Grid.Column="3" Grid.Row="0" Margin="3,3,3,3"/>
             <CheckBox x:Name="cbxAscending" Grid.Column="4" Grid.Row="0" Margin="5,3,3,3" IsChecked="False" />

@@ -127,6 +127,7 @@ namespace UnicontaISO20022CreditTransfer
         protected DateTime dueDate;
         protected bool excludeSectionCdtrAgt;
         protected bool excludeSectionInitgPty;
+        protected bool excludeSectionPmtTpInf;
 
         protected List<PmtInf> pmtInfList;
         protected List<CdtTrfTxInf> cdtTrfTxInfList;
@@ -826,6 +827,22 @@ namespace UnicontaISO20022CreditTransfer
             set
             {
                 excludeSectionCdtrAgt = value;
+            }
+        }
+
+        /// <summary>
+        /// Exclude section PmtTpInf
+        /// </summary>
+        public bool ExcludeSectionPmtTpInf
+        {
+            get
+            {
+                return excludeSectionPmtTpInf;
+            }
+
+            set
+            {
+                excludeSectionPmtTpInf = value;
             }
         }
 

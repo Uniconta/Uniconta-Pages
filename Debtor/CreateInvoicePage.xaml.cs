@@ -58,7 +58,7 @@ namespace UnicontaClient.Pages.CustomPage
             InitializeComponent();
             var api = this.api;
             var Comp = api.CompanyEntity;
-            ((TableView)dgDebtorOrderLineGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
+            ((TableView)dgDebtorOrderLineGrid.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
             ledim1.api = ledim2.api = ledim3.api = ledim4.api = ledim5.api = LeAccount.api = lePayment.api = leTransType.api = LePostingAccount.api = leShipment.api = leDeliveryTerm.api = Projectlookupeditor.api = PrCategorylookupeditor.api = leLayoutGroup.api = employeelookupeditor.api = leInvAccount.api = leDeliveryAddress.api = lePriceList.api = api;
             initialOrder = Comp.CreateUserType<DebtorOrderClient>();
 
@@ -124,7 +124,7 @@ namespace UnicontaClient.Pages.CustomPage
             this.KeyDown += Page_KeyDown;
         }
 
-        private void Page_KeyDown(object sender, KeyEventArgs e)
+        private void Page_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.F8)
                 ribbonControl.PerformRibbonAction("AddItems");
@@ -294,7 +294,11 @@ namespace UnicontaClient.Pages.CustomPage
                 var voucherObj = argument as object[];
                 var voucher = voucherObj[0] as VouchersClient;
                 if (voucher != null)
-                    Order.DocumentRef = voucher.RowId;
+                {
+                    var openedFrom = voucherObj[1];
+                    if (openedFrom == this.ParentControl)
+                        Order.DocumentRef = voucher.RowId;
+                }
             }
 
             if (screenName == TabControls.ItemVariantAddPage && argument != null)
@@ -315,9 +319,18 @@ namespace UnicontaClient.Pages.CustomPage
                     LeAccount.LoadItemSource();
                     if (oneTimeDebtor)//one time
                     {
-                        Order.OneTimeDebtor = args[3] as DebtorClient;
-                        CopyFromDebtor(Order.OneTimeDebtor);
-                        cmbCreateAccount.SelectedIndex = -1;
+                        if ((Int32)args[0] == 1)
+                        {
+                            Order.OneTimeDebtor = args[3] as DebtorClient;
+                            CopyFromDebtor(Order.OneTimeDebtor);
+                            cmbCreateAccount.SelectedIndex = -1;
+                        }
+                        else
+                        {
+                            Order.OneTimeDebtor = null;
+                            oneTimeDebtor = false;
+                        }
+
                     }
                     else if (string.IsNullOrEmpty(LeAccount.EditValue as string))
                         LeAccount.SelectedItem = args[3];
@@ -511,23 +524,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (!string.IsNullOrEmpty(Order._DCAccount) || Order._OneTimeDC != null)
                     {
                         if (Utility.HasControlRights("GenerateInvoice", api.CompanyEntity))
-                        {
-                            var debtor = ClientHelper.GetRef(Order.CompanyId, typeof(Debtor), Order._DCAccount) as Debtor;
-                            if (debtor != null)
-                            {
-                                var InvoiceAccount = Order._InvoiceAccount ?? debtor._InvoiceAccount;
-                                if (InvoiceAccount != null)
-                                    debtor = ClientHelper.GetRef(Order.CompanyId, typeof(Debtor), InvoiceAccount) as Debtor;
-                                if (debtor._PricesInclVat != Order._PricesInclVat)
-                                {
-                                    var confirmationMsgBox = UnicontaMessageBox.Show(string.Format("{0}.\n{1}", string.Format(Uniconta.ClientTools.Localization.lookup("DebtorAndOrderMix"), Uniconta.ClientTools.Localization.lookup("InclVat")),
-                                    Uniconta.ClientTools.Localization.lookup("ProceedConfirmation")), Uniconta.ClientTools.Localization.lookup("Confirmation"), MessageBoxButton.OKCancel);
-                                    if (confirmationMsgBox != MessageBoxResult.OK)
-                                        return;
-                                }
-                            }
                             GenerateInvoice(Order, ActionType == "ShowInvoice" ? true : false);
-                        }
                         else
                             UtilDisplay.ShowControlAccessMsg("GenerateInvoice");
                     }
@@ -753,15 +750,32 @@ namespace UnicontaClient.Pages.CustomPage
         static bool showInvPrintPrv = true;
         private void GenerateInvoice(DebtorOrderClient dbOrder, bool showProformaInvoice)
         {
+            var debtor = ClientHelper.GetRef(dbOrder.CompanyId, typeof(Debtor), dbOrder._DCAccount) as Debtor;
+            if (debtor != null)
+            {
+                var InvoiceAccount = dbOrder._InvoiceAccount ?? debtor._InvoiceAccount;
+                if (InvoiceAccount != null)
+                    debtor = ClientHelper.GetRef(dbOrder.CompanyId, typeof(Debtor), InvoiceAccount) as Debtor;
+                if (debtor._PricesInclVat != dbOrder._PricesInclVat)
+                {
+                    var confirmationMsgBox = UnicontaMessageBox.Show(string.Format("{0}.\n{1}", string.Format(Uniconta.ClientTools.Localization.lookup("DebtorAndOrderMix"), Uniconta.ClientTools.Localization.lookup("InclVat")),
+                    Uniconta.ClientTools.Localization.lookup("ProceedConfirmation")), Uniconta.ClientTools.Localization.lookup("Confirmation"), MessageBoxButton.OKCancel);
+                    if (confirmationMsgBox != MessageBoxResult.OK)
+                        return;
+                }
+
+                hasEmail = debtor._InvoiceEmail != null || debtor._EmailDocuments;
+            }
+
             var lines = (IEnumerable<DCOrderLineClient>)dgDebtorOrderLineGrid.ItemsSource;
             if (lines == null || lines.Count() == 0)
                 return;
-            var dc = dbOrder.OneTimeDebtor == null ? dbOrder.Debtor : dbOrder.OneTimeDebtor;
+            var dc = dbOrder.OneTimeDebtor == null ? debtor : dbOrder.OneTimeDebtor;
             if (dc == null || !Utility.IsExecuteWithBlockedAccount(dc))
                 return;
             if (!api.CompanyEntity.SameCurrency(dbOrder._Currency, dc._Currency))
             {
-                var confirmationMsgBox = UnicontaMessageBox.Show(string.Format("{0}.\n{1}", string.Format(Uniconta.ClientTools.Localization.lookup("CurrencyMismatch"), dc.Currency, dbOrder.Currency),
+                var confirmationMsgBox = UnicontaMessageBox.Show(string.Format("{0}.\n{1}", string.Format(Uniconta.ClientTools.Localization.lookup("CurrencyMismatch"), dc._Currency, dbOrder.Currency),
                 Uniconta.ClientTools.Localization.lookup("ProceedConfirmation")), Uniconta.ClientTools.Localization.lookup("Confirmation"), MessageBoxButton.OKCancel);
                 if (confirmationMsgBox != MessageBoxResult.OK)
                     return;
@@ -783,19 +797,19 @@ namespace UnicontaClient.Pages.CustomPage
             bool invoiceInXML;
             if (dbOrder.OneTimeDebtor == null)
             {
-                debtorName = dc?.Name ?? dbOrder._DCAccount;
+                debtorName = dc?._Name ?? dbOrder._DCAccount;
                 accountName = Util.ConcatParenthesis(dbOrder._DCAccount, dbOrder.Name);
                 invoiceInXML = dc != null && dc.IsPeppolSupported && dc._einvoice;
             }
             else
             {
-                debtorName = dc?.Name ?? dbOrder.OneTimeDebtor.Account;
+                debtorName = dc?._Name ?? dbOrder.OneTimeDebtor.Account;
                 accountName = Util.ConcatParenthesis(dbOrder.OneTimeDebtor.Account, dbOrder.OneTimeDebtor.Name);
                 invoiceInXML = false;
             }
+            bool isOrderOrQuickInv = api.CompanyEntity._CountryId == CountryCode.Germany ? false : true;
 
-
-            CWGenerateInvoice GenrateInvoiceDialog = new CWGenerateInvoice(true, string.Empty, false, askForEmail: true, showNoEmailMsg: !hasEmail, debtorName: debtorName, isOrderOrQuickInv: true, isDebtorOrder: true, InvoiceInXML: invoiceInXML, AccountName: accountName);
+            CWGenerateInvoice GenrateInvoiceDialog = new CWGenerateInvoice(true, string.Empty, false, askForEmail: true, showNoEmailMsg: !hasEmail, debtorName: debtorName, isOrderOrQuickInv: isOrderOrQuickInv, isDebtorOrder: true, InvoiceInXML: invoiceInXML, AccountName: accountName);
             GenrateInvoiceDialog.DialogTableId = 2000000005;
             GenrateInvoiceDialog.SetInvPrintPreview(showInvPrintPrv);
             if (dbOrder._InvoiceDate != DateTime.MinValue)
@@ -804,6 +818,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (!api.CompanyEntity._DeactivateSendNemhandel)
                 GenrateInvoiceDialog.SentByEInvoice(api, UtilCommon.GetEndPoint(dbOrder, dc, api));
 
+            GenrateInvoiceDialog.ShowAllowCredMax(dc._CreditMax != 0);
             GenrateInvoiceDialog.Closed += async delegate
             {
                 if (GenrateInvoiceDialog.DialogResult == true)
@@ -816,6 +831,9 @@ namespace UnicontaClient.Pages.CustomPage
                         GenrateInvoiceDialog.PostOnlyDelivered, GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.NumberOfPages, GenrateInvoiceDialog.SendByEmail,
                         GenrateInvoiceDialog.SendByOutlook, GenrateInvoiceDialog.sendOnlyToThisEmail, GenrateInvoiceDialog.Emails, GenrateInvoiceDialog.GenerateOIOUBLClicked,
                         documents, GenrateInvoiceDialog.SendByOutlook);
+
+                    if (api.CompanyEntity.AllowSkipCreditMax)
+                        invoicePostingResult.SetAllowCreditMax(GenrateInvoiceDialog.AllowSkipCreditMax);
 
                     busyIndicator.IsBusy = true;
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
@@ -855,6 +873,7 @@ namespace UnicontaClient.Pages.CustomPage
         async private void ShowProformaInvoice(DebtorOrderClient order, IEnumerable<DCOrderLineClient> orderLines)
         {
             var invoicePostingResult = SetupInvoicePostingPrintGenerator(order, orderLines, DateTime.Now, true, true, false, false, 0, false, false, false, null, false, null, false);
+            invoicePostingResult.SetAllowCreditMax(api.CompanyEntity.AllowSkipCreditMax);
 
             busyIndicator.IsBusy = true;
             busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
@@ -1165,10 +1184,12 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
             if (cmbCreateAccount.SelectedIndex == 1)
             {
-                if (Order.OneTimeDebtor == null)
-                    Order.OneTimeDebtor = api.CompanyEntity.CreateUserType<DebtorClient>();
                 var debtor = Order.OneTimeDebtor;
-                debtor.Country = (CountryCode)api.CompanyEntity._Country;
+                if (debtor == null)
+                {
+                    debtor = api.CompanyEntity.CreateUserType<DebtorClient>();
+                    debtor._Country = (CountryCode)api.CompanyEntity._Country;
+                }
                 var debtorAccountPage2 = dockCtrl.AddDockItem(TabControls.DebtorAccountPage2, this.ParentControl, new object[2] { debtor, true }, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), "Add_16x16") as DebtorAccountPage2;
                 debtorAccountPage2.DoNotSave = true;
                 oneTimeDebtor = true;

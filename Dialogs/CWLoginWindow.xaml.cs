@@ -49,7 +49,7 @@ namespace UnicontaClient.Controls.Dialogs
             SetDialogResult(false);
         }
         
-        private void ChildWindow_PreviewKeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Enter && this.OKButton.IsEnabled)
             {

@@ -1,54 +1,40 @@
 using UnicontaClient.Models;
-using UnicontaClient.Utilities;
 using DevExpress.Xpf.Bars;
-using DevExpress.Xpf.RichEdit;
-using DevExpress.Xpf.RichEdit.Localization;
-using DevExpress.XtraReports.Design.CodeCompletion;
 using DevExpress.XtraRichEdit;
 using DevExpress.XtraRichEdit.API.Native;
-using DevExpress.XtraRichEdit.Localization;
 using DevExpress.XtraRichEdit.Services;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
+using DevExpress.Xpf.CodeView;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
     public partial class TextInHtmlPage : ControlBasePage
     {
-        ObservableCollection<String> externTypes;
-        public ObservableCollection<String> ExternTypes { get { return externTypes; } set { value = externTypes; } }
+        public ObservableCollection<string> ExternTypes { get { return new ObservableCollection<string> { "Debtor", "DebtorInvoice", "Creditor", "CreditorInvoice", "Employee", "Contact" }; } }
 
-        ObservableCollection<String> properties;
-        public ObservableCollection<String> Properties { get { return properties; } set { value = properties; } }
+        ObservableCollection<string> properties;
+        public ObservableCollection<string> Properties { get { return properties; } set { value = properties; } }
 
         public override string NameOfControl { get { return TabControls.TextInHtmlPage; } }
+
+        private string _htmlContent;
+        public string HtmlContent { get { return _htmlContent; } set { if (_htmlContent != value) { _htmlContent = value; } } }
+
         public TextInHtmlPage(string html) : base(null)
         {
-           // XtraRichEditLocalizer.Active = new UnicontaRichEditLocalizer();
-           // XpfRichEditLocalizer.Active = new UnicontaXPfRichEditLocalizer();
             InitializeComponent();
             MainControl = txtHtmlControl;
             txtHtmlControl.Loaded += TxtHtmlControl_Loaded;
-            txtHtmlControl.HtmlText = html;
-            externTypes = new ObservableCollection<string> { "Debtor", "DebtorInvoice", "Creditor", "CreditorInvoice", "Employee", "Contact" };
-            properties = new ObservableCollection<string>(UtilFunctions.GetAllDisplayPropertyNames(typeof(DebtorClient), api.CompanyEntity, false, false));
+            HtmlContent = html;
+            properties = new ObservableCollection<string>();
             this.DataContext = this;
         }
 
@@ -61,10 +47,6 @@ namespace UnicontaClient.Pages.CustomPage
                 UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("HtmlEditorError"), Uniconta.ClientTools.Localization.lookup("Error"));
                 return;
             }
-            CustomRichEditCommandFactoryService commandFactory = new CustomRichEditCommandFactoryService(txtHtmlControl, service);
-            txtHtmlControl.RemoveService(typeof(IRichEditCommandFactoryService));
-            txtHtmlControl.AddService(typeof(IRichEditCommandFactoryService), commandFactory);
-            txtHtmlControl.ReplaceService<ISyntaxHighlightService>(new CustomHtmlSyntaxHighLightService(txtHtmlControl));
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -74,9 +56,10 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(txtHtmlControl.Text) || string.IsNullOrEmpty(txtHtmlControl.Text))
+            if (string.IsNullOrWhiteSpace(_htmlContent) || string.IsNullOrEmpty(_htmlContent))
                 return;
-            var htmlScript = Encoding.UTF8.GetBytes(txtHtmlControl.HtmlText);
+
+            var htmlScript = Encoding.UTF8.GetBytes(_htmlContent);
             globalEvents.OnRefresh(TabControls.TextInHtmlPage, htmlScript);
             CloseDockItem();
         }
@@ -88,8 +71,8 @@ namespace UnicontaClient.Pages.CustomPage
             if (info.Text.Length <= 0 || !info.Text.Contains(">"))
                 return;
             if (info.Text[0] == '>')
-            {   
-                for (;;)
+            {
+                for (; ; )
                 {
                     if (!info.DecrementStartPosition())
                         return;
@@ -111,34 +94,15 @@ namespace UnicontaClient.Pages.CustomPage
         {
             e.Handled = true;
         }
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            DevExpress.XtraRichEdit.API.Native.DocumentPosition pos = txtHtmlControl.Document.CaretPosition;
-            SubDocument doc = pos.BeginUpdateDocument();
-            var selectedText = property;
-            string propName = string.Concat("{", externType, ".", selectedText, "}");
-            if (string.IsNullOrEmpty(txtHtmlControl.Text))
-                txtHtmlControl.Text = propName + "    ";
-            else
-            {
-                doc.InsertText(pos, propName + "    ");
-                pos.EndUpdateDocument(doc);
-                var position = txtHtmlControl.Document.CreatePosition(pos.ToInt() + propName.Length);
-                txtHtmlControl.Document.CaretPosition = pos;
-            }
-            txtHtmlControl.Focus();
-        }
 
-        string externType;
         private void cmbExternType_EditValueChanged(object sender, RoutedEventArgs e)
         {
-            Type type;
-            var item = sender as BarEditItem;
-            if (item != null)
+            if (sender is BarEditItem item)
             {
                 var name = item.EditValue;
-                externType = name.ToString();
                 properties.Clear();
+                Type type;
+
                 if (name.ToString() == "Debtor")
                     type = typeof(DebtorClient);
                 else if (name.ToString() == "DebtorInvoice")
@@ -149,23 +113,36 @@ namespace UnicontaClient.Pages.CustomPage
                     type = typeof(CreditorInvoiceClient);
                 else if (name.ToString() == "Employee")
                     type = typeof(EmployeeClient);
-                else 
+                else
                     type = typeof(ContactClient);
 
-                foreach (var field in UtilFunctions.GetAllDisplayPropertyNames(type, api.CompanyEntity, false, false))
-                    properties.Add(field);
+                properties.AddRange(UtilFunctions.GetAllDisplayPropertyNames(type, api.CompanyEntity, false, false));
             }
         }
 
-        string property;
-        private void cmbProperties_EditValueChanged(object sender, RoutedEventArgs e)
+        private void btnAdd_ItemClick(object sender, ItemClickEventArgs e)
         {
-            var item = sender as BarEditItem;
-            if (item != null)
+            if (cmbExternType.EditValue == null || cmbProperties.EditValue == null)
             {
-                var name = item.EditValue;
-                property = name.ToString();
+                UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("PleaseSelectOBJ"), cmbExternType.EditValue == null ? Uniconta.ClientTools.Localization.lookup("Type") :
+                    Uniconta.ClientTools.Localization.lookup("Field")), Uniconta.ClientTools.Localization.lookup("Error"));
+                return;
             }
+
+            var pos = txtHtmlControl.Document.CaretPosition;
+            SubDocument doc = pos.BeginUpdateDocument();
+
+            string propName = string.Concat("{", cmbExternType.EditValue.ToString(), ".", cmbProperties.EditValue.ToString(), "}");
+            if (string.IsNullOrEmpty(_htmlContent))
+                _htmlContent = propName + "    ";
+            else
+            {
+                doc.InsertText(pos, propName + "    ");
+                pos.EndUpdateDocument(doc);
+                var position = txtHtmlControl.Document.CreatePosition(pos.ToInt() + propName.Length);
+                txtHtmlControl.Document.CaretPosition = pos;
+            }
+            txtHtmlControl.Focus();
         }
     }
 }

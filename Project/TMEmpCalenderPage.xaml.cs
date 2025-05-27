@@ -35,7 +35,7 @@ namespace UnicontaClient.Pages.CustomPage
         public TMEmpCalendarPage(BaseAPI API) : base(API, string.Empty)
         {
             InitializeComponent();
-            ((TableView)dgTMEmpCalendarGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
+            ((TableView)dgTMEmpCalendarGrid.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
             localMenu.dataGrid = dgTMEmpCalendarGrid;
             SetRibbonControl(localMenu, dgTMEmpCalendarGrid);
             dgTMEmpCalendarGrid.api = api;

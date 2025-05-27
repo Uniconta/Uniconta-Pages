@@ -76,7 +76,7 @@ namespace UnicontaClient.Pages.CustomPage
                 Group.Visible = false;
             dgNotesGrid.UpdateMaster(masterRecord);
             InitPage();
-            ((TableView)dgNotesGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
+            ((TableView)dgNotesGrid.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
         }
 
         public UserNotesPage(SynchronizeEntity syncEntity) : base(syncEntity, true)

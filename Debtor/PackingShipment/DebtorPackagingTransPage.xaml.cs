@@ -1,5 +1,3 @@
-using UnicontaClient.Models;
-using UnicontaClient.Pages;
 using DevExpress.Xpf.Grid;
 using System;
 using System.Collections.Generic;
@@ -16,11 +14,15 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Uniconta.API.Service;
+using Uniconta.ClientTools;
 using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
+using Uniconta.DataModel;
+using UnicontaClient.Models;
+using UnicontaClient.Pages;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -64,6 +66,9 @@ namespace UnicontaClient.Pages.CustomPage
                 case "DeleteRow":
                     dgDebtorPackagingTransGrid.DeleteRow();
                     break;
+                case "SaveGrid":
+                    Save();
+                    break;
                 case "CopyRow":
                     if (selectedItem != null)
                         dgDebtorPackagingTransGrid.CopyRow();
@@ -75,6 +80,22 @@ namespace UnicontaClient.Pages.CustomPage
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
+        }
+
+        void Save()
+        {
+            int i = 0;
+            foreach (var item in dgDebtorPackagingTransGrid.GetVisibleRows() as IEnumerable<InvPackagingTransClient>)
+            {
+                i++;
+                if (item.ReportingType == Uniconta.ClientTools.Localization.lookup("Packaging") && item._WasteSorting == 0) //TODDO:Skal der testes og/eller testes på mere
+                {
+                    var msg = $"{string.Format(Uniconta.ClientTools.Localization.lookup("MandatoryField"), Uniconta.ClientTools.Localization.lookup("WasteSorting"))}, {Uniconta.ClientTools.Localization.lookup("RowNumber")}: {i}";
+                    UnicontaMessageBox.Show(msg, Uniconta.ClientTools.Localization.lookup("Error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+            }
+            saveGrid();
         }
 
         void AddPackingModel()

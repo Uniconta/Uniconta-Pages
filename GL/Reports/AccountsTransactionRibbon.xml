@@ -42,6 +42,7 @@
       <RibbonItem Action="AddVat" LocalizedNameKey="AddOBJ" Parameter="Vat" Glyph="Grid_Add_16x16" />
       <RibbonItem Action="ChangeQuantity" LocalizedNameKey="ChangeOBJ" Parameter="Qty" Glyph="Import_16x16" />
       <RibbonItem Action="ChangeAmount" LocalizedNameKey="ChangeOBJ" Parameter="Amount" Glyph="Budget_16x16" />
+      <RibbonItem Action="ChangeAmountCurrency" LocalizedNameKey="ChangeOBJ" Parameter="AmountCur" Glyph="Budget_16x16" />
       <RibbonItem Action="ChangeProject" LocalizedNameKey="ChangeOBJ" Parameter="Project" Glyph="Reseller_16x16" Module="Project"/>
       <RibbonItem Action="AddEditNote" LocalizedNameKey="AddEditOBJ" Parameter="Note" LargeGlyph="AddUpdate_32x32"/>
     </RibbonItem>

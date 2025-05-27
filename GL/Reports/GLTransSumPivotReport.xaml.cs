@@ -220,14 +220,13 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void chkGrdTtlRow_Checked(object sender, RoutedEventArgs e)
         {
-            var value = (bool)chkGrdTtlRow.IsChecked;
-            pivotDgGLTransSum.ShowRowGrandTotalHeader = value;
-            pivotDgGLTransSum.ShowRowGrandTotals = value;
+            pivotDgGLTransSum.ShowRowGrandTotalHeader =
+            pivotDgGLTransSum.ShowRowGrandTotals = chkGrdTtlRow.IsChecked.GetValueOrDefault();
         }
 
         private void chkGrdTtlCol_Checked(object sender, RoutedEventArgs e)
         {
-            var value = (bool)chkGrdTtlCol.IsChecked;
+            var value = chkGrdTtlCol.IsChecked.GetValueOrDefault();
             pivotDgGLTransSum.ShowColumnGrandTotalHeader = value;
             pivotDgGLTransSum.ShowColumnGrandTotals = value;
             pivotDgGLTransSum.ShowColumnTotals = value;
@@ -235,8 +234,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void chkTtlOnFlds_Checked(object sender, RoutedEventArgs e)
         {
-            var value = (bool)chkTtlOnFlds.IsChecked;
-            pivotDgGLTransSum.ShowRowTotals = value;
+            pivotDgGLTransSum.ShowRowTotals = chkTtlOnFlds.IsChecked.GetValueOrDefault();
         }
     }
 }

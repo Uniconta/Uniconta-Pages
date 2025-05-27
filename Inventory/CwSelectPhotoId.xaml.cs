@@ -35,7 +35,7 @@ namespace UnicontaClient.Pages.CustomPage
             this.Title = string.Format(Uniconta.ClientTools.Localization.lookup("SetOBJ"),Uniconta.ClientTools.Localization.lookup("Photo"));
         }
 
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {
@@ -69,7 +69,7 @@ namespace UnicontaClient.Pages.CustomPage
             var lookupEditor = sender as LookupEditor;
             if (!lookupIsSet)
             {
-                lookupEditor.PopupContentTemplate = (Application.Current).Resources["LookUpDocumentClientPopupContent"] as ControlTemplate;
+                lookupEditor.PopupContentTemplate = (System.Windows.Application.Current).Resources["LookUpDocumentClientPopupContent"] as ControlTemplate;
                 lookupEditor.ValueMember = "RowId";
                 lookupEditor.SelectedIndexChanged += LookupEditor_SelectedIndexChanged;
                 lookupIsSet = true;

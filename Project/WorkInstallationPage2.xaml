@@ -24,6 +24,9 @@ x:Class="UnicontaClient.Pages.CustomPage.WorkInstallationPage2"
                     <CorasauControls:CorasauLayoutItem x:Name="liDCAccount" FieldName="DCAccount">
                         <CorasauControls:LookupEditor x:Name="leDCAccount" Text="{Binding DCAccount,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="liCreditorAccount" FieldName="CreditorAccount" Visibility="Collapsed" >
+                        <CorasauControls:LookupEditor x:Name="leCreditorAccount" Text="{Binding CreditorAccount,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem x:Name="liCode" FieldName="Code" >
                         <CorasauControls:TextEditor Text="{Binding Code, Mode=TwoWay}" />
                     </CorasauControls:CorasauLayoutItem>

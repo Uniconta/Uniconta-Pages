@@ -218,14 +218,10 @@ namespace UnicontaClient.Pages.CustomPage
             var property = prop?.FirstOrDefault();
             if (property == null)
                 return null;
-            if (property.PropertyType == typeof(DateTime))
+            if (property.PropertyType == typeof(DateTime) || Nullable.GetUnderlyingType(property.PropertyType) == typeof(DateTime))
                 return DateTypeTemplate;
-            else if (property.PropertyType.IsEnum)
-#if !SILVERLIGHT
+            else if (property.PropertyType.IsEnum || Nullable.GetUnderlyingType(property.PropertyType)?.IsEnum == true)
                 return CreateTemplateforEnumType(property.PropertyType);
-#else
-                return GenericTypeTemplate;
-#endif
             else if (property.PropertyType == typeof(bool))
             {
                 if (tableValue.Value == null)
@@ -240,12 +236,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     var grd = data.View.DataControl as CorasauDataGrid;
                     var api = grd?.api;
-#if !SILVERLIGHT
                     return CreateTemplateForForeignKeyType(property.ForeignKey, api);
-
-#else
-                    return GenericTypeTemplate;
-#endif
                 }
                 else
                     return GenericTypeTemplate;
@@ -258,7 +249,6 @@ namespace UnicontaClient.Pages.CustomPage
             return base.SelectTemplate(item, container);
         }
 
-#if !SILVERLIGHT
         /// <summary>
         /// Template for Foreign Key Type data
         /// </summary>
@@ -277,12 +267,11 @@ namespace UnicontaClient.Pages.CustomPage
             lookupEdit.SetValue(LookUpEdit.AutoPopulateColumnsProperty, false);
             lookupEdit.SetValue(LookUpEdit.ValidateOnTextInputProperty, true);
             lookupEdit.SetValue(LookUpEdit.IsTextEditableProperty, true);
-            lookupEdit.SetValue(LookUpEdit.PopupContentTemplateProperty, (Application.Current).Resources["LookupEditTemplateSelectorPopupContent"] as ControlTemplate);
+            lookupEdit.SetValue(LookUpEdit.PopupContentTemplateProperty, (System.Windows.Application.Current).Resources["LookupEditTemplateSelectorPopupContent"] as ControlTemplate);
             lookupEdit.SetValue(LookUpEdit.ItemsSourceProperty, itemsSource);
             ForeignKeyTypeDataTemplate.VisualTree = lookupEdit;
             return ForeignKeyTypeDataTemplate;
         }
-#endif
         /// <summary>
         /// Templeat for App Enums type data
         /// </summary>
@@ -290,7 +279,6 @@ namespace UnicontaClient.Pages.CustomPage
         /// <returns></returns>
         private DataTemplate CreateTemplateForAppEnumType(string appEnumName)
         {
-#if !SILVERLIGHT
             AppEnumTypeTemplate = new DataTemplate();
             var appEnum = typeof(AppEnums).GetField(appEnumName);
             var appEnumValues = (AppEnums)(appEnum.GetValue(null));
@@ -299,15 +287,9 @@ namespace UnicontaClient.Pages.CustomPage
             comboBoxEdit.SetValue(ComboBoxEdit.ItemsSourceProperty, appEnumValues.Values);
             AppEnumTypeTemplate.VisualTree = comboBoxEdit;
             return AppEnumTypeTemplate;
-
-           
-#else
-            return GetAppEnumXamlString(appEnumName);
-#endif
         }
 
 
-#if !SILVERLIGHT
         /// <summary>
         /// Creates a Template for Enum Type Property
         /// </summary>
@@ -319,27 +301,23 @@ namespace UnicontaClient.Pages.CustomPage
             EnumTypeTemplate.DataType = enumTypeProperty;
             FrameworkElementFactory comboBoxEdit = new FrameworkElementFactory(typeof(ComboBoxEdit));
             comboBoxEdit.Name = "PART_Editor";
+            if (Nullable.GetUnderlyingType(enumTypeProperty) != null)
+                enumTypeProperty = Nullable.GetUnderlyingType(enumTypeProperty);
             comboBoxEdit.SetValue(ComboBoxEdit.ItemsSourceProperty, Enum.GetValues(enumTypeProperty));
             EnumTypeTemplate.VisualTree = comboBoxEdit;
             return EnumTypeTemplate;
         }
-#endif
         private DataTemplate CreateTemplateforDouble(Type doubleTypeProperty)
         {
-#if !SILVERLIGHT
             DoubleTypeTemplate = new DataTemplate();
             DoubleTypeTemplate.DataType = doubleTypeProperty;
             var doubleEdit = new FrameworkElementFactory(typeof(DoubleEditor));
             doubleEdit.Name = "PART_Editor";
-            doubleEdit.SetValue(DoubleEditor.MarginProperty , new Thickness(-20,0,0,0));
+            doubleEdit.SetValue(DoubleEditor.MarginProperty, new Thickness(-20, 0, 0, 0));
             DoubleTypeTemplate.VisualTree = doubleEdit;
             return DoubleTypeTemplate;
-#else
-            return GetDoubleXamlString();
-#endif
         }
 
-#if !SILVERLIGHT
         private DataTemplate CreateTemplateforInteger(Type integerTypeProperty)
         {
             IntegerTypeTemplate = new DataTemplate();
@@ -350,26 +328,5 @@ namespace UnicontaClient.Pages.CustomPage
             IntegerTypeTemplate.VisualTree = integerEdit;
             return IntegerTypeTemplate;
         }
-#endif
-
-#if SILVERLIGHT
-        private DataTemplate GetDoubleXamlString()
-        {
-           
-        const string assemblyName = "Uniconta.SLTools";
-                    string cellTemplate = @"<DataTemplate xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation' xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'" +
-                                        " xmlns:CorasauControls=\"clr-namespace:Uniconta.ClientTools.Controls;assembly=" + assemblyName + "\" >" +
-                                        "<CorasauControls:DoubleEditor x:Name=\"PART_Editor\" \"/></DataTemplate>";
-            return (DataTemplate)XamlReader.Load(cellTemplate);
-        }
-        private DataTemplate GetAppEnumXamlString(string appEnumName)
-        {
-            const string assemblyName = "Uniconta.SLTools";
-            string cellTemplate = @"<DataTemplate xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation' xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'" +
-                                        " xmlns:CorasauControls=\"clr-namespace:Uniconta.ClientTools.Controls;assembly=" + assemblyName + "\" >" +
-                                        "<CorasauControls:ComboBoxEditor x:Name=\"PART_Editor\" AppEnumName=\"" + appEnumName + "\"/>" + "</DataTemplate>";
-            return (DataTemplate)XamlReader.Load(cellTemplate);
-        }
-#endif
     }
 }

@@ -57,7 +57,7 @@ namespace UnicontaClient.Pages.CustomPage
             bankStatementLine = master as BankStatementLineClient;
             vouchersClient = master as VouchersClient;
 
-            ((TableView)dgGlOffSetAccountTplt.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
+            ((TableView)dgGlOffSetAccountTplt.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
             localMenu.dataGrid = dgGlOffSetAccountTplt;
             dgGlOffSetAccountTplt.api = api;
             SetRibbonControl(localMenu, dgGlOffSetAccountTplt);

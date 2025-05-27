@@ -32,12 +32,6 @@ namespace UnicontaClient.Pages.CustomPage
         public override bool Readonly { get { return false; } }
         public override bool CanInsert { get { return false; } }
 
-#if SILVERLIGHT
-        protected override DataTemplate RowTemplate()
-        {
-            return Application.Current.Resources["CustomDataRowTemplateIsParent"] as DataTemplate;
-        }
-#endif
     }
 
     /// <summary>
@@ -74,9 +68,7 @@ namespace UnicontaClient.Pages.CustomPage
                         Quantity = invBom._Qty;
                 }
             }
-#if !SILVERLIGHT
             dgInvBomclientGrid.tableView.RowStyle = this.Resources["MatchingRowStyle"] as Style;
-#endif
             dgInvBomclientGrid.api = api;
             SetRibbonControl(localMenu, dgInvBomclientGrid);
             dgInvBomclientGrid.BusyIndicator = busyIndicator;
@@ -86,11 +78,7 @@ namespace UnicontaClient.Pages.CustomPage
             LoadBOM = new LoadInvBOMDeep(api);
             Utility.SetupVariants(api, null, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
             dgInvBomclientGrid.View.ShownColumnChooser += View_ShownColumnChooser;
-#if SILVERLIGHT
-            Application.Current.RootVisual.KeyDown += RootVisual_KeyDown;
-#else
             this.PreviewKeyDown += RootVisual_KeyDown;
-#endif
             dgInvBomclientGrid.ShowTotalSummary();
             dgInvBomclientGrid.CustomSummary += DgInvBomclientGrid_CustomSummary;
             this.BeforeClose += InventoryHierarchicalBOMStatement_BeforeClose;
@@ -209,11 +197,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void InventoryHierarchicalBOMStatement_BeforeClose()
         {
-#if SILVERLIGHT
-            Application.Current.RootVisual.KeyDown -= RootVisual_KeyDown;
-#else
             this.PreviewKeyDown -= RootVisual_KeyDown;
-#endif
         }
 
         public override void PerformAction(ShortcutAction action)
@@ -290,10 +274,8 @@ namespace UnicontaClient.Pages.CustomPage
                 filters = filterDialog.PropValuePair;
                 sort = filterDialog.PropSort;
             }
-#if !SILVERLIGHT
             e.Cancel = true;
             filterDialog.Hide();
-#endif
         }
 
         public override async Task InitQuery()
@@ -315,14 +297,14 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var invBomItem = (sender as Image).Tag as InvBOMClient;
+            var invBomItem = (sender as System.Windows.Controls.Image).Tag as InvBOMClient;
             if (invBomItem != null)
                 AddDockItem(TabControls.UserDocsPage, invBomItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Note"), invBomItem._ItemPart));
         }
 
         private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var invBomItem = (sender as Image).Tag as InvBOMClient;
+            var invBomItem = (sender as System.Windows.Controls.Image).Tag as InvBOMClient;
             if (invBomItem != null)
                 AddDockItem(TabControls.UserNotesPage, invBomItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Document"), invBomItem._ItemPart));
         }

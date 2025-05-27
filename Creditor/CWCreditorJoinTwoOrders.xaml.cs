@@ -47,9 +47,6 @@ namespace UnicontaClient.Pages.CustomPage
             LoadCacheInBackGround();
 
             this.Title = Uniconta.ClientTools.Localization.lookup("JoinTwoOrders");
-#if SILVERLIGHT
-            UnicontaClient.Utilities.Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             this.Loaded += CW_Loaded;
         }
 
@@ -75,7 +72,7 @@ namespace UnicontaClient.Pages.CustomPage
             cmbFromOrder.ItemsSource = cmbToOrder.ItemsSource = orderCache;
         }
 
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {

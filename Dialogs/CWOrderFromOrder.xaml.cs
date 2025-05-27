@@ -196,11 +196,11 @@ namespace UnicontaClient.Controls.Dialogs
 
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
-            InverSign = (bool)chkInvertSign.IsChecked;
-            copyAttachment = (bool)chkCopyAttach.IsChecked;
-            copyDeliveryAddress = (bool)chkCopyDelAdd.IsChecked;
-            reCalculatePrice = (bool)chkReCalPrice.IsChecked;
-            onlyItemsWithSupplier = (bool)chkOnlyItemsWithSupplier.IsChecked;
+            InverSign = chkInvertSign.IsChecked.GetValueOrDefault();
+            copyAttachment = chkCopyAttach.IsChecked.GetValueOrDefault();
+            copyDeliveryAddress = chkCopyDelAdd.IsChecked.GetValueOrDefault();
+            reCalculatePrice = chkReCalPrice.IsChecked.GetValueOrDefault();
+            onlyItemsWithSupplier = chkOnlyItemsWithSupplier.IsChecked.GetValueOrDefault();
             DCAccount dcAccount = null;
             if (isDebtorOrder)
             {
@@ -213,7 +213,7 @@ namespace UnicontaClient.Controls.Dialogs
             }
             else
             {
-                orderPerPurchaseAccount = (bool)chkPerSupplier.IsChecked;
+                orderPerPurchaseAccount = chkPerSupplier.IsChecked.GetValueOrDefault();
                 if (CreateNewOrder)
                 {
                     Account = leCreditorAccount.Text;
@@ -258,7 +258,7 @@ namespace UnicontaClient.Controls.Dialogs
 
         void HideControls()
         {
-            if (!(bool)chkCreateNewOrder.IsChecked)
+            if (!chkCreateNewOrder.IsChecked.GetValueOrDefault())
             {
                 Account= String.Empty;
                 leDebtorAccount.SelectedItem= null;

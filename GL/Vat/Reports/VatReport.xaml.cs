@@ -180,6 +180,11 @@ namespace UnicontaClient.Pages.CustomPage
                 UtilDisplay.RemoveMenuCommand(rb, "VatReportHolland");
             if (country != CountryCode.Iceland)
                 UtilDisplay.RemoveMenuCommand(rb, "VatReportIceland");
+            if (master != null && master._MaxJournalPostedId > 0 && master._Data != null)
+            {
+                UtilDisplay.RemoveMenuCommand(rb, "Search");
+                UtilDisplay.RemoveMenuCommand(rb, "Save");
+            }
         }
 
         void localMenu_OnItemClicked(string ActionType)
@@ -1040,7 +1045,7 @@ namespace UnicontaClient.Pages.CustomPage
                 CompanyName = api.CompanyEntity.Name,
                 ReportName = Uniconta.ClientTools.Localization.lookup("VATReport"),
                 CurDateTime = DateTime.Now.ToString("g"),
-                HeaderParameterTemplateStyle = Application.Current.Resources["VatReportPageHeaderStyle"] as Style,
+                HeaderParameterTemplateStyle = System.Windows.Application.Current.Resources["VatReportPageHeaderStyle"] as Style,
                 FromDate = txtDateFrm.Text == string.Empty ? string.Empty : txtDateFrm.DateTime.ToShortDateString(),
                 ToDate = txtDateTo.Text == string.Empty ? string.Empty : txtDateTo.DateTime.ToShortDateString()
             };

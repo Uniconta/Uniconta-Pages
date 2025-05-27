@@ -25,6 +25,7 @@ using Uniconta.ClientTools.Util;
 using Uniconta.API.GeneralLedger;
 using System.Text;
 using UnicontaClient.Utilities;
+using Uniconta.API.Service;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -172,7 +173,8 @@ namespace UnicontaClient.Pages.CustomPage
             if (Comp.InvPrice != Comp.CreditorPrice)
                 DCType.Visible = false;
             if (!Comp.UnitConversion)
-                Unit.Visible = false;
+                Unit.Visible = Unit.ShowInColumnChooser = UnitGroup.Visible = UnitGroup.ShowInColumnChooser = false;
+
         }
 
         private void DgInvPriceListLineClientGrid_RowDoubleClick()
@@ -190,9 +192,6 @@ namespace UnicontaClient.Pages.CustomPage
                 case "CopyRow":
                     dgInvPriceListLineClientGrid.CopyRow();
                     break;
-                case "SaveGrid":
-                    saveGrid();
-                    break;
                 case "DeleteRow":
                     if (dgInvPriceListLineClientGrid.SelectedItem != null)
                         dgInvPriceListLineClientGrid.DeleteRow();
@@ -202,40 +201,54 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
             }
         }
-        
+
+        public override void PageClosing()
+        {
+            ClearCache();
+            base.PageClosing();
+        }
+
+        void ClearCache()
+        {
+            string priceList = null;
+            var lst = dgInvPriceListLineClientGrid.ItemsSource as IEnumerable<InvPriceListLineClient>;
+            if (lst != null)
+            {
+                foreach (var rec in lst)
+                {
+                    if (rec._PriceList != priceList)
+                    {
+                        priceList = rec._PriceList;
+                        InvPriceList plst = (InvPriceList)rec.MasterDebtorPriceList ?? (InvPriceList)rec.MasterCreditorPriceList;
+                        if (plst != null)
+                            plst.ItemPrices = null; // clear cache
+                    }
+                }
+            }
+        }
+
         protected override Task<ErrorCodes> saveGrid()
         {
             if (!BlankFieldExist())
             {
-                var t = base.saveGrid();
-                var lst = dgInvPriceListLineClientGrid.ItemsSource as IEnumerable<InvPriceListLineClient>;
-                var rec = lst?.FirstOrDefault();
-                if (rec != null)
-                {
-                    InvPriceList plst = rec.MasterDebtorPriceList;
-                    if (plst == null)
-                        plst = rec.MasterCreditorPriceList;
-                    if (plst != null)
-                        plst.ItemPrices = null; // clear cache
-                }
-                return t;
+                ClearCache();
+                return base.saveGrid();
             }
             else
             {
                 UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("CannotBeBlank"), Uniconta.ClientTools.Localization.lookup("ItemAndGroup")), Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.OK);
-                return null;
+                return BaseAPI.RetErr(ErrorCodes.FieldCannotBeBlank);
             }
         }
 
         private bool BlankFieldExist()
         {
-           foreach(var row in dgInvPriceListLineClientGrid.GetVisibleRows())
-           {
-                var item = row as InvPriceListLineClient;
+            foreach (var item in dgInvPriceListLineClientGrid.ItemsSource as IEnumerable<InvPriceListLineClient>)
+            {
                 if (item != null && item._Item == null && item._ItemGroup == null && item._DiscountGroup == null)
                     return true;
-           }
-           return false;
+            }
+            return false;
         }
 
         protected override void LoadCacheInBackGround()

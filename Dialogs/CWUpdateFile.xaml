@@ -4,7 +4,7 @@
              xmlns:local="clr-namespace:UnicontaClient.Controls.Dialogs"
              xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
              xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" KeyDown="ChildWindow_KeyDown"
-             Width="{StaticResource Width24}"  SizeToContent="Height">
+             Width="{StaticResource Width38}"  SizeToContent="Height">
     <Grid x:Name="LayoutRoot" Margin="2" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />

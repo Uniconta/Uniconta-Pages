@@ -6,40 +6,66 @@ x:Class="UnicontaClient.Pages.CustomPage.InvPackagingTransPage"
              xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
              xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
              xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
+             xmlns:ClientTools="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
              xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"  
              xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="50"/>
+            <RowDefinition Height="70"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Inventory/ProductPackaging/InvPackagingTransPageRibbon.xml" x:Name="localMenu"/>
-        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="1" Margin="0,12,0,10">
-            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FromDate}"  Margin="10 2 0 0"/>
-            <UnicontaControls:DateEditor x:Name="FromDate"  Margin="10 0 0 0" ShowToday="True"/>
-            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ToDate}"  Margin="10 2 0 0"/>
-            <UnicontaControls:DateEditor x:Name="ToDate"  Margin="10 0 0 0" ShowToday="True"/>
-            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Country}"  Margin="10 2 0 0" />
-            <UnicontaControls:ComboBoxEditor x:Name="cmbCountry" Width="140" Margin="10 0 0 0"/>
-        </StackPanel>
+        <Grid Grid.Row="1" Margin="5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/> 
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ReportingType}" Grid.Column="0" Grid.Row="0" Margin="3,3,3,3" />
+            <UnicontaControls:ComboBoxEditor x:Name="cmbReportingType" Grid.Column="2" Grid.Row="0" Margin="0,3,3,3" SelectedIndexChanged="cmbReportingType_SelectedIndexChanged"/>
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Country}" Grid.Column="0" Grid.Row="1"  Margin="3,3,3,3" />
+            <UnicontaControls:ComboBoxEditor x:Name="cmbCountry" Grid.Column="2" Grid.Row="1" Margin="0,3,3,3"/>
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FromDate}" Grid.Column="4" Grid.Row="0"  Margin="10,3,3,3" />
+            <UnicontaControls:DateEditor x:Name="FromDate" Grid.Column="6" Grid.Row="0"  Margin="0,3,3,3" ShowToday="True"/>
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ToDate}" Grid.Column="4" Grid.Row="1" Margin="10,3,3,3" />
+            <UnicontaControls:DateEditor x:Name="ToDate" Grid.Column="6" Grid.Row="1"  Margin="0,3,3,3" ShowToday="True"/>
+            <TextBlock x:Name="lbAppendNotPosted" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AppendNotPosted}" Grid.Column="7" Grid.Row="0"  Margin="10,0,5,0" Grid.ColumnSpan="2" VerticalAlignment="Center"></TextBlock>
+            <CorasauControls:CheckEditor x:Name="AppendNotPosted" Grid.Column="9" Grid.Row="0" Margin="0,3,3,3" ></CorasauControls:CheckEditor>
+        </Grid>
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="2" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <local:InvPackagingTransGrid x:Name="dgInvPackagingTransGrid" AutoGenerateColumns="None">
                 <local:InvPackagingTransGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="IsCreated" Width="80" AllowEditing="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Date" AllowEditing="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Period" AllowEditing="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Item" AllowEditing="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Name" Width="200" Visible="False"/>
                     <local:ComboBoxColumnClient x:Name="Category" />
                     <local:ComboBoxColumnClient x:Name="PackagingType" />
                     <local:ComboBoxColumnClient x:Name="WasteSorting" />
                     <local:ComboBoxColumnClient x:Name="PackagingRateLevel" />
                     <local:ComboBoxColumnClient x:Name="PackagingConsumer" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Weight" AllowThousandMask="True" Mask="N4"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Unit"  Width="50"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Qty" AllowThousandMask="True" Mask="N4"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Country" AllowEditing="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" Visible="False"/>
                 </local:InvPackagingTransGrid.Columns>
                 <local:InvPackagingTransGrid.TotalSummary >
                     <local:SumColumn FieldName="Category" SummaryType="Count"/>
-                    <local:SumColumn FieldName="Weight" SummaryType="Sum"/>
+                    <local:SumColumn FieldName="Qty" SummaryType="Sum"/>
                 </local:InvPackagingTransGrid.TotalSummary>
             </local:InvPackagingTransGrid>
         </CorasauControls:BusyIndicator>

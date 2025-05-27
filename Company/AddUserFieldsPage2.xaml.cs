@@ -133,15 +133,13 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (ActionType == "Save")
             {
-#if !SILVERLIGHT
                 var element = FocusManager.GetFocusedElement(UtilDisplay.GetCurentWindow());
-                if (element is Control)
+                if (element is System.Windows.Controls.Control)
                 {
-                    var ctrl = element as Control;
+                    var ctrl = element as System.Windows.Controls.Control;
                     TraversalRequest tReq = new TraversalRequest(FocusNavigationDirection.Down);
                     ctrl.MoveFocus(tReq);
                 }
-#endif
                 var name = (LoadedRow as TableFieldsClient)?.Name;
                 if (name == null || name != editrow.Name)
                 {

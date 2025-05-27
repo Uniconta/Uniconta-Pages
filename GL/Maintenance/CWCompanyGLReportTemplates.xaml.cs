@@ -53,7 +53,7 @@ namespace UnicontaClient.Pages.CustomPage
             cbCompany.ItemsSource = companies.ToList();
         }
 
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
                 SetDialogResult(true);

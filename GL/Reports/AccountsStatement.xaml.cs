@@ -269,7 +269,7 @@ namespace UnicontaClient.Pages.CustomPage
             detailView.SearchPanelHighlightResults = true;
             var searchControl = ribbonControl?.SearchControl;
             if (searchControl != null)
-                BindingOperations.SetBinding(detailView, DataViewBase.SearchStringProperty, new Binding("SearchText") { Source = searchControl });
+                BindingOperations.SetBinding(detailView, DataViewBase.SearchStringProperty, new System.Windows.Data.Binding("SearchText") { Source = searchControl });
         }
 
         TableView GetDetailView(int rowHandle)
@@ -737,7 +737,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void HasVoucherImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var gLTransClientTotal = (sender as Image).Tag as GLTransClientTotal;
+            var gLTransClientTotal = (sender as System.Windows.Controls.Image).Tag as GLTransClientTotal;
             if (gLTransClientTotal != null)
                 DebtorTransactions.ShowVoucher(childDgGLTrans.syncEntity, api, busyIndicator);
         }

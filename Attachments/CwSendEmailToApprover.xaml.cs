@@ -31,11 +31,9 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "Note", ResourceType = typeof(InputFieldDataText))]
         public string Note { get; set; }
 
-#if !SILVERLIGHT
         public int DialogTableId;
         protected override int DialogId { get { return DialogTableId; } }
         protected override bool ShowTableValueButton { get { return true; } }
-#endif
         Dictionary<string, string> approverDic;
         public CwSendEmailToApprover(VouchersClient document)
         {
@@ -57,7 +55,7 @@ namespace UnicontaClient.Pages.CustomPage
             Dispatcher.BeginInvoke(new System.Action(() =>{ cmbEmployee.Focus(); }));
         }
 
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {

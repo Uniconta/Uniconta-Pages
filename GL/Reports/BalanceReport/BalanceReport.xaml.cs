@@ -307,7 +307,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (master is GLClosingSheet)
                 tranApi.SetClosingSheet((GLClosingSheet)master);
             balanceClient = new List<BalanceClient>();
-            ((TableView)dgBalanceReport.View).RowStyle = Application.Current.Resources["RowStyle"] as Style;
+            ((TableView)dgBalanceReport.View).RowStyle = System.Windows.Application.Current.Resources["RowStyle"] as Style;
             setColumnDim();
             GenerateBalance();
             ColumndimData();
@@ -324,7 +324,7 @@ namespace UnicontaClient.Pages.CustomPage
             OpenTransactionReport();
         }
 
-        private void Page_KeyDown(object sender, KeyEventArgs e)
+        private void Page_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.F8)
                 OpenTransactionReport();
@@ -864,7 +864,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var amountCol = new BalanceReportManagerGridColumn();
             amountCol.Name = "AmountCol" + i;
-            var amountBinding = new Binding();
+            var amountBinding = new System.Windows.Data.Binding();
             amountBinding.Path = new PropertyPath(string.Concat("Columns[", i, "].Amount"));
             amountBinding.Mode = BindingMode.OneWay;
             amountCol.Binding = amountBinding;
@@ -877,7 +877,7 @@ namespace UnicontaClient.Pages.CustomPage
             var amountDebitCol = new BalanceReportManagerGridColumn();
             amountDebitCol.Name = string.Concat("Amount", i, "Debit");
 
-            var debitBinding = new Binding();
+            var debitBinding = new System.Windows.Data.Binding();
             debitBinding.Path = new PropertyPath(string.Concat("Columns[", i, "].Debit"));
             debitBinding.Mode = BindingMode.OneWay;
             amountDebitCol.Binding = debitBinding;
@@ -890,7 +890,7 @@ namespace UnicontaClient.Pages.CustomPage
             var amountCreditCol = new BalanceReportManagerGridColumn();
             amountCreditCol.Name = string.Concat("Amount", i, "Credit");
             //     amountCreditCol.FieldName = string.Format("Columns[{0}].Credit", i);
-            var creditBinding = new Binding();
+            var creditBinding = new System.Windows.Data.Binding();
             creditBinding.Path = new PropertyPath(string.Concat("Columns[", i, "].Credit"));
             creditBinding.Mode = BindingMode.OneWay;
             amountCreditCol.Binding = creditBinding;

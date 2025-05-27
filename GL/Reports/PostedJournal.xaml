@@ -42,14 +42,15 @@ x:Class="UnicontaClient.Pages.CustomPage.PostedJournals"
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Reference" Width="150" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ReferenceName"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NumberSerie" Width="60" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Voucher" Width="60"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="VoucherPrefix" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceNumber" Width="60"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Lines" Width="60"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderNumber" Width="60"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NumberSerie" Width="60" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Comment"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DateMin" Width="90" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DateMax" Width="90" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DateMin" Width="80" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DateMax" Width="80" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Lines" Width="60"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Deleted" ShowTime="True" MinWidth="120">
                         <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
                             <editor:TextEditSettings DisplayFormat="g"  MaskType="DateTime" />

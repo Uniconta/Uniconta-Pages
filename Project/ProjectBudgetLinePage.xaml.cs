@@ -186,7 +186,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void InitPage(UnicontaBaseEntity master)
         {
-            ((TableView)dgProjectBudgetLinePageGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
+            ((TableView)dgProjectBudgetLinePageGrid.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
             localMenu.dataGrid = dgProjectBudgetLinePageGrid;
             dgProjectBudgetLinePageGrid.api = api;
             _master = master;

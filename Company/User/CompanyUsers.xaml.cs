@@ -234,13 +234,36 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         AddDockItem(TabControls.UserProfileUserPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("UserProfiles"), selectedItem._Name));
                     break;
+                case "NotificationSubscriptions":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.NotificationSubscribePage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Notifications"), selectedItem._Name));
+                    break;
                 case "CreateEmployee":
                     if (selectedItem != null)
                         CreateOrSelectEmployee(selectedItem);
                     break;
+                case "FieldRights":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.UserTableFieldAccessPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("FieldRights"), selectedItem._Name));
+                    break;
+                case "OtherSettings":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.OtherSettings, new object[2] { selectedItem, true }, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("OtherSettings"), selectedItem.UserName));
+                    break;
+                case "UpdateExpireDate":
+                    UpdateExpireDate(selectedItem);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
+            }
+        }
+        async void UpdateExpireDate(CompanyUserAccessClient selectedItem)
+        {
+            if (selectedItem != null)
+            {
+                var err = await api.Update(selectedItem);
+                UtilDisplay.ShowErrorCode(err);
             }
         }
         void CreateUser(UserTypes userType)

@@ -313,7 +313,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                     if (tabItemYld.IsSelected)
                     {
-                        MessageBox.Show("Antud tabelist ei saa ridu kustutada");
+                        System.Windows.MessageBox.Show("Antud tabelist ei saa ridu kustutada");
                     }
 
                     break;

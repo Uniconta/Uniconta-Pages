@@ -532,7 +532,9 @@ namespace UnicontaClient.Pages.CustomPage
                 isOrderOrQuickUpdate = false;
                 dialogId = 2000000104;
             }
-
+            isOrderOrQuickUpdate = api.CompanyEntity._CountryId == CountryCode.Germany ? false : isOrderOrQuickUpdate;
+            if (api.CompanyEntity._CountryId == CountryCode.Germany)
+                invoiceInXml = false;
             string debtorName = debtor?._Name ?? projInvProp._DCAccount;
             var accountName = Util.ConcatParenthesis(projInvProp._DCAccount, projInvProp.Name);
             CWGenerateInvoice GenrateInvoiceDialog = new CWGenerateInvoice(showSimulation, docType, false, true, true, showNoEmailMsg: !showSendByMail, debtorName: debtorName,
@@ -581,14 +583,14 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var obj = (sender as Image).Tag as ProjectInvoiceProposalClient;
+            var obj = (sender as System.Windows.Controls.Image).Tag as ProjectInvoiceProposalClient;
             if (obj != null)
                 AddDockItem(TabControls.UserDocsPage, dgProjInvProposalGrid.syncEntity);
         }
 
         private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var obj = (sender as Image).Tag as ProjectInvoiceProposalClient;
+            var obj = (sender as System.Windows.Controls.Image).Tag as ProjectInvoiceProposalClient;
             if (obj != null)
                 AddDockItem(TabControls.UserNotesPage, dgProjInvProposalGrid.syncEntity);
         }

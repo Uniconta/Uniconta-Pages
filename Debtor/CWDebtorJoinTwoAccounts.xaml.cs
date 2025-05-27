@@ -48,9 +48,6 @@ namespace UnicontaClient.Pages.CustomPage
             LoadCacheInBackGround();
 
             this.Title = string.Format(Uniconta.ClientTools.Localization.lookup("JoinTwoOBJ"), Uniconta.ClientTools.Localization.lookup("Accounts"));
-#if SILVERLIGHT
-            UnicontaClient.Utilities.Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             this.Loaded += CW_Loaded;
         }
 
@@ -76,7 +73,7 @@ namespace UnicontaClient.Pages.CustomPage
                     OKButton.Focus();
             }));
         }
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {

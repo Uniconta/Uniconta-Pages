@@ -56,7 +56,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void InitPage(UnicontaBaseEntity master = null)
         {
             InitializeComponent();
-            ((TableView)dgBankLogDataGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
+            ((TableView)dgBankLogDataGrid.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
 
             dgBankLogDataGrid.UpdateMaster (master);
 

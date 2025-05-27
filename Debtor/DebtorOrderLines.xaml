@@ -11,9 +11,6 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderLines"
     xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
     xmlns:docking="http://schemas.devexpress.com/winfx/2008/xaml/docking">
     <UserControl.Resources>
-        <Style x:Key="StyleRow" TargetType="dxg:RowControl">
-            <Setter Property="Height" Value="Auto"/>
-        </Style>
         <Util:RowIndexConverter x:Key="RowIndexConverter" />
         <Util:MaskConverter x:Key="MaskConverter" />
 
@@ -93,6 +90,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderLines"
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="UnitGroup" Width="100"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="SerieBatch" Visible="False">
                                     <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                         <ControlTemplate>
@@ -102,7 +100,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderLines"
                                     <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
 
                                         <DataTemplate>
-                                            <CorasauControls:ComboBoxEditor x:Name="PART_Editor" GotFocus="SerieBatch_GotFocus" ValueMember="Number"  DisplayMember="DisplayText" ItemsSource="{Binding DataContext.RowData.Row.SerieBatches, Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" />
+                                            <CorasauControls:ComboBoxEditor x:Name="PART_Editor" GotFocus="SerieBatch_GotFocus" ValueMember="DisplayText"  DisplayMember="DisplayText" ItemsSource="{Binding DataContext.RowData.Row.SerieBatches, Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" EditValueChanged="SerialBatch_EditValueChanged" />
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
@@ -201,6 +199,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderLines"
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryDate" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" Visible="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim2" Width="70" FieldName="Dimension2" Visible="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim3" Width="70" FieldName="Dimension3" Visible="False"/>

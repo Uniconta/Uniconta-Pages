@@ -63,7 +63,7 @@ namespace UnicontaClient.Pages.CustomPage
         void SetHeader()
         {
             string header;
-            var syncMaster = dgWorkInstallation.masterRecord as Debtor;
+            var syncMaster = dgWorkInstallation.masterRecord as DCAccount;
             if (syncMaster != null)
                 header = string.Format("{0}: {1}, {2}", Uniconta.ClientTools.Localization.lookup("DeliveryAddresses"), syncMaster._Account, syncMaster._Name);
             else
@@ -73,7 +73,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         public WorkInstallationPage(UnicontaBaseEntity master) : base(master)
         {
-            InitPage(master as Debtor);
+            InitPage(master);
         }
 
         void InitPage(UnicontaBaseEntity master)
@@ -141,14 +141,14 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var client = (sender as Image).Tag as WorkInstallationClient;
+            var client = (sender as System.Windows.Controls.Image).Tag as WorkInstallationClient;
             if (client != null)
                 AddDockItem(TabControls.UserDocsPage, dgWorkInstallation.syncEntity);
         }
 
         private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var client = (sender as Image).Tag as WorkInstallationClient;
+            var client = (sender as System.Windows.Controls.Image).Tag as WorkInstallationClient;
             if (client != null)
                 AddDockItem(TabControls.UserNotesPage, dgWorkInstallation.syncEntity);
         }

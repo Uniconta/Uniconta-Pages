@@ -50,6 +50,9 @@ x:Class="UnicontaClient.Pages.CustomPage.ImportGLDailyJournalPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="InvoicePos" x:Name="liInvoicePos">
                         <CorasauControls:TextEditor Text="{Binding InvoicePos,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="OrderPos" x:Name="liOrderPos">
+                        <CorasauControls:TextEditor Text="{Binding OrderPos,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="DocumentPos" x:Name="liDocuentPos">
                         <CorasauControls:TextEditor Text="{Binding DocumentPos,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>

@@ -19,7 +19,7 @@ namespace UnicontaClient.Controls.Dialogs
             chkClassType.IsChecked = ClassGenerator.generateByName;
         }
 
-        private void CWGenerateClass_KeyDown(object sender, KeyEventArgs e)
+        private void CWGenerateClass_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
                 CancelButton_Click(null, null);

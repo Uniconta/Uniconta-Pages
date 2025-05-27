@@ -1,0 +1,57 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
+                    xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.NotificationEventPage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+        xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
+    <CorasauControls:BusyIndicator x:Name="busyIndicator" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
+        <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <CorasauControls:CorasauRibbonControl x:Name="localMenu" XMLSourcePath=";component/Assets/GridRibbon.xml"/>
+            <local:NotificationEventGrid x:Name="dgNotificationEvent" AutoGenerateColumns="None" Grid.Row="1">
+                <local:NotificationEventGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Level" Width="150" ReadOnly="True"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Notification" Width="150" ReadOnly="True"/>
+                    <local:ComboBoxColumnClient x:Name="DCType" ReadOnly="True"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DCAccount" Width="250" ReadOnly="True">
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.DCAccount,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" PreviewMouseDown="DCAccount_PreviewMouseDown" />
+                                    <TextBlock Grid.Column="1" />
+                                </Grid>
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Text" Width="300" ReadOnly="True"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Data" Width="300" ReadOnly="True"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Reference" Width="300" ReadOnly="True"/>
+                    <!--<local:CorasauDataGridTemplateColumnClient Width="300">
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Margin="5,0,0,0" TextDecorations="Underline" Cursor="Hand" VerticalAlignment="Center" Text="View" PreviewMouseDown="View_PreviewMouseDown" />
+                                    <TextBlock Grid.Column="1" />
+                                </Grid>
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>-->
+                </local:NotificationEventGrid.Columns>
+            </local:NotificationEventGrid>
+        </Grid>
+    </CorasauControls:BusyIndicator>
+</Pages:GridBasePage>

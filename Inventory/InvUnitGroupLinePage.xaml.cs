@@ -34,7 +34,7 @@ namespace UnicontaClient.Pages.CustomPage
         public InvUnitGroupLinePage(UnicontaBaseEntity master) : base(master)
         {
             InitializeComponent();
-            ((TableView)dgInvUnitGroupLineGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
+            ((TableView)dgInvUnitGroupLineGrid.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
             dgInvUnitGroupLineGrid.UpdateMaster(master);
             localMenu.dataGrid = dgInvUnitGroupLineGrid;
             SetRibbonControl(localMenu, dgInvUnitGroupLineGrid);

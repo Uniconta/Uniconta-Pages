@@ -9,7 +9,7 @@ x:Class="UnicontaClient.Pages.CustomPage.SubscriptionsPage"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
     xmlns:dxinteraction="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
     xmlns:Util="clr-namespace:UnicontaClient.Utilities"
-    xmlns:enumType ="clr-namespace:Uniconta.Common;assembly=Uniconta.WindowsAPI"
+    xmlns:Utilities="clr-namespace:UnicontaClient.Utilities"
     d:DesignHeight="300" d:DesignWidth="400">
     <Pages:FormBasePage.Resources>
         <Util:AssemblyConverter x:Key="AssemblyConverter"></Util:AssemblyConverter>
@@ -101,7 +101,7 @@ x:Class="UnicontaClient.Pages.CustomPage.SubscriptionsPage"
                         <CorasauControls:CorasauLayoutItem FieldName="Country">
                             <CorasauControls:ComboBoxEditor x:Name="cmbCountry"  EditValue="{Binding Country,Mode=TwoWay}">
                                 <dxinteraction:Interaction.Behaviors>
-                                    <dxinteraction:EnumItemsSourceBehavior EnumType="{x:Type enumType:CountryCode}" />
+                                    <dxinteraction:EnumItemsSourceBehavior EnumType="{x:Static Utilities:EnumTypeResolver.CountryCode}" />
                                 </dxinteraction:Interaction.Behaviors>
                             </CorasauControls:ComboBoxEditor>
                         </CorasauControls:CorasauLayoutItem>

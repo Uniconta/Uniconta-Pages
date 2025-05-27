@@ -18,6 +18,7 @@ using Uniconta.ClientTools.Util;
 using UnicontaClient.Utilities;
 using DevExpress.Xpf.Grid;
 using Uniconta.Common.Utility;
+using Uniconta.API.System;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -83,7 +84,7 @@ namespace UnicontaClient.Pages.CustomPage
                 lst = new List<DebtorOrderLineClient>();
                 foreach (var _it in copyFromRows)
                 {
-                    double qty = (double)_it.GetType().GetProperty("Qty").GetValue(_it, null);
+                    double qty = Convert.ToDouble(_it.GetType().GetProperty("Qty").GetValue(_it, null));
                     var it = (InvItemClient)_it;
                     lst.Add(CreateNewOrderLine(it._Item, qty, null, 0d, 0d, 0d, 0d, null, null, null, null, null, null, null, 0, DateTime.MinValue, 0, null));
                 }
@@ -156,8 +157,8 @@ namespace UnicontaClient.Pages.CustomPage
         {
             InitializeComponent();
             company = api.CompanyEntity;
-            ((TableView)dgDebtorOrderLineGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
-            ((TableView)dgInvItemStorageClientGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
+            ((TableView)dgDebtorOrderLineGrid.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
+            ((TableView)dgInvItemStorageClientGrid.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
             localMenu.dataGrid = dgDebtorOrderLineGrid;
             SetRibbonControl(localMenu, dgDebtorOrderLineGrid);
             dgDebtorOrderLineGrid.api = api;
@@ -196,7 +197,7 @@ namespace UnicontaClient.Pages.CustomPage
             this.PreviewKeyDown -= RootVisual_KeyDown;
         }
 
-        private void RootVisual_KeyDown(object sender, KeyEventArgs e)
+        private void RootVisual_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.F8)
                 ribbonControl.PerformRibbonAction("AddItems");
@@ -322,6 +323,8 @@ namespace UnicontaClient.Pages.CustomPage
                 Margin.Visible = Margin.ShowInColumnChooser = false;
                 MarginRatio.Visible = MarginRatio.ShowInColumnChooser = false;
             }
+            if (!company.UnitConversion)
+                UnitGroup.Visible = UnitGroup.ShowInColumnChooser = false;
         }
 
         void SetVariantColumns()
@@ -599,19 +602,24 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Variant":
                     globalEvents.NotifyRefreshViewer(NameOfControl, rec);
                     break;
+                case "UnitGroup":
+                    if (rec._UnitGroup != null)
+                        setUnitGroup(rec);
+                    break;
                 case "CustomerItemNumber":
                     if (!string.IsNullOrEmpty(rec.CustomerItemNumber))
                         DebtorOfferLines.FindItemFromCustomerItem(rec, Order, api, rec.CustomerItemNumber);
                     break;
-                case "SerieBatch":
-                    var selectedSerieBatch = rec.SerieBatches?.Where(x => x.Number == rec.SerieBatch).FirstOrDefault();
-                    if (selectedSerieBatch != null && api.CompanyEntity.Warehouse)
-                    {
-                        rec.Warehouse = selectedSerieBatch.Warehouse;
-                        if (api.CompanyEntity.Location)
-                            rec.Location = selectedSerieBatch.Location;
-                    }
-                    break;
+            }
+        }
+
+        void setUnitGroup(DebtorOrderLineClient rec)
+        {
+            var grp = (InvUnitGroup)ClientHelper.GetRef(api.CompanyId, typeof(InvUnitGroup), rec._UnitGroup);
+            if (grp._FixedUnit != 0)
+            {
+                rec._Unit = grp._FixedUnit;
+                rec.NotifyPropertyChanged("Unit");
             }
         }
 
@@ -999,7 +1007,6 @@ namespace UnicontaClient.Pages.CustomPage
             string debtorName = debtor?._Name ?? dbOrder._DCAccount;
             bool showUpdateInv = api.CompanyEntity.Storage || (doctype == CompanyLayoutType.Packnote && api.CompanyEntity.Packnote);
             bool invoiceInXML = debtor != null && debtor.IsPeppolSupported && debtor._einvoice;
-
             var accountName = Util.ConcatParenthesis(dbOrder._DCAccount, dbOrder.Name);
             CWGenerateInvoice GenrateOfferDialog = new CWGenerateInvoice(false, doctype.ToString(), isShowInvoiceVisible: true, askForEmail: true, showNoEmailMsg: !showSendByMail, debtorName: debtorName,
                 isShowUpdateInv: showUpdateInv, isDebtorOrder: true, InvoiceInXML: invoiceInXML, AccountName: accountName);
@@ -1011,6 +1018,8 @@ namespace UnicontaClient.Pages.CustomPage
             var additionalOrdersList = Utility.GetAdditionalOrders(api, dbOrder);
             if (additionalOrdersList != null)
                 GenrateOfferDialog.SetAdditionalOrders(additionalOrdersList);
+            GenrateOfferDialog.ShowAllowCredMax(debtor._CreditMax != 0);
+
             GenrateOfferDialog.Closed += async delegate
             {
                 if (GenrateOfferDialog.DialogResult == true)
@@ -1029,6 +1038,8 @@ namespace UnicontaClient.Pages.CustomPage
                         GenrateOfferDialog.InvoiceQuickPrint, GenrateOfferDialog.NumberOfPages, GenrateOfferDialog.SendByEmail, openOutlook, GenrateOfferDialog.sendOnlyToThisEmail, GenrateOfferDialog.Emails,
                         false, null, false);
                     invoicePostingGenerator.SetAdditionalOrders(GenrateOfferDialog.AdditionalOrders?.Cast<DCOrder>().ToList());
+                    if (api.CompanyEntity.AllowSkipCreditMax)
+                        invoicePostingGenerator.SetAllowCreditMax(GenrateOfferDialog.AllowSkipCreditMax);
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
                     busyIndicator.IsBusy = true;
                     var result = await invoicePostingGenerator.Execute();
@@ -1198,9 +1209,10 @@ namespace UnicontaClient.Pages.CustomPage
 
             string debtorName = debtor?._Name ?? dbOrder._DCAccount;
             bool invoiceInXML = debtor != null && debtor.IsPeppolSupported && debtor._einvoice;
+            bool isOrderOrQuickInv = api.CompanyEntity._CountryId == CountryCode.Germany ? false : true;
 
             var accountName = Util.ConcatParenthesis(dbOrder._DCAccount, dbOrder.Name);
-            CWGenerateInvoice GenrateInvoiceDialog = new CWGenerateInvoice(true, string.Empty, false, true, true, showNoEmailMsg: !showSendByMail, debtorName: debtorName, isOrderOrQuickInv: true, isDebtorOrder: true, InvoiceInXML: invoiceInXML, AccountName: accountName);
+            CWGenerateInvoice GenrateInvoiceDialog = new CWGenerateInvoice(true, string.Empty, false, true, true, showNoEmailMsg: !showSendByMail, debtorName: debtorName, isOrderOrQuickInv: isOrderOrQuickInv, isDebtorOrder: true, InvoiceInXML: invoiceInXML, AccountName: accountName);
             GenrateInvoiceDialog.DialogTableId = 2000000008;
             if (dbOrder._InvoiceDate != DateTime.MinValue)
                 GenrateInvoiceDialog.SetInvoiceDate(dbOrder._InvoiceDate);
@@ -1210,6 +1222,8 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (!api.CompanyEntity._DeactivateSendNemhandel)
                 GenrateInvoiceDialog.SentByEInvoice(api, UtilCommon.GetEndPoint(dbOrder, debtor, api));
+
+            GenrateInvoiceDialog.ShowAllowCredMax(debtor._CreditMax != 0);
 
             GenrateInvoiceDialog.Closed += async delegate
             {
@@ -1229,6 +1243,8 @@ namespace UnicontaClient.Pages.CustomPage
                         GenrateInvoiceDialog.NumberOfPages, GenrateInvoiceDialog.SendByEmail, GenrateInvoiceDialog.SendByOutlook, GenrateInvoiceDialog.sendOnlyToThisEmail, GenrateInvoiceDialog.Emails,
                         GenrateInvoiceDialog.GenerateOIOUBLClicked);
                     invoicePostingResult.SetAdditionalOrders(GenrateInvoiceDialog.AdditionalOrders?.Cast<DCOrder>().ToList());
+                    if (api.CompanyEntity.AllowSkipCreditMax)
+                        invoicePostingResult.SetAllowCreditMax(GenrateInvoiceDialog.AllowSkipCreditMax);
 
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
                     busyIndicator.IsBusy = true;
@@ -1272,6 +1288,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             var invoicePostingResult = SetupInvoicePostingPrintGenerator(order, DateTime.Now, true, true, false, false, 0, false, false, false, null, false);
+            invoicePostingResult.SetAllowCreditMax(api.CompanyEntity.AllowSkipCreditMax);
 
             busyIndicator.IsBusy = true;
             busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
@@ -1423,6 +1440,32 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
+        private void SerialBatch_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
+        {
+            SetSeriBatch(sender as ComboBoxEditor, dgDebtorOrderLineGrid , api);
+        }
+        public static void SetSeriBatch(ComboBoxEditor editor, CorasauDataGrid grid, CrudAPI api)
+        {
+            var ser = editor.SelectedItem as SerialToOrderLineClient;
+            if (ser != null)
+            {
+                var rec = grid.SelectedItem as DCOrderLineClient;
+                if (rec != null)
+                {
+                    grid.SetLoadedRow(rec);
+
+                    rec.SerieBatch = ser.RowId == 0 ? null : ser.Number;
+                    if (api.CompanyEntity.Warehouse && rec.SerieBatch != null)
+                    {
+                        rec.Warehouse = ser._Warehouse;
+                        if (api.CompanyEntity.Location)
+                            rec.Location = ser._Location;
+                    }
+                    grid.SetModifiedRow(rec);
+
+                }
+            }
+        }
         private void btnSales_Click(object sender, RoutedEventArgs e)
         {
             var selectedItem = dgInvItemStorageClientGrid.SelectedItem as InvItemStorageClient;
@@ -1578,7 +1621,9 @@ namespace UnicontaClient.Pages.CustomPage
             var res = await api.Query<SerialToOrderLineClient>(masters, null);
             if (res != null && res.Length > 0)
             {
-                row.SerieBatches = res;
+                var lst = res.ToList();
+                lst.Insert(0, new SerialToOrderLineClient());
+                row.SerieBatches = lst;
                 row.NotifyPropertyChanged("SerieBatches");
             }
         }

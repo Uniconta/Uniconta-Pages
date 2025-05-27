@@ -11,12 +11,13 @@ x:Class="UnicontaClient.Pages.CustomPage.DashBoardViewerPage"
         xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
         xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars" 
         xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+        xmlns:behaviour="clr-namespace:Uniconta.ClientTools.Behaviour;assembly=ClientTools"
         xmlns:dxdash="http://schemas.devexpress.com/winfx/2008/xaml/dashboard" >
     <UserControl.Resources>
         <DataTemplate x:Key="pivotTemplate">
             <dxpg:PivotGridControl Style="{Binding Path=(dxdash:DashboardLayoutItem.ViewStyle), RelativeSource={RelativeSource TemplatedParent}}" AllowResizing="True">
                 <dxmvvm:Interaction.Behaviors>
-                    <local:PivotBehavior />
+                    <behaviour:PivotBehavior />
                 </dxmvvm:Interaction.Behaviors>
             </dxpg:PivotGridControl>
         </DataTemplate>

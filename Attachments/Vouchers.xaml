@@ -169,6 +169,7 @@ x:Class="UnicontaClient.Pages.CustomPage.Vouchers"
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="PayAccount" Width="80" Visible="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="CreditorAccount" Width="80"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="60" Visible="False"/>
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Payment" Visible="False" Width="70"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Project" Visible="False" Width="90"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Visible="False" Width="90"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="WorkSpace" Visible="False" Width="90" />
@@ -191,6 +192,7 @@ x:Class="UnicontaClient.Pages.CustomPage.Vouchers"
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="UserLogidId" Width="100" AllowEditing="False" Visible="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Envelope" AllowEditing="False" Visible="False" Width="55" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="PayDate" AllowEditing="True" Width="85" Visible="False" />
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="DueDate" AllowEditing="True" Width="85" Visible="False" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="VatOperation"  Visible="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="PurchaseNumber" Width="85" Visible="False" IsEditSettingSet="True" >
                             <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
@@ -220,8 +222,9 @@ x:Class="UnicontaClient.Pages.CustomPage.Vouchers"
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Approved2Date" ShowTime="True" AllowEditing="False" Visible="False" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="ProjectName" Visible="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="CategoryName" Visible="False"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Qty" Visible="False" AllowThousandMask="True" Mask="N2"/>
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="SizeKB" Visible="False"/>
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="VatAmount" Width="80" Visible="False"/>
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Qty" Visible="False" Width="70" AllowThousandMask="True" Mask="N2"/>
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="SizeKB" Width="70" Visible="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="OnHold" HideHeaderCheck="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Reference" Visible="False" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" Visible="False" AllowEditing="False" />

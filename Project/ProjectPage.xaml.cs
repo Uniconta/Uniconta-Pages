@@ -660,12 +660,13 @@ namespace UnicontaClient.Pages.CustomPage
 
         void CopyRecord(ProjectClient selectedItem)
         {
-            if (selectedItem == null)
-                return;
-            var project = Activator.CreateInstance(selectedItem.GetType()) as ProjectClient;
-            CorasauDataGrid.CopyAndClearRowId(selectedItem, project);
-            var parms = new object[2] { project, false };
-            AddDockItem(TabControls.ProjectPage2, parms, Uniconta.ClientTools.Localization.lookup("Project"), "Add_16x16");
+            if (selectedItem != null)
+            {
+                var project = Activator.CreateInstance(selectedItem.GetType()) as ProjectClient;
+                CorasauDataGrid.CopyAndClearRowId(selectedItem, project);
+                project._Created = DateTime.MinValue;
+                AddDockItem(TabControls.ProjectPage2, new object[2] { project, false }, Uniconta.ClientTools.Localization.lookup("Project"), "Add_16x16");
+            }
         }
 
         bool copyRowIsEnabled = false;
@@ -764,14 +765,14 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var projectClient = (sender as Image).Tag as ProjectClient;
+            var projectClient = (sender as System.Windows.Controls.Image).Tag as ProjectClient;
             if (projectClient != null)
                 AddDockItem(TabControls.UserDocsPage, dgProjectGrid.syncEntity);
         }
 
         private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var projectClient = (sender as Image).Tag as ProjectClient;
+            var projectClient = (sender as System.Windows.Controls.Image).Tag as ProjectClient;
             if (projectClient != null)
                 AddDockItem(TabControls.UserNotesPage, dgProjectGrid.syncEntity);
         }

@@ -95,7 +95,7 @@ namespace UnicontaClient.Pages.CustomPage
                 = leTransType.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api = leGroup.api = leShipment.api =
                 PrCategorylookupeditor.api = Projectlookupeditor.api = leApprover.api = leDeliveryTerm.api = leInvoiceAccount.api =
                 PriceListlookupeditior.api = leLayoutGroup.api = leVat.api = prTasklookupeditor.api = lePrWorkSpace.api = lePaymentFormat.api = 
-                leCompanyAddress.api = crudapi;
+                leCompanyAddress.api = leDeliveryAddress.api = crudapi;
 
             leRelatedOrder.CrudApi = crudapi;
 
@@ -209,7 +209,18 @@ namespace UnicontaClient.Pages.CustomPage
         {
             AdjustLayout();
         }
-
+        SQLCache installationCache;
+        protected override async void LoadCacheInBackGround()
+        {
+            var api = this.api;
+            var Comp = api.CompanyEntity;
+            if (Comp.DeliveryAddress)
+            {
+                installationCache = Comp.GetCache(typeof(Uniconta.DataModel.WorkInstallation)) ?? await api.LoadCache(typeof(Uniconta.DataModel.WorkInstallation)).ConfigureAwait(false);
+                if (editrow._DCAccount != null)
+                    leDeliveryAddress.cacheFilter = new AccountCacheFilter(installationCache, 2, editrow._DCAccount);
+            }
+        }
         void AdjustLayout()
         {
             var Comp = api.CompanyEntity;
@@ -282,7 +293,11 @@ namespace UnicontaClient.Pages.CustomPage
                 var voucherObj = argument as object[];
                 attachedVoucher = voucherObj[0] as VouchersClient;
                 if (attachedVoucher != null)
-                    editrow.DocumentRef = attachedVoucher.RowId;
+                {
+                    var openedFrom = voucherObj[1];
+                    if (openedFrom == this.ParentControl)
+                        editrow.DocumentRef = attachedVoucher.RowId;
+                }
             }
 
             if (screenName == TabControls.ContactPage2 & argument != null)
@@ -443,6 +458,11 @@ namespace UnicontaClient.Pages.CustomPage
             }
             TableField.SetUserFieldsFromRecord(creditor, editrow);
             BindContact(creditor);
+            if (installationCache != null)
+            {
+                leDeliveryAddress.cacheFilter = new AccountCacheFilter(installationCache, 2, creditor._Account);
+                leDeliveryAddress.InvalidCache();
+            }
             await api.Read(creditor);
             editrow.RefreshBalance();
         }
@@ -493,7 +513,7 @@ namespace UnicontaClient.Pages.CustomPage
             Utility.OpenGoogleMap(location);
         }
 
-        private void cmbContactName_KeyDown(object sender, KeyEventArgs e)
+        private void cmbContactName_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             var selectedItem = cmbContactName.SelectedItem as Contact;
             GoToContact(selectedItem, e.Key);
@@ -531,6 +551,20 @@ namespace UnicontaClient.Pages.CustomPage
         {
             string originalOrderNumber = Convert.ToString((this.LoadedRow as DCOrder)?._OrderNumber);
             DebtorOrdersPage2.CheckOrderNo(sender as TextEdit, typeof(CreditorOrder), api, originalOrderNumber);
+        }
+
+        private void lblDeliveryAddress_ButtonClicked(object sender)
+        {
+            var selectedInstallation = leDeliveryAddress.SelectedItem as WorkInstallationClient;
+            if (selectedInstallation != null)
+            {
+                CopyAddressToRow(selectedInstallation._Name, selectedInstallation._Address1, selectedInstallation._Address2, selectedInstallation._Address3, selectedInstallation._ZipCode, selectedInstallation._City, selectedInstallation._Country);
+                editrow.DeliveryContactPerson = selectedInstallation._ContactPerson;
+                editrow.DeliveryContactEmail = selectedInstallation._ContactEmail;
+                editrow.DeliveryPhone = selectedInstallation._Phone;
+                if (selectedInstallation._DeliveryTerm != null)
+                    editrow.DeliveryTerm = selectedInstallation._DeliveryTerm;
+            }
         }
     }
 }

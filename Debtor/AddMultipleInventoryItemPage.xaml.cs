@@ -59,15 +59,11 @@ namespace UnicontaClient.Pages.CustomPage
             dgMultipleInventoryItems.Loaded += DgMultipleInventoryItems_Loaded;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             GetMenuItem();
-#if SILVERLIGHT
-            Application.Current.RootVisual.KeyDown += AddMultipleInventoryItemPage_KeyDown;
-#else
             this.KeyDown += AddMultipleInventoryItemPage_KeyDown;
-#endif
             DXSerializerHandler.AvoidSaveHeader(false);
         }
 
-        private void AddMultipleInventoryItemPage_KeyDown(object sender, KeyEventArgs e)
+        private void AddMultipleInventoryItemPage_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.F8)
                 Generate();

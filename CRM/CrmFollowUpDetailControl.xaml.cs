@@ -10,7 +10,7 @@ using Uniconta.ClientTools.Controls;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
-    public partial class CrmFollowUpDetailControl : UserControl
+    public partial class CrmFollowUpDetailControl : System.Windows.Controls.UserControl
     {
         CrudAPI _api;
         public CrudAPI api

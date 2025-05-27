@@ -737,7 +737,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var local = (sender as Image).Tag as ProjectTransLocalClientCopy;
+            var local = (sender as System.Windows.Controls.Image).Tag as ProjectTransLocalClientCopy;
             if (local != null)
                 AddDockItem(TabControls.UserNotesPage, local.ProjectRef, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Notes"), local.ProjectRef._Name));
         }

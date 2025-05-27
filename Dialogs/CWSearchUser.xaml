@@ -16,6 +16,8 @@
             <RowDefinition Height="3" />
             <RowDefinition />
             <RowDefinition Height="3" />
+            <RowDefinition />
+            <RowDefinition Height="3" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -41,7 +43,9 @@
         <CorasauControls:ComboBoxEditor x:Name="cmbUserRights" SelectedIndex="1"  AppEnumName="CompanyPermissions" HorizontalAlignment="Stretch" Height="25" Margin="10 0 0 0" Grid.Row="4" Grid.Column="2" />
         <TextBlock x:Name="lblCopyUserRights" Grid.Row="6" Grid.Column="0" VerticalAlignment="Center" TextWrapping="Wrap" />
         <CorasauControls:ComboBoxEditor x:Name="cmbUsers" HorizontalAlignment="Stretch" Height="25" Margin="10 0 0 0" Grid.Row="6" Grid.Column="2" DisplayMember="UserLoginId" AllowNullInput="True" PreviewKeyDown="cmbUsers_KeyDown"/>
-        <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="8" Grid.ColumnSpan="2"  Orientation="Horizontal" Margin="0 10 0 0">
+        <TextBlock x:Name="lblExpire" Grid.Row="8" Grid.Column="0" VerticalAlignment="Center" TextWrapping="Wrap"  Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=Expire}"/>
+        <CorasauControls:DateEditor x:Name="txtExpire" Height="25" Margin="10 0 0 0" Grid.Row="8" Grid.Column="2"/>
+        <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="10" Grid.ColumnSpan="2"  Orientation="Horizontal" Margin="0 10 0 0">
             <Button x:Name="OKButton" IsDefault="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=OK}" Click="OKButton_Click" MinWidth="75" Height="23" 
                     HorizontalAlignment="Right" Margin="0 0 3 0" />
             <Button x:Name="CancelButton" IsCancel="True" Grid.ColumnSpan="2" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=Cancel}" Click="CancelButton_Click" MinWidth="75" 

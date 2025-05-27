@@ -219,13 +219,13 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if ((sender as Image).Tag is InvBOMClient invBomItem)
+            if ((sender as System.Windows.Controls.Image).Tag is InvBOMClient invBomItem)
                 AddDockItem(TabControls.UserDocsPage, invBomItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Note"), invBomItem._ItemPart));
         }
 
         private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if ((sender as Image).Tag is InvBOMClient invBomItem)
+            if ((sender as System.Windows.Controls.Image).Tag is InvBOMClient invBomItem)
                 AddDockItem(TabControls.UserNotesPage, invBomItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Document"), invBomItem._ItemPart));
         }
     }

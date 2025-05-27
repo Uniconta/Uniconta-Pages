@@ -80,7 +80,7 @@ namespace UnicontaClient.Pages.CustomPage
                 lst = new List<ProjectInvoiceProposalLineClient>();
                 foreach (var _it in copyFromRows)
                 {
-                    double qty = (double)_it.GetType().GetProperty("Qty").GetValue(_it, null);
+                    double qty = Convert.ToDouble(_it.GetType().GetProperty("Qty").GetValue(_it, null));
                     var it = (InvItemClient)_it;
                     lst.Add(CreateNewProposalLine(it._Item, qty, null, 0d, 0d, 0d, 0d, null, null, null, null, null, 0, DateTime.MinValue, 0, null));
                 }
@@ -145,7 +145,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             InitializeComponent();
             company = api.CompanyEntity;
-            ((TableView)dgProjInvProposedLineGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
+            ((TableView)dgProjInvProposedLineGrid.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
             localMenu.dataGrid = dgProjInvProposedLineGrid;
             SetRibbonControl(localMenu, dgProjInvProposedLineGrid);
             dgProjInvProposedLineGrid.api = api;
@@ -167,7 +167,7 @@ namespace UnicontaClient.Pages.CustomPage
             return (master is ProjectInvoiceProposalClient projInvProposalClient && projInvProposalClient.PrCategoryRef._CatType == CategoryType.OnAccountInvoicing);
         }
 
-        private void Page_KeyDown(object sender, KeyEventArgs e)
+        private void Page_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.F8)
                 ribbonControl.PerformRibbonAction("AddItems");
@@ -679,7 +679,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "CreateFromInvoice":
                     try
                     {
-                        AddDockItem(TabControls.CreateOrderFromQuickInvoice, new object[4] { api, ord._DCAccount, true, ord }, true, String.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), Uniconta.ClientTools.Localization.lookup("Invoice")), null, new Point(250, 200));
+                        AddDockItem(TabControls.CreateOrderFromQuickInvoice, new object[4] { api, ord._DCAccount, true, ord }, true, String.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), Uniconta.ClientTools.Localization.lookup("Invoice")), null, new System.Windows.Point(250, 200));
                     }
                     catch (Exception ex)
                     {
@@ -707,7 +707,7 @@ namespace UnicontaClient.Pages.CustomPage
             try
             {
                 var par = new object[1] { api };
-                AddDockItem(TabControls.CopyOfferLines, par, true, String.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), Uniconta.ClientTools.Localization.lookup("OfferLine")), null, new Point(250, 200));
+                AddDockItem(TabControls.CopyOfferLines, par, true, String.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), Uniconta.ClientTools.Localization.lookup("OfferLine")), null, new System.Windows.Point(250, 200));
             }
             catch (Exception ex)
             {
@@ -717,7 +717,7 @@ namespace UnicontaClient.Pages.CustomPage
         void CopyLinesFromBudget()
         {
                 var par = new object[2] { api, Order };
-                AddDockItem(TabControls.CopyBudgetLines, par, true, String.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), Uniconta.ClientTools.Localization.lookup("ProjectEstimate")), null, new Point(250, 200));
+                AddDockItem(TabControls.CopyBudgetLines, par, true, String.Format(Uniconta.ClientTools.Localization.lookup("CopyOBJ"), Uniconta.ClientTools.Localization.lookup("ProjectEstimate")), null, new System.Windows.Point(250, 200));
         }
         async void RefreshGrid()
         {
@@ -776,10 +776,10 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             string debtorName = debtor?._Name ?? dbOrder._DCAccount;
-            bool invoiceInXML = debtor != null && debtor.IsPeppolSupported && debtor._einvoice;
-
+            bool invoiceInXML = debtor != null && debtor.IsPeppolSupported && debtor._einvoice && (api.CompanyEntity._CountryId != CountryCode.Germany);
+            bool isOrderOrQuickInv = api.CompanyEntity._CountryId == CountryCode.Germany ? false : true;
             var accountName = Util.ConcatParenthesis(dbOrder._DCAccount, dbOrder.Name);
-            CWGenerateInvoice GenrateInvoiceDialog = new CWGenerateInvoice(true, string.Empty, false, true, true, showNoEmailMsg: !showSendByMail, debtorName: debtorName, isOrderOrQuickInv: true, isDebtorOrder: true, InvoiceInXML: invoiceInXML, AccountName: accountName);
+            var GenrateInvoiceDialog = new CWGenerateInvoice(true, string.Empty, false, true, true, showNoEmailMsg: !showSendByMail, debtorName: debtorName, isOrderOrQuickInv: isOrderOrQuickInv, isDebtorOrder: true, InvoiceInXML: invoiceInXML, AccountName: accountName);
             GenrateInvoiceDialog.DialogTableId = 2000000086;
             if (dbOrder._InvoiceDate != DateTime.MinValue)
                 GenrateInvoiceDialog.SetInvoiceDate(dbOrder._InvoiceDate);

@@ -129,7 +129,7 @@ namespace UnicontaClient.Pages.CustomPage.GL.Vat.UK.ViewModels
                 return;
             }
             //confirmation box
-            MessageBoxResult confirmation = MessageBox.Show("When you submit this VAT information you are making a legal declaration that the information is true and complete. A false declaration can result in prosecution. Are you sure you wish to continue? ", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            MessageBoxResult confirmation = System.Windows.MessageBox.Show("When you submit this VAT information you are making a legal declaration that the information is true and complete. A false declaration can result in prosecution. Are you sure you wish to continue? ", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Warning);
             switch (confirmation)
             {
                 case MessageBoxResult.Yes:
@@ -169,7 +169,7 @@ namespace UnicontaClient.Pages.CustomPage.GL.Vat.UK.ViewModels
             }
             catch (WebException we)
             {
-                MessageBox.Show(we.Message, "Web Exception");
+                System.Windows.MessageBox.Show(we.Message, "Web Exception");
                 return;
             }
             finally
@@ -215,7 +215,7 @@ namespace UnicontaClient.Pages.CustomPage.GL.Vat.UK.ViewModels
             }
             if (CheckForExistingData())
             {
-                var result = MessageBox.Show("Existing data has been detected in one or more boxes and will be overriden. Do you wish to continue?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                var result = System.Windows.MessageBox.Show("Existing data has been detected in one or more boxes and will be overriden. Do you wish to continue?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning);
                 switch (result)
                 {
                     case MessageBoxResult.Yes:
@@ -443,7 +443,7 @@ try
             cto.CreateNewOrg();
             if (model == null)
             {
-                MessageBox.Show("No obligation was selected, or an error occured.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                System.Windows.MessageBox.Show("No obligation was selected, or an error occured.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
             //if (model.Status == "Fulfilled")

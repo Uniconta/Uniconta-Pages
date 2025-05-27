@@ -89,7 +89,7 @@ namespace UnicontaClient.Pages.CustomPage
                     Format = new DevExpress.Xpf.Core.ConditionalFormatting.Format()
                     {
                         Foreground = new SolidColorBrush(Colors.Red),
-                        Background = new SolidColorBrush(Color.FromRgb(255, 165, 165))
+                        Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 165, 165))
                     },
                     ApplyToRow = true
                 };
@@ -272,7 +272,7 @@ namespace UnicontaClient.Pages.CustomPage
         void InitPage(UnicontaBaseEntity master)
         {
             this.master = master;
-            ((TreeListView)dgProjectBudgetLinePageGrid.View).RowStyle = Application.Current.Resources["StyleRow"] as Style;
+            ((TreeListView)dgProjectBudgetLinePageGrid.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
             localMenu.dataGrid = dgProjectBudgetLinePageGrid;
             dgProjectBudgetLinePageGrid.api = api;
             dgProjectBudgetLinePageGrid.UpdateMaster(master);

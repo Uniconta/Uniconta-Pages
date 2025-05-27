@@ -430,23 +430,17 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         public override bool IsDataChaged { get { return editAllChecked ? false : dgContactGrid.HasUnsavedData; } }
-        public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)
-        {
-            isReadOnly = true;
-            useBinding = true;
-            return true;
-        }
 
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var contactClient = (sender as Image).Tag as ContactClient;
+            var contactClient = (sender as System.Windows.Controls.Image).Tag as ContactClient;
             if (contactClient != null)
                 AddDockItem(TabControls.UserDocsPage, dgContactGrid.syncEntity);
         }
 
         private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var contactClient = (sender as Image).Tag as ContactClient;
+            var contactClient = (sender as System.Windows.Controls.Image).Tag as ContactClient;
             if (contactClient != null)
                 AddDockItem(TabControls.UserNotesPage, dgContactGrid.syncEntity);
         }

@@ -26,6 +26,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CompanyUsers"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="MainMenu" Width="90"  />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="UserTasks" IsSmart="True" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="FixedProfile" Width="90" FixedWidth="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Expire" FixedWidth="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="HasTwoFactor" Width="70" FixedWidth="True" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="IgnoreTwoFactor" Width="70" FixedWidth="True" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="HideCostPrice" Width="70" FixedWidth="True" />

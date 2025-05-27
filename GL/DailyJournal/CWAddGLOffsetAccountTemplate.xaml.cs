@@ -20,11 +20,7 @@ namespace UnicontaClient.Pages.CustomPage
             this.DataContext = this;
             offSetAccountName = name;
             InitializeComponent();
-#if !SILVERLIGHT
             this.Title = Uniconta.ClientTools.Localization.lookup("OffsetAccountTemplate");
-#else
-            Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             txtAccount.Text = offSetAccountName;      
             this.Loaded += CW_Loaded;
         }
@@ -46,7 +42,7 @@ namespace UnicontaClient.Pages.CustomPage
             SetDialogResult(true);
         }
 
-        private void txtAccount_KeyDown(object sender, KeyEventArgs e)
+        private void txtAccount_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
                 SaveButton_Click(sender, e);

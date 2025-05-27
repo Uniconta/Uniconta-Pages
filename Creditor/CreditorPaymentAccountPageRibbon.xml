@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+	<RibbonItem TabId="0" LocalizedNameKey="Home">
+		<!---When we create new TabPage -->
+		<RibbonItem Action="Save" ShortcutKey="Ctrl+S" LocalizedNameKey="Save" Glyph="save-16x16" LargeGlyph="save-32x32"/>
+		<RibbonItem Action="Cancel" LocalizedNameKey="Cancel" Glyph="close-16x16" LargeGlyph="close-32x32"/>
+	</RibbonItem>
+	<RibbonItem>
+		<RibbonItem Action="Approve" LocalizedNameKey="Approve" LargeGlyph="Tick_Highlighted_32x32"/>
+		<RibbonItem Action="Log" LocalizedNameKey="Log" LargeGlyph="Server_Count_32x32"/>
+	</RibbonItem>
+</root>

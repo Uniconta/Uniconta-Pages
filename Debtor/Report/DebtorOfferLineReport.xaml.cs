@@ -311,6 +311,11 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
+        private void SerialBatch_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
+        {
+            DebtorOrderLines.SetSeriBatch(sender as ComboBoxEditor, dgDebtorOfferLineGrid, api);
+        }
+
         protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;

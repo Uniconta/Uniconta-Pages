@@ -22,14 +22,6 @@ x:Class="UnicontaClient.Pages.CustomPage.TMJournalLinePage"
         <Style TargetType="Run" x:Key="SummaryTotalStyle">
             <Setter Property="TextBlock.Foreground" Value="{Binding Column.TotalSummaries[2].Value, Converter={StaticResource FiedlValueToForegroundColor}}" />
         </Style>
-        <Style x:Name="StyleRow" TargetType="dxg:RowControl">
-            <Setter Property="Height" Value="Auto"/>
-            <!--<Style.Triggers>
-                <DataTrigger Binding="{Binding Path=Row.IsMatched}" Value="True">
-                    <Setter Property="Background" Value="{StaticResource RowMatchColor}" />
-                </DataTrigger>
-            </Style.Triggers>-->
-        </Style>
         <Style TargetType="{x:Type dxe:DateEdit}" x:Key="CustomColorDateEdit">
             <Style.Resources>
                 <utilityfunction:DateEditColorConverter x:Key="DateEditColorConverter" />
@@ -137,7 +129,7 @@ x:Class="UnicontaClient.Pages.CustomPage.TMJournalLinePage"
                                     </localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
                                     <localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                                         <DataTemplate>
-                                            <localPage:CorasauGridLookupEditorClient HasCustomLookUp="True" IsReadOnly="{Binding DataContext.RowData.Row.IsEditable,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}" GotFocus="ProjectTask_GotFocus" x:Name="PART_Editor" ItemsSource="{Binding DataContext.RowData.Row.ProjectTaskSource,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" />
+                                            <localPage:CorasauGridLookupEditorClient HasCustomLookUp="True" IsReadOnly="{Binding DataContext.RowData.Row.IsEditable,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToBoolConverter}}" HideRefreshCache="True"  GotFocus="ProjectTask_GotFocus" x:Name="PART_Editor" ItemsSource="{Binding DataContext.RowData.Row.ProjectTaskSource,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" />
                                         </DataTemplate>
                                     </localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridForeignKeyColumnClient>

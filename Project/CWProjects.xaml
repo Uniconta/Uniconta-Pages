@@ -3,6 +3,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWProjects"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:cw="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+        xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
         xmlns:ClientToolsControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
         Height="150" Width="320">
     <Grid x:Name="LayoutRoot" Margin="2">
@@ -20,8 +21,11 @@ x:Class="UnicontaClient.Pages.CustomPage.CWProjects"
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="30" />
             </Grid.RowDefinitions>
-            <TextBlock Height="23" Grid.Row="0" x:Name="lblProject" Grid.Column="0"/>
-            <ClientToolsControls:LookupEditor x:Name="leProject" Text="{Binding Project, Mode=TwoWay}" Grid.Column="2" HorizontalAlignment="Stretch" Height="23"/>
+            <TextBlock Height="23" Grid.Row="0" x:Name="lblProject" Grid.Column="0" VerticalAlignment="Bottom"/>
+            <StackPanel Orientation="Horizontal" Grid.Column="2">
+                <ClientToolsControls:LookupEditor x:Name="leProject" Text="{Binding Project, Mode=TwoWay}"  HorizontalAlignment="Stretch" Height="23"/>
+                <Image x:Name="imgClearProject" Margin="8 0 0 0" Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/Clear_Filter_16x16.svg,UsePalette=False}"  Cursor="Hand" Stretch="None" MouseLeftButtonDown="imgClearProject_MouseLeftButtonDown" />
+            </StackPanel>
             <TextBlock x:Name="txtAllLines" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AllLines}" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0" />
             <ClientToolsControls:CheckEditor x:Name="chkAllLines" Grid.Row="1"  Grid.Column="2" HorizontalAlignment="Left"  VerticalAlignment="Center" IsChecked="{Binding Path=AllLines}" />
         </Grid>

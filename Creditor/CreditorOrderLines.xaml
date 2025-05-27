@@ -12,11 +12,10 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrderLines"
     xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
     xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:docking="http://schemas.devexpress.com/winfx/2008/xaml/docking"
     d:DesignHeight="300" d:DesignWidth="400">
     <UserControl.Resources>
-        <Style x:Key="StyleRow" TargetType="dxg:RowControl">
-            <Setter Property="Height" Value="Auto"/>
-        </Style>
         <Util:RowIndexConverter x:Key="RowIndexConverter" />
         <Util:MaskConverter x:Key="MaskConverter" />
     </UserControl.Resources>
@@ -28,7 +27,10 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrderLines"
         </Grid.RowDefinitions>
         <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Creditor/CreditorOrderLineGridRibbon.xml" x:Name="localMenu"/>
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
-            <localPage:CreditorOrderLineGrid  x:Name="dgCreditorOrderLineGrid" AutoGenerateColumns="None">
+            <docking:DockLayoutManager x:Name="DockingControl" AllowCustomization="False">
+                <docking:LayoutGroup x:Name="lGroup" AllowDrag="False" AllowDock="False" AllowFloat="False" Orientation="Vertical" AllowContextMenu="False" >
+                    <docking:LayoutPanel x:Name="layOutCreditorOrderLine" FloatOnDoubleClick="False" AllowDrag="False" AllowDock="False" AllowClose="False" AllowContextMenu="False" AllowMaximize="False" AllowDockToDocumentGroup="False" ShowCloseButton="False"  ShowPinButton="False" ItemHeight="7*">
+                        <localPage:CreditorOrderLineGrid  x:Name="dgCreditorOrderLineGrid" AutoGenerateColumns="None">
                 <localPage:CreditorOrderLineGrid.Columns>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Subtotal" ReadOnly="True" Visible="False" Width="50" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Note" Width="50" >
@@ -137,6 +139,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrderLines"
                         </localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                     </localPage:CorasauDataGridForeignKeyColumnClient>
                     <localPage:ComboBoxColumnClient x:Name="Storage" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="UnitGroup" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="IgnoreBlocked" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeleteLine" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Width="70" Visible="False"/>
@@ -186,6 +189,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrderLines"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Cartons" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Weight" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Volume" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryDate" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim2" Width="70" FieldName="Dimension2" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim3" Width="70" FieldName="Dimension3" Visible="False"/>
@@ -193,6 +197,84 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrderLines"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim5" Width="70" FieldName="Dimension5" Visible="False"/>
                 </localPage:CreditorOrderLineGrid.Columns>
             </localPage:CreditorOrderLineGrid>
+                    </docking:LayoutPanel>
+                    <docking:LayoutPanel x:Name="layOutInvItemStorage" FloatOnDoubleClick="False" AllowDrag="False" AllowDock="False" AllowClose="False" AllowContextMenu="False" AllowMaximize="False" AllowDockToDocumentGroup="False" ShowCloseButton="False"  ShowPinButton="False" ItemHeight="3*">
+                        <docking:LayoutPanel.CaptionTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OnHand}"/>
+                                    <Button x:Name="btnPurchase" Click="btnPurchase_Click" ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PurchaseLines}"  Margin="10,0,0,0">
+                                        <StackPanel>
+                                            <Image Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/Plus_8x8.svg, UsePalette=True}" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}"/>
+                                        </StackPanel>
+                                    </Button>
+                                    <Button x:Name="btnSales" Click="btnSales_Click" ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OrdersLine}"  Margin="5,0,0,0">
+                                        <StackPanel>
+                                            <Image Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/Minus_8x8.svg, UsePalette=True}" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                            </DataTemplate>
+                        </docking:LayoutPanel.CaptionTemplate>
+                        <localPage:InvItemStorageClientGridReadOnly  x:Name="dgInvItemStorageClientGrid" AutoGenerateColumns="None">
+                            <localPage:InvItemStorageClientGridReadOnly.Columns>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="invItem" FieldName="Item" Width="100" Visible="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="colInvItemVariant1" FieldName="Variant1" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="colInvItemVariant2" FieldName="Variant2"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="colInvItemVariant3" FieldName="Variant3" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="colInvItemVariant4" FieldName="Variant4" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="colInvItemVariant5" FieldName="Variant5" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="ItemName" Width="200" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="InvItemWarehouse" FieldName="Warehouse" Width="100"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="InvItemLocation" FieldName="Location" Width="100"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Available" Width="80">
+                                    <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                                        <DataTemplate>
+                                            <CorasauControls:TextEditor  x:Name="PART_Editor" HorizontalContentAlignment="Right" Mask="{Binding Path=DataContext.RowData.Row.Decimals,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource MaskConverter},ConverterParameter=Decimals}" MaskUseAsDisplayFormat="True" MaskType="Numeric" EditValue="{Binding Path=DataContext.RowData.Row.Available,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                        </DataTemplate>
+                                    </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                                </localPage:CorasauDataGridTemplateColumnClient>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="AvailableForReservation" Width="80" AllowEditing="false" Visible="False">
+                                    <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                                        <DataTemplate>
+                                            <CorasauControls:TextEditor  x:Name="PART_Editor" HorizontalContentAlignment="Right" Mask="{Binding Path=DataContext.RowData.Row.Decimals,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource MaskConverter},ConverterParameter=Decimals}" MaskUseAsDisplayFormat="True" MaskType="Numeric" EditValue="{Binding Path=DataContext.RowData.Row.AvailableForReservation,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                        </DataTemplate>
+                                    </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                                </localPage:CorasauDataGridTemplateColumnClient>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="inItemQty" FieldName="Qty" Width="80" AllowEditing="false">
+                                    <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                                        <DataTemplate>
+                                            <CorasauControls:TextEditor  x:Name="PART_Editor" HorizontalContentAlignment="Right" Mask="{Binding Path=DataContext.RowData.Row.Decimals,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource MaskConverter},ConverterParameter=Decimals}" MaskUseAsDisplayFormat="True" MaskType="Numeric" EditValue="{Binding Path=DataContext.RowData.Row.Qty,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                        </DataTemplate>
+                                    </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                                </localPage:CorasauDataGridTemplateColumnClient>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="QtyReserved" Width="80" AllowEditing="false">
+                                    <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                                        <DataTemplate>
+                                            <CorasauControls:TextEditor  x:Name="PART_Editor" HorizontalContentAlignment="Right" Mask="{Binding Path=DataContext.RowData.Row.Decimals,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource MaskConverter},ConverterParameter=Decimals}" MaskUseAsDisplayFormat="True" MaskType="Numeric" EditValue="{Binding Path=DataContext.RowData.Row.QtyReserved,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                        </DataTemplate>
+                                    </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                                </localPage:CorasauDataGridTemplateColumnClient>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="QtyOrdered" Width="80" AllowEditing="false">
+                                    <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                                        <DataTemplate>
+                                            <CorasauControls:TextEditor  x:Name="PART_Editor" HorizontalContentAlignment="Right" Mask="{Binding Path=DataContext.RowData.Row.Decimals,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource MaskConverter},ConverterParameter=Decimals}" MaskUseAsDisplayFormat="True" MaskType="Numeric" EditValue="{Binding Path=DataContext.RowData.Row.QtyOrdered,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                        </DataTemplate>
+                                    </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                                </localPage:CorasauDataGridTemplateColumnClient>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="MinStockLevel" Width="80"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="MaxStockLevel" Width="80"/>
+                            </localPage:InvItemStorageClientGridReadOnly.Columns>
+                            <localPage:InvItemStorageClientGridReadOnly.TotalSummary>
+                                <localPage:SumColumn FieldName="Available" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                                <localPage:SumColumn FieldName="Qty" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                                <localPage:SumColumn FieldName="QtyReserved" SummaryType="Sum" DisplayFormat="{}{0:N2}" />
+                                <localPage:SumColumn FieldName="QtyOrdered" SummaryType="Sum" DisplayFormat="{}{0:N2}" />
+                            </localPage:InvItemStorageClientGridReadOnly.TotalSummary>
+                        </localPage:InvItemStorageClientGridReadOnly>
+                    </docking:LayoutPanel>
+                </docking:LayoutGroup>
+            </docking:DockLayoutManager>
         </CorasauControls:BusyIndicator>
     </Grid>
 </Pages:GridBasePage>

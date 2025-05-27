@@ -35,10 +35,11 @@
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="Invoices" LocalizedNameKey="Invoices" ControlName="Invoices" LargeGlyph="Invoice_32x32"/>
+    <RibbonItem LocalizedNameKey="ShowInvoice" Action="ShowInvoice" LargeGlyph="Show_Invoice_32x32" ShortcutKey="F7" />
     <RibbonItem Action="Contacts" LocalizedNameKey="Contacts" ControlName="ContactPage" Module="Contacts" LargeGlyph="Contacts_32x32"/>
     <RibbonItem Module="Attachments" LocalizedNameKey="Attachments" LargeGlyph="Attachments_32x32" >
-      <RibbonItem Action="AddNote" ShortcutKey="Alt+N" LocalizedNameKey="Note" ControlName="UserNotesPage" Glyph="Add_Notes_16x16" />
-      <RibbonItem Action="AddDoc" LocalizedNameKey="Document" ControlName="UserDocsPage" Glyph="Accounts_Statement_Report_16x16" ShortcutKey="Ctrl+O" />
+    <RibbonItem Action="AddNote" ShortcutKey="Alt+N" LocalizedNameKey="Note" ControlName="UserNotesPage" Glyph="Add_Notes_16x16" />
+    <RibbonItem Action="AddDoc" LocalizedNameKey="Document" ControlName="UserDocsPage" Glyph="Accounts_Statement_Report_16x16" ShortcutKey="Ctrl+O" />
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>

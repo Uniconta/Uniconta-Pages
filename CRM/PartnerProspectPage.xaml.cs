@@ -205,18 +205,17 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var prospectClient = (sender as Image).Tag as PartnerProspectClient;
+            var prospectClient = (sender as System.Windows.Controls.Image).Tag as PartnerProspectClient;
             if (prospectClient != null)
                 AddDockItem(TabControls.UserDocsPage, dgCrmProspectGrid.syncEntity);
         }
 
         private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var prospectClient = (sender as Image).Tag as PartnerProspectClient;
+            var prospectClient = (sender as System.Windows.Controls.Image).Tag as PartnerProspectClient;
             if (prospectClient != null)
                 AddDockItem(TabControls.UserNotesPage, dgCrmProspectGrid.syncEntity);
         }
-#if !SILVERLIGHT
         private void HasEmailImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             var prospectClient = (sender as TextBlock).Tag as PartnerProspectClient;
@@ -234,6 +233,5 @@ namespace UnicontaClient.Pages.CustomPage
             var prospect = (sender as TextBlock).Tag as PartnerProspectClient;
             Utility.OpenWebSite(prospect._Www);
         }
-#endif
     }
 }

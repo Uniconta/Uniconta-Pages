@@ -176,13 +176,13 @@ namespace UnicontaClient.Pages.CustomPage
         void GetDafaultSearchFilterValues()
         {
             isDefaultValIsSet = true;
-            isDebtor = (bool)cbxDebtor.IsChecked;
-            isCreditor = (bool)cbxCreditor.IsChecked;
-            isProspect = (bool)cbxProspects.IsChecked;
-            isContact = (bool)cbxContact.IsChecked;
-            isSearchInInvLns = (bool)cbxSearchInvLines.IsChecked;
-            isOnlyRcdsWthEmail = (bool)cbxOnlyEmails.IsChecked;
-            isTelephone = (bool)cbxOnlyTelephone.IsChecked;
+            isDebtor = cbxDebtor.IsChecked.GetValueOrDefault();
+            isCreditor = cbxCreditor.IsChecked.GetValueOrDefault();
+            isProspect = cbxProspects.IsChecked.GetValueOrDefault();
+            isContact = cbxContact.IsChecked.GetValueOrDefault();
+            isSearchInInvLns = cbxSearchInvLines.IsChecked.GetValueOrDefault();
+            isOnlyRcdsWthEmail = cbxOnlyEmails.IsChecked.GetValueOrDefault();
+            isTelephone = cbxOnlyTelephone.IsChecked.GetValueOrDefault();
             fromDate = txtDateFrm.DateTime;
             toDate = txtDateTo.DateTime;
             interestMatchg = cmbInterestMatch.SelectedIndex;
@@ -453,8 +453,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void cbxSearchInvLines_Checked(object sender, RoutedEventArgs e)
         {
-            var isProspectSel = (bool)cbxSearchInvLines.IsChecked;
-            cbxProspects.IsChecked = !isProspectSel;
+            cbxProspects.IsChecked = !cbxSearchInvLines.IsChecked.GetValueOrDefault();
         }
 
         void invItemFilterDialog_Closing(object sender, System.ComponentModel.CancelEventArgs e)

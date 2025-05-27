@@ -121,7 +121,7 @@ namespace UnicontaClient.Pages.CustomPage
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
                     busyIndicator.IsBusy = true;
                     var postingApi = new UnicontaAPI.Project.API.PostingAPI(api);
-                    var result = await postingApi.PostWIP(lines, (bool)chkAddWip.IsChecked, CwPostWIP.NumberSerie, CwPostWIP.TransType, CwPostWIP.PostingDate, CwPostWIP.Comment,
+                    var result = await postingApi.PostWIP(lines, chkAddWip.IsChecked.GetValueOrDefault(), CwPostWIP.NumberSerie, CwPostWIP.TransType, CwPostWIP.PostingDate, CwPostWIP.Comment,
                         CwPostWIP.Simulate, new GLTransClientTotal());
                     busyIndicator.IsBusy = false;
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LoadingMsg");
@@ -154,8 +154,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         void LoadData()
         {
-            var addWIP = (bool)chkAddWip.IsChecked;
-            var removeWIP = (bool)chkRemoveWIP.IsChecked;
+            var addWIP = chkAddWip.IsChecked.GetValueOrDefault();
+            var removeWIP = chkRemoveWIP.IsChecked.GetValueOrDefault();
             if (addWIP == removeWIP)
             {
                 UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("BothCannotBeChecked"), Uniconta.ClientTools.Localization.lookup("Error"));

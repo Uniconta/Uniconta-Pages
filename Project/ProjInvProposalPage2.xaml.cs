@@ -285,7 +285,11 @@ namespace UnicontaClient.Pages.CustomPage
                 args = argument as object[];
                 var voucher = args[0] as VouchersClient;
                 if (voucher != null)
-                    editrow.DocumentRef = voucher.RowId;
+                {
+                    var openedFrom = args[1];
+                    if (openedFrom == this.ParentControl)
+                        editrow.DocumentRef = voucher.RowId;
+                }
             }
         }
 
@@ -642,7 +646,7 @@ namespace UnicontaClient.Pages.CustomPage
             row.DeliveryCountry = country;
         }
 
-        private void cmbContactName_KeyDown(object sender, KeyEventArgs e)
+        private void cmbContactName_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             var selectedItem = cmbContactName.SelectedItem as Contact;
             GoToContact(selectedItem, e.Key);

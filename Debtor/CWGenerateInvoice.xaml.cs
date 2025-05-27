@@ -28,6 +28,8 @@ namespace UnicontaClient.Pages.CustomPage
 {
     public partial class CWGenerateInvoice : ChildWindow
     {
+        #region Public Properties
+
         public string InvoiceNumber { get; set; }
         [InputFieldData]
         [Display(Name = "Simulation", ResourceType = typeof(InputFieldDataText))]
@@ -69,12 +71,24 @@ namespace UnicontaClient.Pages.CustomPage
         public List<object> AdditionalOrders { get; set; }
         [Display(Name = "PhysicalVouchers", ResourceType = typeof(InputFieldDataText))]
         public int PhysicalVoucherRef { get; set; }
+        [Display(Name = "AllowSkipCreditMax", ResourceType = typeof(InputFieldDataText))] 
+        public bool AllowSkipCreditMax { get; set; } = false;
+
+        #endregion
+
+        #region Other Members
 
         protected override int DialogId { get { return DialogTableId; } }
         public int DialogTableId { get; set; }
         protected override bool ShowTableValueButton { get { return true; } }
         private bool invoiceInXml;
         private bool IsSendXmlSalesInvoice;
+        CreditorOrderClient _dcOrder;
+        CrudAPI _api;
+        #endregion
+
+        #region Constructors
+
         public CWGenerateInvoice(bool showSimulation, string title, bool showInputforInvNumber, bool askForEmail, bool showInvoice, bool isShowInvoiceVisible, bool showNoEmailMsg, string debtorName,
             bool isShowUpdateInv, bool isOrderOrQuickInv, bool isQuickPrintVisible, bool isDebtorOrder, bool InvoiceInXML, bool isPageCountVisible)
             : this(showSimulation, title, showInputforInvNumber, askForEmail, showInvoice, isShowInvoiceVisible, showNoEmailMsg, debtorName, isShowUpdateInv, isOrderOrQuickInv, isQuickPrintVisible, isDebtorOrder, InvoiceInXML, isPageCountVisible, null)
@@ -153,13 +167,93 @@ namespace UnicontaClient.Pages.CustomPage
             this.Loaded += CW_Loaded;
         }
 
-        void CW_Loaded(object sender, RoutedEventArgs e)
+        #endregion
+
+
+        #region Public Methods
+        public void SetSendAsEmailCheck(bool isChecked)
         {
-            if (IsSendXmlSalesInvoice)
-                liGenerateOIOUBLClicked.Label = Uniconta.ClientTools.Localization.lookup("SendInvoicebyUBL");
-            Dispatcher.BeginInvoke(new Action(() => { OKButton.Focus(); }));
+            chkSendEmail.IsChecked = isChecked;
         }
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+
+        public void SetInvoiceNumber(long Number)
+        {
+            SetInvoiceNumber(NumberConvert.ToStringNull(Number));
+        }
+
+        public void SetInvoiceNumber(string Number)
+        {
+            InvoiceNumber = Number;
+            txtInvNumber.Text = Number;
+        }
+
+        public void SetInvoiceDate(DateTime date)
+        {
+            dpDate.DateTime = date;
+        }
+
+        public void SetInvPrintPreview(bool InvPrintPrvw)
+        {
+            chkShowInvoice.IsChecked = InvPrintPrvw;
+        }
+
+        public void SetAdditionalOrders(IEnumerable<DCOrder> orderList)
+        {
+            SetAdditionalOrders(orderList, null);
+        }
+
+        public void SetAdditionalOrders(IEnumerable<DCOrder> orderList, IEnumerable<object> selectedItems)
+        {
+            lgOrders.Visibility = Visibility.Visible;
+            cbOrders.ItemsSource = orderList;
+            cbOrders.EditValue = selectedItems;
+        }
+
+        public void SetVouchersFromCreditorOrder(CrudAPI api, CreditorOrderClient dcOrder)
+        {
+            if (lgOrders.Visibility == Visibility.Collapsed)
+            {
+                lgOrders.Visibility = Visibility.Visible;
+                liAdditionalOrders.Visibility = Visibility.Collapsed;
+            }
+            liDocumentRef.Visibility = Visibility.Visible;
+            _dcOrder = dcOrder;
+            _api = api;
+        }
+
+        public void SetOIOUBLLabelText(bool sendXmlSalesInvoice) { } //Method to backward compatible
+
+        public void SentByEInvoice(CrudAPI api, Tuple<NHRNetworkType, NHREndPointType, string> endPoint, bool forceEnableEinvoice = false)
+        {
+            IsSendXmlSalesInvoice = true;
+            var enableEinvoice = api.CompanyEntity._OIOUBLSendOnServer && invoiceInXml && (endPoint == null || endPoint.Item3 != null);
+            chkOIOUBL.IsChecked = enableEinvoice;
+            liGenerateOIOUBLClicked.IsEnabled = enableEinvoice || forceEnableEinvoice;
+
+            if (!enableEinvoice || endPoint == null)
+                return;
+
+            liReceiverEndPoint.Visibility = Visibility.Visible;
+            var endPointId = Regex.Replace(endPoint.Item3, "[^0-9]", "");
+            var baseUrl = api.session.Connection.Target == APITarget.Live ? NHR.NHR_WEB : NHR.NHR_WEB_DEMO;
+            var keyValue = endPoint.Item2 == NHREndPointType.GLN ? "&key=" : "DK%3ACVR&key=";
+            var NHRUrl = string.Concat(baseUrl, keyValue, endPointId);
+
+            if (endPoint.Item1 == NHRNetworkType.Peppol)
+                lblReceiverEndPoint.Content = string.Concat("Peppol", Environment.NewLine, Uniconta.ClientTools.Localization.lookup(endPoint.Item2 == NHREndPointType.GLN ? "GLNnumber" : "CompanyRegNo"), ": ", endPoint.Item3);
+            else
+                lblReceiverEndPoint.Content = UtilDisplay.CreateHyperLinkTextControl(NHRUrl, string.Concat(Uniconta.ClientTools.Localization.lookup(endPoint.Item2 == NHREndPointType.GLN ? "GLNnumber" : "CompanyRegNo"), ": ", endPointId));
+        }
+        
+        public void ShowAllowCredMax(bool isShow)
+        {
+            liAllowSkipCreditMax.Visibility = isShow ? Visibility.Visible : Visibility.Collapsed;
+            chkAllowSkipCreditMax.IsChecked = false;
+        }
+        #endregion
+
+        #region Local Events
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {
@@ -177,81 +271,13 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        public void SetSendAsEmailCheck(bool isChecked)
+
+        void CW_Loaded(object sender, RoutedEventArgs e)
         {
-            chkSendEmail.IsChecked = isChecked;
+            if (IsSendXmlSalesInvoice)
+                liGenerateOIOUBLClicked.Label = Uniconta.ClientTools.Localization.lookup("SendInvoicebyUBL");
+            Dispatcher.BeginInvoke(new Action(() => { OKButton.Focus(); }));
         }
-
-        public void SetInvoiceNumber(long Number)
-        {
-            SetInvoiceNumber(NumberConvert.ToStringNull(Number));
-        }
-
-        public void SetInvoiceNumber(string Number)
-        {
-            InvoiceNumber = Number;
-            txtInvNumber.Text = Number;
-        }
-        public void SetInvoiceDate(DateTime date)
-        {
-            dpDate.DateTime = date;
-        }
-
-        public void SetInvPrintPreview(bool InvPrintPrvw)
-        {
-            chkShowInvoice.IsChecked = InvPrintPrvw;
-        }
-
-        public void SetAdditionalOrders(IEnumerable<DCOrder> orderList)
-        {
-            SetAdditionalOrders(orderList, null);
-        }
-        public void SetAdditionalOrders(IEnumerable<DCOrder> orderList, IEnumerable<object> selectedItems)
-        {
-            lgOrders.Visibility = Visibility.Visible;
-            cbOrders.ItemsSource = orderList;
-            cbOrders.EditValue = selectedItems;
-        }
-
-        CreditorOrderClient _dcOrder;
-        CrudAPI _api;
-        public void SetVouchersFromCreditorOrder(CrudAPI api, CreditorOrderClient dcOrder)
-        {
-            if (lgOrders.Visibility == Visibility.Collapsed)
-            {
-                lgOrders.Visibility = Visibility.Visible;
-                liAdditionalOrders.Visibility = Visibility.Collapsed;
-            }
-            liDocumentRef.Visibility = Visibility.Visible;
-            _dcOrder = dcOrder;
-            _api = api;
-        }
-
-        public void SetOIOUBLLabelText(bool sendXmlSalesInvoice) { } //Method to backward compatible
-
-
-        public void SentByEInvoice(CrudAPI api, Tuple<NHRNetworkType, NHREndPointType, string> endPoint, bool forceEnableEinvoice = false)
-        {
-            IsSendXmlSalesInvoice = true;
-            var enableEinvoice = api.CompanyEntity._OIOUBLSendOnServer && invoiceInXml && (endPoint == null || endPoint.Item3 != null);
-            chkOIOUBL.IsChecked = enableEinvoice;
-            liGenerateOIOUBLClicked.IsEnabled = enableEinvoice || forceEnableEinvoice;
-
-            if (!enableEinvoice || endPoint == null)
-                return;
-            
-            liReceiverEndPoint.Visibility = Visibility.Visible;
-            var endPointId = Regex.Replace(endPoint.Item3, "[^0-9]", "");
-            var baseUrl = api.session.Connection.Target == APITarget.Live ? NHR.NHR_WEB : NHR.NHR_WEB_DEMO;
-            var keyValue = endPoint.Item2 == NHREndPointType.GLN ? "&key=" : "DK%3ACVR&key=";
-            var NHRUrl = string.Concat(baseUrl, keyValue, endPointId);
-
-            if (endPoint.Item1 == NHRNetworkType.Peppol)
-                lblReceiverEndPoint.Content = string.Concat("Peppol", Environment.NewLine, Uniconta.ClientTools.Localization.lookup(endPoint.Item2 == NHREndPointType.GLN ? "GLNnumber" : "CompanyRegNo"),": ", endPoint.Item3);
-            else
-                lblReceiverEndPoint.Content = UtilDisplay.CreateHyperLinkTextControl(NHRUrl, string.Concat(Uniconta.ClientTools.Localization.lookup(endPoint.Item2 == NHREndPointType.GLN ? "GLNnumber" : "CompanyRegNo"), ": ", endPointId));
-        }
-
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
             var str = txtInvNumber.Text;
@@ -313,7 +339,7 @@ namespace UnicontaClient.Pages.CustomPage
         async private void liDocumentRef_LookupButtonClicked(object sender)
         {
             var lookupDocumentRefEditor = sender as LookupEditor;
-            lookupDocumentRefEditor.PopupContentTemplate = (Application.Current).Resources["LookUpUrlDocumentClientPopupContent"] as ControlTemplate;
+            lookupDocumentRefEditor.PopupContentTemplate = (System.Windows.Application.Current).Resources["LookUpUrlDocumentClientPopupContent"] as ControlTemplate;
             lookupDocumentRefEditor.ValueMember = "RowId";
             lookupDocumentRefEditor.SelectedIndexChanged += LookupDocumentRefEditor_SelectedIndexChanged;
             var voucherList = await Utilities.Utility.GetVoucherReferenceList(_api, _dcOrder);
@@ -327,6 +353,8 @@ namespace UnicontaClient.Pages.CustomPage
             PhysicalVoucherRef = voucherClient.RowId;
             NotifyPropertyChanged(nameof(PhysicalVoucherRef));
         }
+        
+        #endregion
     }
 }
 

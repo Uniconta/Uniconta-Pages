@@ -108,14 +108,14 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var row = (sender as Image).Tag as InvItemNameGroupClient;
+            var row = (sender as System.Windows.Controls.Image).Tag as InvItemNameGroupClient;
             if (row != null)
                 AddDockItem(TabControls.UserDocsPage, dgInventoryNameGroupGrid.syncEntity);
         }
 
         private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var row = (sender as Image).Tag as InvItemNameGroupClient;
+            var row = (sender as System.Windows.Controls.Image).Tag as InvItemNameGroupClient;
             if (row != null)
                 AddDockItem(TabControls.UserNotesPage, dgInventoryNameGroupGrid.syncEntity);
         }

@@ -41,11 +41,7 @@ namespace UnicontaClient.Pages
             this.DataContext = this;
             IsProdOrder = isProdOrder;
             InitializeComponent();
-#if !SILVERLIGHT
             this.Title = isProdOrder == false ? Uniconta.ClientTools.Localization.lookup("PurchaseOrder") : Uniconta.ClientTools.Localization.lookup("ProductionOrder");
-#else
-            UnicontaClient.Utilities.Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             API = api;
             leGroup.api = leShipment.api = leEmployee.api = API;
 
@@ -65,7 +61,7 @@ namespace UnicontaClient.Pages
             {
                 txbCreateProdLine.Text = string.Format(Uniconta.ClientTools.Localization.lookup("CreateOBJ"), Uniconta.ClientTools.Localization.lookup("ProductionLines"));
 
-                var prodReg = AppEnums.ProductionRegister.ToString((int)api.CompanyEntity?._OrderLineStorage);
+                var prodReg = AppEnums.ProductionRegister.ToString((int)api.CompanyEntity._OrderLineStorage);
                 storageType.ItemsSource = AppEnums.ProductionRegister.Values;
                 storageType.SelectedItem = prodReg;
               
@@ -107,7 +103,7 @@ namespace UnicontaClient.Pages
             Dispatcher.BeginInvoke(new Action(() => { txtOurRef.Focus(); }));
         }
 
-        private void ChildWindow_KeyDown(object sender, KeyEventArgs e)
+        private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {
@@ -139,8 +135,8 @@ namespace UnicontaClient.Pages
                 DefaultCreditorOrder._DeliveryDate = deDeliveryDate.DateTime;
                 DefaultCreditorOrder._Shipment = Shipment;
                 DefaultCreditorOrder._Employee = Employee;
-                OrderLinePerWareHouse = (bool)chkOrderLinePrWH.IsChecked;
-                OrderLinePerLocation = (bool)chkOrderLinePrLoc.IsChecked;
+                OrderLinePerWareHouse = chkOrderLinePrWH.IsChecked.GetValueOrDefault();
+                OrderLinePerLocation = chkOrderLinePrLoc.IsChecked.GetValueOrDefault();
             }
             else
             {

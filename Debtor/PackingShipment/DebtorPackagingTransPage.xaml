@@ -16,15 +16,18 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorPackagingTransPage"
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <local:DebtorPackagingTransGrid x:Name="dgDebtorPackagingTransGrid" AutoGenerateColumns="None">
                 <local:DebtorPackagingTransGrid.Columns>
-                    <!--<local:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" />-->
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ReportingType" />
                     <local:ComboBoxColumnClient x:Name="Category" />
                     <local:ComboBoxColumnClient x:Name="PackagingType" />
                     <local:ComboBoxColumnClient x:Name="WasteSorting" />
                     <local:ComboBoxColumnClient x:Name="PackagingRateLevel" />
                     <local:ComboBoxColumnClient x:Name="PackagingConsumer" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Weight" AllowThousandMask="True" Mask="N4"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Unit"  Width="50"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Qty" AllowThousandMask="True" Mask="N4"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Country" AllowEditing="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Date" AllowEditing="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Item" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Name" Width="150" />
                 </local:DebtorPackagingTransGrid.Columns>
             </local:DebtorPackagingTransGrid>
         </CorasauControls:BusyIndicator>
