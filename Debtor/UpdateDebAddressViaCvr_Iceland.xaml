@@ -1,5 +1,5 @@
 <Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
-        xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
 x:Class="UnicontaClient.Pages.CustomPage.UpdateDebAddressViaCvr_Iceland"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -26,6 +26,7 @@ x:Class="UnicontaClient.Pages.CustomPage.UpdateDebAddressViaCvr_Iceland"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceInXML" Width="150" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="VatNumber" Width="150" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="IndustryCode" Width="50" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CompanyState" Width="50" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="NewName" ReadOnly="True" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="NewAddress"  Width="150"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="NewAddress2"  Width="150"/>
@@ -34,7 +35,8 @@ x:Class="UnicontaClient.Pages.CustomPage.UpdateDebAddressViaCvr_Iceland"
 
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="NewInvoiceInXML" Width="150" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="NewVatNumber" Width="150" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NewIndustryCode" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NewIndustryCode" Width="150" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NewCompanyState" Width="150" />
                 </localPage:UpdateDebAddressViaCvrGrid_Iceland.Columns>
             </localPage:UpdateDebAddressViaCvrGrid_Iceland>
         </UnicontaControls:BusyIndicator>

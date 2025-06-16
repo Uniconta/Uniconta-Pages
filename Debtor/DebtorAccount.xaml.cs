@@ -325,6 +325,13 @@ namespace UnicontaClient.Pages.CustomPage
                         break;
                     }
                     break;
+                case "ValidateAddress":
+                    ValidateFunctions(selectedItems, ActionType);
+                    break;
+                case "ValidateNemhandel":
+                    ValidateFunctions(selectedItems, ActionType);
+                    break;
+
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -342,6 +349,23 @@ namespace UnicontaClient.Pages.CustomPage
             debtor._lastPayment = DateTime.MinValue;
             debtor._LastInvoice = DateTime.MinValue;
             AddDockItem(TabControls.DebtorAccountPage2, new object[2] { debtor, IdObject.get(false) }, Uniconta.ClientTools.Localization.lookup("DebtorAccount"), "Add_16x16");
+        }
+
+        void ValidateFunctions(IList selectedItems, string actiontype)
+        {
+            if (selectedItems != null)
+            {
+                var selectedItemsArr = dgDebtorAccountGrid.SelectedItems.Cast<DebtorClient>().ToArray();
+                var msg = string.Format(Uniconta.ClientTools.Localization.lookup("MarkedControlFunction"), selectedItemsArr.Length);
+                var result = UnicontaMessageBox.Show(msg, Uniconta.ClientTools.Localization.lookup("Validate"), UnicontaMessageBox.YesNo, MessageBoxImage.Question);
+                if (result != UnicontaMessageBox.Yes)
+                    return;
+
+                if (actiontype == "ValidateNemhandel")
+                    AddDockItem(TabControls.DebtorNHRLookup, selectedItemsArr, null, null, true, null);
+                else
+                    AddDockItem(TabControls.UpdateDebAddressViaCvr, selectedItemsArr, null, null, true, null, new[] { new BasePage.ValuePair(null, "Debtor") });
+            }
         }
 
         async void CreateMandates(IList debtors)

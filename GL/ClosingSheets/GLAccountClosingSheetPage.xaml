@@ -15,6 +15,7 @@ x:Class="UnicontaClient.Pages.CustomPage.GLAccountClosingSheetPage"
     d:DesignHeight="300" d:DesignWidth="400">
     <UserControl.Resources>
         <Util:VisibilityBoolConverter x:Key="VisibilityBoolConverter" />
+        <Util:VisibilityTextConverter x:Key="VisibilityTextConverter" />
         <Util:ImageNameToImagesourceConverter x:Key="ImageNameToImagesourceConverter"/>
     </UserControl.Resources>
     <Grid x:Name="LayoutRoot" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
@@ -57,6 +58,18 @@ x:Class="UnicontaClient.Pages.CustomPage.GLAccountClosingSheetPage"
                             </DataTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="HasLink" Visible="True" Width="35">
+                        <localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="&#x1f310;" Width="16" Height="16" VerticalAlignment="Center" />
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                        <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <TextBlock Text="&#x1f310;" Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" MouseLeftButtonDown="HasLink_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.Link,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityTextConverter}}" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
+                            </ControlTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Account" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Width="300">
                         <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
@@ -90,16 +103,16 @@ x:Class="UnicontaClient.Pages.CustomPage.GLAccountClosingSheetPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ExternalNo" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SheetNote" Width="50" AllowEditing="True" ReadOnly="False">
-                            <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
-                                <editor:MemoEditSettings MaxLength="4000"/>
-                            </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                        <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                            <editor:MemoEditSettings MaxLength="4000"/>
+                        </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Index" Width="120"  AllowEditing="True" ReadOnly="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Link" Width="120"  AllowEditing="True" ReadOnly="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="WorkPaper" Width="120"  AllowEditing="True" ReadOnly="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SheetComment" Width="50" AllowEditing="True" ReadOnly="False">
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SheetComment" Width="250" AllowEditing="True" ReadOnly="False">
                         <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
-                            <editor:MemoEditSettings MaxLength="4000"/>
+                            <editor:TextEditSettings TextWrapping="Wrap"/>
                         </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Comment" Width="120"/>

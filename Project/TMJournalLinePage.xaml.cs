@@ -658,12 +658,12 @@ namespace UnicontaClient.Pages.CustomPage
             tmJournalLineFilter = new PropValuePair[]
             {
                 PropValuePair.GenereteWhereElements("Date", JournalLineDate, CompareOperator.Equal),
-                PropValuePair.GenereteWhereElements("RegistrationType", typeof(int), "0"),
+                PropValuePair.GenereteWhereElements("RegistrationType", "0", CompareOperator.Equal, typeof(int))
             };
             tmJournalLineTransReg = new PropValuePair[]
             {
                  PropValuePair.GenereteWhereElements("Date", JournalLineDate, CompareOperator.Equal),
-                 PropValuePair.GenereteWhereElements("RegistrationType", typeof(int), "1")
+                 PropValuePair.GenereteWhereElements("RegistrationType", "1", CompareOperator.Equal, typeof(int))
             };
             SetColumnHeader();
         }
@@ -810,8 +810,8 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 PropValuePair.GenereteWhereElements(nameof(TMJournalLineClient.Employee), typeof(string), employee.KeyStr),
                 PropValuePair.GenereteWhereElements(nameof(TMJournalLineClient.Date), JournalLineDate.AddDays(-7), CompareOperator.Equal),
-                PropValuePair.GenereteWhereElements(nameof(TMJournalLineClient.RegistrationType), typeof(int), "0"),
-                PropValuePair.GenereteWhereElements(nameof(TMJournalLineClient.CopyLine), typeof(bool), "1")
+                PropValuePair.GenereteWhereElements(nameof(TMJournalLineClient.RegistrationType), "0", CompareOperator.Equal, typeof(int)),
+                PropValuePair.GenereteWhereElements(nameof(TMJournalLineClient.CopyLine), "1", CompareOperator.Equal, typeof(bool))
             };
             var copyPrevJournalLine = await api.Query<TMJournalLineClient>(pairJournalTrans);
             if (copyPrevJournalLine == null || copyPrevJournalLine.Length == 0)
@@ -2866,12 +2866,12 @@ namespace UnicontaClient.Pages.CustomPage
             tmJournalLineFilter = new PropValuePair[]
             {
                 PropValuePair.GenereteWhereElements("Date", JournalLineDate, CompareOperator.Equal),
-                PropValuePair.GenereteWhereElements("RegistrationType", typeof(int), "0")
+                PropValuePair.GenereteWhereElements("RegistrationType", "0", CompareOperator.Equal, typeof(int))
             };
             tmJournalLineTransReg = new PropValuePair[]
             {
                  PropValuePair.GenereteWhereElements("Date", JournalLineDate, CompareOperator.Equal),
-                 PropValuePair.GenereteWhereElements("RegistrationType", typeof(int), "1")
+                 PropValuePair.GenereteWhereElements("RegistrationType", "1", CompareOperator.Equal, typeof(int))
             };
             SetColumnHeader();
             await BindGrid();

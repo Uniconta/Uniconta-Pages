@@ -1086,8 +1086,9 @@ namespace UnicontaClient.Pages.CustomPage
             selectedItem._Data = null;
             var voucher = Activator.CreateInstance(selectedItem.GetType()) as VouchersClient;
             CorasauDataGrid.CopyAndClearRowId(selectedItem, voucher);
+            selectedItem._Data = _Data;
+            voucher._Data = selectedItem.Buffer;
             voucher._Created = DateTime.MinValue;
-            voucher._Data = selectedItem._Data = _Data;
             voucher._Approved = voucher._Approved2 = false;
             voucher._Approver1 = voucher._Approver2 = null;
             voucher._PurchaseNumber = 0;
@@ -1123,9 +1124,9 @@ namespace UnicontaClient.Pages.CustomPage
                 PropValuePair.GenereteWhereElements("InEnvelope", "0", CompareOperator.Equal),
             };
             if (selectedItem.RowId > 3000) // we just search in the last 3000
-                filter.Add(PropValuePair.GenereteWhereElements("RowId", NumberConvert.ToString(selectedItem.RowId - 3000), CompareOperator.GreaterThanOrEqual));
+                filter.Add(PropValuePair.GenereteWhereElements("RowId", NumberConvert.ToString(selectedItem.RowId - 3000), CompareOperator.GreaterThanOrEqual, typeof(Int32)));
             // should be added after first RowId
-            filter.Add(PropValuePair.GenereteWhereElements("RowId", selectedItem.RowId, CompareOperator.NotEqual)); // we do not want ourself
+            filter.Add(PropValuePair.GenereteWhereElements("RowId", NumberConvert.ToString(selectedItem.RowId), CompareOperator.NotEqual, typeof(Int32))); // we do not want ourself
 
             busyIndicator.IsBusy = true;
             var lst = await api.Query(api.CompanyEntity.CreateUserType<VouchersClient>(), null, filter);
@@ -1208,6 +1209,8 @@ namespace UnicontaClient.Pages.CustomPage
                     dgVoucherGrid.Filter(null);
             }
         }
+
+        bool isPurchaseUpdated = false;
         private async void CreatePurchaseOrder(VouchersClient voucherClient)
         {
             // save lines first.
@@ -1223,6 +1226,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (errorCode != ErrorCodes.Succes)
                     return;
 
+                isPurchaseUpdated = voucherClient.Fileextension != FileextensionsTypes.XML && voucherClient.PurchaseNumber != 0;
                 var orderApi = new OrderAPI(api);
                 var dcOrder = this.CreateGridObject(typeof(CreditorOrderClient)) as CreditorOrderClient;
                 var result = await orderApi.CreateOrderFromDocument(voucherClient, dcOrder);
@@ -1238,7 +1242,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void ShowPurchaseOrderLines(DCOrder order)
         {
-            var confrimationText = string.Format(" {0}. {1}:{2},{3}:{4}\r\n{5}", Localization.lookup("PurchaseOrderCreated"), Localization.lookup("OrderNumber"), order._OrderNumber,
+            var txt = isPurchaseUpdated ? Localization.lookup("PurchaseOrderUpdated") : Localization.lookup("PurchaseOrderCreated");
+            var confrimationText = string.Format("{0}. {1}:{2},{3}:{4}\r\n{5}", txt, Localization.lookup("OrderNumber"), order._OrderNumber,
                 Localization.lookup("Account"), order._DCAccount, string.Concat(string.Format(Localization.lookup("GoTo"), Localization.lookup("Orderline")), " ?"));
 
             var confirmationBox = new CWConfirmationBox(confrimationText, string.Empty, false);
@@ -1517,7 +1522,8 @@ namespace UnicontaClient.Pages.CustomPage
                         if (fileInfo != null)
                         {
                             var voucher = new VouchersClient();
-                            StreamingManager.Copy(selectedItem, voucher);
+                            if (api.CompanyEntity.DocumentScanner == 0)
+                                StreamingManager.Copy(selectedItem, voucher);
                             voucher._Fileextension = DocumentConvert.GetDocumentType(fileInfo.FileExtension);
                             voucher._Data = fileInfo.FileBytes;
                             voucher._Text = selectedItem._Text ?? fileInfo.FileName;
@@ -1525,6 +1531,7 @@ namespace UnicontaClient.Pages.CustomPage
                             voucher._Created = selectedItem._Created;
                             voucher._Content = selectedItem._Content;
                             voucher._ScanDoc = true;
+                            voucher._SentToScanner = false;
                             // voucher._NoCompress = true;
                             voucherClients[iVoucher++] = voucher;
                             size += voucher._Data.Length;

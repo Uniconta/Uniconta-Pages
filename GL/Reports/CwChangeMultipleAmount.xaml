@@ -23,7 +23,11 @@ x:Class="UnicontaClient.Pages.CustomPage.CwChangeMultipleAmount"
             <dxg:GridControl.Columns>
                 <dxg:GridColumn  FieldName="Account" IsSmart="True" AllowEditing="False" Width="70"/>
                 <dxg:GridColumn  FieldName="Text" IsSmart="True" AllowEditing="False" MinWidth="200"/>
-                <dxg:GridColumn  FieldName="Amount" IsSmart="True" AllowEditing="False" MinWidth="100"/>
+                <dxg:GridColumn  FieldName="Amount" IsSmart="True" AllowEditing="False" MinWidth="100">
+                    <dxg:GridColumn.EditSettings>
+                        <dxe:TextEditSettings Mask="n2" MaskType="Numeric" MaskUseAsDisplayFormat="True"/>
+                    </dxg:GridColumn.EditSettings>
+                </dxg:GridColumn>
                 <dxg:GridColumn  FieldName="NewAmount" x:Name="colNewAmount" IsSmart="True" MinWidth="100" AllowEditing="True">
                     <dxg:GridColumn.EditSettings>
                         <dxe:TextEditSettings Mask="n2" MaskType="Numeric" MaskUseAsDisplayFormat="True"/>

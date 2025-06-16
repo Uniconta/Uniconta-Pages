@@ -1043,7 +1043,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         TextEditSettings GetColumnFormat(string format)
         {
-            return new TextEditSettings() { MaskType = MaskType.Numeric, MaskUseAsDisplayFormat = true, Mask = format, HorizontalContentAlignment = EditSettingsHorizontalAlignment.Right };
+            return new TextEditSettings() { MaskType = MaskType.Numeric, MaskUseAsDisplayFormat = true, Mask = format, HorizontalContentAlignment = EditSettingsHorizontalAlignment.Right, DisplayFormat = format };
         }
 
         private void CreateBalanceRow(BalanceHeader finbal, int ColNo, bool FirstTime)
@@ -1157,7 +1157,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else
             {
-                AddDockItem(TabControls.BalanceReportPrint, new object[4] { hdrData, listdata, PassedCriteria.ObjBalance, frontPageReport }, 
+                AddDockItem(TabControls.BalanceReportPrint, new object[4] { hdrData, listdata, PassedCriteria.ObjBalance, frontPageReport },
                 string.Concat(Uniconta.ClientTools.Localization.lookup("ReportCriteria"), ":", header), null, true);
             }
         }

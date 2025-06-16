@@ -158,6 +158,7 @@ namespace UnicontaClient.Pages.CustomPage
             layOutInvItemStorage.Caption = Uniconta.ClientTools.Localization.lookup("OnHand");
             OnHandScreenInOrder = api.CompanyEntity._OnHandScreenInOrder;
             layOutInvItemStorage.Visibility = OnHandScreenInOrder ? Visibility.Visible : Visibility.Collapsed;
+            dgCreditorOrderLineGrid.ShowTotalSummary();
             InitialLoad();
             this.KeyDown += Page_KeyDown;
         }

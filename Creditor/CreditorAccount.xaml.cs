@@ -122,6 +122,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void localMenu_OnItemClicked(string ActionType)
         {
             var selectedItem = dgCreditorAccountGrid.SelectedItem as CreditorClient;
+            var selectedItems = dgCreditorAccountGrid.SelectedItems;
             switch (ActionType)
             {
                 case "EditAll":
@@ -253,6 +254,18 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "BankApprove":
                     BankApprove();
+                    break;
+                case "ValidateAddress":
+                    if (selectedItems != null)
+                    {
+                        var selectedItemsArr = dgCreditorAccountGrid.SelectedItems.Cast<CreditorClient>().ToArray();
+                        var msg = string.Format(Uniconta.ClientTools.Localization.lookup("MarkedControlFunction"), selectedItemsArr.Length);
+                        var result = UnicontaMessageBox.Show(msg, Uniconta.ClientTools.Localization.lookup("Validate"), UnicontaMessageBox.YesNo, MessageBoxImage.Question);
+                        if (result != UnicontaMessageBox.Yes)
+                            return;
+
+                        AddDockItem(TabControls.UpdateDebAddressViaCvr, selectedItemsArr, null, null, true, null, new[] { new BasePage.ValuePair(null, "Creditor") });
+                    }
                     break;
 
                 default:

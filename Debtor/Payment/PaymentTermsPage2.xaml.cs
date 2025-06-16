@@ -86,8 +86,9 @@ namespace UnicontaClient.Pages.CustomPage
                     grpDays.Visibility = grpAccount.Visibility = grpCashDisCount.Visibility = Visibility.Visible;
                     break;
                 case PaymentMethodTypes.Creditcard:
-                    lItemOffsetAccount.Visibility = grpDays.Visibility = liPct1.Visibility = liPct2.Visibility = grpCashDisCount.Visibility = liPostOnDC.Visibility = Visibility.Collapsed;
+                    lItemOffsetAccount.Visibility = grpDays.Visibility = liPct1.Visibility = liPct2.Visibility = grpCashDisCount.Visibility = Visibility.Collapsed;
                     grpAccount.Visibility = Visibility.Visible;
+                    liPostOnDC.Visibility = Visibility.Visible;
                     break;
                 case PaymentMethodTypes.Factoring:
                     grpDays.Visibility = liPostOnDC.Visibility = Visibility.Collapsed;

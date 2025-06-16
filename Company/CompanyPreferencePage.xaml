@@ -76,6 +76,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CompanyPreferencePage"
                         <CorasauControls:CorasauLayoutItem FieldName="ScanPaymentData">
                             <CorasauControls:CheckEditor IsChecked="{Binding ScanPaymentData,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="ScanMatchBank">
+                            <CorasauControls:CheckEditor IsChecked="{Binding ScanMatchBank,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="lastGroup">
@@ -138,6 +141,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CompanyPreferencePage"
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="MandatoryOnAccountItem">
                             <CorasauControls:CheckEditor IsChecked="{Binding MandatoryOnAccountItem,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="ProjectBudgetMonth">
+                            <CorasauControls:CheckEditor IsChecked="{Binding ProjectBudgetMonth,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=NemHandel}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" MinWidth="420">

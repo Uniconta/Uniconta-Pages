@@ -655,7 +655,6 @@ namespace UnicontaClient.Pages.CustomPage
 
                     if (result)
                         DebtorOrders.Updatedata(dbOrder, doctype);
-
                     else
                         Utility.ShowJournalError(invoicePostingResult.PostingResult.ledgerRes, dgCreditorOrdersGrid);
                 }

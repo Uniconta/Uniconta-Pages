@@ -190,6 +190,7 @@ namespace UnicontaClient.Pages.CustomPage
         public void SetInvoiceDate(DateTime date)
         {
             dpDate.DateTime = date;
+            dpDate.IsReadOnly = true;
         }
 
         public void SetInvPrintPreview(bool InvPrintPrvw)

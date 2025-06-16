@@ -567,10 +567,9 @@ namespace UnicontaClient.Pages.CustomPage
                 JournalCache = await api.LoadCache(typeof(Uniconta.DataModel.GLDailyJournal)).ConfigureAwait(false);
             if (BankAccountCache == null)
                 BankAccountCache = await api.LoadCache(typeof(Uniconta.DataModel.BankStatement)).ConfigureAwait(false);
-            if (PaymentFormatCache == null)
-                PaymentFormatCache = await api.LoadCache(typeof(Uniconta.DataModel.CreditorPaymentFormat)).ConfigureAwait(false);
+            if (api.CompanyEntity.CreditorBankApprovement)
+                api.LoadCache(typeof(Uniconta.DataModel.CreditorPaymentAccount), true).ConfigureAwait(false);
         }
-
 
         ItemBase ibaseExpandGroups;
         ItemBase ibaseCollapseGroups;

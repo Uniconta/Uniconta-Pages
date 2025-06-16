@@ -34,7 +34,7 @@
 			<RibbonItem Action="ChartView" LocalizedNameKey="EnableChart" Glyph="Report_16x16" />
 		</RibbonItem>
 		<RibbonItem Action="DebtorBudgetLines" LocalizedNameKey="Budget" ControlName="DebtorBudgetLinePage" Module="_DebtorBudget" LargeGlyph="Budget_32x32"/>
-		<RibbonItem Action="BudgetYear" LocalizedNameKey="BudgetYear" Glyph="Update_32x32" LargeGlyph="Accounting_Period_32x32" />
+		<RibbonItem Action="BudgetYear" LocalizedNameKey="MonthlyPlanning" Glyph="Update_32x32" LargeGlyph="Accounting_Period_32x32" />
 	</RibbonItem>
 	<RibbonItem>
 		<RibbonItem Action="QueriesandReports" LocalizedNameKey="QueriesandReports" LargeGlyph="Statistics_32x32">

@@ -18,6 +18,7 @@ using System.Windows;
 using System.Threading.Tasks;
 using Uniconta.API.Service;
 using Uniconta.DataModel;
+using Uniconta.ClientTools.Controls;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -116,6 +117,18 @@ namespace UnicontaClient.Pages.CustomPage
         private void Search()
         {
             InitQuery();
+        }
+
+        protected override LookUpTable HandleLookupOnLocalPage(LookUpTable lookup, CorasauDataGrid dg)
+        {
+            var stat = dgAcStatsGrid.SelectedItem as InvStatistickClient;
+            if (stat == null || stat.DCType != 2)
+                return lookup;
+            if (dgAcStatsGrid.CurrentColumn?.Name == "Account")
+            {
+                lookup.TableType = typeof(Uniconta.DataModel.Creditor);
+            }
+            return lookup;
         }
     }
 }

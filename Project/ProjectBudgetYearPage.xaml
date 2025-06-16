@@ -8,9 +8,12 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectBudgetYearPage"
                     xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"
                     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core">
     <Pages:GridBasePage.Resources>
-        <Util:FiedlValueToForegroundColor x:Key="FiedlValueToForegroundColor" />
-        <Style TargetType="Run" x:Key="SummaryTotalStyle">
-            <Setter Property="TextBlock.Foreground" Value="{Binding Column.TotalSummaries[2].Value, Converter={StaticResource FiedlValueToForegroundColor}}" />
+        <localPage:SummaryValueToForegroundConverter x:Key="SummaryValueToForegroundConverter" />
+        <Style TargetType="Run" x:Key="DefaultSummaryTotalStyle">
+            <Setter Property="TextBlock.HorizontalAlignment" Value="Right" />
+        </Style>
+        <Style TargetType="Run" x:Key="SummaryTotalStyle" BasedOn="{StaticResource DefaultSummaryTotalStyle}">
+            <Setter Property="Foreground" Value="{Binding Value, Converter={StaticResource SummaryValueToForegroundConverter}}" />
         </Style>
     </Pages:GridBasePage.Resources>
 
@@ -53,7 +56,13 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectBudgetYearPage"
                         </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ProjectName" AllowEditing="False" Fixed="Left" FixedWidth="True" Visible="True"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Employee" AllowEditing="False" Fixed="Left" FixedWidth="True" Width="75" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Employee" Fixed="Left" FixedWidth="True" Width="75">
+                        <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Employee,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" />
+                            </ControlTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="EmployeeName" AllowEditing="False" Fixed="Left" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PayrollCategory" Fixed="Left" FixedWidth="True" Width="75" Visible="True">
                         <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
@@ -71,7 +80,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectBudgetYearPage"
                         </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategoryName" AllowEditing="False" Fixed="Left" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="WorkSpace" Fixed="Left"  FixedWidth="True" Width="75" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="WorkSpace" Fixed="Left" FixedWidth="True" Width="75" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Task" Fixed="Left" FixedWidth="True" Width="60" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="MonthQty1" Width="75" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="MonthQty2" Width="75" />
@@ -92,57 +101,57 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectBudgetYearPage"
                     <localPage:SumColumn FieldName="Project" SummaryType="Custom" SerializableTag="NormHours" />
                     <localPage:SumColumn FieldName="Project" SummaryType="Custom" SerializableTag="Total" />
 
-                    <localPage:SumColumn FieldName="MonthQty1" SummaryType="Sum" DisplayFormat="{}{0:N2}" />
-                    <localPage:SumColumn FieldName="MonthQty1" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="HoursMonth1" />
+                    <localPage:SumColumn FieldName="MonthQty1" SummaryType="Sum" DisplayFormat="{}{0:N2}" TotalSummaryElementStyle="{StaticResource DefaultSummaryTotalStyle}"/>
+                    <localPage:SumColumn FieldName="MonthQty1" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="HoursMonth1" TotalSummaryElementStyle="{StaticResource DefaultSummaryTotalStyle}"/>
                     <localPage:SumColumn FieldName="MonthQty1" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="TotalMonth1" TotalSummaryElementStyle="{StaticResource SummaryTotalStyle}" />
 
-                    <localPage:SumColumn FieldName="MonthQty2" SummaryType="Sum" DisplayFormat="{}{0:N2}" />
-                    <localPage:SumColumn FieldName="MonthQty2" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="HoursMonth2" />
-                    <localPage:SumColumn FieldName="MonthQty2" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="TotalMonth2" TotalSummaryElementStyle="{StaticResource SummaryTotalStyle}"/>
+                    <localPage:SumColumn FieldName="MonthQty2" SummaryType="Sum" DisplayFormat="{}{0:N2}" TotalSummaryElementStyle="{StaticResource DefaultSummaryTotalStyle}"/>
+                    <localPage:SumColumn FieldName="MonthQty2" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="HoursMonth2" TotalSummaryElementStyle="{StaticResource DefaultSummaryTotalStyle}"/>
+                    <localPage:SumColumn FieldName="MonthQty2" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="TotalMonth2" TotalSummaryElementStyle="{StaticResource SummaryTotalStyle}" />
 
-                    <localPage:SumColumn FieldName="MonthQty3" SummaryType="Sum" DisplayFormat="{}{0:N2}" />
-                    <localPage:SumColumn FieldName="MonthQty3" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="HoursMonth3" />
-                    <localPage:SumColumn FieldName="MonthQty3" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="TotalMonth3" TotalSummaryElementStyle="{StaticResource SummaryTotalStyle}"/>
+                    <localPage:SumColumn FieldName="MonthQty3" SummaryType="Sum" DisplayFormat="{}{0:N2}" TotalSummaryElementStyle="{StaticResource DefaultSummaryTotalStyle}"/>
+                    <localPage:SumColumn FieldName="MonthQty3" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="HoursMonth3" TotalSummaryElementStyle="{StaticResource DefaultSummaryTotalStyle}"/>
+                    <localPage:SumColumn FieldName="MonthQty3" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="TotalMonth3" TotalSummaryElementStyle="{StaticResource SummaryTotalStyle}" />
 
-                    <localPage:SumColumn FieldName="MonthQty4" SummaryType="Sum" DisplayFormat="{}{0:N2}" />
-                    <localPage:SumColumn FieldName="MonthQty4" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="HoursMonth4" />
-                    <localPage:SumColumn FieldName="MonthQty4" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="TotalMonth4" TotalSummaryElementStyle="{StaticResource SummaryTotalStyle}"/>
+                    <localPage:SumColumn FieldName="MonthQty4" SummaryType="Sum" DisplayFormat="{}{0:N2}" TotalSummaryElementStyle="{StaticResource DefaultSummaryTotalStyle}"/>
+                    <localPage:SumColumn FieldName="MonthQty4" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="HoursMonth4" TotalSummaryElementStyle="{StaticResource DefaultSummaryTotalStyle}"/>
+                    <localPage:SumColumn FieldName="MonthQty4" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="TotalMonth4" TotalSummaryElementStyle="{StaticResource SummaryTotalStyle}" />
 
-                    <localPage:SumColumn FieldName="MonthQty5" SummaryType="Sum" DisplayFormat="{}{0:N2}" />
-                    <localPage:SumColumn FieldName="MonthQty5" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="HoursMonth5" />
-                    <localPage:SumColumn FieldName="MonthQty5" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="TotalMonth5" TotalSummaryElementStyle="{StaticResource SummaryTotalStyle}"/>
+                    <localPage:SumColumn FieldName="MonthQty5" SummaryType="Sum" DisplayFormat="{}{0:N2}" TotalSummaryElementStyle="{StaticResource DefaultSummaryTotalStyle}"/>
+                    <localPage:SumColumn FieldName="MonthQty5" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="HoursMonth5" TotalSummaryElementStyle="{StaticResource DefaultSummaryTotalStyle}"/>
+                    <localPage:SumColumn FieldName="MonthQty5" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="TotalMonth5" TotalSummaryElementStyle="{StaticResource SummaryTotalStyle}" />
 
-                    <localPage:SumColumn FieldName="MonthQty6" SummaryType="Sum" DisplayFormat="{}{0:N2}" />
-                    <localPage:SumColumn FieldName="MonthQty6" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="HoursMonth6" />
-                    <localPage:SumColumn FieldName="MonthQty6" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="TotalMonth6" TotalSummaryElementStyle="{StaticResource SummaryTotalStyle}"/>
+                    <localPage:SumColumn FieldName="MonthQty6" SummaryType="Sum" DisplayFormat="{}{0:N2}" TotalSummaryElementStyle="{StaticResource DefaultSummaryTotalStyle}"/>
+                    <localPage:SumColumn FieldName="MonthQty6" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="HoursMonth6" TotalSummaryElementStyle="{StaticResource DefaultSummaryTotalStyle}"/>
+                    <localPage:SumColumn FieldName="MonthQty6" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="TotalMonth6" TotalSummaryElementStyle="{StaticResource SummaryTotalStyle}" />
 
-                    <localPage:SumColumn FieldName="MonthQty7" SummaryType="Sum" DisplayFormat="{}{0:N2}" />
-                    <localPage:SumColumn FieldName="MonthQty7" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="HoursMonth7" />
-                    <localPage:SumColumn FieldName="MonthQty7" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="TotalMonth7" TotalSummaryElementStyle="{StaticResource SummaryTotalStyle}"/>
+                    <localPage:SumColumn FieldName="MonthQty7" SummaryType="Sum" DisplayFormat="{}{0:N2}" TotalSummaryElementStyle="{StaticResource DefaultSummaryTotalStyle}"/>
+                    <localPage:SumColumn FieldName="MonthQty7" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="HoursMonth7" TotalSummaryElementStyle="{StaticResource DefaultSummaryTotalStyle}"/>
+                    <localPage:SumColumn FieldName="MonthQty7" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="TotalMonth7" TotalSummaryElementStyle="{StaticResource SummaryTotalStyle}" />
 
-                    <localPage:SumColumn FieldName="MonthQty8" SummaryType="Sum" DisplayFormat="{}{0:N2}" />
-                    <localPage:SumColumn FieldName="MonthQty8" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="HoursMonth8" />
-                    <localPage:SumColumn FieldName="MonthQty8" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="TotalMonth8" TotalSummaryElementStyle="{StaticResource SummaryTotalStyle}"/>
+                    <localPage:SumColumn FieldName="MonthQty8" SummaryType="Sum" DisplayFormat="{}{0:N2}" TotalSummaryElementStyle="{StaticResource DefaultSummaryTotalStyle}"/>
+                    <localPage:SumColumn FieldName="MonthQty8" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="HoursMonth8" TotalSummaryElementStyle="{StaticResource DefaultSummaryTotalStyle}"/>
+                    <localPage:SumColumn FieldName="MonthQty8" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="TotalMonth8" TotalSummaryElementStyle="{StaticResource SummaryTotalStyle}" />
 
-                    <localPage:SumColumn FieldName="MonthQty9" SummaryType="Sum" DisplayFormat="{}{0:N2}" />
-                    <localPage:SumColumn FieldName="MonthQty9" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="HoursMonth9" />
-                    <localPage:SumColumn FieldName="MonthQty9" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="TotalMonth9" TotalSummaryElementStyle="{StaticResource SummaryTotalStyle}"/>
+                    <localPage:SumColumn FieldName="MonthQty9" SummaryType="Sum" DisplayFormat="{}{0:N2}" TotalSummaryElementStyle="{StaticResource DefaultSummaryTotalStyle}"/>
+                    <localPage:SumColumn FieldName="MonthQty9" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="HoursMonth9" TotalSummaryElementStyle="{StaticResource DefaultSummaryTotalStyle}"/>
+                    <localPage:SumColumn FieldName="MonthQty9" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="TotalMonth9" TotalSummaryElementStyle="{StaticResource SummaryTotalStyle}" />
 
-                    <localPage:SumColumn FieldName="MonthQty10" SummaryType="Sum" DisplayFormat="{}{0:N2}" />
-                    <localPage:SumColumn FieldName="MonthQty10" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="HoursMonth10" />
-                    <localPage:SumColumn FieldName="MonthQty10" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="TotalMonth10" TotalSummaryElementStyle="{StaticResource SummaryTotalStyle}"/>
+                    <localPage:SumColumn FieldName="MonthQty10" SummaryType="Sum" DisplayFormat="{}{0:N2}" TotalSummaryElementStyle="{StaticResource DefaultSummaryTotalStyle}"/>
+                    <localPage:SumColumn FieldName="MonthQty10" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="HoursMonth10" TotalSummaryElementStyle="{StaticResource DefaultSummaryTotalStyle}"/>
+                    <localPage:SumColumn FieldName="MonthQty10" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="TotalMonth10" TotalSummaryElementStyle="{StaticResource SummaryTotalStyle}" />
 
-                    <localPage:SumColumn FieldName="MonthQty11" SummaryType="Sum" DisplayFormat="{}{0:N2}" />
-                    <localPage:SumColumn FieldName="MonthQty11" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="HoursMonth11" />
-                    <localPage:SumColumn FieldName="MonthQty11" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="TotalMonth11" TotalSummaryElementStyle="{StaticResource SummaryTotalStyle}"/>
+                    <localPage:SumColumn FieldName="MonthQty11" SummaryType="Sum" DisplayFormat="{}{0:N2}" TotalSummaryElementStyle="{StaticResource DefaultSummaryTotalStyle}"/>
+                    <localPage:SumColumn FieldName="MonthQty11" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="HoursMonth11" TotalSummaryElementStyle="{StaticResource DefaultSummaryTotalStyle}"/>
+                    <localPage:SumColumn FieldName="MonthQty11" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="TotalMonth11" TotalSummaryElementStyle="{StaticResource SummaryTotalStyle}" />
 
-                    <localPage:SumColumn FieldName="MonthQty12" SummaryType="Sum" DisplayFormat="{}{0:N2}" />
-                    <localPage:SumColumn FieldName="MonthQty12" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="HoursMonth12" />
-                    <localPage:SumColumn FieldName="MonthQty12" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="TotalMonth12" TotalSummaryElementStyle="{StaticResource SummaryTotalStyle}"/>
+                    <localPage:SumColumn FieldName="MonthQty12" SummaryType="Sum" DisplayFormat="{}{0:N2}" TotalSummaryElementStyle="{StaticResource DefaultSummaryTotalStyle}"/>
+                    <localPage:SumColumn FieldName="MonthQty12" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="HoursMonth12" TotalSummaryElementStyle="{StaticResource DefaultSummaryTotalStyle}"/>
+                    <localPage:SumColumn FieldName="MonthQty12" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="TotalMonth12" TotalSummaryElementStyle="{StaticResource SummaryTotalStyle}" />
 
-                    <localPage:SumColumn FieldName="TotalQty" SummaryType="Sum" DisplayFormat="{}{0:N2}" />
-                    <localPage:SumColumn FieldName="TotalQty" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="EmpNormHoursSum" />
-                    <localPage:SumColumn FieldName="TotalQty" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="TotalSum" TotalSummaryElementStyle="{StaticResource SummaryTotalStyle}"/>
+                    <localPage:SumColumn FieldName="TotalQty" SummaryType="Sum" DisplayFormat="{}{0:N2}" TotalSummaryElementStyle="{StaticResource DefaultSummaryTotalStyle}"/>
+                    <localPage:SumColumn FieldName="TotalQty" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="EmpNormHoursSum" TotalSummaryElementStyle="{StaticResource DefaultSummaryTotalStyle}"/>
+                    <localPage:SumColumn FieldName="TotalQty" SummaryType="Custom" DisplayFormat="{}{0:N2}" SerializableTag="TotalSum" TotalSummaryElementStyle="{StaticResource SummaryTotalStyle}" />
                 </localPage:ProjectBudgetYearGridClient.TotalSummary>
             </localPage:ProjectBudgetYearGridClient>
         </CorasauControls:BusyIndicator>

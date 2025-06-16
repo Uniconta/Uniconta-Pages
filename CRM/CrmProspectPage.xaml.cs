@@ -1,7 +1,9 @@
-using UnicontaClient.Models;
-using UnicontaClient.Utilities;
 using System;
+using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using Uniconta.API.Crm;
 using Uniconta.API.Service;
 using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
@@ -9,9 +11,8 @@ using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using Uniconta.DataModel;
-using Uniconta.API.Crm;
-using System.Windows.Input;
-using System.Windows.Controls;
+using UnicontaClient.Models;
+using UnicontaClient.Utilities;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -78,6 +79,8 @@ namespace UnicontaClient.Pages.CustomPage
         private void localMenu_OnItemClicked(string ActionType)
         {
             var selectedItem = dgCrmProspectGrid.SelectedItem as CrmProspectClient;
+            var selectedItems = dgCrmProspectGrid.SelectedItems;
+
             switch (ActionType)
             {
                 case "EditAll":
@@ -151,6 +154,18 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "UndoDelete":
                     dgCrmProspectGrid.UndoDeleteRow();
+                    break;
+                case "ValidateAddress":
+                    if (selectedItems != null)
+                    {
+                        var selectedItemsArr = dgCrmProspectGrid.SelectedItems.Cast<CrmProspectClient>().ToArray();
+                        var msg = string.Format(Uniconta.ClientTools.Localization.lookup("MarkedControlFunction"), selectedItemsArr.Length);
+                        var result = UnicontaMessageBox.Show(msg, Uniconta.ClientTools.Localization.lookup("Validate"), UnicontaMessageBox.YesNo, MessageBoxImage.Question);
+                        if (result != UnicontaMessageBox.Yes)
+                            return;
+
+                        AddDockItem(TabControls.UpdateDebAddressViaCvr, selectedItemsArr, null, null, true, null, new[] { new BasePage.ValuePair(null, "Prospect") });
+                    }
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);

@@ -184,7 +184,7 @@ namespace UnicontaClient.Pages.CustomPage
         async void SaveDatev()
         {
             var datev = await UnicontaClient.Pages.GLTransPage.CreateDatevHeader(api);
-            var cw = new CwDatevHeaderParams(datev.Consultant, datev.Client, datev.Path, datev.DefaultAccount, datev.LanguageId, datev.FiscalYearBegin, datev.Active, api);
+            var cw = new CwDatevHeaderParams(datev.Consultant, datev.Client, datev.Path, datev.DefaultAccount, datev.LanguageId, datev.FiscalYearBegin, datev.Active, datev.Dim1, datev.Dim2, api);
             cw.Closed += delegate
             {
                 if (cw.DialogResult == true)
@@ -196,6 +196,8 @@ namespace UnicontaClient.Pages.CustomPage
                     datev.LanguageId = cw.LanguageId;
                     datev.FiscalYearBegin = cw.FiscalYearBegin;
                     datev.Active = cw.Active; //Per
+                    datev.Dim1 = cw.Kost1;
+                    datev.Dim2 = cw.Kost2;
                     UnicontaClient.Pages.GLTransPage.SaveDatevHeader(datev, api);
                 }
             };
@@ -246,6 +248,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             busyIndicator.IsBusy = true;
             byte status = 0;
+            bool errorShown = false;
             if (!string.IsNullOrEmpty(DatevDetails.AccessToken) && DatevDetails.Tokenvalidto > DateTime.Now)
             {
                 var UCService = selectedItem.DatevService;
@@ -269,13 +272,7 @@ namespace UnicontaClient.Pages.CustomPage
             try
             {
                 var loginResult = await LoginToDatev(api);
-                if (loginResult == null)
-                {
-                    setShowHideGreen(false);
-                    UnicontaMessageBox.Show("Fehler beim Anmelden an DATEV", "Fehler", MessageBoxButton.OK);
-                    status = 1;
-                }
-                else if (!loginResult.IsError)
+                if (!loginResult.IsError)
                 {
                     DatevDetails.AccessToken = loginResult.AccessToken;
                     DatevDetails.IdentityToken = loginResult.IdentityToken; // ???
@@ -287,15 +284,17 @@ namespace UnicontaClient.Pages.CustomPage
                 else
                 {
                     setShowHideGreen(false);
-                    UnicontaMessageBox.Show("Fehler beim Anmelden an DATEV " + loginResult.Error, "Fehler",
+                    UnicontaMessageBox.Show("Fehler beim Anmelden an DATEV: " + loginResult.Error, "Fehler",
                         MessageBoxButton.OK);
+                    errorShown = true;
                     status = 1;
                 }
             }
             catch (Exception e)
             {
                 setShowHideGreen(false);
-                UnicontaMessageBox.Show("Fehler beim Anmelden an DATEV " + e.Message, "Fehler", MessageBoxButton.OK);
+                UnicontaMessageBox.Show("Fehler beim Anmelden an DATEV: " + e.Message, "Fehler", MessageBoxButton.OK);
+                errorShown = true;
                 status = 1;
 
             }
@@ -303,14 +302,20 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 busyIndicator.IsBusy = false;
             }
-            if (string.IsNullOrEmpty(DatevDetails.AccessToken))
+
+            if (!errorShown)
             {
-                setShowHideGreen(false);
-                UnicontaMessageBox.Show("Der DATEV Zugangstoken ist ungültig oder abgelaufen", "Fehler", MessageBoxButton.OK);
-                status = 1;
+                if (string.IsNullOrEmpty(DatevDetails.AccessToken))
+                {
+                    setShowHideGreen(false);
+                    UnicontaMessageBox.Show("Der DATEV Zugangstoken ist ungültig oder abgelaufen", "Fehler",
+                        MessageBoxButton.OK);
+                    status = 1;
+                }
+                else
+                    TestUpload(selectedItem);
             }
-            else
-                TestUpload(selectedItem);
+
             InsDatevLog(selectedItem, DateTime.Now, "Anmeldung an https://login.datev.de/openid", "", "", status, "");
 
         }
@@ -496,6 +501,11 @@ namespace UnicontaClient.Pages.CustomPage
                     dialog = new CWBrowserDialog(startUrlWithSuffix, "DATEV Login");
 
                     Dispatcher.BeginInvoke((Action)(() => dialog.Show()));
+                    dialog.Closed += (sender, args) =>
+                    {
+                        if (http?.IsListening == true)
+                            http.Stop();
+                    };
                     //Process.Start(startInfo);
 
                     var context = await http.GetContextAsync();
@@ -560,7 +570,7 @@ namespace UnicontaClient.Pages.CustomPage
                     http.Stop();
 
                     // Close the browser dialog automatically after 5 seconds (only on success)
-                    await Task.Delay(TimeSpan.FromSeconds(5)).ContinueWith(_ =>
+                    Task.Delay(TimeSpan.FromSeconds(5)).ContinueWith(_ =>
                         Dispatcher.BeginInvoke((Action)(() => dialog?.Close()))
                     );
 
@@ -579,13 +589,14 @@ namespace UnicontaClient.Pages.CustomPage
 
                 if (ex is ApplicationException || ex is TaskCanceledException || ex is HttpListenerException)
                     throw new ApplicationException("Anmeldevorgang abgebrochen", ex);
+
                 api.ReportException(ex, "Fehler bei der Verbindung mit login.datev.de");
+                throw ex;
             }
             finally
             {
                 tokenSource.Cancel();
             }
-            return null;
         }
         async Task<GLTransPage.DatevHeader> CreateDatevHeader()
         {
@@ -826,6 +837,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                         var UpText = "";
                         var UpTextEXTF = "";
+                        // 1 = Buchungen, 2 = Belege, 3 = beides
                         if (DatevDetails.UCService == 2 || DatevDetails.UCService == 3)
                         {
                             UpText = "Die Belege werden vom Server hochgeladen. Sie können diese Seite verlassen, mit Uniconta an anderer Stelle weiterarbeiten. ";
@@ -834,8 +846,8 @@ namespace UnicontaClient.Pages.CustomPage
                         if (DatevDetails.UCService == 1 || DatevDetails.UCService == 3)
                         {
                             UpTextEXTF = String.Format("{0} Dateien (Stammdaten und Buchungen) gesendet. {1} ohne Fehler. {2} - {3}", anz, DatevDetails.SendOK, err, DateTime.Now);
+                            selectedItem._SendToDatevEXTF = UpTextEXTF;
                         }
-                        selectedItem._SendToDatevEXTF = UpTextEXTF;
                         selectedItem._DatevService = Convert.ToByte(DatevDetails.UCService);
                         await api.Update(selectedItem);
                         busyIndicator.IsBusy = false;

@@ -1,5 +1,3 @@
-using UnicontaClient.Pages;
-using UnicontaClient.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,18 +13,20 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Uniconta.API.Service;
+using Uniconta.API.System;
 using Uniconta.ClientTools;
 using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
+using Uniconta.Common.Utility;
 using Uniconta.DataModel;
 using UnicontaClient.Controls.Dialogs;
 using UnicontaClient.Models;
-using Uniconta.Common.Utility;
-using Uniconta.API.Service;
-using Uniconta.API.System;
+using UnicontaClient.Pages;
+using UnicontaClient.Utilities;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -52,8 +52,17 @@ namespace UnicontaClient.Pages.CustomPage
     }
     public partial class UpdateDebAddressViaCvr : GridBasePage
     {
+        UnicontaBaseEntity[] records;
+        bool isSearch;
+            
         public UpdateDebAddressViaCvr(BaseAPI API) : base(API, string.Empty)
         {
+            InitPage();
+        }
+
+        public UpdateDebAddressViaCvr(UnicontaBaseEntity[] records) : base(records, 0,0)
+        {
+            this.records = records;
             InitPage();
         }
 
@@ -89,6 +98,7 @@ namespace UnicontaClient.Pages.CustomPage
                     dgUpdateDebtorAddress.RemoveFocusedRowFromGrid();
                     break;
                 case "Search":
+                    isSearch = true && records != null;
                     LoadGrid();
                     break;
                 case "SaveGrid":
@@ -112,7 +122,6 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         dgUpdateDebtorAddress.DCtype = 1;
                         SetHeader(string.Concat(Uniconta.ClientTools.Localization.lookup("Creditor"), ": ", Uniconta.ClientTools.Localization.lookup("UpdateAddress")));
-
                     }
                     else if (rec.Value == "Prospect")
                     {
@@ -127,6 +136,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override Task InitQuery()
         {
+            if (records != null && records.Length > 0)
+                LoadGrid();
             return null;
         }
 
@@ -162,17 +173,32 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void LoadDebtorList()
         {
-            var filter = new[] { PropValuePair.GenereteWhereElements("LegalIdent", typeof(string), "!null") };
-            var debtorList = await api.Query<DebtorClientLocal>(filter);
-            if (debtorList == null || debtorList.Length == 0)
+            DebtorClient[] debtors;
+            DebtorClient[] debtorsSelected = null;
+            if (records == null || isSearch)
+            {
+                debtorsSelected = isSearch && records != null ? records.OfType<DebtorClient>().ToArray() : null;
+                var filter = new[] { PropValuePair.GenereteWhereElements("LegalIdent", typeof(string), "!null") };
+                debtors = await api.Query<DebtorClient>(filter);
+            }
+            else
+                debtors = records.OfType<DebtorClient>().ToArray();
+
+            if (debtors == null || debtors.Length == 0)
                 return;
             int counterFound = 0;
+            int cntTotal = 0;
             var newDebList = new List<DebtorClientLocal>();
-            foreach (var debtor in debtorList)
+            foreach (var debtor in debtors)
             {
                 var cvr = debtor._LegalIdent;
                 if (cvr == null || cvr.Length < 5)
                     continue;
+
+                if (isSearch && !debtorsSelected.Any(s => s._Account == debtor._Account))
+                    continue;
+
+                cntTotal++;
                 busyIndicator.IsBusy = true;
                 CompanyInfo ci = null;
                 try
@@ -193,11 +219,13 @@ namespace UnicontaClient.Pages.CustomPage
                     string code = null;
                     if (IndustryCodes != null)
                         code = IndustryCodes.Get(ci.industrycode?.code)?.KeyStr;
-                   
+
                     if (code != null && Equal(ci.industrycode?.code, debtor._IndustryCode))
                         continue;
 
-                    var newDebtor = debtor;
+                    var newDebtor = new DebtorClientLocal();
+                    StreamingManager.Copy(debtor, newDebtor);
+
                     newDebtor.NewAddress = streetAddress;
                     newDebtor.NewAddress2 = address.street2;
                     newDebtor.NewZipCode = address.zipcode;
@@ -218,24 +246,41 @@ namespace UnicontaClient.Pages.CustomPage
                     busyIndicator.IsBusy = false;
                 }
             }
+
             ClearBusy();
             dgUpdateDebtorAddress.ItemsSource = newDebList;
-            SetStatusText(debtorList.Length, counterFound, newDebList.Count);
+            SetStatusText(cntTotal, counterFound, newDebList.Count);
         }
 
         async void LoadCreditorList()
         {
-            var filter = new[] { PropValuePair.GenereteWhereElements("LegalIdent", typeof(string), "!null") };
-            var lst = await api.Query<CreditorClientLocal>(filter);
-            if (lst == null || lst.Length == 0)
+            CreditorClient[] creditors;
+            CreditorClient[] creditorsSelected = null;
+            if (records == null || isSearch)
+            {
+                creditorsSelected = isSearch && records != null ? records.OfType<CreditorClient>().ToArray() : null;
+                var filter = new[] { PropValuePair.GenereteWhereElements("LegalIdent", typeof(string), "!null") };
+                creditors = await api.Query<CreditorClient>(filter);
+            }
+            else
+                creditors = records.OfType<CreditorClient>().ToArray();
+
+            if (creditors == null || creditors.Length == 0)
                 return;
             int counterFound = 0;
+            int cntTotal = 0;
             var newCredList = new List<CreditorClientLocal>();
-            foreach (var creditor in lst)
+
+            foreach (var creditor in creditors)
             {
                 var cvr = creditor._LegalIdent;
                 if (cvr == null || cvr.Length < 5)
                     continue;
+
+                if (isSearch && !creditorsSelected.Any(s => s._Account == creditor._Account))
+                    continue;
+
+                cntTotal++;
                 busyIndicator.IsBusy = true;
                 CompanyInfo ci = null;
                 try
@@ -252,7 +297,9 @@ namespace UnicontaClient.Pages.CustomPage
                                Equal(address.zipcode, creditor._ZipCode) && Equal(ci.industrycode?.code, creditor._IndustryCode))
                         continue;
 
-                    var newCreditor = creditor;
+                    var newCreditor = new CreditorClientLocal();
+                    StreamingManager.Copy(creditor, newCreditor);
+
                     newCreditor.NewAddress = streetAddress;
                     newCreditor.NewAddress2 = address.street2;
                     newCreditor.NewZipCode = address.zipcode;
@@ -272,22 +319,37 @@ namespace UnicontaClient.Pages.CustomPage
             }
             ClearBusy();
             dgUpdateDebtorAddress.ItemsSource = newCredList;
-            SetStatusText(lst.Length, counterFound, newCredList.Count);
+            SetStatusText(cntTotal, counterFound, newCredList.Count);
         }
 
         async void LoadProspectList()
         {
-            var filter = new[] { PropValuePair.GenereteWhereElements("LegalIdent", typeof(string), "!null") };
-            var lst = await api.Query<CrmProspectClientLocal>(filter);
-            if (lst == null || lst.Length == 0)
+            CrmProspectClient[] prospects;
+            CrmProspectClient[] prospectsSelected = null;
+            if (records == null || isSearch)
+            {
+                prospectsSelected = isSearch && records != null ? records.OfType<CrmProspectClient>().ToArray() : null;
+                var filter = new[] { PropValuePair.GenereteWhereElements("LegalIdent", typeof(string), "!null") };
+                prospects = await api.Query<CrmProspectClient>(filter);
+            }
+            else
+                prospects = records.OfType<CrmProspectClient>().ToArray();
+
+            if (prospects == null || prospects.Length == 0)
                 return;
+
             int counterFound = 0;
+            int cntTotal = 0;
             var newProsList = new List<CrmProspectClientLocal>();
-            foreach (var prospect in lst)
+            foreach (var prospect in prospects)
             {
                 var cvr = prospect._LegalIdent;
                 if (cvr == null || cvr.Length < 5)
                     continue;
+
+                if (isSearch && !prospectsSelected.Any(s => s._RowId == prospect._RowId))
+                    continue;
+
                 busyIndicator.IsBusy = true;
                 CompanyInfo ci = null;
                 try
@@ -304,7 +366,9 @@ namespace UnicontaClient.Pages.CustomPage
                             Equal(address.zipcode, prospect._ZipCode) && Equal(ci.industrycode?.code, prospect._IndustryCode))
                         continue;
 
-                    var newProspect = prospect;
+                    var newProspect = new CrmProspectClientLocal();
+                    StreamingManager.Copy(prospect, newProspect);
+
                     newProspect.NewAddress = streetAddress;
                     newProspect.NewAddress2 = address.street2;
                     newProspect.NewZipCode = address.zipcode;
@@ -324,7 +388,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             ClearBusy();
             dgUpdateDebtorAddress.ItemsSource = newProsList;
-            SetStatusText(lst.Length, counterFound, newProsList.Count);
+            SetStatusText(cntTotal, counterFound, newProsList.Count);
         }
 
         async void SaveGrid()

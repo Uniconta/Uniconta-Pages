@@ -57,6 +57,29 @@ namespace UnicontaClient.Pages.CustomPage
             dgDebtorPackagingTransGrid.UpdateMaster(master);
             dgDebtorPackagingTransGrid.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
+            dgDebtorPackagingTransGrid.tableView.ShowingEditor += TableView_ShowingEditor;
+        }
+
+        private void TableView_ShowingEditor(object sender, ShowingEditorEventArgs e)
+        {
+            var view = sender as TableView;
+            var row = view?.Grid?.GetRow(e.RowHandle) as InvPackagingTransClient;
+            if (row == null) return;
+            var reporting = (ReportingType)AppEnums.PackagingReportingType.IndexOf(row.ReportingType);
+            switch (e.Column.FieldName)
+            {
+                case "PackagingType":
+                case "WasteSorting":
+                case "PackagingRateLevel":
+                    if (reporting != Uniconta.DataModel.ReportingType.Packing)
+                        e.Cancel = true;
+                    break;
+
+                case "PackagingConsumer":
+                    if (reporting != Uniconta.DataModel.ReportingType.Packing && reporting != Uniconta.DataModel.ReportingType.Electronic)
+                        e.Cancel = true;
+                    break;
+            }
         }
         private void LocalMenu_OnItemClicked(string ActionType)
         {

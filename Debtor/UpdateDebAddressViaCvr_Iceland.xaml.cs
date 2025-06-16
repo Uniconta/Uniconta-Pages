@@ -173,7 +173,8 @@ namespace UnicontaClient.Pages.CustomPage
                     var streetAddress = address.CompleteStreet;
                     if (Equal(ci.life.name, debtor._Name) && Equal(streetAddress, debtor._Address1) && Equal(address.street2, debtor._Address2) &&
                                Equal(address.zipcode, debtor._ZipCode) && ci._invoiceinxml == debtor._InvoiceInXML && Equal(debtor.VatNumber, ci.vat) &&
-                               Equal(ci.industrycode?.code, debtor._IndustryCode))
+                               Equal(ci.industrycode?.code, debtor._IndustryCode) &&
+                               Equal(ci.companystatus.StatusCode().ToString(), debtor._StateOfCompany.ToString()))
                         continue;
 
                     var newDebtor = debtor;
@@ -190,7 +191,7 @@ namespace UnicontaClient.Pages.CustomPage
                         newDebtor.NewInvoiceInXML = "Enginn";
                     if (ci.industrycode != null)
                         newDebtor.NewIndustryCode = ci.industrycode.code;
-
+                    newDebtor.NewCompanyState = ci.companystatus.StatusCode().ToString();
                     newDebList.Add(newDebtor);
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("Loading") + " " + NumberConvert.ToString(newDebList.Count);
                     busyIndicator.IsBusy = false;
@@ -237,10 +238,24 @@ namespace UnicontaClient.Pages.CustomPage
                 item._InvoiceInXML = item.NewInvoiceInXML != "Enginn";
                 item._IndustryCode = item.NewIndustryCode;
                 item._VatNumber = item.NewVatNumber;
+                item.CompanyState = setats(item.NewCompanyState);
                 lst2[i] = item;
                 i++;
             }
             return api.Update(lst1, lst2);
+        }
+
+        private string setats(string value)
+        {
+            switch (value)
+            {
+                case "Virkt": return "0";
+                case "Félagsslit": return "1";
+                case "Gjaldþrota": return "2";
+                case "Samruni": return "6";
+                case "Óskilgreint": return "4";
+                default: return "";
+            }
         }
 
         public void SetStatusText(int total, int found, int newRecord)
@@ -271,7 +286,7 @@ namespace UnicontaClient.Pages.CustomPage
             internal CompanyCloud()
             {
                 httpClient = new HttpClient();
-                httpClient.BaseAddress = new Uri("https://functionapp120220608132902.azurewebsites.net/api/getComp");
+                httpClient.BaseAddress = new Uri("https://functionapp1net20250602100734.azurewebsites.net/api/getComp");
             }
 
             internal async Task<CompanyInfoIceland> GetIslandCompanyInfo(string cvrNumber)
@@ -298,6 +313,8 @@ namespace UnicontaClient.Pages.CustomPage
                     companyInfo.industrycode = new Industrycode();
                     companyInfo.industrycode.code = ccData.Isat;
                 }
+                companyInfo.companystatus = new Companystatus();
+                companyInfo.companystatus.text = ccData.CompanyStat;
                 return companyInfo;
             }
         }
@@ -307,6 +324,7 @@ namespace UnicontaClient.Pages.CustomPage
     {
         private string _address, _address2, _city, _zipCode, _name, _industryCode;
         private new string _InvoiceInXML, _VatNumber;
+        private string _CompanyState;
 
         [StringLength(60)]
         [Display(Name = "NewAddress", ResourceType = typeof(DCAccountText))]
@@ -338,12 +356,30 @@ namespace UnicontaClient.Pages.CustomPage
         [ForeignKeyAttribute(ForeignKeyTable = typeof(IndustryCode))]
         [Display(Name = "NewIndustryCode", ResourceType = typeof(DCAccountText))]
         public string NewIndustryCode { get { return _industryCode; } set { _industryCode = value; NotifyPropertyChanged("NewIndustryCode"); } }
+
+        [StringLength(20)]
+        [Display(Name = "NewCompanyState", ResourceType = typeof(DebCred_AccountText))]
+        public string NewCompanyState { get { return _CompanyState; } set { _CompanyState = states(value); NotifyPropertyChanged("NewCompanyState"); } }
+
+        private string states(string value)
+        {
+            switch (value)
+            {
+                case "0": return "Virkt";
+                case "1": return "Félagsslit";
+                case "2": return "Gjaldþrota";
+                case "6": return "Samruni";
+                case "4": return "Óskilgreint";
+                default: return "Óþekkt";
+            }
+        }
     }
 
     public class DebCred_AccountText : DCAccountText
     {
         public static string NewInvoiceInXML => string.Format(Uniconta.ClientTools.Localization.lookup("NewOBJ"), Uniconta.ClientTools.Localization.lookup("einvoice"));
         public static string NewVatNumber => string.Format(Uniconta.ClientTools.Localization.lookup("NewOBJ"), Uniconta.ClientTools.Localization.lookup("VatNumber"));
+        public static string NewCompanyState => string.Format(Uniconta.ClientTools.Localization.lookup("NewOBJ"), Uniconta.ClientTools.Localization.lookup("CompanyState"));
     }
 
     public class CompanyCloudData : RSK_companyData

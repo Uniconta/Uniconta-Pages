@@ -10,9 +10,6 @@
 		<RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16" LargeGlyph="save-32x32"/>
 	</RibbonItem>
 	<RibbonItem>
-		<RibbonItem Action="View" ShortcutKey="F7" LocalizedNameKey="View" LargeGlyph="View_Highlighted_32x32" />
-	</RibbonItem>
-	<RibbonItem>
 		<!---If we want to create a new group in same PageTab-->
 		<RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32">
 			<!---If we want Inner menu-->
@@ -25,5 +22,9 @@
 			<RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16" LargeGlyph="Import_16x16" ShortcutKey=""/>
 			<RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16" ShortcutKey=""/>
 		</RibbonItem>
+	</RibbonItem>
+	<RibbonItem>
+		<RibbonItem Action="Debtors"  LocalizedNameKey="Debtors"  LargeGlyph="Debitor_Group_32x32"/>
+		<RibbonItem Action="EDeliveryMapping" LocalizedNameKey="EDeliveryMapping" LargeGlyph="Settings_32x32"/>
 	</RibbonItem>
 </root>

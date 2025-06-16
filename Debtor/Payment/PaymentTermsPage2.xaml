@@ -43,6 +43,9 @@ x:Class="UnicontaClient.Pages.CustomPage.PaymentTermsPage2"
                         <CorasauControls:LookupEditor x:Name="leAccount" Text="{Binding Account,Mode=TwoWay}">
                         </CorasauControls:LookupEditor>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="PostOnDC" x:Name="liPostOnDC">
+                        <CorasauControls:CheckEditor x:Name="chkPostOnDC"  IsChecked="{Binding PostOnDC,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="OffsetAccount" x:Name="lItemOffsetAccount">
                         <CorasauControls:LookupEditor x:Name="leOffsetAccount" Text="{Binding OffsetAccount,Mode=TwoWay}">
                         </CorasauControls:LookupEditor>
@@ -57,9 +60,7 @@ x:Class="UnicontaClient.Pages.CustomPage.PaymentTermsPage2"
                     <CorasauControls:CorasauLayoutItem x:Name="liPct2" FieldName="Pct2" >
                         <CorasauControls:DoubleEditor FieldName="Pct2" />
                     </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="PostOnDC" x:Name="liPostOnDC">
-                        <CorasauControls:CheckEditor x:Name="chkPostOnDC"  IsChecked="{Binding PostOnDC,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
+                   
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup x:Name="grpDays" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Days}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem FieldName="Days" x:Name="liDays">

@@ -75,7 +75,7 @@
     <RibbonItem Action="Prices" LocalizedNameKey="SalesPricesAndDiscounts" ControlName="CustomerPriceListLinePage" Module="InvPrice" LargeGlyph="PriceTag_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="ProducerResponsibility" LocalizedNameKey="ProducerResponsibility" Module="InvPackaging" LargeGlyph="Pack_32x32"/>
+    <RibbonItem Action="ProducerResponsibility" LocalizedNameKey="ProducerResponsibility" Module="InvPackaging" LargeGlyph="ProducerResponsibility32x32"/>
     <RibbonItem Action="InStock" LocalizedNameKey="InStock" LargeGlyph="Storage_32x32"/>
   </RibbonItem>
   <RibbonItem TabId="1" LocalizedNameKey="EditAll">

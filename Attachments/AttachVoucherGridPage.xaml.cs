@@ -181,6 +181,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         DispatcherTimer dt;
         VouchersClient selectedVoucherClient;
+       
         private void DataControl_CurrentItemChanged(object sender, DevExpress.Xpf.Grid.CurrentItemChangedEventArgs ce)
         {
             selectedVoucherClient = ce.NewItem as VouchersClient;
@@ -189,6 +190,7 @@ namespace UnicontaClient.Pages.CustomPage
                 dt = new DispatcherTimer() { Interval = TimeSpan.FromMilliseconds(250) };
                 dt.Tick += delegate
                 {
+                    dt.Stop(); 
                     ShowVoucherOnTimer(dt, selectedVoucherClient, busyIndicator, voucherViewer, api);
                 };
             }
@@ -196,7 +198,7 @@ namespace UnicontaClient.Pages.CustomPage
                 dt.Stop();
             dt.Start();
         }
-
+       
         public static async void ShowVoucherOnTimer(DispatcherTimer dt, VouchersClient selectedVoucherClient, BusyIndicator busyIndicator, UnicontaVoucherViewer voucherViewer, CrudAPI api)
         {
             dt?.Stop();
@@ -235,8 +237,6 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 int rowId = Convert.ToInt32(e.GetListSourceFieldValue("RowId"));
                 e.Value = _attachedVoucherList.Contains(rowId);
-                if (_attachedVoucherList.Contains(rowId))
-                    dgAttachVouchers.View.FocusedRowHandle = e.ListSourceRowIndex;
             }
         }
 

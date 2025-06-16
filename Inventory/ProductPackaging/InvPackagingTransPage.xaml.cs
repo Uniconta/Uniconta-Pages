@@ -212,19 +212,30 @@ namespace UnicontaClient.Pages.CustomPage
                         sort = new SortInvPackJournalPostedId();
                         Array.Sort(packagingTrans, sort);
 
-                        search._JournalPostedId = 1;
+                        search._JournalPostedId = rec._JournalPostedId;
                         var pos = Array.BinarySearch(packagingTrans, search, sort);
                         if (pos >= 0 && pos < packagingTrans.Length)
                             continue;
                         mInvoices.Add(rec);
                     }
 
-                    if (mInvoices.Count > 0)
+                    var cntTotal = mInvoices.Count;
+                    if (cntTotal > 0)
                     {
+                        int cnt = 0;
                         packLst = new List<InvPackagingTransClient>();
                         var packagingProducts = await api.Query<InvPackagingProductClient>();
                         foreach (var rec in mInvoices)
                         {
+                            busyIndicator.IsBusy = true;
+
+                            cnt++;
+                            if (cnt == 1 || cnt == cntTotal || (cnt % 100) == 0)
+                            {
+                                busyIndicator.BusyContent = string.Concat(Uniconta.ClientTools.Localization.lookup("Loading") + " " + NumberConvert.ToString(cnt), " af ", cntTotal);
+                                busyIndicator.IsBusy = false;
+                            }
+
                             var debtor = (Debtor)debtors.Get(rec._DCAccount);
                             var lines = await api.Query<DebtorInvoiceLines>(rec);
                             if (lines.Length > 0)
@@ -238,7 +249,7 @@ namespace UnicontaClient.Pages.CustomPage
                                     if (ins != null && ins._Country != null)
                                         delCountry = ins._Country;
                                 }
-                                else if (rec.DeliveryAccount != null && rec.DeliveryAccount != rec.Account) //TODO:TEST DENNE
+                                else if (rec.DeliveryAccount != null && rec.DeliveryAccount != rec.Account)
                                 {
                                     var dc = debtors.Get(rec.DeliveryAccount);
                                     if (dc != null)
@@ -246,7 +257,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
 
                                 if ((byte)delCountry != cmbCountry.SelectedIndex)
-                                    continue; // skip if country does not match
+                                    continue;
 
                                 var sortPack = new SortPackProductItem();
                                 Array.Sort(packagingProducts, sortPack);
@@ -407,7 +418,7 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
 
             busyIndicator.IsBusy = true;
-            busyIndicator.BusyContent = string.Format(Uniconta.ClientTools.Localization.lookup("ExportingFile"), Uniconta.ClientTools.Localization.lookup("IntraStat"));
+            busyIndicator.BusyContent = string.Format(Uniconta.ClientTools.Localization.lookup("ExportingFile"), Uniconta.ClientTools.Localization.lookup("ProducerResponsibility"));
 
             Stream stream = null;
             try
@@ -490,7 +501,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             int cnt = 0;
             var writer = new StreamWriter(stream, Encoding.Default);
-            cnt = CSVHelper.ExportDataGridToExcel(stream, Headers, corasauBaseEntity, Props, spreadSheet, ".xlsx", DateTime.Now.Ticks.ToString());
+            cnt = CSVHelper.ExportDataGridToExcel(stream, Headers, corasauBaseEntity, Props, ".xlsx", DateTime.Now.Ticks.ToString());
             writer.Flush();
             return cnt;
         }

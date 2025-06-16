@@ -65,10 +65,10 @@ namespace UnicontaClient.Pages.CustomPage
             if (argumentParams != null)
             {
                 int operation = -1;
-                if (int.TryParse(argumentParams[0] as string, out operation))
+                if (argumentParams[0] != null && int.TryParse(argumentParams[0].ToString(), out operation) && operation != 3)
                 {
-                    if (operation != 3)
-                        layoutItems.DataContext = dataContext;
+                    layoutItems.DataContext = null;
+                    layoutItems.DataContext = dataContext;
                 }
             }
         }

@@ -44,10 +44,20 @@ namespace UnicontaClient.Pages.CustomPage
         Uniconta.DataModel.Contact searchContact;
         SortContact sortContact;
 
+        UnicontaBaseEntity[] records;
+        bool isSearch;
+
         public DebtorNHRLookup(BaseAPI API) : base(API, string.Empty)
         {
             InitPage();
         }
+
+        public DebtorNHRLookup(UnicontaBaseEntity[] records) : base(records, 0, 0)
+        {
+            this.records = records;
+            InitPage();
+        }
+
 
         public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)
         {
@@ -161,6 +171,7 @@ namespace UnicontaClient.Pages.CustomPage
                     dgDebtorNHRLookup.RemoveFocusedRowFromGrid();
                     break;
                 case "Search":
+                    isSearch = true && records != null;
                     LoadGrid();
                     break;
                 case "SaveGrid":
@@ -178,6 +189,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override Task InitQuery()
         {
+            if (records != null && records.Length > 0)
+                LoadGrid();
             return null;
         }
 
@@ -213,19 +226,37 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void LoadDebtorList()
         {
-            var filter = new List<PropValuePair>()
+            DebtorClient[] debtors;
+            DebtorClient[] debtorsSelected = null;
+            if (records == null || isSearch)
             {
-                PropValuePair.GenereteWhereElements(nameof(DebtorNHR._LegalIdent), typeof(string), "!null"),
-                PropValuePair.GenereteWhereElements(nameof(DebtorNHR._Blocked), typeof(int), 0),
-                PropValuePair.GenereteWhereElements(nameof(DebtorNHR.Country), typeof(int), NumberConvert.ToString((int)CountryCode.Denmark)),
-                PropValuePair.GenereteWhereElements(nameof(DebtorNHR.Country), typeof(int), NumberConvert.ToString((int)CountryCode.Greenland)),
-                PropValuePair.GenereteWhereElements(nameof(DebtorNHR.Country), typeof(int), NumberConvert.ToString((int)CountryCode.FaroeIslands))
-            };
 
-            var isLive = api.session.Connection.Target == APITarget.Live;
-            var debtorList = await api.Query<DebtorNHR>(filter);
-            if (debtorList == null || debtorList.Length == 0)
+                var filter = new List<PropValuePair>()
+                {
+                    PropValuePair.GenereteWhereElements(nameof(DebtorNHR._LegalIdent), typeof(string), "!null"),
+                    PropValuePair.GenereteWhereElements(nameof(DebtorNHR._Blocked), typeof(int), 0),
+                    PropValuePair.GenereteWhereElements(nameof(DebtorNHR.Country), typeof(int), NumberConvert.ToString((int)CountryCode.Denmark)),
+                    PropValuePair.GenereteWhereElements(nameof(DebtorNHR.Country), typeof(int), NumberConvert.ToString((int)CountryCode.Greenland)),
+                    PropValuePair.GenereteWhereElements(nameof(DebtorNHR.Country), typeof(int), NumberConvert.ToString((int)CountryCode.FaroeIslands))
+                };
+
+                debtors = await api.Query<DebtorClient>(filter);
+
+                if (isSearch && records != null)
+                {
+                    debtorsSelected = records.OfType<DebtorClient>().ToArray();
+                    debtorsSelected = debtorsSelected.Where(d => !string.IsNullOrEmpty(d._LegalIdent) && !d._Blocked && (d._Country == CountryCode.Denmark || d._Country == CountryCode.Greenland || d._Country == CountryCode.FaroeIslands)).ToArray();
+                }
+            }
+            else
+            {
+                debtors = records.OfType<DebtorClient>().ToArray();
+                debtors = debtors.Where(d => !string.IsNullOrEmpty(d._LegalIdent) && !d._Blocked && (d._Country == CountryCode.Denmark || d._Country == CountryCode.Greenland || d._Country == CountryCode.FaroeIslands)).ToArray();
+            }
+
+            if (debtors == null || debtors.Length == 0)
                 return;
+
             int cntAll = 0;
             int cntActivateNHR = 0;
             int cntDeactivateNHR = 0;
@@ -235,8 +266,9 @@ namespace UnicontaClient.Pages.CustomPage
             int cntNHRActive = 0;
 
             int validateMax = string.IsNullOrWhiteSpace(txtValidateNumber.Text) ? 0 : (int)NumberConvert.ToInt(txtValidateNumber.Text);
-            var newDebNHRLst = new List<DebtorNHR>(debtorList.Count());
-            int cntTotal = debtorList.Length;
+            var newDebNHRLst = new List<DebtorNHR>(debtors.Count());
+            int cntTotal = debtorsSelected != null ? debtorsSelected.Length : debtors.Length;
+            var isLive = api.session.Connection.Target == APITarget.Live;
 
             if (contactCache == null)
                 contactCache = await api.LoadCache<Uniconta.DataModel.Contact>();
@@ -246,19 +278,22 @@ namespace UnicontaClient.Pages.CustomPage
             Array.Sort(contactArr, sortContact);
             searchContact = new Contact();
 
-            foreach (var debtor in debtorList)
+            foreach (var debtor in debtors)
             {
                 busyIndicator.IsBusy = true;
 
                 try
                 {
-                    cntAll++;
+                    if (isSearch && !debtorsSelected.Any(s => s._Account == debtor._Account))
+                        continue;
+
                     if (cntAll == 1 || cntAll == cntTotal || (cntAll % 50) == 0)
                     {
                         busyIndicator.BusyContent = string.Concat(Uniconta.ClientTools.Localization.lookup("Loading") + " " + NumberConvert.ToString(cntAll), " af ", cntTotal);
                         busyIndicator.IsBusy = false;
                     }
 
+                    cntAll++;
                     bool doSkip = false; 
                     if (HasGLNSetting(debtor))
                     {
@@ -286,7 +321,9 @@ namespace UnicontaClient.Pages.CustomPage
 
                         if (nhrInfo.Status != Uniconta.ClientTools.NemhandelStatus.OK && nhrInfo.Status != Uniconta.ClientTools.NemhandelStatus.None)
                         {
-                            var debtorNHR = debtor;
+                            var debtorNHR = new DebtorNHR();
+                            StreamingManager.Copy(debtor, debtorNHR);
+
                             debtorNHR.StatusInfo = nhrInfo.StatusInfo;
                             debtorNHR.NewGLN = nhrInfo.GLNNew;
                             debtorNHR._Status = (byte)nhrInfo.Status;
@@ -320,7 +357,7 @@ namespace UnicontaClient.Pages.CustomPage
             iDeavtivate.IsChecked = true;
         }
 
-        bool HasGLNSetting(DebtorNHR debtor)
+        bool HasGLNSetting(DebtorClient debtor)
         {
             var debInv = (DCAccount)debtorCache?.Get(debtor._InvoiceAccount);
             if (debInv?._EAN != null)

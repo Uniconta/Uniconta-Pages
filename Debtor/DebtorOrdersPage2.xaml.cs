@@ -220,7 +220,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (!Comp.SetupSizes)
                 grpSize.Visibility = Visibility.Collapsed;
             if (!Comp.InvPackaging)
-                ESGGroup.Visibility = Visibility.Collapsed;
+                EPRGroup.Visibility = Visibility.Collapsed;
             if (!Comp.ProjectTask)
                 projectTask.Visibility = Visibility.Collapsed;
             else if (editrow?._Project != null)

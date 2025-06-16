@@ -44,6 +44,11 @@
     <RibbonItem Action="ConvertToDebtor" LocalizedNameKey="ConvertToDebtor" LargeGlyph="Convert_To_User_32x32">
     </RibbonItem>
   </RibbonItem>
+	<RibbonItem>
+		<RibbonItem Action="ValidateFunctions" LocalizedNameKey="Validate" LargeGlyph="Check_Journal_32x32">
+			<RibbonItem Action="ValidateAddress" LocalizedNameKey="address" />
+		</RibbonItem>
+	</RibbonItem>
    <RibbonItem TabId="1" LocalizedNameKey="EditAll">
     <RibbonItem Action="EditAll"  LocalizedNameKey="EditAll" Glyph="Edit_16x16" LargeGlyph="Edit_32x32"/>
     <RibbonItem Action="AddLine"  LocalizedNameKey="AddOBJ" Parameter="Prospect" Glyph="Add_16x16" LargeGlyph="Add_32x32"/>

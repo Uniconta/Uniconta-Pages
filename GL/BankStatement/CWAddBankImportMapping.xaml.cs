@@ -25,6 +25,9 @@ namespace UnicontaClient.Pages.CustomPage
     {
         private CrudAPI api;
         Uniconta.DataModel.BankStatement master;
+        [ForeignKeyAttribute(ForeignKeyTable = typeof(GLVat))]
+        public string Vat { get; set; }
+
         [ForeignKeyAttribute(ForeignKeyTable = typeof(GLChargeGroup))]
         public string Charge { get; set; }
 
@@ -65,6 +68,7 @@ namespace UnicontaClient.Pages.CustomPage
             txtAccount.Text = bankStatement._Account;
             txtText.Text = bankStatement._Text;
             leCharge.api = api;
+            leVat.api = api;
             BindDimension();
         }
 
@@ -178,6 +182,7 @@ namespace UnicontaClient.Pages.CustomPage
             bankImportMap._Dim4 = leDim4.Text;
             bankImportMap._Dim5 = leDim5.Text;
             bankImportMap._Charge = Charge;
+            bankImportMap._Vat = Vat;
             var err = await api.Insert(bankImportMap);
             if (err != ErrorCodes.Succes)
                 UtilDisplay.ShowErrorCode(err);

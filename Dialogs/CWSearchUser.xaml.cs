@@ -55,6 +55,10 @@ namespace UnicontaClient.Controls.Dialogs
                     this.Title = string.Format(Uniconta.ClientTools.Localization.lookup("AddOBJ"), Uniconta.ClientTools.Localization.lookup("InvoiceUser"));
                     cmbUserRights.SelectedIndex = 3;
                     break;
+                case UserTypes.ViewUser:
+                    this.Title = string.Format(Uniconta.ClientTools.Localization.lookup("AddOBJ"), Uniconta.ClientTools.Localization.lookup("ViewUser"));
+                    cmbUserRights.SelectedIndex = 3;
+                    break;
             }
         }
 

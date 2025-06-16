@@ -44,6 +44,7 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgEmployeeGrid);
             ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
             localMenu.OnItemClicked += localMenu_OnItemClicked;
+            RemoveMenuCommands();
         }
 
         protected override void OnLayoutLoaded()
@@ -61,6 +62,15 @@ namespace UnicontaClient.Pages.CustomPage
             if (screenName == TabControls.UserNotesPage || screenName == TabControls.UserDocsPage && argument != null)
                 dgEmployeeGrid.UpdateItemSource(argument);
         }
+
+        private void RemoveMenuCommands()
+        {
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            var Comp = api.CompanyEntity;
+            if (!api.CompanyEntity._ProjectBudgetMonth)
+                UtilDisplay.RemoveMenuCommand(rb, "BudgetYear");
+        }
+
         private void localMenu_OnItemClicked(string ActionType)
         {
             var selectedItem = dgEmployeeGrid.SelectedItem as EmployeeClient;
@@ -175,7 +185,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "BudgetYear":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.ProjectBudgetYearPage, selectedItem, string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("BudgetYear"), selectedItem._Name));
+                        AddDockItem(TabControls.ProjectBudgetYearPage, selectedItem, string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("MonthlyPlanning"), selectedItem._Name));
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);

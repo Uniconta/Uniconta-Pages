@@ -104,6 +104,9 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     editrow.SetMaster(master);
                     editrow.SetMaster(debtorOrder);
+                    var lin = master as DCOrderLineClient;
+                    if (lin != null && lin._DeliveryDate != DateTime.MinValue)
+                        editrow._DeliveryDate = lin._DeliveryDate;
                     editrow._EndDiscountPct = 0;
                     editrow._Storage = crudapi.CompanyEntity._PurchaseLineStorage;
                     if (Qty != 0d)

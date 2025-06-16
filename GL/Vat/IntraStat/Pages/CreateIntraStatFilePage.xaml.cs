@@ -341,7 +341,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             int cnt = 0;
             var writer = new StreamWriter(stream, Encoding.Default);
-            cnt = CSVHelper.ExportDataGridToExcel(stream, Headers, corasauBaseEntity, Props, spreadSheet, ".xlsx", "Intrastat");
+            cnt = CSVHelper.ExportDataGridToExcel(stream, Headers, corasauBaseEntity, Props, ".xlsx", "Intrastat");
             writer.Flush();
             return cnt;
         }
@@ -633,8 +633,8 @@ namespace UnicontaClient.Pages.CustomPage
             DefaultExp = checkExport.IsChecked.GetValueOrDefault();
             DefaultVIES = checkVIES.IsChecked.GetValueOrDefault();
 
-            var ws = spreadSheet.Document.Worksheets[0];
-            ws.Clear(ws.GetUsedRange());
+            //var ws = spreadSheet.Document.Worksheets[0];
+            //ws.Clear(ws.GetUsedRange());
 
             GetInvoiceLinesToIntraStat(txtDateFrm.DateTime, txtDateTo.DateTime, checkImport.IsChecked.GetValueOrDefault(), checkExport.IsChecked.GetValueOrDefault());
         }

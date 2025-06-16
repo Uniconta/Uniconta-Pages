@@ -63,7 +63,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgGLTable.RowDoubleClick += dgGLTable_RowDoubleClick;
             dgGLTable.BusyIndicator = busyIndicator;
             dgGLTable.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
-            ((TableView)dgGLTable.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
+            ((TableView)dgGLTable.View).RowStyle = Application.Current.Resources["RowStyle"] as Style;
             GetMenuItem();
         }
 
@@ -125,32 +125,6 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                 }
             }
-            LoadExtensions(t);
-        }
-
-        async void LoadExtensions(Task t)
-        {
-            var notes = await api.Query<GLClosingSheetExtension>(masterRecord);
-            if (notes != null && notes.Length > 0)
-            {
-                await t;
-                var cache = this.AccountListCache;
-                if (cache != null)
-                {
-                    foreach (var n in notes)
-                    {
-                        var Acc = (GLAccountClosingSheetClient)cache.Get(n._Account);
-                        if (Acc != null)
-                        {
-                            Acc._Extensions = n;
-                            Acc.Link = n._Link;
-                            Acc.Index = n._Index;
-                            Acc.WorkPaper = n._WorkPaper;
-                            Acc.SheetComment = n._Comment;
-                        }
-                    }
-                }
-            }
         }
 
         void SaveNotes()
@@ -192,48 +166,7 @@ namespace UnicontaClient.Pages.CustomPage
                         masterRecord.GetType().GetMethod("NotifyPropertyChanged")?.Invoke(masterRecord, new object[] { "HasNotes" });
                     }
                 }
-                SaveExtensions(arr);
             }
-        }
-
-        void SaveExtensions(GLAccountClosingSheetClient[] arr)
-        {
-            var ins = new List<GLClosingSheetExtension>();
-            var del = new List<GLClosingSheetExtension>();
-            var upd = new List<GLClosingSheetExtension>();
-            foreach (var Acc in arr)
-            {
-                GLClosingSheetExtension n;
-                bool HasValues = Acc._Link != null || Acc._Index != null || Acc._WorkPaper != null || Acc._SheetComment != null;
-                if (HasValues || Acc._Extensions != null)
-                {
-                    if (Acc._Extensions == null)
-                    {
-                        n = new GLClosingSheetExtension() { _Account = Acc._Account, _Link = Acc._Link, _Index = Acc._Index, _WorkPaper = Acc._WorkPaper, _Comment = Acc._SheetComment };
-                        n.SetMaster(masterRecord);
-                        ins.Add(n);
-                    }
-                    else if (!HasValues)
-                    {
-                        del.Add(Acc._Extensions);
-                        Acc._Extensions = null;
-                    }
-                    else
-                    {
-                        n = Acc._Extensions;
-                        if (n._Index != Acc._Index || n._Link != Acc._Link || n._WorkPaper != Acc._WorkPaper || n._Comment != Acc._SheetComment)
-                        {
-                            n._Index = Acc._Index;
-                            n._Link = Acc._Link;
-                            n._WorkPaper = Acc._WorkPaper;
-                            n._Comment = Acc._SheetComment;
-                            upd.Add(n);
-                        }
-                    }
-                }
-            }
-            if (ins.Count > 0 || del.Count > 0 || upd.Count > 0)
-                api.MultiCrud(ins, upd, del);
         }
 
         public override void PageClosing()
@@ -395,7 +328,7 @@ namespace UnicontaClient.Pages.CustomPage
                 var dgList = dgGLTable.ItemsSource as IEnumerable<GLAccountClosingSheetClient>;
                 if (dgList != null)
                 {
-                    ClosingSheetHasLinesList = dgList.Where(x => x.IsEmpty == false || x._AccountType == 0);
+                    ClosingSheetHasLinesList = dgList.Where(x => x.IsEmpty == false);
                     dgGLTable.ItemsSource = ClosingSheetHasLinesList;
                     showAll = false;
                 }
@@ -679,27 +612,16 @@ namespace UnicontaClient.Pages.CustomPage
             dgGLTable.Visibility = Visibility.Visible;
         }
 
-        protected override void LoadCacheInBackGround()
-        {
-            LoadType(new[] { typeof(Uniconta.DataModel.GLVat), typeof(Uniconta.DataModel.GLTransType) });
-        }
-
         private void HasDocImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var closingSheet = (sender as System.Windows.Controls.Image).Tag as GLAccountClosingSheetClient;
+            var closingSheet = (sender as Image).Tag as GLAccountClosingSheetClient;
             if (closingSheet != null)
                 AddDockItem(TabControls.UserDocsPage, dgGLTable.syncEntity);
         }
 
-        private void HasLink_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            var closingSheet = (sender as TextBlock).Tag as GLAccountClosingSheetClient;
-            Utility.OpenWebSite(closingSheet._Link);
-        }
-
         private void HasNoteImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var closingSheet = (sender as System.Windows.Controls.Image).Tag as GLAccountClosingSheetClient;
+            var closingSheet = (sender as Image).Tag as GLAccountClosingSheetClient;
             if (closingSheet != null)
                 AddDockItem(TabControls.UserNotesPage, dgGLTable.syncEntity);
         }

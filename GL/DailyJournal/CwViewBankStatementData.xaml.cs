@@ -117,26 +117,7 @@ namespace UnicontaClient.Pages.CustomPage
                 else if (fileExtension == ".xls" || fileExtension == ".xlsx")
                 {
                     hasType = true;
-                    IWorkbook workBook = importSpreadSheet.Document;
-                    workBook.LoadDocument(file);
-                    DevExpress.Spreadsheet.Worksheet worksheet = importSpreadSheet.Document.Worksheets[0];
-                    var range = worksheet.GetUsedRange();
-                    var dataTable = worksheet.CreateDataTable(range, true);
-                    for (int col = 0; col < range.ColumnCount; col++)
-                    {
-                        CellValueType cellType = range[0, col].Value.Type;
-                        for (int r = 1; r < range.RowCount; r++)
-                        {
-                            if (cellType != range[r, col].Value.Type)
-                            {
-                                dataTable.Columns[col].DataType = typeof(string);
-                                break;
-                            }
-                        }
-                    }
-                    DataTableExporter exporter = worksheet.CreateDataTableExporter(range, dataTable, true);
-                    exporter.Export();
-                    DataTable = exporter.DataTable;
+                    DataTable = CSVHelper.CreateDataTableFromExcel(file);
                 }
                 else if (fileExtension == ".txt")
                 {

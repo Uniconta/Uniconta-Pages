@@ -69,6 +69,5 @@ x:Class="UnicontaClient.Pages.CustomPage.InvPackagingTransPage"
                 </local:InvPackagingTransGrid.TotalSummary>
             </local:InvPackagingTransGrid>
         </CorasauControls:BusyIndicator>
-        <CorasauControls:UnicontaSpreadSheetControl  x:Name="spreadSheet" Visibility="Collapsed"/>
     </Grid>
 </Pages:GridBasePage>

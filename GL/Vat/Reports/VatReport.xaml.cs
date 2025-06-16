@@ -255,7 +255,7 @@ namespace UnicontaClient.Pages.CustomPage
                             };
                             if (master != null && master._MaxJournalPostedId != 0)
                             {
-                                var node = PropValuePair.GenereteWhereElements("JournalPostedId", NumberConvert.ToString(master._MaxJournalPostedId), CompareOperator.LessThanOrEqual);
+                                var node = PropValuePair.GenereteWhereElements("JournalPostedId", NumberConvert.ToString(master._MaxJournalPostedId), CompareOperator.LessThanOrEqual, typeof(Int32));
                                 filter.Add(node);
 
                                 if (rdbLastPeriod.IsChecked == true)

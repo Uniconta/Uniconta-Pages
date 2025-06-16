@@ -6,13 +6,7 @@ x:Class="UnicontaClient.Pages.CustomPage.EDeliveryMappingPage"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
     xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" 
     xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"
-    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
-    xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"  
-    xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
-    xmlns:docking="http://schemas.devexpress.com/winfx/2008/xaml/docking">
-    <UserControl.Resources>
-        <Util:ListStringConverter x:Key="ListToStringConverter"/>
-    </UserControl.Resources>
+    xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools">
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
@@ -21,7 +15,7 @@ x:Class="UnicontaClient.Pages.CustomPage.EDeliveryMappingPage"
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
         <CorasauControls:CorasauRibbonControl x:Name="localMenu" XMLSourcePath=";component/Pages/Debtor/EDeliveryMappingRibbon.xml"/>
-        <Grid Grid.Row="1" Margin="5" x:Name="gridHeaderParam">
+        <Grid Grid.Row="1" Margin="5">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="15"/>
@@ -44,53 +38,33 @@ x:Class="UnicontaClient.Pages.CustomPage.EDeliveryMappingPage"
         </Grid>
         <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{StaticResource WindowHeaderGradient}" />
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="3" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
-            <docking:DockLayoutManager x:Name="DockingControl" AllowCustomization="False">
-                <docking:LayoutGroup x:Name="lGroup" AllowDrag="False" AllowDock="False" AllowFloat="False" Orientation="Vertical" AllowContextMenu="False" >
-                    <docking:LayoutPanel x:Name="layOutEdeliveryMapping" FloatOnDoubleClick="False" AllowDrag="False" AllowDock="False" AllowClose="False" AllowContextMenu="False" AllowMaximize="False" AllowDockToDocumentGroup="False" ShowCloseButton="False"  ShowPinButton="False" ItemHeight="7*">
-                        <localPage:EDeliveryMappingGrid  x:Name="dgEdeliveryMappingGrid" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
-                            <localPage:EDeliveryMappingGrid.Columns>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="XmlTag" Binding="{Binding Path=XmlTag, Mode=TwoWay, Converter={StaticResource ListToStringConverter}}">
-                                    <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
-                                        <ControlTemplate>
-                                            <TextBlock Text="{Binding DataContext.RowData.Row.XmlTag,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
-                                        </ControlTemplate>
-                                    </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
-                                    <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                                        <DataTemplate>
-                                            <CorasauControls:ComboBoxEditor GotFocus="cmbXmlTag_GotFocus" x:Name="leXmlTag" SelectedIndexChanged="cmbXmlTag_SelectedIndexChanged"/>
-                                        </DataTemplate>
-                                    </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                                </localPage:CorasauDataGridTemplateColumnClient>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Table" Binding="{Binding Path=Table, Mode=TwoWay, Converter={StaticResource ListToStringConverter}}">
-                                    <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
-                                        <ControlTemplate>
-                                            <TextBlock Text="{Binding DataContext.RowData.Row.Table,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
-                                        </ControlTemplate>
-                                    </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
-                                    <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                                        <DataTemplate>
-                                            <CorasauControls:ComboBoxEditor GotFocus="cbTable_GotFocus" x:Name="cbTable" SelectedIndexChanged="cbTable_SelectedIndexChanged"/>
-                                        </DataTemplate>
-                                    </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                                </localPage:CorasauDataGridTemplateColumnClient>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Property" Binding="{Binding Path=Property, Mode=TwoWay, Converter={StaticResource ListToStringConverter}}">
-                                    <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
-                                        <ControlTemplate>
-                                            <TextBlock Text="{Binding DataContext.RowData.Row.Property,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
-                                        </ControlTemplate>
-                                    </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
-                                    <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                                        <DataTemplate>
-                                            <CorasauControls:ComboBoxEditor GotFocus="cbProperty_GotFocus" x:Name="cbProperty" SelectedIndexChanged="cbProperty_SelectedIndexChanged"/>
-                                        </DataTemplate>
-                                    </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
-                                </localPage:CorasauDataGridTemplateColumnClient>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Value" Width="100" Visible="False"/>
-                            </localPage:EDeliveryMappingGrid.Columns>
-                        </localPage:EDeliveryMappingGrid>
-                    </docking:LayoutPanel>
-                </docking:LayoutGroup>
-            </docking:DockLayoutManager>
+            <localPage:EDeliveryMappingGrid x:Name="dgEdeliveryMappingGrid" AutoGenerateColumns="None">
+                <localPage:EDeliveryMappingGrid.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="TagId">
+                        <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                            <CorasauControls:ComboBoxEditSettingsCustom x:Name="cmbTagIds" DisplayMember="Name" ValueMember="RowId"/>
+                        </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="TableId">
+                        <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                            <CorasauControls:ComboBoxEditSettingsCustom x:Name="cmbTableIds" DisplayMember="DisplayName" ValueMember="Id"/>
+                        </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Property">
+                        <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Property,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                            </ControlTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" GotFocus="PART_Editor_GotFocus" DisplayMember="DisplayName" ValueMember="Id" ItemsSource="{Binding DataContext.RowData.Row.PropertySource,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" />
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Value" Width="100" Visible="False"/>
+                </localPage:EDeliveryMappingGrid.Columns>
+            </localPage:EDeliveryMappingGrid>
         </CorasauControls:BusyIndicator>
     </Grid>
 </Pages:GridBasePage>

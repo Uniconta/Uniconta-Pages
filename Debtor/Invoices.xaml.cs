@@ -463,7 +463,7 @@ namespace UnicontaClient.Pages.CustomPage
                             dockName = string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("Preview"), string.Format("{0}: {1}", isInvoice ? Uniconta.ClientTools.Localization.lookup("Invoice") :
                                 Uniconta.ClientTools.Localization.lookup("Packnote"), NumberConvert.ToString(docNumber)));
 
-                            AddDockItem(TabControls.StandardPrintReportPage, new object[] { new List<IPrintReport> { printReport }, reportName }, dockName);
+                            AddDockItem(TabControls.StandardPrintReportPage, new object[] {  printReport , reportName }, dockName);
                             break;
                         }
                     }
@@ -571,7 +571,7 @@ namespace UnicontaClient.Pages.CustomPage
                     await iPrintReport.InitializePrint();
                 }
 
-                if (api.CompanyEntity._CountryId == CountryCode.Germany) // For Speicial Invoicing in For Germany
+                if (debtorInvoicePrint.Debtor.Country == CountryCode.Germany) // For Speicial Invoicing in For Germany
                     iPrintReport.AdditionalData = InvoicePostingPrintGenerator.XmlDataGenerationForGermany(debtorInvoicePrint, api.CompanyEntity);
             }
             return iPrintReport;
@@ -765,7 +765,7 @@ namespace UnicontaClient.Pages.CustomPage
                     workInstallation = (WorkInstallation)workInstallCache.Get(invClient._Installation);
                 }
 
-                if (this.api.CompanyEntity._CountryId == CountryCode.Germany)
+                if (debtor._Country == CountryCode.Germany)
                 {
                     if (folderBrowserDialog == null)
                     {
@@ -782,7 +782,7 @@ namespace UnicontaClient.Pages.CustomPage
                         var xmlContent = obj.GenerateZugferdXml();
 
                         // export xml
-                        var invoiceLabel = (debtor._Country == CountryCode.Germany || debtor._Country == CountryCode.Austria || debtor._Country == CountryCode.Switzerland)
+                        var invoiceLabel = (debtor._Language == Uniconta.Common.Language.Default || debtor._Language == Uniconta.Common.Language.de || debtor._Language == Uniconta.Common.Language.de_at || debtor._Language == Uniconta.Common.Language.de_ch)
                             ? "E-Rechnung"
                             : "E-Invoice";
                         var fileName = $"{invoiceLabel}_{invClient.InvoiceNum}.xml";

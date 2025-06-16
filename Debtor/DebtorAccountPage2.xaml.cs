@@ -415,6 +415,12 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                         if (!string.IsNullOrEmpty(ci.vat) && editrow.Country == CountryCode.Denmark)
                             editrow.VatNumber = ci.vat;
+
+                        if (api.CompanyEntity._CountryId == CountryCode.Iceland)
+                        {
+                            editrow.VatNumber = ci.vat;
+                            editrow.CompanyState = ci.companystatus.StatusCode().ToString();
+                        }
                     }
                 }
                 else

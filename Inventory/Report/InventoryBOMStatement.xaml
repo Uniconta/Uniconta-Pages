@@ -54,6 +54,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryBOMStatement"
                                         </DataTemplate>
                                     </local:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </local:CorasauDataGridTemplateColumnClient>
+                                <local:CorasauDataGridTemplateColumnClient x:Name="Unit" Width="100"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="UnitSize" Width="80" />
                                 <local:CorasauDataGridTemplateColumnClient x:Name="CostPriceFactor" Width="80" />
                                 <local:ComboBoxColumnClient x:Name="QtyType" Width="100"/>

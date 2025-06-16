@@ -7,6 +7,7 @@
       <RibbonItem Action="AddWorkUser" LocalizedNameKey="WorkUser" Glyph="Add_16x16"/>
       <RibbonItem Action="AddProjectTimeUser" LocalizedNameKey="TimeUser" Glyph="Add_16x16"/>
       <RibbonItem Action="AddInvoiceUser" LocalizedNameKey="InvoiceUser" Glyph="Add_16x16" />
+      <RibbonItem Action="AddViewUser" LocalizedNameKey="ViewUser" Glyph="Add_16x16" />
 			<RibbonItem Action="CopyRecord" LocalizedNameKey="CopyFromAnotherCompany" Glyph="Copy_16x16" EnableSeperator="True" ShortcutKey="Shift+F2"/>
 		</RibbonItem>
 		<RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="RemoveOBJ" Parameter="User" LargeGlyph="Delete_32x32"/>

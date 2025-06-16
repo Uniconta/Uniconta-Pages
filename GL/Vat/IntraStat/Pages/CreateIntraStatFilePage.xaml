@@ -52,39 +52,38 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateIntraStatFilePage"
 
         </Grid>
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="2" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
-            <localPage:CreateIntraStatFilePageGrid  x:Name="dgIntraStatGrid" AutoGenerateColumns="None">
+            <localPage:CreateIntraStatFilePageGrid x:Name="dgIntraStatGrid" AutoGenerateColumns="None">
                 <localPage:CreateIntraStatFilePageGrid.Columns>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" FieldName="Date" Width="90" ReadOnly="True"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Period" FieldName="Period" Width="90" ReadOnly="True"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ImportOrExport" FieldName="ImportOrExport" Width="80" ReadOnly="True"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="TransType" FieldName="TransType" Width="75"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DCAccount" FieldName="DCAccount" Width="90" ReadOnly="True"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AccountName" FieldName="AccountName" Width="90" ReadOnly="True"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DebtorRegNo" Width="150" Visible="False" ReadOnly="True"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="IsTriangularTrade" FieldName="IsTriangularTrade" Width="50" ReadOnly="True"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Country" FieldName="Country" Width="80" ReadOnly="True"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="fDebtorRegNo" Width="150" Visible="False" ReadOnly="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DebtorRegNoVIES" Width="150" Visible="False" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" FieldName="Date" Width="90" ReadOnly="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Period" FieldName="Period" Width="90" ReadOnly="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ImportOrExport" FieldName="ImportOrExport" Width="80" ReadOnly="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="TransType" FieldName="TransType" Width="75" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DCAccount" FieldName="DCAccount" Width="90" ReadOnly="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AccountName" FieldName="AccountName" Width="90" ReadOnly="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DebtorRegNo" Width="150" Visible="False" ReadOnly="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="IsTriangularTrade" FieldName="IsTriangularTrade" Width="50" ReadOnly="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Country" FieldName="Country" Width="80" ReadOnly="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="fDebtorRegNo" Width="150" Visible="False" ReadOnly="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DebtorRegNoVIES" Width="150" Visible="False" ReadOnly="True" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Item" Width="90" ReadOnly="True" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ItemName" Width="200" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ItemName" Width="200" ReadOnly="True" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ItemCode" FieldName="ItemCode" Width="80" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CountryOfOrigin" FieldName="CountryOfOrigin" Width="80" />
                     <localPage:ComboBoxColumnClient x:Name="CountryOfOriginUNK" Width="80" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="WeightPerPCS" FieldName="WeightPerPCS" Width="50" ReadOnly="True"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="IntraUnitPerPCS" FieldName="IntraUnitPerPCS" Width="80" ReadOnly="True"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceQuantity" FieldName="InvoiceQuantity" Width="80"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="WeightPerPCS" FieldName="WeightPerPCS" Width="50" ReadOnly="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="IntraUnitPerPCS" FieldName="IntraUnitPerPCS" Width="80" ReadOnly="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceQuantity" FieldName="InvoiceQuantity" Width="80" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="NetWeight" FieldName="NetWeight" Width="50" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="IntraUnit" FieldName="IntraUnit" Width="80" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceNumber" FieldName="InvoiceNumber" Width="50" ReadOnly="True"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InvAmount" FieldName="InvAmount" Width="80" ReadOnly="True"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Compressed" Width="60" ReadOnly="True" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SystemInfo" FieldName="SystemInfo" Width="200" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceNumber" FieldName="InvoiceNumber" Width="50" ReadOnly="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InvAmount" FieldName="InvAmount" Width="80" ReadOnly="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Compressed" Width="60" ReadOnly="True" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SystemInfo" FieldName="SystemInfo" Width="200" ReadOnly="True" />
                 </localPage:CreateIntraStatFilePageGrid.Columns>
                 <localPage:CreateIntraStatFilePageGrid.TotalSummary>
-                    <localPage:SumColumn FieldName="ItemCode" SummaryType="Count"/>
+                    <localPage:SumColumn FieldName="ItemCode" SummaryType="Count" />
                 </localPage:CreateIntraStatFilePageGrid.TotalSummary>
             </localPage:CreateIntraStatFilePageGrid>
         </CorasauControls:BusyIndicator>
-        <CorasauControls:UnicontaSpreadSheetControl  x:Name="spreadSheet" Visibility="Collapsed"/>
     </Grid>
 </Pages:GridBasePage>

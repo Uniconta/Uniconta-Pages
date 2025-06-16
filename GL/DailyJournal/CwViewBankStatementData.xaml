@@ -56,6 +56,5 @@ x:Class="UnicontaClient.Pages.CustomPage.CwViewBankStatementData"
             <Button x:Name="CancelButton" IsCancel="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Cancel}" Click="CancelButton_Click" MinWidth="75" 
                     Height="23" HorizontalAlignment="Right"   />
         </StackPanel>
-        <CorasauControls:UnicontaSpreadSheetControl  x:Name="importSpreadSheet" Visibility="Collapsed"/>
     </Grid>
 </cw:ChildWindow>

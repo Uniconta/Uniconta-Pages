@@ -156,7 +156,7 @@ namespace ISO20022CreditTransfer
             }
 
             exportFormat = (ExportFormatType)credPaymFormat._ExportFormat;
-            
+
             companyCountryId = UnicontaCountryToISO(company._CountryId);
 
             creditorIBAN = string.Empty;
@@ -170,19 +170,23 @@ namespace ISO20022CreditTransfer
                 creditorBank = (CreditorPaymentAccount)credBankCache.Get(creditor._Account);
                 if (creditorBank != null && !creditorBank._Approved)
                 {
-                    checkErrors.Add(new CheckError(Localization.lookup("CreditorBankNotApproved")));
-                    return new XMLDocumentGenerateResult(dummyDoc, CheckError.Count > 0, 0, CheckError);
+                    await crudAPI.Read(creditorBank);
+                    if (!creditorBank._Approved)
+                    {
+                        checkErrors.Add(new CheckError(Localization.lookup("CreditorBankNotApproved")));
+                        return new XMLDocumentGenerateResult(dummyDoc, CheckError.Count > 0, 0, CheckError);
+                    }
                 }
             }
 
             RequestedExecutionDate(trans._PaymentDate, company);
             PaymentCurrency(trans.CurrencyLocalStr, trans._PaymentMethod, trans._PaymentId, trans.SWIFT);
 
-            if(glJournalGenerated == false)
+            if (glJournalGenerated == false)
                 CreditorAddress(creditor);
 
             if (trans.PaymentMethod == null)
-                checkErrors.Add(new CheckError(fieldCannotBeEmpty("PaymentMethod" )));
+                checkErrors.Add(new CheckError(fieldCannotBeEmpty("PaymentMethod")));
             else if (trans._PaymentMethod == PaymentTypes.None)
                 checkErrors.Add(new CheckError(string.Concat(Uniconta.ClientTools.Localization.lookup("PaymentMethod"), " = ", trans.PaymentMethod)));
 
@@ -201,8 +205,8 @@ namespace ISO20022CreditTransfer
                     break;
 
                 case PaymentTypes.IBAN:
-                     PaymentMethodIBAN(creditor, company, trans._PaymentId);
-                     CreditorBIC(trans._SWIFT);
+                    PaymentMethodIBAN(creditor, company, trans._PaymentId);
+                    CreditorBIC(trans._SWIFT);
                     break;
 
                 case PaymentTypes.PaymentMethod3: //FIK71 + BankGirot
@@ -224,12 +228,12 @@ namespace ISO20022CreditTransfer
 
             CreditorBankApproved(trans, creditor);
             await RegulatoryReporting(trans);
-            
+
             //Validations <<
 
             return new XMLDocumentGenerateResult(dummyDoc, CheckError.Count > 0, 0, CheckError);
         }
-       
+
 
         /// <summary>
         /// Validate PaymentType
@@ -316,14 +320,14 @@ namespace ISO20022CreditTransfer
                 var countryId = string.Empty;
                 if (paymentType == PaymentTypes.IBAN)
                 {
-                    if (! string.IsNullOrEmpty(paymentId))
+                    if (!string.IsNullOrEmpty(paymentId))
                     {
                         paymentId = Regex.Replace(paymentId, "[^\\w\\d]", "");
                         countryId = paymentId.Length < 2 ? string.Empty : paymentId.Substring(0, 2).ToUpper();
                     }
                 }
 
-                if (! string.IsNullOrEmpty(swift))
+                if (!string.IsNullOrEmpty(swift))
                 {
                     swift = Regex.Replace(swift, "[^\\w\\d]", "");
                     if (swift.Length > 6)
@@ -335,7 +339,7 @@ namespace ISO20022CreditTransfer
             }
         }
 
-     
+
         /// <summary>
         /// Validate Creditor address
         /// </summary>
@@ -355,7 +359,6 @@ namespace ISO20022CreditTransfer
                 var string2 = string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("Creditor"), creditor._Account);
                 checkErrors.Add(new CheckError(String.Format("{0}, {1}", string1, string2)));
             }
-
         }
 
         /// <summary>
@@ -363,7 +366,7 @@ namespace ISO20022CreditTransfer
         /// </summary>
         private void CreditorBIC(String swift, bool bbanSwift = false)
         {
-            if (! string.IsNullOrEmpty(swift))
+            if (!string.IsNullOrEmpty(swift))
             {
                 swift = Regex.Replace(swift, "[^\\w\\d]", "");
 
@@ -378,14 +381,14 @@ namespace ISO20022CreditTransfer
                     string countryId = string.Empty;
                     if (creditorSWIFT.Length >= 6)
                         countryId = creditorSWIFT.Substring(4, 2);
-                    
+
                     if (glJournalGenerated && countryId != BaseDocument.COUNTRY_DK)
                         checkErrors.Add(new CheckError(String.Format("Creditor information is required for foreign payments and they're not available.")));
                 }
             }
             else
             {
-                if(!bbanSwift)
+                if (!bbanSwift)
                     checkErrors.Add(new CheckError(Uniconta.ClientTools.Localization.lookup("ErrorSWIFTAddress")));
             }
         }
@@ -441,7 +444,7 @@ namespace ISO20022CreditTransfer
 
                     if (!StandardPaymentFunctions.ValidateIBAN(creditorIBAN))
                     {
-                        checkErrors.Add(new CheckError(Uniconta.ClientTools.Localization.lookup("PaymentIdInvalid"))); 
+                        checkErrors.Add(new CheckError(Uniconta.ClientTools.Localization.lookup("PaymentIdInvalid")));
                     }
                     else
                     {
@@ -533,14 +536,14 @@ namespace ISO20022CreditTransfer
                 {
                     bban = Regex.Replace(bban, "[^0-9]", "");
                     if (bban.Length <= 4)
-                        checkErrors.Add(new CheckError(Uniconta.ClientTools.Localization.lookup("PaymentIdInvalid"))); 
+                        checkErrors.Add(new CheckError(Uniconta.ClientTools.Localization.lookup("PaymentIdInvalid")));
 
                     var countryId = glJournalGenerated ? UnicontaCountryToISO(company._CountryId) : UnicontaCountryToISO(creditor._Country);
 
                     if (countryId == BaseDocument.COUNTRY_DK)
                     {
                         if (bban.Length > 14)
-                            checkErrors.Add(new CheckError(Uniconta.ClientTools.Localization.lookup("PaymentIdInvalid"))); 
+                            checkErrors.Add(new CheckError(Uniconta.ClientTools.Localization.lookup("PaymentIdInvalid")));
                     }
                 }
             }
@@ -573,7 +576,7 @@ namespace ISO20022CreditTransfer
                         checkErrors.Add(new CheckError(string.Concat("Regulatory reporting: supplementary text concerning the purpose is required (Payment amount > ", RGLTRYRPTGLIMITAMOUNT_NOK, " NOK")));
                 }
             }
-            else if (exportFormat == ExportFormatType.ISO20022_SE && (isoPaymentType == ISO20022PaymentTypes.CROSSBORDER || isoPaymentType == ISO20022PaymentTypes.SEPA || 
+            else if (exportFormat == ExportFormatType.ISO20022_SE && (isoPaymentType == ISO20022PaymentTypes.CROSSBORDER || isoPaymentType == ISO20022PaymentTypes.SEPA ||
                 (isoPaymentType == ISO20022PaymentTypes.DOMESTIC && transCcy != Currencies.SEK))) //Domestic payments Currency <> SEK are subject to regulatory reporting
             {
                 double paymAmount = 0;
@@ -588,7 +591,7 @@ namespace ISO20022CreditTransfer
                 if (paymAmount >= RGLTRYRPTGLIMITAMOUNT_SEK)
                 {
                     if (trans.RgltryRptgCode == 0)
-                        checkErrors.Add(new CheckError(string.Concat("Regulatory reporting purpose code is required (Payment amount > ", RGLTRYRPTGLIMITAMOUNT_SEK," SEK")));
+                        checkErrors.Add(new CheckError(string.Concat("Regulatory reporting purpose code is required (Payment amount > ", RGLTRYRPTGLIMITAMOUNT_SEK, " SEK")));
                 }
             }
         }
@@ -604,7 +607,7 @@ namespace ISO20022CreditTransfer
                 //Validate Creditor BBAN >>
                 var bban = creditor.PaymentId;
                 if (bban == null)
-                { 
+                {
                     checkErrors.Add(new CheckError(Uniconta.ClientTools.Localization.lookup("CredBBANMissing")));
                 }
                 else
@@ -684,7 +687,7 @@ namespace ISO20022CreditTransfer
         /// </summary>
         private Boolean PaymentMethodFIK73(string ocrLine)
         {
-         
+
             if (string.IsNullOrEmpty(ocrLine))
             {
                 checkErrors.Add(new CheckError(fieldCannotBeEmpty("PaymentId")));
@@ -810,7 +813,7 @@ namespace ISO20022CreditTransfer
         {
             if (string.IsNullOrEmpty(ocrLine))
             {
-                checkErrors.Add(new CheckError(fieldCannotBeEmpty("PaymentId"))); 
+                checkErrors.Add(new CheckError(fieldCannotBeEmpty("PaymentId")));
                 return false;
             }
 
@@ -913,7 +916,7 @@ namespace ISO20022CreditTransfer
 
             var total = 0;
             var alt = false;
-            for (int i = number.Length; (--i >= 0); )
+            for (int i = number.Length; (--i >= 0);)
             {
                 var curDigit = (number[i] - '0');
                 if (alt)
@@ -958,7 +961,7 @@ namespace ISO20022CreditTransfer
         /// <summary>
         /// Switzerland QRR code check digit validation
         /// </summary>
-        private  bool QRRCheckDigitCheck(string number)
+        private bool QRRCheckDigitCheck(string number)
         {
             int[] tabelle = { 0, 9, 4, 6, 8, 2, 7, 1, 3, 5 };
             int uebertrag = 0;

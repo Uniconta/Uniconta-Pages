@@ -205,7 +205,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrdersPage2"
                         <CorasauControls:CheckEditor x:Name="chkDeliveryIsInvoiceAddress" IsChecked="{Binding DeliveryIsInvoiceAddress, Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
-                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="ESGGroup"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ESG}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="450" >
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="EPRGroup"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ProducerResponsibility}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="450" >
                     <CorasauControls:CorasauLayoutItem FieldName="PackagingConsumer" x:Name="liPackagingConsumer">
                         <CorasauControls:ComboBoxEditor SelectedItem="{Binding PackagingConsumer,Mode=TwoWay}" x:Name="cmbPackagingConsumer"/>
                     </CorasauControls:CorasauLayoutItem>

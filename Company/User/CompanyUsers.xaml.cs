@@ -92,7 +92,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (api.session.User._Role == (byte)UserRoles.Accountant)
                     UtilDisplay.RemoveMenuCommand(rb, "AddProjectTimeUser");
                 if (api.session.User._Role == (byte)UserRoles.Standard)
-                    UtilDisplay.RemoveMenuCommand(rb, "AddInvoiceUser");
+                    UtilDisplay.RemoveMenuCommand(rb, new[] { "AddInvoiceUser", "AddViewUser" });
             }
             if (!api.CompanyEntity.Project)
                 UtilDisplay.RemoveMenuCommand(rb, "AddProjectTimeUser");
@@ -126,6 +126,9 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "AddInvoiceUser":
                     CreateUser(UserTypes.InvoiceUser);
+                    break;
+                case "AddViewUser":
+                    CreateUser(UserTypes.ViewUser);
                     break;
                 case "CopyRecord":
                     CopyUsersFromCompanies();
@@ -273,6 +276,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case UserTypes.StandardUser:
                 case UserTypes.ProjectTimeUser:
                 case UserTypes.InvoiceUser:
+                case UserTypes.ViewUser:
                     var curComp = UtilDisplay.GetDefaultCompany();
                     long rights = curComp.Rights;
                     if (AccessLevel.Get(rights, CompanyTasks.AsOwner) == CompanyPermissions.Full)
@@ -356,6 +360,8 @@ namespace UnicontaClient.Pages.CustomPage
                 fixedProfile = FixedProfiles.ProjectTimeUser;
             else if (userType == UserTypes.InvoiceUser)
                 fixedProfile = FixedProfiles.Invoice;
+            else if (userType == UserTypes.ViewUser)
+                fixedProfile = FixedProfiles.View;
             var userAccess = _companyUsers.Where(u => u._LoginId == LoginId).FirstOrDefault();
             if (userAccess != null)
             {

@@ -84,10 +84,6 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 return;
             }
-            if (dgProjectBudgetYear.GetRow(e.RowHandle) is ProjectBudgetYearClient projectBudgetYearRow)
-            {
-                e.Cancel = !projectBudgetYearRow.IsEditable;
-            }
         }
 
         private void DgProjectBudgetYear_CustomSummary(object sender, DevExpress.Data.CustomSummaryEventArgs e)
@@ -115,79 +111,79 @@ namespace UnicontaClient.Pages.CustomPage
                             if (tagName == "HoursMonth1")
                                 e.TotalValue = normHoursMonth1;
                             else if (tagName == "TotalMonth1")
-                                e.TotalValue = month1Sum - normHoursMonth1;
+                                e.TotalValue = new ProjectBudgetSumColumnWrapper(month1Sum, normHoursMonth1);
                             break;
                         case "MonthQty2":
                             if (tagName == "HoursMonth2")
                                 e.TotalValue = normHoursMonth2;
                             else if (tagName == "TotalMonth2")
-                                e.TotalValue = month2Sum - normHoursMonth2;
+                                e.TotalValue = new ProjectBudgetSumColumnWrapper(month2Sum , normHoursMonth2);
                             break;
                         case "MonthQty3":
                             if (tagName == "HoursMonth3")
                                 e.TotalValue = normHoursMonth3;
                             else if (tagName == "TotalMonth3")
-                                e.TotalValue = month3Sum - normHoursMonth3;
+                                e.TotalValue = new ProjectBudgetSumColumnWrapper(month3Sum, normHoursMonth3);
                             break;
                         case "MonthQty4":
                             if (tagName == "HoursMonth4")
                                 e.TotalValue = normHoursMonth4;
                             else if (tagName == "TotalMonth4")
-                                e.TotalValue = month4Sum - normHoursMonth4;
+                                e.TotalValue = new ProjectBudgetSumColumnWrapper(month4Sum, normHoursMonth4);
                             break;
                         case "MonthQty5":
                             if (tagName == "HoursMonth5")
                                 e.TotalValue = normHoursMonth5;
                             else if (tagName == "TotalMonth5")
-                                e.TotalValue = month5Sum - normHoursMonth5;
+                                e.TotalValue = new ProjectBudgetSumColumnWrapper(month5Sum, normHoursMonth5);
                             break;
                         case "MonthQty6":
                             if (tagName == "HoursMonth6")
                                 e.TotalValue = normHoursMonth6;
                             else if (tagName == "TotalMonth6")
-                                e.TotalValue = month6Sum - normHoursMonth6;
+                                e.TotalValue = new ProjectBudgetSumColumnWrapper(month6Sum, normHoursMonth6);
                             break;
                         case "MonthQty7":
                             if (tagName == "HoursMonth7")
                                 e.TotalValue = normHoursMonth7;
                             else if (tagName == "TotalMonth7")
-                                e.TotalValue = month7Sum - normHoursMonth7;
+                                e.TotalValue = new ProjectBudgetSumColumnWrapper(month7Sum, normHoursMonth7);
                             break;
                         case "MonthQty8":
                             if (tagName == "HoursMonth8")
                                 e.TotalValue = normHoursMonth8;
                             else if (tagName == "TotalMonth8")
-                                e.TotalValue = month8Sum - normHoursMonth8;
+                                e.TotalValue = new ProjectBudgetSumColumnWrapper(month8Sum, normHoursMonth8);
                             break;
                         case "MonthQty9":
                             if (tagName == "HoursMonth9")
                                 e.TotalValue = normHoursMonth9;
                             else if (tagName == "TotalMonth9")
-                                e.TotalValue = month9Sum - normHoursMonth9;
+                                e.TotalValue = new ProjectBudgetSumColumnWrapper(month9Sum, normHoursMonth9);
                             break;
                         case "MonthQty10":
                             if (tagName == "HoursMonth10")
                                 e.TotalValue = normHoursMonth10;
                             else if (tagName == "TotalMonth10")
-                                e.TotalValue = month10Sum - normHoursMonth10;
+                                e.TotalValue = new ProjectBudgetSumColumnWrapper(month10Sum, normHoursMonth10);
                             break;
                         case "MonthQty11":
                             if (tagName == "HoursMonth11")
                                 e.TotalValue = normHoursMonth11;
                             else if (tagName == "TotalMonth11")
-                                e.TotalValue = month11Sum - normHoursMonth11;
+                                e.TotalValue = new ProjectBudgetSumColumnWrapper(month11Sum, normHoursMonth11);
                             break;
                         case "MonthQty12":
                             if (tagName == "HoursMonth12")
                                 e.TotalValue = normHoursMonth12;
                             else if (tagName == "TotalMonth12")
-                                e.TotalValue = month12Sum - normHoursMonth12;
+                                e.TotalValue =   new ProjectBudgetSumColumnWrapper(month12Sum, normHoursMonth12);
                             break;
                         case "TotalQty":
                             if (tagName == "EmpNormHoursSum")
                                 e.TotalValue = normHoursTotal;
                             else if (tagName == "TotalSum")
-                                e.TotalValue = totalSum - normHoursTotal;
+                                e.TotalValue = new ProjectBudgetSumColumnWrapper(totalSum, normHoursTotal);
                             break;
                     }
                 }
@@ -238,6 +234,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "RefreshGrid":
                     LoadBudgetYear();
                     break;
+                case "Save":
                 case "SaveDataGrid":
                     SaveBudgetYear();
                     break;
@@ -263,7 +260,6 @@ namespace UnicontaClient.Pages.CustomPage
                 var projectBudgetLine = api.CompanyEntity.CreateUserType<ProjectBudgetLineClient>();
                 projectBudgetLine.SetMaster(_empMaster);
                 var newRow = new ProjectBudgetYearClient(projectBudgetLine);
-                newRow.IsEditable = true;
                 var selectedIndex = dgProjectBudgetYear.View.FocusedRowHandle < 0 ? -1 : dgProjectBudgetYear.View.FocusedRowHandle;
 
                 if (_ProjectBudgetYearClients != null)
@@ -296,12 +292,8 @@ namespace UnicontaClient.Pages.CustomPage
                 var selectedRow = dgProjectBudgetYear.SelectedItem as ProjectBudgetYearClient;
                 if (selectedRow != null)
                 {
-                    var selectedIndex = dgProjectBudgetYear.View.FocusedRowHandle;
-                    if (selectedIndex >= 0)
-                    {
-                        _ProjectBudgetYearClients.RemoveAt(selectedIndex);
-                        ResetSourceOnGrid();
-                    }
+                    _ProjectBudgetYearClients.Remove(selectedRow);
+                    ResetSourceOnGrid();
                 }
             }
         }

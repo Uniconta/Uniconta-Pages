@@ -372,7 +372,7 @@ namespace UnicontaClient.Pages.CustomPage
                     SetAccountSource(rec);
                     break;
                 case "Invoice":
-                    if (rec._Invoice != null)
+                    if (rec._Invoice != null && rec._Account == null)
                     {
                         GLJournalAccountType type = rec._AmountCent > 0 ? GLJournalAccountType.Debtor : GLJournalAccountType.Creditor;
                         rec.AccountType = AppEnums.GLAccountType.ToString((int)type);

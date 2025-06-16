@@ -1,8 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Globalization;
+using System.Windows.Data;
+using System.Windows.Media;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.Common;
 
@@ -75,18 +78,9 @@ namespace UnicontaClient.Pages.CustomPage
     public class ProjectBudgetYearClient : INotifyPropertyChanged
     {
         private double _MonthQty1, _MonthQty2, _MonthQty3, _MonthQty4, _MonthQty5, _MonthQty6, _MonthQty7, _MonthQty8, _MonthQty9, _MonthQty10, _MonthQty11, _MonthQty12;
-        private bool _IsEditable = false;
+        //private bool _IsEditable = false;
         private string _Project, _Employee, _PrCategory, _WorkSpace, _Task, _PayrollCategory;
         public readonly int CompanyId;
-
-        public bool IsEditable
-        {
-            get { return _IsEditable; }
-            set
-            {
-                _IsEditable = value; NotifyPropertyChanged(nameof(IsEditable));
-            }
-        }
 
         [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.Project))]
         [Display(Name = "Project", ResourceType = typeof(ProjectTransClientText))]
@@ -95,9 +89,6 @@ namespace UnicontaClient.Pages.CustomPage
             get { return _Project; }
             set
             {
-                if (!_IsEditable)
-                    return;
-
                 _Project = value;
                 NotifyPropertyChanged(nameof(Project));
                 NotifyPropertyChanged(nameof(ProjectName));
@@ -107,8 +98,18 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "ProjectName", ResourceType = typeof(ProjectTransClientText))]
         public string ProjectName { get { return ClientHelper.GetName(CompanyId, typeof(Uniconta.DataModel.Project), _Project); } }
 
+        [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.Employee))]
         [Display(Name = "Employee", ResourceType = typeof(ProjectTransClientText))]
-        public string Employee { get { return _Employee; } }
+        public string Employee 
+        { 
+            get { return _Employee; }
+            set
+            {
+                _Employee = value;
+                NotifyPropertyChanged(nameof(Employee));    
+                NotifyPropertyChanged(nameof(EmployeeName));
+            }
+        }
 
         [Display(Name = "EmployeeName", ResourceType = typeof(ProjectTransClientText))]
         public string EmployeeName { get { return ClientHelper.GetName(CompanyId, typeof(Uniconta.DataModel.Employee), _Employee); } }
@@ -121,9 +122,6 @@ namespace UnicontaClient.Pages.CustomPage
             get { return _PrCategory; }
             set
             {
-                if (!_IsEditable)
-                    return;
-
                 _PrCategory = value;
                 NotifyPropertyChanged(nameof(PrCategory));
                 NotifyPropertyChanged(nameof(PrCategoryName));
@@ -141,9 +139,6 @@ namespace UnicontaClient.Pages.CustomPage
             get { return _PayrollCategory; }
             set
             {
-                if (!_IsEditable)
-                    return;
-
                 _PayrollCategory = value;
                 PrCategory = ((Uniconta.DataModel.EmpPayrollCategory)ClientHelper.GetRef(CompanyId, typeof(Uniconta.DataModel.EmpPayrollCategory), _PayrollCategory))?._PrCategory;
                 NotifyPropertyChanged(nameof(PayrollCategory));
@@ -161,9 +156,6 @@ namespace UnicontaClient.Pages.CustomPage
             get { return _WorkSpace; }
             set
             {
-                if (!_IsEditable)
-                    return;
-
                 _WorkSpace = value;
                 NotifyPropertyChanged(nameof(WorkSpace));
             }
@@ -176,9 +168,6 @@ namespace UnicontaClient.Pages.CustomPage
             get { return _Task; }
             set
             {
-                if (!_IsEditable)
-                    return;
-
                 _Task = value;
                 NotifyPropertyChanged(nameof(Task));
             }
@@ -250,4 +239,34 @@ namespace UnicontaClient.Pages.CustomPage
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
+
+    public class ProjectBudgetSumColumnWrapper
+    {
+        public double AbsoluteValue { get; set; }
+        public bool IsNegative { get; set; }
+
+        public ProjectBudgetSumColumnWrapper(double monthVal, double normVal)
+        {
+            AbsoluteValue = Math.Abs(monthVal - normVal);
+            IsNegative = monthVal - normVal < 0;
+        }
+        public override string ToString() => AbsoluteValue.ToString("N2");
+    }
+
+    public class SummaryValueToForegroundConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is ProjectBudgetSumColumnWrapper wrapper)
+                return wrapper.IsNegative ? new SolidColorBrush((System.Windows.Media.Color)System.Windows.Application.Current.Resources["RedColor"]) :new SolidColorBrush((System.Windows.Media.Color)System.Windows.Application.Current.Resources["GreenColor"]); 
+
+            return new SolidColorBrush((System.Windows.Media.Color)System.Windows.Application.Current.Resources["PrimaryTextColor"]); 
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value;
+        }
+    }
+
 }

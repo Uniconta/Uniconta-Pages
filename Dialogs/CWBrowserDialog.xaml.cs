@@ -20,7 +20,7 @@ namespace UnicontaClient.Controls.Dialogs
             Title = title ?? string.Empty;
             var browserControl = UtilDisplay.LoadWebControl(source);
             layoutGrid.Children.Add(browserControl);
-            System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+            System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
 
         }
 

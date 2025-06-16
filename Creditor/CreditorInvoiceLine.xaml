@@ -76,6 +76,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorInvoiceLine"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Weight" Visible="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Cartons" Visible="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Volume" Visible="false"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountInclVat" Visible="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryTime" Visible="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" Visible="false" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim2" Width="70" FieldName="Dimension2" Visible="false" />

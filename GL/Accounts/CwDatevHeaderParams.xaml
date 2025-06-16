@@ -26,6 +26,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CwDatevHeaderParams"
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -45,16 +46,21 @@ x:Class="UnicontaClient.Pages.CustomPage.CwDatevHeaderParams"
             <UnicontaControls:LookupEditor x:Name="leGlAccount" Text="{Binding DefaultAccount, Mode=TwoWay}" Grid.Column="2" Width="170"  Grid.Row="4" Height="25"   Margin="18 5 0 0" HorizontalAlignment="Left" />
             <TextBlock  Grid.Column="0"  Grid.Row="5" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FiscalYearBegin}" VerticalAlignment="Center" Margin="0 5 0 0"/>
             <UnicontaControls:DateEditor x:Name="dtFiscalYrBgn" DateTime="{Binding FiscalYearBegin,Mode=TwoWay}" Grid.Column="2" Width="170"  Grid.Row="5" Height="25"  Margin="18 5 0 0" HorizontalAlignment="Left" />
-            <TextBlock  x:Name="txtDatev1"  Grid.Column="0"  Grid.Row="6" VerticalAlignment="Center" Margin="0 5 0 0"/>
-            <StackPanel  Orientation="Horizontal" Grid.Column="0"  Grid.Row="7" VerticalAlignment="Center" Margin="0 5 0 0">
+            <TextBlock  Grid.Column="0"  Grid.Row="6" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter='Exportfeld KOST1 Kostenstelle'}" VerticalAlignment="Center" Margin="0 5 0 0"/>
+            <ComboBox x:Name="cmbKost1" SelectionChanged="CmbKost1_OnSelectionChanged"  Grid.Column="2" Width="170"  Grid.Row="6" Height="25"  Margin="18 5 0 0" HorizontalAlignment="Left" />
+            <TextBlock  Grid.Column="0"  Grid.Row="7" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter='Exportfeld KOST2 Kostenträger'}" VerticalAlignment="Center" Margin="0 5 0 0"/>
+            <ComboBox x:Name="cmbKost2" SelectionChanged="CmbKost2_OnSelectionChanged"  Grid.Column="2" Width="170"  Grid.Row="7" Height="25"  Margin="18 5 0 0" HorizontalAlignment="Left" />
+
+            <TextBlock  x:Name="txtDatev1"  Grid.Column="0"  Grid.Row="8" VerticalAlignment="Center" Margin="0 25 0 0"/>
+            <StackPanel  Orientation="Horizontal" Grid.Column="0"  Grid.Row="9" VerticalAlignment="Center" Margin="0 5 0 0">
                 <TextBlock  x:Name="txtDatev2"  />
                 <TextBlock  Margin="5 0 0 0">
             <Hyperlink x:Name="txturl" NavigateUri = "https://www.uniconta.com/de/unipedia-de/finanzbuchhaltung/uberwachungsaktivitaten/datev-schnittstelle/" RequestNavigate="Hyperlink_RequestNavigate" />
                 </TextBlock>
             </StackPanel>
-            <TextBlock  x:Name="txtDatev"  Grid.Column="0"  Grid.Row="9" VerticalAlignment="Center" Margin="0 5 0 0"/>
-            <TextBlock  Grid.Column="0"  Grid.Row="10" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Buchungsdatenservice aktiviert ist:}" VerticalAlignment="Center" Margin="0 5 0 0"/>
-            <UnicontaControls:CheckEditor x:Name="active" EditValue="{Binding Active, Mode=TwoWay}" Grid.Column="2" Width="170"  Grid.Row="10" Height="25"   Margin="18 5 0 0" HorizontalAlignment="Left" />
+            <TextBlock  x:Name="txtDatev"  Grid.Column="0"  Grid.Row="10" VerticalAlignment="Center" Margin="0 25 0 0"/>
+            <TextBlock  Grid.Column="0"  Grid.Row="11" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Buchungsdatenservice aktiviert ist:}" VerticalAlignment="Center" Margin="0 5 0 0"/>
+            <UnicontaControls:CheckEditor x:Name="active" EditValue="{Binding Active, Mode=TwoWay}" Grid.Column="2" Width="170"  Grid.Row="11" Height="25"   Margin="18 5 0 0" HorizontalAlignment="Left" />
 
         </Grid>
         <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="1" Orientation="Horizontal" Margin="0 10 0 0">

@@ -26,7 +26,7 @@ using UnicontaClient.Controls.Dialogs;
 using EnumsNET;
 using Uniconta.DataModel;
 using DevExpress.Diagram.Core.Shapes;
-using NPOI.SS.Formula.Functions;
+using NPOI.SS.Formula.Functions; 
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -63,10 +63,20 @@ namespace UnicontaClient.Pages.CustomPage
             var view = sender as TableView;
             var row = view?.Grid?.GetRow(e.RowHandle) as InvPackagingProductClient;
             if (row == null) return;
-            if (e.Column.FieldName == "PackagingType" || e.Column.FieldName == "WasteSorting" || e.Column.FieldName == "PackagingRateLevel" || e.Column.FieldName == "PackagingConsumer")
+
+            switch (e.Column.FieldName)
             {
-                if (row._Reporting != ReportingType.Packing && row._Reporting == ReportingType.Electronic && e.Column.FieldName != "PackagingConsumer")
-                    e.Cancel = true;
+                case "PackagingType":
+                case "WasteSorting":
+                case "PackagingRateLevel":
+                    if (row._Reporting != ReportingType.Packing)
+                        e.Cancel = true;
+                    break;
+
+                case "PackagingConsumer":
+                    if (row._Reporting == ReportingType.Batteries || row._Reporting == ReportingType.OneTimeUsePlastic)
+                        e.Cancel = true;
+                    break;
             }
         }
 
@@ -94,7 +104,6 @@ namespace UnicontaClient.Pages.CustomPage
                 case "ReportingType":
                     rec.Category = null;
                     SetCategorySource(rec);
-                    rec.ColumnReadOnly = (rec.ReportingType != AppEnums.PackagingReportingType.ToString((byte)ReportingType.Packing));
                     break;
             }
         }
