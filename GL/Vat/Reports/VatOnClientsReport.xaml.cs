@@ -169,5 +169,20 @@ namespace UnicontaClient.Pages.CustomPage
         {
             return dgVatOnClients.Filter(propValuePair);
         }
+
+        protected override LookUpTable HandleLookupOnLocalPage(LookUpTable lookup, CorasauDataGrid dg)
+        {
+            var tr = dgVatOnClients.SelectedItem as GLTransDCSumClient;
+            if (tr == null)
+                return lookup;
+            if (dgVatOnClients.CurrentColumn?.Name == "DCAccount")
+            {
+                if (cmbDCType.SelectedIndex == 1)
+                    lookup.TableType = typeof(Uniconta.DataModel.Creditor);
+                else
+                    lookup.TableType = typeof(Uniconta.DataModel.Debtor);
+            }
+            return lookup;
+        }
     }
 }

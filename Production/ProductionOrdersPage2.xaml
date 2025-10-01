@@ -9,9 +9,8 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrdersPage2"
         xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
         xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools">
     <UserControl.Resources>
-        <Util:RowIndexConverter x:Key="RowIndexConverter" />
+        <Util:LocalizationValueConverter x:Key="GlobalLocalizationValueConverter" />
         <Util:MaskConverter x:Key="MaskConverter" />
-        <Util:DoubleValueZeroConverter x:Key="DoubleValueZeroConverter" />
     </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
@@ -36,7 +35,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrdersPage2"
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="ProdQty" x:Name="liProdQty">
                         <StackPanel Orientation="Horizontal">
-                            <CorasauControls:DoubleMathEditor x:Name="dblProdQty" FieldName="ProdQty" Text="{Binding ProdQty,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged, Converter={StaticResource DoubleValueZeroConverter}}" 
+                            <CorasauControls:DoubleMathEditor x:Name="dblProdQty" FieldName="ProdQty" Text="{Binding ProdQty,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" 
                                        Mask="{Binding Decimals,Converter={StaticResource MaskConverter},ConverterParameter=Decimals}" 
                                        MaskUseAsDisplayFormat="True" MaskType="Numeric"  ShowError="False" HideZero="True" />
                         </StackPanel>
@@ -71,7 +70,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrdersPage2"
                     </CorasauControls:CorasauLayoutItem>
 
                     <CorasauControls:CorasauLayoutItem FieldName="LastReportedFinished" x:Name="liLastReportedFinished">
-                        <CorasauControls:DateEditor x:Name="deLastReportedFinished" EditValue="{Binding DeliveryDate,Mode=OneWay}"/>
+                        <CorasauControls:DateEditor x:Name="deLastReportedFinished" EditValue="{Binding LastReportedFinished,Mode=OneWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
 

@@ -35,7 +35,6 @@ namespace UnicontaClient.Controls.Dialogs
             if (api.session.Uid != api.CompanyEntity._OwnerUid || api.session.User._Role == (int)UserRoles.Accountant)
             {
                 lblSetupText.Visibility = Visibility.Collapsed;
-                lblSetupType.Visibility = Visibility.Collapsed;
                 lstSetupType.Visibility = Visibility.Collapsed;
             }
         }

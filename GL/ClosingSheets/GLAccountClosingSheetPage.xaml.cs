@@ -63,7 +63,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgGLTable.RowDoubleClick += dgGLTable_RowDoubleClick;
             dgGLTable.BusyIndicator = busyIndicator;
             dgGLTable.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
-            ((TableView)dgGLTable.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
+            ((TableView)dgGLTable.View).RowStyle = System.Windows.Application.Current.Resources["RowAutoHeightAccountTypeStyle"] as Style;
             GetMenuItem();
         }
 
@@ -314,7 +314,23 @@ namespace UnicontaClient.Pages.CustomPage
 
         void dgGLTable_RowDoubleClick()
         {
-            ribbonControl.PerformRibbonAction("ClosingSheetLines");
+            var selectedItem = dgGLTable.SelectedItem as GLAccountClosingSheetClient;
+            if (selectedItem == null || masterRecord == null)
+                return;
+            if (dgGLTable.CurrentColumn == OrgBalance)
+            {
+                var page = dockCtrl.AddDockItem(api.CompanyEntity, TabControls.AccountsTransaction, this.ParentControl, dgGLTable.syncEntity, Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("AccountsTransaction"), selectedItem._Name), controlParam: "QueryonPageLoad=false") as AccountsTransaction;
+                if (page != null)
+                    page.FilterWithDates(masterRecord._FromDate, masterRecord._ToDate);
+            }
+            else if (dgGLTable.CurrentColumn == LastPeriod)
+            {
+                var page = dockCtrl.AddDockItem(api.CompanyEntity, TabControls.AccountsTransaction, this.ParentControl, dgGLTable.syncEntity, Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("AccountsTransaction"), selectedItem._Name), controlParam: "QueryonPageLoad=false") as AccountsTransaction;
+                if (page != null)
+                    page.FilterWithDates(masterRecord._FromDate2, masterRecord._ToDate2);
+            }
+            else
+                ribbonControl.PerformRibbonAction("ClosingSheetLines");
         }
         private void Name_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {

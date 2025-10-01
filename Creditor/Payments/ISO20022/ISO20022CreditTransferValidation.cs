@@ -31,6 +31,7 @@ namespace ISO20022CreditTransfer
         private CreditorPaymentFormat credPaymFormat;
         private ExportFormatType exportFormat;
         private string companyCountryId;
+        private bool newPaymentFormat;
         private CrudAPI crudAPI;
         private Company company;
 
@@ -123,6 +124,7 @@ namespace ISO20022CreditTransfer
             this.credPaymFormat = credPaymFormat;
 
             CompanyBankEnum = bankSpecific.CompanyBank();
+            newPaymentFormat = bankSpecific.NewPaymentFormat();
         }
 
         static public string UnicontaCountryToISO(CountryCode code)
@@ -168,7 +170,7 @@ namespace ISO20022CreditTransfer
             if (company.CreditorBankApprovement)
             {
                 creditorBank = (CreditorPaymentAccount)credBankCache.Get(creditor._Account);
-                if (creditorBank != null && !creditorBank._Approved)
+                if (creditorBank != null && !creditorBank._Approved && !(trans.AllowBankApprovement && crudAPI.CompanyEntity.AllowApproval))
                 {
                     await crudAPI.Read(creditorBank);
                     if (!creditorBank._Approved)
@@ -353,7 +355,7 @@ namespace ISO20022CreditTransfer
                 checkErrors.Add(new CheckError(String.Format("{0}, {1}", string1, string2)));
             }
 
-            if (CompanyBankEnum == CompanyBankENUM.CreditSuisse && creditor._ZipCode == null)
+            if ((CompanyBankEnum == CompanyBankENUM.CreditSuisse || newPaymentFormat) && creditor._ZipCode == null)
             {
                 var string1 = fieldCannotBeEmpty("ZipCode");
                 var string2 = string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("Creditor"), creditor._Account);

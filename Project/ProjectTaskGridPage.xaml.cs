@@ -212,7 +212,11 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
             }
         }
-
+        protected override void OnLayoutLoaded()
+        {
+            base.OnLayoutLoaded();
+            dgProjectTaskGrid.Readonly = true;
+        }
         private void AddPeriod()
         {
             var prjBudgetLns = dgProjectTaskGrid.GetVisibleRows() as IEnumerable<ProjectTaskClient>;

@@ -435,8 +435,8 @@ namespace UnicontaClient.Pages.CustomPage
                 dgBSLinesGrid.SetLoadedRow(selectedLine);
                 selectedLine.DocumentRef = selectedRowId;
                 // selectedLine.DocumentDate = selectedVoucher._DocumentDate;
-                if (AssignText)
-                    selectedLine.Text = selectedLine._Text ?? selectedVoucher._Text;
+                if (AssignText && selectedVoucher._Text != null)
+                    selectedLine.Text = selectedVoucher._Text;
                 var amount = selectedLine.Amount;
                 if (selectedVoucher._Dim1 != null)
                     selectedLine.Dimension1 = selectedVoucher._Dim1;

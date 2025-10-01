@@ -117,7 +117,7 @@ namespace UnicontaClient.Pages.CustomPage
                             if (tagName == "HoursMonth2")
                                 e.TotalValue = normHoursMonth2;
                             else if (tagName == "TotalMonth2")
-                                e.TotalValue = new ProjectBudgetSumColumnWrapper(month2Sum , normHoursMonth2);
+                                e.TotalValue = new ProjectBudgetSumColumnWrapper(month2Sum, normHoursMonth2);
                             break;
                         case "MonthQty3":
                             if (tagName == "HoursMonth3")
@@ -177,7 +177,7 @@ namespace UnicontaClient.Pages.CustomPage
                             if (tagName == "HoursMonth12")
                                 e.TotalValue = normHoursMonth12;
                             else if (tagName == "TotalMonth12")
-                                e.TotalValue =   new ProjectBudgetSumColumnWrapper(month12Sum, normHoursMonth12);
+                                e.TotalValue = new ProjectBudgetSumColumnWrapper(month12Sum, normHoursMonth12);
                             break;
                         case "TotalQty":
                             if (tagName == "EmpNormHoursSum")
@@ -413,7 +413,7 @@ namespace UnicontaClient.Pages.CustomPage
             var prjBudgetLine = new ProjectBudgetLineClient();
             prjBudgetLine.SetMaster(api.CompanyEntity);
             prjBudgetLine.Project = item.Project;
-            prjBudgetLine.Employee = _empMaster.KeyStr;
+            prjBudgetLine.Employee = item.Employee;
             prjBudgetLine.PrCategory = item.PrCategory;
             prjBudgetLine.PayrollCategory = item.PayrollCategory;
             prjBudgetLine.Task = item.Task;

@@ -3,10 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Forms;
 using Uniconta.API.DebtorCreditor;
 using Uniconta.API.Service;
 using Uniconta.ClientTools.Controls;
@@ -61,6 +64,8 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override string NameOfControl { get { return TabControls.EDeliveryMappingPage; } }
 
+        private NHRAPI nhrApi;
+        private SQLCache mapppingGrpCache;
         private SQLCache xmlCache;
         private DebtorInvoiceClient invoice;
 
@@ -75,121 +80,35 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgEdeliveryMappingGrid);
             dgEdeliveryMappingGrid.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
-            SetMappingGroups(master);
-            SyncEntityMasterRowChanged((eDeliveryMappingGroupClient)leMappinggroup.SelectedItem);
             dgEdeliveryMappingGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
+            dgEdeliveryMappingGrid.UpdateMaster(master);
+            xmlCache = api.GetCache(typeof(eDeliveryTagTypeClient));
+            mapppingGrpCache = api.GetCache(typeof(eDeliveryMappingGroupClient));
+            nhrApi = new NHRAPI(api);
+            Loaded += async (s, e) => await InitAsync();
         }
 
-        private void LocalMenu_OnItemClicked(string ActionType)
+        private async Task InitAsync()
         {
-            var selectedItem = dgEdeliveryMappingGrid.SelectedItem as EDeliveryMappingClientExtended;
-            switch (ActionType)
-            {
-                case "AddRow":
-                    if (dgEdeliveryMappingGrid.masterRecord == null)
-                    {
-                        UnicontaMessageBox.Show(Localization.lookup("eDeliveryMappingMissingGroup"), Localization.lookup("EDeliveryMapping"));
-                        return;
-                    }
-                    dgEdeliveryMappingGrid.AddRow();
-                    xmlDocument = null;
-                    break;
-                case "DeleteRow":
-                    if (selectedItem != null)
-                    {
-                        dgEdeliveryMappingGrid.DeleteRow();
-                        gridRibbon_BaseActions("SaveGrid");
-                        xmlDocument = null;
-                    }
-                    break;
-                case "SaveGrid":
-                    ValidateAndSave();
-                    break;
-                case "View":
-                    ViewVoucher();
-                    break;
-                default:
-                    gridRibbon_BaseActions(ActionType);
-                    break;
-            }
+            if (xmlCache == null)
+                xmlCache = await api.LoadCache(typeof(eDeliveryTagTypeClient));
+            if (mapppingGrpCache == null)
+                mapppingGrpCache = await api.LoadCache(typeof(eDeliveryMappingGroupClient));
+
+            var master = dgEdeliveryMappingGrid.masterRecord as eDeliveryMappingGroupClient;
+            SetMappingGroups(master);
+            SyncEntityMasterRowChanged(master);
         }
 
-        private async void ValidateAndSave()
+        protected override void SyncEntityMasterRowChanged(UnicontaBaseEntity args)
         {
-            var result = await GetValidatedeDeliveryMappingDoc();
-            if (result != null && result.Length > 1)
-                await saveGrid();
-        }
-
-        private byte[] xmlDocument = null;
-        private async Task<byte[]> GetValidatedeDeliveryMappingDoc()
-        {
-            if (xmlDocument != null)
-                return xmlDocument;
-
-            if (dgEdeliveryMappingGrid.ItemsSource is List<EDeliveryMappingClientExtended> mappings &&
-                mappings != null && mappings.Count > 0)
+            if (args is eDeliveryMappingGroupClient master && master != null)
             {
-                if (mappings.Any(m => m.TagId == 0))
-                {
-                    UnicontaMessageBox.Show(Localization.lookup(ErrorCodes.FieldCannotBeBlank.ToString() + ": Tag"),
-                        Localization.lookup("Error"));
-                    return null;
-                }
-                if (mappings.GroupBy(x => x.TagId).Any(g => g.Count() > 1))
-                {
-                    UnicontaMessageBox.Show(Localization.lookup("eDeliveryMappingDuplicateTags"), Localization.lookup("Error"));
-                    return null;
-                }
-
-                var xmlTagsAndValues = mappings.ToDictionary(x => x.eDeliveryTag.Name, 
-                    y =>
-                    {
-                        if (y.Value == null)
-                            SetValue(y);
-
-                        return y.Value;
-                    });
-
-                var result = await new NHRAPI(api).GetValidatedeDeliveryMappingDoc(invoice, xmlTagsAndValues);
-                if (result != null && result.Length == 1)
-                    UnicontaMessageBox.Show(Localization.lookup(((ErrorCodes)result[0]).ToString()), Localization.lookup("Error"));
-                else if (result == null || result.Length == 0)
-                    UnicontaMessageBox.Show(Localization.lookup(api.LastError.ToString()), Localization.lookup("Error"));
-
-                xmlDocument = result;
+                dgEdeliveryMappingGrid.UpdateMaster(master);
+                InitQuery();
+                SetXmlTags(master);
+                cmbTableIds.ItemsSource = master?.GetTableAndProperties(api.CompanyEntity)?.OrderBy(x => x.DisplayName)?.ToList();
             }
-
-            return xmlDocument;
-        }
-
-        VoucherViewerWindow voucherViewer;
-        protected async void ViewVoucher()
-        {
-            var header = string.Format(Localization.lookup("ViewOBJ"), "XML");
-            if (voucherViewer == null || xmlDocument == null)
-            {
-                var xmlDocument = await GetValidatedeDeliveryMappingDoc();
-                var voucher = new VouchersClient
-                {
-                    _Data = xmlDocument,
-                    _Fileextension = FileextensionsTypes.XML
-                };
-
-                voucherViewer = new VoucherViewerWindow(invoice, this.api, header);
-                voucherViewer._LoadInitMaster(invoice, voucher, 0, true);
-                voucherViewer.Owner = UtilDisplay.GetCurentWindow();
-                voucherViewer.Closed += delegate { voucherViewer = null; };
-            }
-            if (VoucherViewerWindow.lastHeight != 0)
-            {
-                voucherViewer.Width = VoucherViewerWindow.lastWidth;
-                voucherViewer.Height = VoucherViewerWindow.lastHeight;
-            }
-            if (VoucherViewerWindow.isMaximized)
-                voucherViewer.WindowState = WindowState.Maximized;
-
-            voucherViewer.Show();
         }
 
         bool hasTableIdChanged;
@@ -221,11 +140,173 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        private async void SetMappingGroups(eDeliveryMappingGroupClient master)
+        private void LocalMenu_OnItemClicked(string ActionType)
         {
-            var mapppingGrpCache = api.CompanyEntity.GetCache(typeof(eDeliveryMappingGroupClient)) ??
-                await api.CompanyEntity.LoadCache(typeof(eDeliveryMappingGroupClient), api);
+            var selectedItem = dgEdeliveryMappingGrid.SelectedItem as EDeliveryMappingClientExtended;
+            switch (ActionType)
+            {
+                case "AddRow":
+                    if (dgEdeliveryMappingGrid.masterRecord == null)
+                    {
+                        UnicontaMessageBox.Show(Localization.lookup("eDeliveryMappingMissingGroup"), Localization.lookup("EDeliveryMapping"));
+                        return;
+                    }
+                    dgEdeliveryMappingGrid.AddRow();
+                    xmlDocument = null;
+                    break;
+                case "DeleteRow":
+                    if (selectedItem != null)
+                    {
+                        dgEdeliveryMappingGrid.DeleteRow();
+                        gridRibbon_BaseActions("SaveGrid");
+                        xmlDocument = null;
+                    }
+                    break;
+                case "SaveGrid":
+                    ValidateAndSave();
+                    break;
+                case "View":
+                    ViewVoucher();
+                    break;
+                case "SendUBL":
+                case "ExportUBL":
+                    if (invoice == null)
+                    {
+                        UnicontaMessageBox.Show(Localization.lookup("ZeroInvoice"), Localization.lookup("Error"));
+                        return;
+                    }
+                    if (xmlDocument == null)
+                    {
+                        var msg = UnicontaMessageBox.Show(string.Format(Localization.lookup("SaveChangesFor"), Localization.lookup("EDeliveryMapping")), Localization.lookup("EDeliveryMapping"), MessageBoxButton.YesNo);
+                        if (msg != MessageBoxResult.Yes)
+                            return;
+                        ValidateAndSave();
+                    }
+                    if ("SendUBL" == ActionType)
+                            Invoices.SendUBL(new DebtorInvoiceClient[1] { invoice }, api, null, busyIndicator);
+                    if ("ExportUBL" == ActionType)
+                        Invoices.ExportUBL(new DebtorInvoiceClient[1] { invoice }, api, null, null, null, mapppingGrpCache, false);
+                    break;
+                case "DocSendLog":
+                    if (invoice != null)
+                        AddDockItem(TabControls.DocsSendLogGridPage, invoice);
+                    break;
+                case "ImportUBL":
+                    CustomXmlFile();
+                    break;
+                default:
+                    gridRibbon_BaseActions(ActionType);
+                    break;
+            }
+        }
 
+        private async void ValidateAndSave()
+        {
+            var result = await GetValidatedeDeliveryMappingDoc();
+            if (result != null)
+                await saveGrid();
+        }
+
+        private string xmlDocument = null;
+        private async Task<string> GetValidatedeDeliveryMappingDoc()
+        {
+            if (xmlDocument != null)
+                return xmlDocument;
+
+            if (dgEdeliveryMappingGrid.ItemsSource is List<EDeliveryMappingClientExtended> mappings &&
+                mappings != null && mappings.Count > 0)
+            {
+                if (mappings.Any(m => m.TagId == 0))
+                {
+                    UnicontaMessageBox.Show(Localization.lookup(ErrorCodes.FieldCannotBeBlank.ToString() + ": Tag"),
+                        Localization.lookup("Error"));
+                    return null;
+                }
+                if (mappings.GroupBy(x => x.TagId).Any(g => g.Count() > 1))
+                {
+                    UnicontaMessageBox.Show(Localization.lookup("eDeliveryMappingDuplicateTags"), Localization.lookup("Error"));
+                    return null;
+                }
+
+                var emptyLabel = "{" + Localization.lookup("Empty") + "}";
+                var xmlTagsAndValues = mappings
+                    .Select(x =>
+                    {
+                        if (x.Value == null)
+                            SetValue(x);
+
+                        return new { x.eDeliveryTag.Name, x.Value };
+                    })
+                    .Where(x => !string.IsNullOrEmpty(x.Value) && x.Value != emptyLabel)
+                    .ToDictionary(x => x.Name, y => y.Value);
+
+                var result = await nhrApi.GetValidatedeDeliveryMappingDoc(invoice, xmlTagsAndValues);
+                if (result == null)
+                    UnicontaMessageBox.Show(Localization.lookup(api.LastError.ToString()), Localization.lookup("Error"));
+
+                xmlDocument = result;
+            }
+
+            return xmlDocument;
+        }
+
+        VoucherViewerWindow voucherViewer;
+        protected async void ViewVoucher()
+        {
+            var header = string.Format(Localization.lookup("ViewOBJ"), "XML");
+            if (voucherViewer == null || xmlDocument == null)
+            {
+                var xmlDocument = await GetValidatedeDeliveryMappingDoc();
+                var voucher = new VouchersClient
+                {
+                    _Data = Encoding.UTF8.GetBytes(xmlDocument),
+                    _Fileextension = FileextensionsTypes.XML
+                };
+
+                voucherViewer = new VoucherViewerWindow(invoice, this.api, header);
+                voucherViewer._LoadInitMaster(invoice, voucher, 0, true);
+                voucherViewer.Owner = UtilDisplay.GetCurentWindow();
+                voucherViewer.Closed += delegate { voucherViewer = null; };
+            }
+            if (VoucherViewerWindow.lastHeight != 0)
+            {
+                voucherViewer.Width = VoucherViewerWindow.lastWidth;
+                voucherViewer.Height = VoucherViewerWindow.lastHeight;
+            }
+            if (VoucherViewerWindow.isMaximized)
+                voucherViewer.WindowState = WindowState.Maximized;
+
+            voucherViewer.Show();
+        }
+
+        private async void CustomXmlFile()
+        {
+            string file = null;
+            try
+            {
+                using (var openFileDialog = new OpenFileDialog())
+                {
+                    openFileDialog.Filter = "XML files (*.xml)|*.xml";
+                    openFileDialog.Title = "Select an XML File";
+                    if (openFileDialog.ShowDialog() != DialogResult.OK)
+                        return;
+
+                    file = File.ReadAllText(openFileDialog.FileName);
+                }
+            }
+            catch { }
+            if (file != null)
+            {
+                var errCode = await nhrApi.SendOIOUBL(file);
+                if (errCode != 0)
+                    UnicontaMessageBox.Show(Localization.lookup(errCode.ToString()), Localization.lookup("Error"));
+            }
+            else
+                UnicontaMessageBox.Show(Localization.lookup("ViewerFailed"), Localization.lookup("Error"));
+        }
+
+        private void SetMappingGroups(eDeliveryMappingGroupClient master)
+        {
             if ((mapppingGrpCache == null || mapppingGrpCache.Count == 0) && master != null)
                 if (mapppingGrpCache != null && mapppingGrpCache.Get(master.Name) == null)
                     mapppingGrpCache.Add(master);
@@ -245,22 +326,13 @@ namespace UnicontaClient.Pages.CustomPage
                 leMappinggroup.SelectedItem = mapppingGrpCache.First();
         }
 
-        protected override void SyncEntityMasterRowChanged(UnicontaBaseEntity args)
-        {
-            if (args is eDeliveryMappingGroupClient master && master != null)
-            {
-                dgEdeliveryMappingGrid.UpdateMaster(master);
-                InitQuery();
-                SetXmlTags(master);
-                cmbTableIds.ItemsSource = master?.GetTableAndProperties(api.CompanyEntity)?.OrderBy(x => x.DisplayName)?.ToList();
-            }
-        }
-
         private async void SetXmlTags(eDeliveryMappingGroupClient master)
         {
-            if (xmlCache == null)
-                xmlCache = api.CompanyEntity.GetCache(typeof(eDeliveryTagTypeClient)) ??
-                    await api.CompanyEntity.LoadCache(typeof(eDeliveryTagTypeClient), api);
+            if (xmlCache == null || xmlCache.Count == 0)
+            {
+                var tags = await api.Query<eDeliveryTagTypeClient>();
+                xmlCache = new SQLCache(tags);
+            }
 
             cmbTagIds.ItemsSource = xmlCache?.GetNotNullArray?
                 .Select(x => (eDeliveryTagTypeClient)x)?
@@ -286,14 +358,18 @@ namespace UnicontaClient.Pages.CustomPage
                 var compareOp = docType == eDeliveryDocumentType.Invoice ?
                     CompareOperator.GreaterThan : CompareOperator.LessThan;
 
-                result = (await api.Query<DebtorInvoiceClient>(
-                    new PropValuePair[3]
-                    {
-                        PropValuePair.GenereteOrderByElement("Date", true),
-                        PropValuePair.GenereteWhereElements("LineTotal", 0L, compareOp),
-                        PropValuePair.GenereteTakeN(10),
-                    }))?
+                result = api.CompanyEntity.DebtorInvoices?.GetRecords?
+                    .Where(i => compareOp == CompareOperator.LessThan ? i.TotalAmount < 0 : i.TotalAmount >= 0)?
+                    .OrderByDescending(i => i.Date)?
+                    .Take(100)?
                     .ToArray();
+
+                if (result == null || result.Length == 0)
+                    result = (await api.Query<DebtorInvoiceClient>(
+                        new PropValuePair[1] { PropValuePair.GenereteWhereElements("LineTotal", 0L, compareOp) }))?
+                        .OrderByDescending(i => i.Date)?
+                        .Take(100)?
+                        .ToArray();
             }
 
             tbDocumentNum.Text = newMappingGroup.DocType;

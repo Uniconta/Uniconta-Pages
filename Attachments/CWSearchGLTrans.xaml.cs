@@ -43,7 +43,6 @@ namespace UnicontaClient.Pages.CustomPage
         public static DateTime ToDate { get; set; } = DateTime.Now;
         public static bool includeWithoutAttachment { get; set; } = true;
         static double windowWidth = 1050;
-
         public GLTransClient SelectedRow;
         public CWSearchGLTrans(CrudAPI api)
         {
@@ -56,7 +55,6 @@ namespace UnicontaClient.Pages.CustomPage
             txtJournalPostedId.Validate += Txt_Validate;
             txtVoucher.Validate += Txt_Validate;
             this.Width = windowWidth;
-
         }
 
         private void Txt_Validate(object sender, DevExpress.Xpf.Editors.ValidationEventArgs e)
@@ -130,6 +128,14 @@ namespace UnicontaClient.Pages.CustomPage
             }
             // var trans = await api.Query<GLTransClient>(new GLTransClient(), null, filters);
             dgGLTrans.Filter(filters);
+        }
+
+        private void Voucher_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var selectedItem = dgGLTrans.SelectedItem as GLTransClient;
+            var cwDocViewer = new VoucherViewerWindow(dgGLTrans.syncEntity, api, string.Concat(Uniconta.ClientTools.Localization.lookup("Voucher"), ":", selectedItem.DocumentRef));
+            cwDocViewer.Owner = this;
+            cwDocViewer.Show();
         }
     }
 }

@@ -2462,14 +2462,14 @@ namespace UnicontaClient.Pages.CustomPage
                 return false;
 
             double valRegHours = 0;
-            double valNormHours1 = 0, valNormHours2 = 0, valNormHours3 = 0, valNormHours4 = 0, valNormHours5 = 0, valNormHours6 = 0, valNormHours7 = 0, valNormHoursTotal = 0;
+            double valNormHours1 = 0, valNormHours2 = 0, valNormHours3 = 0, valNormHours4 = 0, valNormHours5 = 0, valNormHours6 = 0, valNormHours7 = 0, valNormHoursTotal = 0, normHoursWeek = 0;
 
             double daysCnt = 0;
             double normDaysCnt = 0;
 
             DateTime startDateWeek = DateTime.MinValue, startDateClose = DateTime.MinValue, endDateClose = DateTime.MinValue;
 
-            if (actionType == TMJournalActionType.Close && dialogDate < JournalLineDate.AddDays(6))
+            if (actionType == TMJournalActionType.Close && dialogDate <= JournalLineDate.AddDays(6))
             {
                 var tmLinesHours = dgTMJournalLineGrid.ItemsSource as IEnumerable<TMJournalLineClient>;
 
@@ -2520,11 +2520,13 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                 }
                 valNormHoursTotal = valNormHours1 + valNormHours2 + valNormHours3 + valNormHours4 + valNormHours5 + valNormHours6 + valNormHours7;
+                normHoursWeek = normHoursDay1 + normHoursDay2 + normHoursDay3 + normHoursDay4 + normHoursDay5 + normHoursDay6 + normHoursDay7;
             }
             else
             {
                 valRegHours = totalSum;
                 valNormHoursTotal = normHoursTotal;
+                normHoursWeek = normHoursTotal;
 
                 startDateWeek = employee._TMApproveDate >= JournalLineDate ? employee._TMApproveDate.AddDays(1) : JournalLineDate;
                 startDateClose = startDateWeek;
@@ -2590,7 +2592,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
 
                 #region Insert Difference hours line
-                if ((actionType == TMJournalActionType.Validate || actionType == TMJournalActionType.Close) && valNormHoursTotal != 0)
+                if ((actionType == TMJournalActionType.Validate || actionType == TMJournalActionType.Close) && normHoursWeek != 0)
                 {
                     if (JournalLineDate.AddDays(6) > employee._TMCloseDate && ret == true && valRegHours - valNormHoursTotal > 0 && (lstCatOverTime != null || lstCatFlexTime != null))
                     {

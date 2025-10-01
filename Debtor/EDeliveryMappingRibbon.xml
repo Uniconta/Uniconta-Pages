@@ -13,6 +13,14 @@
 		<RibbonItem Action="View" ShortcutKey="F7" LocalizedNameKey="View" LargeGlyph="View_Highlighted_32x32" />
 	</RibbonItem>
 	<RibbonItem>
+		<RibbonItem LocalizedNameKey="Send" Module="_OIOUBLSendOnServer" LargeGlyph="SendInvoiceMail_32x32">
+			<RibbonItem Action="SendUBL" LocalizedNameKey="SendInvoicebyUBL"/>
+			<RibbonItem Action="ImportUBL" LocalizedNameKey="ImportSendCustomOIOUBL"/>
+		</RibbonItem>
+		<RibbonItem Action="ExportUBL" LocalizedNameKey="ExportOBJ" Parameter="einvoice" LargeGlyph="Import_32x32"/>
+		<RibbonItem Action="DocSendLog" LocalizedNameKey="Log" ControlName="DocsSendLogGridPage" LargeGlyph="Server_Count_32x32" />
+	</RibbonItem>
+	<RibbonItem>
 		<!---If we want to create a new group in same PageTab-->
 		<RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32">
 			<!---If we want Inner menu-->

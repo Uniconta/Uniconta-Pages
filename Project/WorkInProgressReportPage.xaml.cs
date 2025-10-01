@@ -345,6 +345,14 @@ namespace UnicontaClient.Pages.CustomPage
 
         bool tmLinesWIPLoaded;
 
+        private DateTime AdjustToPreviousSunday(DateTime date)
+        {
+            if (date == DateTime.MinValue)
+                return date;
+            int daysBack = (int)date.DayOfWeek;
+            return date.AddDays(-daysBack);
+        }
+
         async private Task IncludeJournals()
         {
             dgWorkInProgressRpt.Columns.GetColumnByName("EmployeeHoursJournal").Visible = includeJournals;
@@ -376,74 +384,124 @@ namespace UnicontaClient.Pages.CustomPage
 
             var tmJourLines = await api.Query<TMJournalLineClient>(projCache.Get(cmbProject.Text), pairTM);
 
-            var tmLines = tmJourLines.Where(s => (s._Project != null &&
-                                                  s._PayrollCategory != null &&
-                                                  s._Date > empCache.Get(s._Employee)._TMApproveDate))
-                                                  .GroupBy(x => new { x._Employee, x._Project, x._PayrollCategory, x._WorkSpace, x._Task, x._Date }).Select(x => new TMJournalLineClient
-                                                  {
-                                                      Date = x.Key._Date,
-                                                      Project = x.Key._Project,
-                                                      Employee = x.Key._Employee,
-                                                      PayrollCategory = x.Key._PayrollCategory,
-                                                      Task = x.Key._Task,
-                                                      WorkSpace = x.Key._WorkSpace,
-                                                      Day1 = x.Sum(y => y._Day1),
-                                                      Day2 = x.Sum(y => y._Day2),
-                                                      Day3 = x.Sum(y => y._Day3),
-                                                      Day4 = x.Sum(y => y._Day4),
-                                                      Day5 = x.Sum(y => y._Day5),
-                                                      Day6 = x.Sum(y => y._Day6),
-                                                      Day7 = x.Sum(y => y._Day7),
-                                                  }).ToList();
+            var grouped = new Dictionary<(string emp, string proj, string cat, string ws, string task, DateTime date), TMJournalLineClient>();
+            Uniconta.DataModel.Employee emp = null;
+            DateTime? approveDateEmp = null;
+
+            foreach (var line in tmJourLines)
+            {
+                if (line._Project == null || line._PayrollCategory == null || line._Employee == null)
+                    continue;
+
+                if (emp == null || emp._Number != line._Employee)
+                {
+                    emp = empCache.Get(line._Employee);
+                    if (emp?._TMApproveDate != DateTime.MinValue)
+                        approveDateEmp = AdjustToPreviousSunday(emp._TMApproveDate);
+                    else
+                        approveDateEmp = null;
+                }
+
+                if (line._Date < approveDateEmp)
+                    continue;
+
+                var key = (line._Employee, line._Project, line._PayrollCategory, line._WorkSpace, line._Task, line._Date);
+
+                if (!grouped.TryGetValue(key, out var target))
+                {
+                    target = new TMJournalLineClient
+                    {
+                        Date = key._Date,
+                        Project = key._Project,
+                        Employee = key._Employee,
+                        PayrollCategory = key._PayrollCategory,
+                        Task = key._Task,
+                        WorkSpace = key._WorkSpace
+                    };
+                    grouped[key] = target;
+                }
+
+                target.Day1 += line._Day1;
+                target.Day2 += line._Day2;
+                target.Day3 += line._Day3;
+                target.Day4 += line._Day4;
+                target.Day5 += line._Day5;
+                target.Day6 += line._Day6;
+                target.Day7 += line._Day7;
+            }
+
+            var tmLines = grouped.Values.ToList();
 
             var tmLinesWIP = new Dictionary<string, TmpprojectSum>(100);
             var localtmLines = new List<TMJournalLineClient>(100);
-            string lastEmployee = null;
 
             var grpEmpDate = tmLines.GroupBy(x => new { x.Employee, x.Date }).Select(g => new { g.Key.Employee, g.Key.Date });
+
+            bool isApprovedSunday = true;
+            DateTime approvedDateSunday = DateTime.MinValue;
+            var approveDate = DateTime.MinValue;
             foreach (var row in grpEmpDate)
             {
-                var emp = empCache.Get(row.Employee);
-                var startDate = emp._TMApproveDate < row.Date ? row.Date : emp._TMApproveDate >= row.Date.AddDays(6) ? DateTime.MinValue : emp._TMApproveDate;
-                var endDate = row.Date.AddDays(6);
-
-                if (startDate != DateTime.MinValue)
+                if (emp == null || emp._Number != row.Employee)
                 {
-                    if (lastEmployee == null || lastEmployee != emp._Number)
+                    emp = empCache.Get(row.Employee);
+                    await priceLookup.EmployeeChanged(emp);
+
+                    if (emp?._TMApproveDate != DateTime.MinValue)
                     {
-                        lastEmployee = emp._Number;
-                        await priceLookup.EmployeeChanged(emp);
+                        approveDate = emp._TMApproveDate;
+                        isApprovedSunday = approveDate.DayOfWeek == DayOfWeek.Sunday;
+                        approvedDateSunday = AdjustToPreviousSunday(approveDate);
+                    }
+                }
+
+                localtmLines.Clear();
+                foreach (var s in tmLines)
+                    if (s._Date == row.Date && s._Employee == emp._Number)
+                        localtmLines.Add(s);
+
+                await priceLookup.GetEmployeePrice(localtmLines);
+
+                bool onlyPartWeek = !isApprovedSunday && approvedDateSunday == row.Date.AddDays(-1);
+                int dayOfStart = isApprovedSunday ? 0 : (int)approveDate.DayOfWeek;
+                foreach (var rec in localtmLines)
+                {
+                    var lookupValue = showWorkspace || showTask ? string.Concat(rec._Project, rec._WorkSpace, rec._Task) : rec._Project;
+
+                    if (!tmLinesWIP.TryGetValue(lookupValue, out TmpprojectSum lineWIP))
+                    {
+                        lineWIP = new TmpprojectSum { Project = rec._Project };
+                        tmLinesWIP[lookupValue] = lineWIP;
                     }
 
-                    localtmLines.Clear();
-                    foreach (var s in tmLines)
-                        if (s._Date == row.Date && s._Employee == emp._Number)
-                            localtmLines.Add(s);
-
-                    await priceLookup.GetEmployeePrice(localtmLines);
-
-                    foreach (var rec in localtmLines)
+                    if (onlyPartWeek)
                     {
-                        var lookupValue = showWorkspace || showTask ? string.Concat(rec._Project, rec._WorkSpace, rec._Task) : rec._Project;
+                        double hoursTot = 0;
+                        double salesPriceTot = 0;
+                        double costPriceTot = 0;
 
-                        TmpprojectSum lineWIP;
-                        if (tmLinesWIP.TryGetValue(lookupValue, out lineWIP))
+                        for (int x = dayOfStart + 1; x <= 7; x++)
                         {
-                            lineWIP.EmployeeHoursJournal += rec.Total;
-                            lineWIP.EmployeeFeeJournal += rec.TotalSalesPrice;
-                            lineWIP.EmployeeFeeJournalCostValue += rec.TotalCostPrice;
+                            double dayHours = rec.GetHoursDayN(x);
+                            if (dayHours == 0)
+                                continue;
+                            double daySalesPrice = rec.GetSalesPricesDayN(x);
+                            double dayCostPrice = rec.GetCostPricesDayN(x);
+
+                            hoursTot += dayHours;
+                            salesPriceTot += dayHours * daySalesPrice;
+                            costPriceTot += dayHours * dayCostPrice;
                         }
-                        else
-                        {
-                            tmLinesWIP.Add(lookupValue,
-                             new TmpprojectSum
-                             {
-                                 Project = rec._Project,
-                                 EmployeeHoursJournal = rec.Total,
-                                 EmployeeFeeJournal = rec.TotalSalesPrice,
-                                 EmployeeFeeJournalCostValue = rec.TotalCostPrice,
-                             });
-                        }
+
+                        lineWIP.EmployeeHoursJournal += hoursTot;
+                        lineWIP.EmployeeFeeJournal += salesPriceTot;
+                        lineWIP.EmployeeFeeJournalCostValue += costPriceTot;
+                    }
+                    else
+                    {
+                        lineWIP.EmployeeHoursJournal += rec.Total;
+                        lineWIP.EmployeeFeeJournal += rec.TotalSalesPrice;
+                        lineWIP.EmployeeFeeJournalCostValue += rec.TotalCostPrice;
                     }
                 }
             }
@@ -630,7 +688,17 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "Transactions":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.ProjectTransactionPage, dgWorkInProgressRpt.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Transactions"), selectedItem.Project));
+                    {
+                        var header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Transactions"), selectedItem.Project);
+                        if (selectedItem._Workspace != null)
+                            header += string.Format(" ({0}: {1})", Uniconta.ClientTools.Localization.lookup("Workspace"), selectedItem.Workspace);
+
+                        object[] param = new object[2];
+                        param[0] = (object)selectedItem.ProjectRef;
+                        param[1] = selectedItem._Workspace;
+
+                        AddDockItem(TabControls.ProjectTransactionPage,  param, header);
+                    }
                     break;
                 case "Search":
                     LoadGrid();

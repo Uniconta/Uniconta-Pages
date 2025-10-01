@@ -176,6 +176,13 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     PostProjectOrder(selectedItem);
                     break;
+                case "Invoices":
+                    if (selectedItem != null)
+                    {
+                        string header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Order"), selectedItem._OrderNumber);
+                        AddDockItem(TabControls.Invoices, selectedItem, header);
+                    }
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;

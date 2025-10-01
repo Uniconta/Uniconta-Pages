@@ -499,7 +499,7 @@ namespace UnicontaClient.Pages.CustomPage
                     //startInfo.UseShellExecute = true;
                     Console.WriteLine($"Start browser with URL '{startUrlWithSuffix}'");
                     dialog = new CWBrowserDialog(startUrlWithSuffix, "DATEV Login");
-
+                    dialog.EnableCertificateSelection(); ;
                     Dispatcher.BeginInvoke((Action)(() => dialog.Show()));
                     dialog.Closed += (sender, args) =>
                     {

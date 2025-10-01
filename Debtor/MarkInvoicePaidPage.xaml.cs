@@ -160,17 +160,17 @@ namespace UnicontaClient.Pages.CustomPage
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
                     busyIndicator.IsBusy = true;
 
-                    var glLines = new List<GLDailyJournalLineClient>();
+                    var glLines = new List<GLDailyJournalLineClient>(12);
                     var visibleRows = dgDebtorTransOpen.GetVisibleRows();
                     foreach (var row in visibleRows as IEnumerable<MarkInvoicePaidClient>)
                     {
-                        if (row.Paid && row.AmountPaid > 0)
+                        if (row.Paid && row.AmountOpen > 0)
                         {
                             var rec = new GLDailyJournalLineClient()
                             {
                                 _Account = row.Account,
                                 _AccountType = (byte)GLJournalAccountType.Debtor,
-                                _Credit = row.AmountPaid,
+                                _Credit = row.AmountPaid != 0 ? row.AmountPaid : row.AmountOpen,
                                 _Date = row.DatePaid != DateTime.MinValue ? row.DatePaid : postingDialog.PayDate,
                                 _OffsetAccount = postingDialog.Bank,
                                 _Invoice = row.InvoiceAN,

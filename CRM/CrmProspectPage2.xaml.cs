@@ -90,7 +90,8 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     editrow = CreateNew() as CrmProspectClient;
                     editrow.SetMaster(Comp);
-                    editrow.Country = Comp._CountryId;
+                    if (editrow.Country == 0)
+                        editrow.Country = Comp._CountryId;
                 }
             }
             layoutItems.DataContext = editrow;

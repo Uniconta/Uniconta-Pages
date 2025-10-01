@@ -89,7 +89,8 @@ namespace UnicontaClient.Pages.CustomPage
                 if (!isCopiedRow)
                 {
                     editrow = CreateNew() as CreditorClient;
-                    editrow.Country = crudapi.CompanyEntity._CountryId;
+                    if (editrow.Country == 0)
+                        editrow.Country = crudapi.CompanyEntity._CountryId;
                 }
                 editrow._D2CAccount = null;
             }

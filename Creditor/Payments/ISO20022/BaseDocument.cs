@@ -31,6 +31,8 @@ namespace UnicontaISO20022CreditTransfer
         protected const string XMLNS_CCTS = "xmlns:ccts";
         public const string XMLNS_XSI_VALUE = "http://www.w3.org/2001/XMLSchema-instance";
         public const string XMLNS_PAIN003 = "urn:iso:std:iso:20022:tech:xsd:pain.001.001.03";
+        public const string XMLNS_PAIN009 = "urn:iso:std:iso:20022:tech:xsd:pain.001.001.09";
+
         protected const string CAC = "cac";
         protected const string CBC = "cbc";
 
@@ -77,7 +79,8 @@ namespace UnicontaISO20022CreditTransfer
         public const string POSTAL_ADDRESS = "PostalAddress";
         public const string ADDRESSLINE = "AdrLine";
         public const string STREET_NAME = "StrtNm";
-        
+        public const string BUILDING_NUMBER = "BldgNb";
+
         public const string TOWN_NAME = "TwnNm";
         public const string POSTAL_CODE = "PstCd";
         public const string COUNTRY = "Ctry";
@@ -128,6 +131,8 @@ namespace UnicontaISO20022CreditTransfer
 
         public const string OCR = "OCR";
         public const string QRR = "QRR";
+        public const string NETS = "NETS";
+
         #endregion
 #if !SILVERLIGHT
         #region Member variables

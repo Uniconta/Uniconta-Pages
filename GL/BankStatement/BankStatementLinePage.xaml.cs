@@ -626,37 +626,23 @@ namespace UnicontaClient.Pages.CustomPage
 
                     break;
                 case "ViewVoucher":
-                    bool useGLTrans = true;
-                    if (selectedItem != null)
-                    {
-                        selectedTrans = dgAccountsTransGrid.SelectedItem as GLTransClientTotalBank;
-                        if (selectedTrans == null || selectedTrans._DocumentRef == 0)
-                            useGLTrans = false;
-                        else if (selectedItem._DocumentRef != 0 && selectedItem._DocumentRef != selectedTrans._DocumentRef)
-                        {
-                            var page = this as GridBasePage;
-                            useGLTrans = (page.CurrentKeyDownGrid == dgAccountsTransGrid);
-                        }
-                    }
-                    if (useGLTrans)
-                    {
-                        selectedTrans = dgAccountsTransGrid.SelectedItem as GLTransClientTotalBank;
-                        if (selectedTrans != null)
-                        {
-                            dgAccountsTransGrid.syncEntity.Row = selectedTrans;
-                            busyIndicator.IsBusy = true;
-                            ViewVoucher(TabControls.VouchersPage3, dgAccountsTransGrid.syncEntity);
-                            busyIndicator.IsBusy = false;
-                        }
-                    }
-                    else if (selectedItem != null)
+                    GridControl focusedGrid = this.CurrentKeyDownGrid;
+                    if (dgAccountsTransGrid.IsKeyboardFocusWithin == true)
+                        focusedGrid = dgAccountsTransGrid;
+                    else if (dgBankStatementLine.IsKeyboardFocusWithin == true)
+                        focusedGrid = dgBankStatementLine;
+                    if (focusedGrid == dgAccountsTransGrid)
+                        ViewTransVoucher();
+                    else if (selectedItem?.DocumentRef > 0)
                     {
                         dgBankStatementLine.syncEntity.Row = selectedItem;
                         busyIndicator.IsBusy = true;
                         ViewVoucher(TabControls.VouchersPage3, dgBankStatementLine.syncEntity);
                         busyIndicator.IsBusy = false;
                     }
-                    break;
+                    else
+                        ViewTransVoucher();
+                        break;
                 case "DragDrop":
                 case "ImportVoucher":
                     if (selectedItem != null)
@@ -756,6 +742,19 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
             }
         }
+
+        void ViewTransVoucher()
+        {
+            var selectedTrans = dgAccountsTransGrid.SelectedItem as GLTransClientTotalBank;
+            if (selectedTrans != null)
+            {
+                dgAccountsTransGrid.syncEntity.Row = selectedTrans;
+                busyIndicator.IsBusy = true;
+                ViewVoucher(TabControls.VouchersPage3, dgAccountsTransGrid.syncEntity);
+                busyIndicator.IsBusy = false;
+            }
+        }
+
 
         async void Adjustment()
         {
@@ -1177,6 +1176,9 @@ namespace UnicontaClient.Pages.CustomPage
                             if (bst._AccountType > 0 && bst.Account != null && act.DCAccount != null && bst.Account != act.DCAccount) // we have a different DC. we cannot match
                                 continue;
 
+                            if (bst._Invoice != null && act._Invoice != 0 && NumberConvert.ToInt(bst._Invoice) != act._Invoice)
+                                continue;
+
                             if (Text != null && act._Text != null)
                             {
                                 if (Text == act._Text)
@@ -1563,6 +1565,8 @@ namespace UnicontaClient.Pages.CustomPage
                                     var act2 = markedactList[j];
                                     if (bst._AmountCent != 0 && bst._AmountCent == (!ShowCurrency ? act2._AmountCent : act2._AmountCurCent))
                                     {
+                                        if (bst._Invoice != null && act2._Invoice != 0 && NumberConvert.ToInt(bst._Invoice) != act2._Invoice)
+                                            continue;
                                         if (match < 0)
                                             match = j;
                                         else

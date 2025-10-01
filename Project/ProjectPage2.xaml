@@ -233,7 +233,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectPage2"
                     <CorasauControls:CorasauLayoutItem x:Name="liAdjustmentCost" FieldName="AdjustmentCost">
                         <CorasauControls:DoubleEditor  FieldName="AdjustmentCost" MarkReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liCostValue" FieldName="CostValue">
+                    <CorasauControls:CorasauLayoutItem x:Name="liCostValue" FieldName="CostValue" Visibility="{Binding Visibility, ElementName=lixCostValue}">
                         <CorasauControls:DoubleEditor  FieldName="CostValue" MarkReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>

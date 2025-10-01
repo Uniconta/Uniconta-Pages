@@ -46,7 +46,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorInvoiceLinesPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesPrice" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="NetDiscount" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DiscountPct" Width="50"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceTotal" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NetAmountInv" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CostPrice" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Margin" Width="100" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="MarginRatio" Width="60" />
@@ -68,8 +68,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorInvoiceLinesPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="StockUpdate" Width="60" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PartOfBOM" Width="50" Visible="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderNumber" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceNetAmount" Width="90" Visible="false"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="GrossAmount" Width="90" Visible="false"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="GrossAmountInv" Width="90" Visible="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="50" Visible="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="EndDiscountPct" Width="35" Visible="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="MovementType" Visible="false"/>
@@ -93,9 +92,8 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorInvoiceLinesPage"
                 </localPage:InvTransClientGrid.Columns>
                 <localPage:InvTransClientGrid.TotalSummary>
                     <localPage:SumColumn FieldName="InvoiceQty" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
-                    <localPage:SumColumn FieldName="InvoiceTotal" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
-                    <localPage:SumColumn FieldName="NetAmount" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
-                    <localPage:SumColumn FieldName="GrossAmount" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="NetAmountInv" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                    <localPage:SumColumn FieldName="GrossAmountInv" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <localPage:SumColumn FieldName="Margin" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <localPage:SumColumn FieldName="CostValue" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <localPage:SumColumn FieldName="MarginRatio" SummaryType="Custom" DisplayFormat="{}{0:N2}" />

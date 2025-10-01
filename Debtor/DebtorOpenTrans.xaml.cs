@@ -101,6 +101,7 @@ namespace UnicontaClient.Pages.CustomPage
                 var err = await transApi.Settle(tranOpenMaster, settles);
                 tranOpenMaster = null;
                 settles = null;
+                SetStatusText();
                 UtilDisplay.ShowErrorCode(err);
                 InitQuery();
             }
@@ -320,7 +321,7 @@ namespace UnicontaClient.Pages.CustomPage
                         else
                         {
                             invoiceCur += settle.PartialSettlement != 0 ? settle.PartialSettlement : settle._AmountOpenCur;
-                            invoice += tranOpenMaster._AmountOpen;
+                            invoice += settle._AmountOpen;
                         }
                     }
                     if (invoiceCur != 0d)

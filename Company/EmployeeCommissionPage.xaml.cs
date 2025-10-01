@@ -151,17 +151,21 @@ namespace UnicontaClient.Pages.CustomPage
                 if (commission._IsRevenue)
                     amount = tran._NetAmount() * commission._Rate / -100d;
                 else
-                    amount = tran.Margin * commission._Rate / -100d;
+                    amount = tran.Margin * commission._Rate / 100d;
             }
             if (amount == 0)
                 return null;
 
-            var calCom = new CalCommissionClient();
-            calCom.SetMaster(tran);
-            calCom._InvoiceNumber = tran._InvoiceNumber;
-            calCom._InvoiceRowId = tran._InvoiceRowId;
-            calCom._Commission = Math.Round(amount, 2);
-            return calCom;
+            return new CalCommissionClient
+            {
+                _CompanyId = tran.CompanyId,
+                _Employee = tran._Employee,
+                _Item = tran._Item,
+                _Account = tran._DCAccount,
+                _InvoiceNumber = tran._InvoiceNumber,
+                _InvoiceRowId = tran._InvoiceRowId,
+                _Commission = Math.Round(amount, 2)
+            };
         }
 
         private CalCommissionClient CalculateCommissionDebInvoice(DebtorInvoiceClient dic, EmployeeCommission commission)
@@ -177,14 +181,15 @@ namespace UnicontaClient.Pages.CustomPage
             if (amount == 0)
                 return null;
 
-            var calCom = new CalCommissionClient();
-            calCom._CompanyId = dic.CompanyId;
-            calCom._Employee = dic._Employee;
-            calCom._Account = dic._DCAccount;
-            calCom._InvoiceNumber = (int)dic._InvoiceNumber;
-            calCom._InvoiceRowId = dic.RowId;
-            calCom._Commission = Math.Round(amount, 2);
-            return calCom;
+            return new CalCommissionClient
+            {
+                _CompanyId = dic.CompanyId,
+                _Employee = dic._Employee,
+                _Account = dic._DCAccount,
+                _InvoiceNumber = (int)dic._InvoiceNumber,
+                _InvoiceRowId = dic.RowId,
+                _Commission = Math.Round(amount, 2)
+            };
         }
 
         async void calc(DateTime fromDate, DateTime toDate)
@@ -193,7 +198,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             var employee = (master as Uniconta.DataModel.Employee)?._Number;
 
-            var propValuePairList = new List<PropValuePair>()
+            var propValuePairList = new List<PropValuePair>(2)
             {
                 PropValuePair.GenereteWhereElements("Date", typeof(DateTime), string.Concat(fromDate.ToShortDateString(), "..", toDate.ToShortDateString())),
                 PropValuePair.GenereteWhereElements("Deleted", typeof(int), "0")

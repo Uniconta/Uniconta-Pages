@@ -528,6 +528,9 @@ namespace UnicontaClient.Pages.CustomPage
                 case "RefreshGrid":
                     RefreshGrid();
                     return;
+                case "UpdateCostPrices":
+                    UpdateCostPrice();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -763,6 +766,27 @@ namespace UnicontaClient.Pages.CustomPage
                     row.SetCostFromItem(item);
             }
             return false;
+        }
+
+        private void UpdateCostPrice()
+        {
+            var prodOrderLineLst = dgProductionOrderLineGrid.ItemsSource as IEnumerable<ProductionOrderLineClient>;
+
+            if (prodOrderLineLst == null)
+                return;
+
+            foreach(var line in prodOrderLineLst)
+            {
+                var lnPrice = line.Price;
+                var itm = line.InvItem;
+
+                if (itm != null && itm.CostPrice != lnPrice)
+                {
+                    dgProductionOrderLineGrid.SetLoadedRow(line);
+                    line.Price = itm.CostPrice;
+                    dgProductionOrderLineGrid.SetModifiedRow(line);
+                }
+            }
         }
     }
 }

@@ -120,6 +120,12 @@ namespace UnicontaClient.Pages.CustomPage
             base.OnLayoutLoaded();
             setDim();
             dgProjectGrid.Readonly = true;
+
+            if (api.CompanyEntity.HideCostPrice)
+            {
+                CostValue.Visible = CostValue.ShowInColumnChooser = Margin.Visible = Margin.ShowInColumnChooser =
+                    MarginRatio.Visible = MarginRatio.ShowInColumnChooser = false;
+            }
         }
         protected override void LoadCacheInBackGround()
         {
@@ -371,7 +377,8 @@ namespace UnicontaClient.Pages.CustomPage
                         AddDockItem(TabControls.PurchaseLines, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("PurchaseLines"), selectedItem._Number));
                     break;
                 case "RefreshGrid":
-                    TestDebtorReload(true, dgProjectGrid.ItemsSource as IEnumerable<Uniconta.DataModel.Project>);
+                    if (gridControl.Visibility == Visibility.Visible)
+                        TestDebtorReload(true, dgProjectGrid.ItemsSource as IEnumerable<Uniconta.DataModel.Project>);
                     break;
                 case "DeleteTransactions":
                     if (selectedItem != null)

@@ -42,6 +42,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override string LineNumberProperty { get { return "_LineNumber"; } }
         public override bool AllowSort { get { return false; } }
         public override bool Readonly { get { return false; } }
+        public string userWarehouse;
         public override bool AddRowOnPageDown()
         {
             var selectedItem = (DCOrderLine)this.SelectedItem;
@@ -64,7 +65,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     var it = (InvTrans)_it;
                     lst.Add(CreateNewReservationLine(it._Item, it.MovementTypeEnum == InvMovementType.Debtor ? -it._Qty : it._Qty, it._Text, it._Price, it.MovementTypeEnum == InvMovementType.Debtor ? -it._AmountEntered : it._AmountEntered,
-                        it._DiscountPct, it._Discount, it._Variant1, it._Variant2, it._Variant3, it._Variant4, it._Variant5, it._Unit, it._Date, it._Week, it._Note, it._Task, it._WorkSpace));
+                        it._DiscountPct, it._Discount, it._Variant1, it._Variant2, it._Variant3, it._Variant4, it._Variant5, it._Warehouse, it._Location, it._Unit, it._Date, it._Week, it._Note, it._Task, it._WorkSpace));
                 }
             }
             else if (row is ProjectBudgetLineClient)
@@ -76,7 +77,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var itemCache = api.CompanyEntity.GetCache(typeof(InvItem));
                     if (it._Item == null || (itemCache?.Get(it._Item) as InvItem)?._ItemType != (byte)ItemType.Item || it._QtyTaken != 0d)
                         continue;
-                    lst.Add(CreateNewReservationLine(it._Item, it._Qty, it._Text, 0d, 0d, 0d, 0d, it._Variant1, it._Variant2, it._Variant3, it._Variant4, it._Variant5, it._Unit,
+                    lst.Add(CreateNewReservationLine(it._Item, it._Qty, it._Text, 0d, 0d, 0d, 0d, it._Variant1, it._Variant2, it._Variant3, it._Variant4, it._Variant5, it._Warehouse, it._Location, it._Unit,
                     it._Date, 0, null, it._Task, it._WorkSpace));
                 }
             }
@@ -86,7 +87,7 @@ namespace UnicontaClient.Pages.CustomPage
                 foreach (var _it in copyFromRows)
                 {
                     var it = (DCOrderLine)_it;
-                    var line = CreateNewReservationLine(it._Item, it._Qty, it._Text, it._Price, it._AmountEntered, it._DiscountPct, it._Discount, it._Variant1, it._Variant2, it._Variant3, it._Variant4, it._Variant5, it._Unit,
+                    var line = CreateNewReservationLine(it._Item, it._Qty, it._Text, it._Price, it._AmountEntered, it._DiscountPct, it._Discount, it._Variant1, it._Variant2, it._Variant3, it._Variant4, it._Variant5, it._Warehouse, it._Location, it._Unit,
                         it._Date, it._Week, it._Note, it._Task, it._WorkSpace);
                     TableField.SetUserFieldsFromRecord(it, line);
                     lst.Add(line);
@@ -99,14 +100,14 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     double qty = Convert.ToDouble(_it.GetType().GetProperty("Qty").GetValue(_it, null));
                     var it = (InvItemClient)_it;
-                    lst.Add(CreateNewReservationLine(it._Item, qty, null, 0d, 0d, 0d, 0d, null, null, null, null, null, 0, DateTime.MinValue, 0, null, null, null));
+                    lst.Add(CreateNewReservationLine(it._Item, qty, null, 0d, 0d, 0d, 0d, null, null, null, null, null, null, null, 0, DateTime.MinValue, 0, null, null, null));
                 }
             }
             return lst;
         }
 
-        private ProjectReservationLineClient CreateNewReservationLine(string item, double qty, string text, double price, double amountEntered, double discPct, double disc, string variant1, string variant2, string variant3, string variant4, string variant5,
-           ItemUnit unit, DateTime date, byte week, string note, string task, string workspace)
+        private ProjectReservationLineClient CreateNewReservationLine(string item, double qty, string text, double price, double amountEntered, double discPct, double disc, string variant1, string variant2, string variant3, string variant4, string variant5, string warehouse,
+           string location, ItemUnit unit, DateTime date, byte week, string note, string task, string workspace)
         {
             var orderline = Activator.CreateInstance(this.TableTypeUser) as ProjectReservationLineClient;
             orderline._Qty = qty;
@@ -121,13 +122,20 @@ namespace UnicontaClient.Pages.CustomPage
             orderline._Variant3 = variant3;
             orderline._Variant4 = variant4;
             orderline._Variant5 = variant5;
+            if (warehouse != null)
+            {
+                orderline._Warehouse = warehouse;
+                orderline._Location = location;
+            }
+            else
+                orderline._Warehouse = userWarehouse;
             orderline._Unit = unit;
             orderline._Date = date;
             orderline._Week = week;
             orderline._Note = note;
             orderline._Storage = StorageRegister.Register;
             orderline._Task = task;
-            orderline._WorkSpace= workspace;
+            orderline._WorkSpace = workspace;
             return orderline;
         }
 
@@ -138,7 +146,7 @@ namespace UnicontaClient.Pages.CustomPage
 
     public partial class ProjReservationLine : GridBasePage
     {
-        SQLCache items, standardVariants, variants1, variants2, employees;
+        SQLCache items, warehouse, standardVariants, variants1, variants2, employees;
         ProjectClient ProjectOrder { get { return dgProjReservationLineGrid.masterRecord as ProjectClient; } }
         ProjectReservation Order;
         FindPrices PriceLookup;
@@ -247,6 +255,14 @@ namespace UnicontaClient.Pages.CustomPage
             SetVariantColumns();
             UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            if (!company.Location || !company.Warehouse)
+                Location.Visible = Location.ShowInColumnChooser = false;
+            else
+                Location.ShowInColumnChooser = true;
+            if (!company.Warehouse)
+                Warehouse.Visible = Warehouse.ShowInColumnChooser = false;
+            else
+                Warehouse.ShowInColumnChooser = true;
             if (company.HideCostPrice)
             {
                 Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
@@ -320,6 +336,8 @@ namespace UnicontaClient.Pages.CustomPage
                         if (t != null && orderLine.RowId == 0)
                             await t;
                     }
+                    if (api.CompanyEntity.Warehouse)
+                        dgProjReservationLineGrid.SetLoadedRow(orderLine);
                 }
                 else if (screenName == TabControls.CreateOrderFromQuickInvoice)
                 {
@@ -418,6 +436,8 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                         setVariant(rec, false);
                         TableField.SetUserFieldsFromRecord(selectedItem, rec);
+                        if (rec._Warehouse == null)
+                            rec.Warehouse = dgProjReservationLineGrid.userWarehouse;
                         if (selectedItem._Blocked)
                             UtilDisplay.ShowErrorCode(ErrorCodes.ItemIsOnHold, null);
 
@@ -432,6 +452,14 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "Total":
                     Dispatcher.BeginInvoke(new Action(() => { RecalculateAmount(); }));
+                    break;
+                case "Warehouse":
+                    if (warehouse != null)
+                        setLocation((InvWarehouse)warehouse.Get(rec._Warehouse), rec);
+                    break;
+                case "Location":
+                    if (string.IsNullOrEmpty(rec._Warehouse))
+                        rec._Location = null;
                     break;
                 case "Employee":
                     if (rec._Employee != null)
@@ -663,6 +691,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         void PostProjectOrder(ProjectReservationLineClient order)
         {
+            saveGridLocal();
+
             var dialog = new CwPostProjectOrder();
             dialog.DialogTableId = 2000000087;
             dialog.Closed += async delegate
@@ -750,6 +780,63 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override void RowsPastedDone() { RecalculateAmount(); }
 
+        private void Warehouse_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
+        {
+            if (dgProjReservationLineGrid.CurrentColumn == Warehouse)
+            {
+                if (Validate(Convert.ToString(e.OldValue), Convert.ToString(e.NewValue)))
+                    e.Handled = true;
+            }
+        }
+        bool Validate(string oldValue, string newValue)
+        {
+            var selectedItem = dgProjReservationLineGrid.SelectedItem as ProjectReservationLineClient;
+            if (selectedItem == null)
+                return false;
+            if (selectedItem._SerieBatchMarked)
+            {
+                if (newValue != oldValue)
+                {
+                    UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("ChangeWareHousLoc"), Uniconta.ClientTools.Localization.lookup("Warning"));
+                    (dgProjReservationLineGrid.tableView).CancelRowEdit();
+                    return true;
+                }
+            }
+            return false;
+        }
+        async void setLocation(InvWarehouse master, ProjectReservationLineClient rec)
+        {
+            if (api.CompanyEntity.Location)
+            {
+                if (master != null)
+                    rec.locationSource = master.Locations ?? await master.LoadLocations(api);
+                else
+                {
+                    rec.locationSource = null;
+                    rec.Location = null;
+                }
+                rec.NotifyPropertyChanged("LocationSource");
+            }
+        }
+        private void PART_Editor_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (warehouse == null)
+                return;
+
+            var selectedItem = dgProjReservationLineGrid.SelectedItem as ProjectReservationLineClient;
+            if (selectedItem?._Warehouse != null)
+                setLocation((InvWarehouse)warehouse.Get(selectedItem._Warehouse), selectedItem);
+        }
+
+        private void Location_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
+        {
+            if (dgProjReservationLineGrid.CurrentColumn == Location)
+            {
+                if (Validate(Convert.ToString(e.OldValue), Convert.ToString(e.NewValue)))
+                    e.Handled = true;
+            }
+        }
+
         public override void RowPasted(UnicontaBaseEntity rec)
         {
             var Comp = api.CompanyEntity;
@@ -790,6 +877,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var Comp = api.CompanyEntity;
             this.items = Comp.GetCache(typeof(InvItem));
+            this.warehouse = Comp.GetCache(typeof(InvWarehouse));
             this.variants1 = Comp.GetCache(typeof(InvVariant1));
             this.variants2 = Comp.GetCache(typeof(InvVariant2));
             this.standardVariants = Comp.GetCache(typeof(InvStandardVariant));
@@ -809,6 +897,8 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (this.items == null)
                 this.items = api.GetCache(typeof(Uniconta.DataModel.InvItem)) ?? await api.LoadCache(typeof(Uniconta.DataModel.InvItem)).ConfigureAwait(false);
+            if (Comp.Warehouse && this.warehouse == null)
+                this.warehouse = api.GetCache(typeof(Uniconta.DataModel.InvWarehouse)) ?? await api.LoadCache(typeof(Uniconta.DataModel.InvWarehouse)).ConfigureAwait(false);
             if (Comp.ItemVariants)
             {
                 if (this.standardVariants == null)
@@ -827,6 +917,8 @@ namespace UnicontaClient.Pages.CustomPage
                 this.exchangeRate = await t.ConfigureAwait(false);
 
             this.employees = api.GetCache(typeof(Uniconta.DataModel.Employee)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Employee)).ConfigureAwait(false);
+            if (Comp.Warehouse)
+                dgProjReservationLineGrid.userWarehouse = EmployeeClient.GetUserEmployee(api)?._Warehouse;
 
             Dispatcher.BeginInvoke(new Action(() =>
             {

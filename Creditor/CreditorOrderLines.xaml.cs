@@ -154,9 +154,9 @@ namespace UnicontaClient.Pages.CustomPage
             dgCreditorOrderLineGrid.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgCreditorOrderLineGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
-            layOutCreditorOrderLine.Caption = Uniconta.ClientTools.Localization.lookup("OrdersLine");
+            layOutCreditorOrderLine.Caption = Uniconta.ClientTools.Localization.lookup("PurchaseLines");
             layOutInvItemStorage.Caption = Uniconta.ClientTools.Localization.lookup("OnHand");
-            OnHandScreenInOrder = api.CompanyEntity._OnHandScreenInOrder;
+            OnHandScreenInOrder = api.CompanyEntity._OnHandScreenInPurchase;
             layOutInvItemStorage.Visibility = OnHandScreenInOrder ? Visibility.Visible : Visibility.Collapsed;
             dgCreditorOrderLineGrid.ShowTotalSummary();
             InitialLoad();

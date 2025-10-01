@@ -40,17 +40,17 @@ x:Class="UnicontaClient.Pages.CustomPage.EDeliveryMappingPage"
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="3" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <localPage:EDeliveryMappingGrid x:Name="dgEdeliveryMappingGrid" AutoGenerateColumns="None">
                 <localPage:EDeliveryMappingGrid.Columns>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="TagId">
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="TagId" Width="270">
                         <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
                             <CorasauControls:ComboBoxEditSettingsCustom x:Name="cmbTagIds" DisplayMember="Name" ValueMember="RowId"/>
                         </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
                     </localPage:CorasauDataGridTemplateColumnClient>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="TableId">
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="TableId" Width="270">
                         <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
                             <CorasauControls:ComboBoxEditSettingsCustom x:Name="cmbTableIds" DisplayMember="DisplayName" ValueMember="Id"/>
                         </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
                     </localPage:CorasauDataGridTemplateColumnClient>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Property">
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Property" Width="100">
                         <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                             <ControlTemplate>
                                 <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Property,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
@@ -62,7 +62,7 @@ x:Class="UnicontaClient.Pages.CustomPage.EDeliveryMappingPage"
                             </DataTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Value" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Value" Width="150" Visible="False"/>
                 </localPage:EDeliveryMappingGrid.Columns>
             </localPage:EDeliveryMappingGrid>
         </CorasauControls:BusyIndicator>

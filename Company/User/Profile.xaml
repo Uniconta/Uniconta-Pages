@@ -130,9 +130,12 @@ x:Class="UnicontaClient.Pages.CustomPage.Profile"
                     <CorasauControls:CorasauLayoutItem x:Name="liClientAPIVersion" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter= ClientAPIVersion,StringFormat=\{0\}:}">
                         <TextBlock x:Name="txtAPIVersion" TextWrapping="Wrap"></TextBlock>
                     </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liDotnetVersion" Label=".NET Version:">
+                    <CorasauControls:CorasauLayoutItem x:Name="liDotnetVersion" Label=".NET Version">
                         <TextBlock x:Name="txtDotnetVersion" TextWrapping="Wrap"></TextBlock>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="liStartupTime" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Started}">
+                        <TextBlock x:Name="txtStartupTime" TextWrapping="Wrap"></TextBlock>
+                    </CorasauControls:CorasauLayoutItem> 
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutGroup>
         </CorasauControls:CorasauLayoutControl>

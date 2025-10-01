@@ -324,9 +324,11 @@ namespace UnicontaClient.Pages.CustomPage
                         var prTrans = new ProjectTransCategorySumClientLocal() { _CompanyId = CompanyId, _BudgetSales = bc._Sales, _BudgetCost = bc._Cost, _BudgetQty = bc._Qty, _PrCategory = bc._PrCategory, _Project = bc._Project };
 
                         var cat = (PrCategory)cats.Get(bc._PrCategory);
-                        prTrans._CatType = cat._CatType;
-                        if (cat._CatType == CategoryType.Sum || cat._CatType == CategoryType.Header)
+                        if (cat != null && (cat._CatType == CategoryType.Sum || cat._CatType == CategoryType.Header))
+                        {
+                            prTrans._CatType = cat._CatType;
                             sums.Add(prTrans);
+                        }
                         else
                         {
                             if (extras == null)

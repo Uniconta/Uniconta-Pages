@@ -31,6 +31,13 @@ namespace UnicontaClient.Pages.CustomPage
             this.Title = Uniconta.ClientTools.Localization.lookup("Attach");
             this.Loaded += CW_Loaded;
         }
+
+        public CWForAllTrans(bool isTransactions) : this()
+        {
+            ForAllTransactions = isTransactions;
+            txtForAllTransactions.Visibility = chkForAllTransactions.Visibility = Visibility.Collapsed;
+        }
+
         void CW_Loaded(object sender, RoutedEventArgs e)
         {
             Dispatcher.BeginInvoke(new Action(() => { OKButton.Focus(); }));

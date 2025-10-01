@@ -125,13 +125,13 @@ namespace UnicontaClient.Pages.CustomPage
         ItemBase ibase, ibaseCurrent;
 
         static bool IsCollapsed = true;
-        static int transaction;
+        bool OnlyOpen, OnlyDue = false;
         CWServerFilter creditorFilterDialog = null;
         bool creditorFilterCleared;
+        string includedJournals;
         TableField[] CreditorUserFields { get; set; }
         IEnumerable<PropValuePair> creditorFilterValues;
-        bool OnlyOpen, OnlyDue = false;
-        string includedJournals;
+        static int transaction;
         public static void SetDateTime(DateEditor frmDateeditor, DateEditor todateeditor)
         {
             if (frmDateeditor.Text == string.Empty)
@@ -145,6 +145,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         public override string NameOfControl { get { return TabControls.CreditorStatement; } }
+        Uniconta.DataModel.Creditor _master;
 
         public override void AssignMultipleGrid(List<CorasauDataGrid> gridCtrls)
         {
@@ -153,7 +154,6 @@ namespace UnicontaClient.Pages.CustomPage
             isChildGridExist = true;
         }
 
-        Uniconta.DataModel.Creditor _master;
         public CreditorStatement(BaseAPI API)
             : base(API, string.Empty)
         {
@@ -163,31 +163,27 @@ namespace UnicontaClient.Pages.CustomPage
         public CreditorStatement(SynchronizeEntity syncEntity) : base(syncEntity, true)
         {
             _master = syncEntity.Row as Uniconta.DataModel.Creditor;
-            if (_master != null)
-                FromAccount = _master._Account;
             Init();
             SetHeader();
-        }
-
-        private void SetHeader()
-        {
-            string key = _master._Account;
-            if (string.IsNullOrEmpty(key)) return;
-            string header = string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("Statement"), key);
-            SetHeader(header);
         }
         protected override void SyncEntityMasterRowChanged(UnicontaBaseEntity args)
         {
             _master = args as Uniconta.DataModel.Creditor;
-            if (_master != null)
-                FromAccount = _master._Account;
             SetHeader();
             if (_master != null)
+                InitQuery();
+        }
+        private void SetHeader()
+        {
+            string key = _master._Account;
+            if (key != null)
             {
-                cmbAccounts.EditValue = _master._Account;
-                LoadDCTrans();
+                string header = string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("Statement"), key);
+                SetHeader(header);
+                FromAccount = key;
             }
         }
+        
 
         void Init()
         {
@@ -210,14 +206,9 @@ namespace UnicontaClient.Pages.CustomPage
 
             var Comp = api.CompanyEntity;
             accountCache = Comp.GetCache(typeof(Uniconta.DataModel.Creditor));
-
             if (Comp.RoundTo100)
                 Amount.HasDecimals = colSumAmount.HasDecimals = Debit.HasDecimals = Credit.HasDecimals = false;
-            if (_master != null)
-            {
-                cmbAccounts.EditValue = _master._Account;
-                LoadDCTrans();
-            }
+            
             TransactionReport.SetDailyJournal(cmbJournals, api);
             dgCreditorTrans.RowDoubleClick += DgCreditorTrans_RowDoubleClick;
             dgCreditorTrans.SelectedItemChanged += DgCreditorTrans_SelectedItemChanged;
@@ -291,6 +282,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override Task InitQuery()
         {
+            if (_master != null)
+            {
+                txtAccount.Text = string.Empty;
+                cmbAccounts.EditValue = _master._Account;
+                return LoadDCTrans();
+            }
             return null;
         }
 
@@ -299,17 +296,7 @@ namespace UnicontaClient.Pages.CustomPage
             var Comp = api.CompanyEntity;
             var creditorRow = new CreditorClient();
             creditorRow.SetMaster(Comp);
-            var creditorUserField = creditorRow.UserFieldDef();
-            if (creditorUserField != null)
-            {
-                CreditorUserFields = creditorUserField;
-            }
-        }
-
-        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
-        {
-            if (accountCache == null)
-                accountCache = await api.LoadCache(typeof(Uniconta.DataModel.Creditor)).ConfigureAwait(false);
+            CreditorUserFields = creditorRow.UserFieldDef();
         }
 
         void GetMenuItem()
@@ -318,7 +305,16 @@ namespace UnicontaClient.Pages.CustomPage
             ibase = UtilDisplay.GetMenuCommandByName(rb, "ExpandAndCollapse");
             ibaseCurrent = UtilDisplay.GetMenuCommandByName(rb, "ExpandCollapseCurrent");
         }
-
+        Task<SQLCache> accountCacheTask;
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
+        {
+            if (accountCache == null)
+            {
+                accountCacheTask = api.LoadCache(typeof(Uniconta.DataModel.Creditor));
+                accountCache = await accountCacheTask.ConfigureAwait(false);
+                accountCacheTask = null;
+            }
+        }
         private void LocalMenu_OnItemClicked(string ActionType)
         {
 
@@ -505,11 +501,13 @@ namespace UnicontaClient.Pages.CustomPage
             else if (cmbTrasaction.SelectedIndex == 2)
                 OnlyOpen = OnlyDue = true;
         }
-
-        async void LoadDCTrans()
+      
+        async Task LoadDCTrans()
         {
             CreditorStatement.SetDateTime(txtDateFrm, txtDateTo);
             DateTime fromDate = DebtorStatement.DefaultFromDate, toDate = DebtorStatement.DefaultToDate;
+            
+            
             transaction = cmbTrasaction.SelectedIndex;
             includedJournals = cmbJournals.Text;
             var fromAccount = txtAccount.Text;
@@ -520,8 +518,9 @@ namespace UnicontaClient.Pages.CustomPage
             var listTrans = (CreditorTransClientTotal[])await transApi.GetTransWithPrimo(new CreditorTransClientTotal(), fromDate, toDate, fromAccount, toAccount, OnlyOpen, null, creditorFilterValues, OnlyDue, includedJournals);
             if (listTrans != null)
             {
-                if (accountCache == null)
-                    accountCache = await api.LoadCache(typeof(Uniconta.DataModel.Creditor));
+                var t = accountCacheTask;
+                if (t != null)
+                    accountCache = await t;
 
                 FillStatement(listTrans, OnlyOpen, toDate);
             }
@@ -538,6 +537,11 @@ namespace UnicontaClient.Pages.CustomPage
                 IsCollapsed = false;
             ExpandAndCollapseAll(IsCollapsed);
             maintainState = false;
+            if (_master == null)
+            {
+                cmbAccounts.SelectedIndex = -1;
+                txtAccount.Text = string.Empty;
+            }
         }
         List<CreditorStatementList> statementList = null;
         void FillStatement(CreditorTransClientTotal[] listTrans, bool OnlyOpen, DateTime toDate)

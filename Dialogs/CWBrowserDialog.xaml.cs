@@ -12,13 +12,12 @@ namespace UnicontaClient.Controls.Dialogs
     /// </summary>
     public partial class CWBrowserDialog : ChildWindow
     {
-        Uri source;
         public CWBrowserDialog(string url, string title = null)
         {
             InitializeComponent();
-            source = new Uri(url);
             Title = title ?? string.Empty;
-            var browserControl = UtilDisplay.LoadWebControl(source);
+            var browserControl = new UnicontaWebViewer(new Uri(url));
+            browserControl.ShowNavigationError = false;
             layoutGrid.Children.Add(browserControl);
             System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
 
@@ -39,6 +38,12 @@ namespace UnicontaClient.Controls.Dialogs
         {
             if (e.Key == System.Windows.Input.Key.Escape)
                 SetDialogResult(false);
+        }
+
+        public void EnableCertificateSelection()
+        {
+            if (layoutGrid.Children.Count != 0 && layoutGrid.Children[0] is UnicontaWebViewer webViewer)
+                webViewer?.EnableCertificateSelection(true);
         }
     }
 }

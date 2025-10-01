@@ -330,6 +330,7 @@ namespace UnicontaISO20022CreditTransfer
             switch (companyBankEnum)
             {
                 case CompanyBankENUM.ING_Bank:
+                case CompanyBankENUM.ABN_Amro_bank:
                     return string.Empty;
                 default:
                     return "ONCL";

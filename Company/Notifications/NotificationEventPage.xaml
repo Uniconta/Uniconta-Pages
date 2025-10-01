@@ -6,6 +6,7 @@ x:Class="UnicontaClient.Pages.CustomPage.NotificationEventPage"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+        xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors" 
         xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
     <CorasauControls:BusyIndicator x:Name="busyIndicator" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusyMessage}">
         <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
@@ -16,6 +17,7 @@ x:Class="UnicontaClient.Pages.CustomPage.NotificationEventPage"
             <CorasauControls:CorasauRibbonControl x:Name="localMenu" XMLSourcePath=";component/Assets/GridRibbon.xml"/>
             <local:NotificationEventGrid x:Name="dgNotificationEvent" AutoGenerateColumns="None" Grid.Row="1">
                 <local:NotificationEventGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Created" Width="100" ReadOnly="True"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Level" Width="150" ReadOnly="True"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Notification" Width="150" ReadOnly="True"/>
                     <local:ComboBoxColumnClient x:Name="DCType" ReadOnly="True"/>
@@ -33,7 +35,11 @@ x:Class="UnicontaClient.Pages.CustomPage.NotificationEventPage"
                             </ControlTemplate>
                         </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Text" Width="300" ReadOnly="True"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Text" Width="300" ReadOnly="True">
+                        <local:CorasauDataGridTemplateColumnClient.EditSettings>
+                            <editor:TextEditSettings TextWrapping="Wrap" AcceptsReturn="True" />
+                        </local:CorasauDataGridTemplateColumnClient.EditSettings>
+                    </local:CorasauDataGridTemplateColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Data" Width="300" ReadOnly="True"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Reference" Width="300" ReadOnly="True"/>
                     <!--<local:CorasauDataGridTemplateColumnClient Width="300">

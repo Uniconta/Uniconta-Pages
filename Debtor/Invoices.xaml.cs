@@ -33,6 +33,7 @@ using DevExpress.Data;
 using Uniconta.Common.Utility;
 using GermanyEInvoice.Create;
 using Uniconta.API.System;
+using System.Xml;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -68,7 +69,7 @@ namespace UnicontaClient.Pages.CustomPage
 
     public partial class Invoices : GridBasePage
     {
-        SQLCache Debcache, LayoutGroupCache;
+        SQLCache Debcache, LayoutGroupCache, eDeliveryMappingGroups;
         public override string NameOfControl { get { return TabControls.Invoices.ToString(); } }
 
         DateTime filterDate;
@@ -704,20 +705,30 @@ namespace UnicontaClient.Pages.CustomPage
 
         private async void ExportUBL(IEnumerable<DebtorInvoiceClient> invoiceUBL)
         {
+            eDeliveryMappingGroups = eDeliveryMappingGroups ?? api.GetCache(typeof(eDeliveryMappingGroupClient))
+                ?? await api.LoadCache(typeof(eDeliveryMappingGroupClient));
+
+            LayoutGroupCache = api.GetCache(typeof(DebtorLayoutGroup)) ?? await api.LoadCache(typeof(DebtorLayoutGroup));
+            ExportUBL(invoiceUBL, api, SystemInfo, LayoutGroupCache, Debcache, eDeliveryMappingGroups, true);
+        }
+
+        public static async void ExportUBL(IEnumerable<DebtorInvoiceClient> invoiceUBL, CrudAPI api,
+            CorasauDataGridTemplateColumnClient SystemInfo, SQLCache LayoutGroupCache, SQLCache Debcache,
+            SQLCache eDeliveryMappingGroups, bool isInvoicePage)
+        {
             int cnt = invoiceUBL.Count();
-            if (UnicontaMessageBox.Show(string.Concat(Uniconta.ClientTools.Localization.lookup("QtyMarked"), " ", cnt),
+            if (isInvoicePage && UnicontaMessageBox.Show(string.Concat(Uniconta.ClientTools.Localization.lookup("QtyMarked"), " ", cnt),
                     string.Format(Uniconta.ClientTools.Localization.lookup("ExportOBJ"), Uniconta.ClientTools.Localization.lookup("einvoice")), MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
                 return;
 
-            var api = this.api;
             var Comp = api.CompanyEntity;
 
             var InvCache = api.GetCache(typeof(Uniconta.DataModel.InvItem)) ?? await api.LoadCache(typeof(Uniconta.DataModel.InvItem));
             var VatCache = api.GetCache(typeof(Uniconta.DataModel.GLVat)) ?? await api.LoadCache(typeof(Uniconta.DataModel.GLVat));
-            LayoutGroupCache = api.GetCache(typeof(DebtorLayoutGroup)) ?? await api.LoadCache(typeof(DebtorLayoutGroup));
             SQLCache workInstallCache = null;
             SQLCache Contacts = null;
-            SystemInfo.Visible = true;
+            if (SystemInfo != null)
+                SystemInfo.Visible = true;
 
             var applFilePath = string.Empty;
             var listOfXmlPath = new List<string>();
@@ -729,97 +740,102 @@ namespace UnicontaClient.Pages.CustomPage
 
             foreach (var invClient in invoiceUBL.ToList())
             {
-                var debtor = (Debtor)Debcache.Get(invClient._DCAccount);
-                if (debtor == null)
-                    continue;
-
-                var InvTransInvoiceLines = (DebtorInvoiceLines[])await Invapi.GetInvoiceLines(invClient, new DebtorInvoiceLines());
-
-                Contact contactPerson = null;
-                if (invClient._ContactRef != 0)
-                {
-                    if (Contacts == null)
-                        Contacts = api.GetCache(typeof(Uniconta.DataModel.Contact)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Contact));
-                    foreach (var contact in (Uniconta.DataModel.Contact[])Contacts.GetRecords)
-                        if (contact.RowId == invClient._ContactRef)
-                        {
-                            contactPerson = contact;
-                            break;
-                        }
-                }
-
-                UtilCommon.SetDeliveryAdress(invClient, debtor, api);
-
-                Debtor deliveryAccount;
-                if (invClient._DeliveryAccount != null)
-                    deliveryAccount = (Debtor)Debcache.Get(invClient._DeliveryAccount);
-                else
-                    deliveryAccount = null;
-
-                WorkInstallation workInstallation = null;
-                if (invClient._Installation != null)
-                {
-                    if (workInstallCache == null)
-                        workInstallCache = api.GetCache(typeof(Uniconta.DataModel.WorkInstallation)) ?? await api.LoadCache(typeof(Uniconta.DataModel.WorkInstallation));
-
-                    workInstallation = (WorkInstallation)workInstallCache.Get(invClient._Installation);
-                }
-
-                if (debtor._Country == CountryCode.Germany)
-                {
-                    if (folderBrowserDialog == null)
-                    {
-                        folderBrowserDialog = UtilDisplay.LoadFolderBrowserDialog;
-                        var dialogResult = folderBrowserDialog.ShowDialog();
-                        if (dialogResult != true)
-                            break;
-                    }
-
-                    var obj = new ProcessInvoice(debtor, invClient, InvTransInvoiceLines, this.api.CompanyEntity);
-                    if (obj.CanProcess())
-                    {
-                        // generate xml contents
-                        var xmlContent = obj.GenerateZugferdXml();
-
-                        // export xml
-                        var invoiceLabel = (debtor._Language == Uniconta.Common.Language.Default || debtor._Language == Uniconta.Common.Language.de || debtor._Language == Uniconta.Common.Language.de_at || debtor._Language == Uniconta.Common.Language.de_ch)
-                            ? "E-Rechnung"
-                            : "E-Invoice";
-                        var fileName = $"{invoiceLabel}_{invClient.InvoiceNum}.xml";
-                        var filePath = System.IO.Path.Combine(folderBrowserDialog.SelectedPath, fileName);
-                        try
-                        {
-                            if (File.Exists(filePath))
-                                File.Delete(filePath);
-                            File.WriteAllBytes(filePath, xmlContent);
-                        }
-                        catch (Exception ex)
-                        {
-                            UnicontaMessageBox.Show($"Fehler bei Export der E-Rechnung {invClient.InvoiceNum} ({ex.Message})", "Fehler");
-                            break;
-                        }
-                    }
-
-                    continue;
-                }
-
-                var attachments = await FromXSDFile.OIOUBL.ExportImport.Attachments.CollectInvoiceAttachments(invClient, api);
-                var result = Uniconta.API.DebtorCreditor.OIOUBL.GenerateOioXML(Comp, debtor, deliveryAccount, invClient, InvTransInvoiceLines, InvCache, VatCache, null, contactPerson, attachments, LayoutGroupCache, workInstallation);
-
                 bool createXmlFile = true;
 
-                if (result.HasErrors)
+                var xml = await GetEdeliveryMappingDoc(invClient, api, eDeliveryMappingGroups);
+                if (xml == null)
                 {
-                    countErr++;
-                    createXmlFile = false;
-                    invClient._SystemInfo = string.Empty;
-                    foreach (FromXSDFile.OIOUBL.ExportImport.PrecheckError error in result.PrecheckErrors)
-                    {
-                        invClient._SystemInfo = invClient._SystemInfo + error.ToString() + "\n";
-                    }
-                }
+                    var debtor = (Debtor)Debcache.Get(invClient._DCAccount);
+                    if (debtor == null)
+                        continue;
 
-                if (result.Document != null && createXmlFile)
+                    var InvTransInvoiceLines = (DebtorInvoiceLines[])await Invapi.GetInvoiceLines(invClient, new DebtorInvoiceLines());
+
+                    Contact contactPerson = null;
+                    if (invClient._ContactRef != 0)
+                    {
+                        if (Contacts == null)
+                            Contacts = api.GetCache(typeof(Uniconta.DataModel.Contact)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Contact));
+                        foreach (var contact in (Uniconta.DataModel.Contact[])Contacts.GetRecords)
+                            if (contact.RowId == invClient._ContactRef)
+                            {
+                                contactPerson = contact;
+                                break;
+                            }
+                    }
+
+                    UtilCommon.SetDeliveryAdress(invClient, debtor, api);
+
+                    Debtor deliveryAccount;
+                    if (invClient._DeliveryAccount != null)
+                        deliveryAccount = (Debtor)Debcache.Get(invClient._DeliveryAccount);
+                    else
+                        deliveryAccount = null;
+
+                    WorkInstallation workInstallation = null;
+                    if (invClient._Installation != null)
+                    {
+                        if (workInstallCache == null)
+                            workInstallCache = api.GetCache(typeof(Uniconta.DataModel.WorkInstallation)) ?? await api.LoadCache(typeof(Uniconta.DataModel.WorkInstallation));
+
+                        workInstallation = (WorkInstallation)workInstallCache.Get(invClient._Installation);
+                    }
+
+                    if (debtor._Country == CountryCode.Germany)
+                    {
+                        if (folderBrowserDialog == null)
+                        {
+                            folderBrowserDialog = UtilDisplay.LoadFolderBrowserDialog;
+                            var dialogResult = folderBrowserDialog.ShowDialog();
+                            if (dialogResult != true)
+                                break;
+                        }
+
+                        var obj = new ProcessInvoice(debtor, invClient, InvTransInvoiceLines, api.CompanyEntity);
+                        if (obj.CanProcess())
+                        {
+                            // generate xml contents
+                            var xmlContent = obj.GenerateZugferdXml();
+
+                            // export xml
+                            var invoiceLabel = (debtor._Language == Uniconta.Common.Language.Default || debtor._Language == Uniconta.Common.Language.de || debtor._Language == Uniconta.Common.Language.de_at || debtor._Language == Uniconta.Common.Language.de_ch)
+                                ? "E-Rechnung"
+                                : "E-Invoice";
+                            var fileName = $"{invoiceLabel}_{invClient.InvoiceNum}.xml";
+                            var filePath = System.IO.Path.Combine(folderBrowserDialog.SelectedPath, fileName);
+                            try
+                            {
+                                if (File.Exists(filePath))
+                                    File.Delete(filePath);
+                                File.WriteAllBytes(filePath, xmlContent);
+                            }
+                            catch (Exception ex)
+                            {
+                                UnicontaMessageBox.Show($"Fehler bei Export der E-Rechnung {invClient.InvoiceNum} ({ex.Message})", "Fehler");
+                                break;
+                            }
+                        }
+
+                        continue;
+                    }
+
+                    var attachments = await FromXSDFile.OIOUBL.ExportImport.Attachments.CollectInvoiceAttachments(invClient, api);
+                    var result = Uniconta.API.DebtorCreditor.OIOUBL.GenerateOioXML(Comp, debtor, deliveryAccount, invClient, InvTransInvoiceLines, InvCache, VatCache, null, contactPerson, attachments, LayoutGroupCache, workInstallation);
+
+                    if (result.HasErrors)
+                    {
+                        countErr++;
+                        createXmlFile = false;
+                        invClient._SystemInfo = string.Empty;
+                        foreach (FromXSDFile.OIOUBL.ExportImport.PrecheckError error in result.PrecheckErrors)
+                        {
+                            invClient._SystemInfo = invClient._SystemInfo + error.ToString() + "\n";
+                        }
+                    }
+                    else 
+                        xml = result.Document;
+                }
+                if (xml != null && createXmlFile)
                 {
                     string invoice = Uniconta.ClientTools.Localization.lookup("Invoice");
                     string filename = null;
@@ -872,7 +888,7 @@ namespace UnicontaClient.Pages.CustomPage
                     listOfXmlPath.Add(filename);
                     try
                     {
-                        result.Document.Save(filename);
+                        xml.Save(filename);
                     }
                     catch (Exception ex)
                     {
@@ -898,7 +914,44 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
+        private static async Task<XmlDocument> GetEdeliveryMappingDoc(DebtorInvoiceClient inv, CrudAPI api,
+            SQLCache eDeliveryMappingGroups)
+        {
+            try
+            {
+                var comp = api.CompanyEntity as CompanyClient;
+                var nhrApi = new NHRAPI(api);
+
+                var mappings = await nhrApi.GetMappingsByInvoice(inv, eDeliveryMappingGroups);
+                var xmlTagsAndValues = mappings?
+                    .Select(x => Tuple.Create(
+                        x.eDeliveryTag.Name,
+                        x.GetTablePropertyValueFromEntity(inv, comp)
+                    ))?
+                    .Where(x => !string.IsNullOrEmpty(x.Item2))
+                    .ToDictionary(x => x.Item1, y => y.Item2);
+
+                var xml = xmlTagsAndValues == null || xmlTagsAndValues.Count == 0 ? null :
+                    await nhrApi.GetValidatedeDeliveryMappingDoc(inv, xmlTagsAndValues);
+
+                if (xml == null)
+                    return null;
+
+                var xmlDoc = new XmlDocument();
+                xmlDoc.LoadXml(xml);
+                return xmlDoc;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
         void SendUBL(IEnumerable<DebtorInvoiceClient> invoiceUBL)
+            => SendUBL(invoiceUBL, api, SystemInfo, busyIndicator);
+
+        public static void SendUBL(IEnumerable<DebtorInvoiceClient> invoiceUBL, CrudAPI api,
+            CorasauDataGridTemplateColumnClient SystemInfo, BusyIndicator busyIndicator)
         {
             int icount = invoiceUBL.Count();
             var cwSendUBL = new CWSendUBL(icount);
@@ -907,7 +960,9 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (cwSendUBL.DialogResult == true)
                 {
-                    SystemInfo.Visible = true;
+                    if (SystemInfo != null)
+                        SystemInfo.Visible = true;
+
                     busyIndicator.IsBusy = true;
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
                     InvoiceAPI Invapi = new InvoiceAPI(api);

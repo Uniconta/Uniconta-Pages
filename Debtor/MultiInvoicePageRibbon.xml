@@ -34,6 +34,7 @@
   <RibbonItem>
     <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="EditOBJ" Parameter="Order" Glyph="Edit_16x16" LargeGlyph="Edit_32x32"/>
     <RibbonItem Action="OrderLine" LocalizedNameKey="OrdersLine" LargeGlyph="Order_Lines_Highlighted_32x32" ShortcutKey="ALT+L"></RibbonItem>
+    <RibbonItem Action="Invoices" LocalizedNameKey="Invoices" ControlName="Invoices" LargeGlyph="Invoice_32x32"/>
     <RibbonItem LocalizedNameKey="GenerateOBJ" Parameter="Invoices" Action="GenerateInvoice" LargeGlyph="Generate_32x32" ShortcutKey="Ctrl+O"></RibbonItem>
     <RibbonItem LocalizedNameKey="GenerateInvoiceCurrentLine" Action="GenerateInvoice2" LargeGlyph="Invoice_32x32" ShortcutKey="Ctrl+M"></RibbonItem>
     <RibbonItem LocalizedNameKey="RecalculatePrices" Action="RecalculateOrderPrices" LargeGlyph="Calculator_32x32"></RibbonItem>

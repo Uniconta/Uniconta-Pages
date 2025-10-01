@@ -1,27 +1,32 @@
 using UnicontaClient.Models;
-using UnicontaClient.Pages;
 using System;
 using System.Collections;
-using System.Linq;
 using Uniconta.API.Service;
-using Uniconta.ClientTools;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
-using UnicontaClient.Controls.Dialogs;
 using Uniconta.API.System;
 using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.Util;
 using System.Threading.Tasks;
+using Uniconta.DataModel;
+using System.Windows;
+using DevExpress.Xpf.Grid;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
+    public class NotificationEventSort : IComparer
+    {
+        public int Compare(object x, object y) =>
+            DateTime.Compare(((NotificationEvent)y)._Created, ((NotificationEvent)x)._Created);
+    }
+
     public class NotificationEventGrid : CorasauDataGridClient
     {
         public override Type TableType { get { return typeof(NotificationEventClient); } }
         public override bool Readonly { get { return false; } }
-
+        public override IComparer GridSorting => new NotificationEventSort();
     }
 
     public partial class NotificationEventPage : GridBasePage
@@ -63,6 +68,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void Init(UnicontaBaseEntity master)
         {
             InitializeComponent();
+            ((TableView)dgNotificationEvent.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
             this.master = master;
             if (master != null)
                 dgNotificationEvent.UpdateMaster(master);
@@ -198,6 +204,9 @@ namespace UnicontaClient.Pages.CustomPage
                 var deleteMenu = UtilDisplay.GetMenuCommandByName(rb, "Delete");
                 deleteMenu.Caption = Uniconta.ClientTools.Localization.lookup("Remove");
             }
+            else
+                UtilDisplay.RemoveMenuCommand(rb, "Delete");
+
             UtilDisplay.RemoveMenuCommand(rb, new string[] { "AddRow", "EditRow", "SaveGrid" });
             base.OnLayoutLoaded();
         }

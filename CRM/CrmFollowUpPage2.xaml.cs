@@ -110,7 +110,6 @@ namespace UnicontaClient.Pages.CustomPage
 
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
             liOfferNumber.ButtonClicked += liOfferNumber_ButtonClicked;
-            BindContact();
         }
 
         protected override void OnLayoutLoaded()
@@ -173,8 +172,12 @@ namespace UnicontaClient.Pages.CustomPage
             ContactCache = Comp.GetCache(typeof(Uniconta.DataModel.Contact)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.Contact), api).ConfigureAwait(false);
             ProjectCache = Comp.GetCache(typeof(Uniconta.DataModel.Project)) ?? await Comp.LoadCache(typeof(Uniconta.DataModel.Project), api).ConfigureAwait(false);
 
-
-            Dispatcher.BeginInvoke(new Action(() => SetAccountSource()));
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                SetAccountSource();
+                BindContact();
+            }
+            ));
         }
 
         private void liOfferNumber_ButtonClicked(object sender)

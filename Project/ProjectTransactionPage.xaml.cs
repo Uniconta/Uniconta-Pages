@@ -38,11 +38,12 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override string NameOfControl { get { return TabControls.ProjectTransactionPage; } }
 
-        ItemBase iIncludeSubProBase, iIncludeTimeJournalBase;
-        static bool includeSubProject, InclTimeJournals;
+        ItemBase iIncludeSubProBase, iIncludeTimeJournalBase, iViewOnlyOpenBase;
+        static bool includeSubProject, InclTimeJournals, viewOnlyOpen;
         UnicontaBaseEntity master;
         string projLst = null;
         List<ProjectTransClient> timetransLst;
+        private string parmWorkspace;
 
         bool timeTransFound;
 
@@ -73,6 +74,14 @@ namespace UnicontaClient.Pages.CustomPage
         public ProjectTransactionPage(UnicontaBaseEntity master) : base(master)
         {
             InitializePage(master);
+        }
+
+        public ProjectTransactionPage(UnicontaBaseEntity master, string workspace) : base(master)
+        {
+            parmWorkspace = workspace;
+            InitializePage(master);
+            if (syncEntity != null)
+                dgProjectTransaction.UpdateMaster(master);
         }
 
         static UnicontaBaseEntity getMaster(UnicontaBaseEntity master)
@@ -164,6 +173,9 @@ namespace UnicontaClient.Pages.CustomPage
                 UtilDisplay.RemoveMenuCommand(rb, "InclTimeJournals");
             }
 
+            iViewOnlyOpenBase = UtilDisplay.GetMenuCommandByName(rb, "ViewOnlyOpen");
+            iViewOnlyOpenBase.IsChecked = viewOnlyOpen;
+
             dgProjectTransaction.api = api;
             dgProjectTransaction.BusyIndicator = busyIndicator;
             dgProjectTransaction.ShowTotalSummary();
@@ -201,6 +213,8 @@ namespace UnicontaClient.Pages.CustomPage
         {
             timetransLst = null;
             timeTransFound = false;
+            InclTimeJournals = false;
+            iIncludeTimeJournalBase.IsChecked = InclTimeJournals;
         }
 
         private void SetIncludeFilter()
@@ -320,9 +334,21 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (api.CompanyEntity.HideInternalProjects)
             {
-                if (filter == null)
-                    filter = new List<PropValuePair>(1);
+                if (filter == null) filter = new List<PropValuePair>(1);
                 filter.Add(PropValuePair.GenereteParameter("HideInternalProjects", typeof(string), "1"));
+            }
+
+            if (parmWorkspace != null)
+            {
+                if (filter == null) filter = new List<PropValuePair>(1);
+                filter.Add(PropValuePair.GenereteWhereElements(nameof(ProjectTrans._WorkSpace), typeof(string), parmWorkspace));
+                WorkSpace.Visible = true;
+            }
+
+            if (viewOnlyOpen)
+            {
+                if (filter == null) filter = new List<PropValuePair>(1);
+                filter.Add(PropValuePair.GenereteWhereElements(nameof(ProjectTrans._Invoiced), typeof(int), 0));
             }
 
             await dgProjectTransaction.Filter(filter);
@@ -342,6 +368,13 @@ namespace UnicontaClient.Pages.CustomPage
                 await IncludeTimeJournals();
         }
 
+        private DateTime AdjustToPreviousSunday(DateTime date)
+        {
+            if (date == DateTime.MinValue)
+                return date;
+            int daysBack = (int)date.DayOfWeek;
+            return date.AddDays(-daysBack);
+        }
         private async Task IncludeTimeJournals()
         {
             if (!InclTimeJournals || timeTransFound)
@@ -370,15 +403,26 @@ namespace UnicontaClient.Pages.CustomPage
                 busyIndicator.IsBusy = true;
 
                 var pairTM = new List<PropValuePair>();
+                UnicontaBaseEntity unicontaBaseEntity = null;
+
+                DateTime? baseDate = emp?._TMApproveDate;
+                if (baseDate == null)
+                {
+                    baseDate = Employees
+                        .Where(x => x._TMApproveDate != DateTime.MinValue && x._Terminated == DateTime.MinValue)
+                        .Min(x => x._TMApproveDate as DateTime?);
+                }
+                DateTime minApprovedDate = AdjustToPreviousSunday(baseDate ?? DateTime.MinValue);
+                pairTM.Add(PropValuePair.GenereteWhereElements(nameof(TMJournalLineClient.Date), minApprovedDate, CompareOperator.GreaterThanOrEqual));
+
 
                 if (emp != null)
                 {
-                    pairTM.Add(PropValuePair.GenereteWhereElements(nameof(TMJournalLineClient.Employee), typeof(string), emp._Number));
-                    pairTM.Add(PropValuePair.GenereteWhereElements(nameof(TMJournalLineClient.Date), emp._TMApproveDate, CompareOperator.GreaterThanOrEqual));
+                    unicontaBaseEntity = emp;
                 }
                 else if (proj != null)
                 {
-                    if (projLst == null)
+                    if (includeSubProject)
                     {
                         var strb = StringBuilderReuse.Create();
                         strb.Append(proj._Number);
@@ -389,26 +433,13 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                         projLst = strb.ToString();
                         strb.Release();
+                        pairTM.Add(PropValuePair.GenereteWhereElements(nameof(TMJournalLineClient.Project), typeof(string), projLst));
+
                     }
-
-                    var projselected = includeSubProject ? projLst : proj._Number;
-                    pairTM.Add(PropValuePair.GenereteWhereElements(nameof(TMJournalLineClient.Project), typeof(string), projselected));
-                    var minApproveDate = Employees.Where(x => x._TMApproveDate != DateTime.MinValue && x._Terminated == DateTime.MinValue).Min(x => x._TMApproveDate as DateTime?) ?? DateTime.MinValue;
-                    if (minApproveDate != DateTime.MinValue)
-                        pairTM.Add(PropValuePair.GenereteWhereElements(nameof(TMJournalLineClient.Date), minApproveDate, CompareOperator.GreaterThanOrEqual));
+                    else
+                        unicontaBaseEntity = proj;
                 }
-                else
-                {
-                    var minApproveDate = Employees.Where(x => x._TMApproveDate != DateTime.MinValue && x._Terminated == DateTime.MinValue).Min(x => x._TMApproveDate as DateTime?) ?? DateTime.MinValue;
-                    if (minApproveDate != DateTime.MinValue)
-                        pairTM.Add(PropValuePair.GenereteWhereElements(nameof(TMJournalLineClient.Date), minApproveDate, CompareOperator.GreaterThanOrEqual));
-                }
-
-                var tmJourLines = await api.Query<TMJournalLineClient>(pairTM);
-
-                var tmLines = tmJourLines.Where(s => (s.Project != null &&
-                                                     s.PayrollCategory != null &&
-                                                     s.Date > Employees.First(z => z._Number == s.Employee)._TMApproveDate)).ToArray();
+                var tmLines = await api.Query<TMJournalLineClient>(unicontaBaseEntity, pairTM);
 
                 var search = new TMJournalLineClient();
                 var sort = new TMJournalEmpDateSort();
@@ -421,13 +452,29 @@ namespace UnicontaClient.Pages.CustomPage
                 EmpPayrollCategory payrollCat = null;
                 Uniconta.DataModel.Project project = null;
                 var grpEmpDate = tmLines.GroupBy(x => new { x.Employee, x.Date }).Select(g => new { g.Key.Employee, g.Key.Date, EmployeeTable = Employees.Get(g.Key.Employee) });
+
+                bool isApprovedSunday = true;
+                DateTime approvedDateSunday = DateTime.MinValue;
+                var approveDate = DateTime.MinValue;
                 foreach (var rec in grpEmpDate)
                 {
                     if (lastEmployee != rec.Employee)
                     {
                         lastEmployee = rec.Employee;
                         await priceLookup.EmployeeChanged(rec.EmployeeTable);
+
+                        approveDate = rec.EmployeeTable._TMApproveDate;
+                        if (approveDate != DateTime.MinValue)
+                        {
+                            approvedDateSunday = AdjustToPreviousSunday(approveDate);
+                            isApprovedSunday = approveDate.DayOfWeek == DayOfWeek.Sunday;
+                        }
                     }
+
+                    if (rec.Date < approvedDateSunday)
+                        continue;
+
+                    int dayOfStart = isApprovedSunday ? 0 : (int)approveDate.DayOfWeek;
 
                     search._Employee = rec.Employee;
                     search._Date = rec.Date;
@@ -440,6 +487,9 @@ namespace UnicontaClient.Pages.CustomPage
                         if (s._Employee != rec.Employee || s._Date != rec.Date)
                             break;
 
+                        if (s._Project == null || s._PayrollCategory == null || s._Employee == null)
+                            continue;
+
                         if (s.Total != 0)
                         {
                             if (lastPayroll != s._PayrollCategory)
@@ -448,74 +498,83 @@ namespace UnicontaClient.Pages.CustomPage
                                 lastPayroll = s._PayrollCategory;
                             }
 
-                            var line = new ProjectTransClient();
-                            line.IsTimeJournal = true;
-                            line._Project = s._Project;
-                            line._Employee = s._Employee;
-                            line._PayrollCategory = s._PayrollCategory;
-                            line._PrCategory = payrollCat?._PrCategory;
-                            line._WorkSpace = s._WorkSpace;
-                            line._Task = s._Task;
-                            line._Invoiceable = s._Invoiceable;
-                            line._Date = s._Date;
-
-                            if (s._RegistrationType == RegistrationType.Hours)
+                            for (int x = dayOfStart + 1; x <= 7; x++)
                             {
-                                line._Text = s._Text;
-                                line._Unit = (byte)ItemUnit.Hours;
-                                if (payrollCat != null && (payrollCat._InternalType == Uniconta.DataModel.InternalType.OverTime || payrollCat._InternalType == Uniconta.DataModel.InternalType.FlexTime))
-                                    line._Qty = payrollCat._Factor == 0 ? s.Total : s.Total * payrollCat._Factor;
-                                else
-                                    line._Qty = s.Total;
-                            }
-                            else
-                            {
-                                line._Text = s._Text;
-                                line._Unit = (byte)ItemUnit.km;
-                                line._Qty = s.Total;
-                            }
+                                double dayHours = s.GetHoursDayN(x);
+                                if (dayHours == 0)
+                                    continue;
 
-                            s.Day1 = s.Total;
-                            s.Day2 = s.Day3 = s.Day4 = s.Day5 = s.Day6 = s.Day7 = 0;
-                            await priceLookup.GetEmployeePrice(s);
-                            line._CostPrice = s.GetCostPricesDayN(1);
-                            line._SalesPrice = s.GetSalesPricesDayN(1);
+                                var line = new ProjectTransClient();
+                                line.IsTimeJournal = true;
+                                line._Project = s._Project;
+                                line._Employee = s._Employee;
+                                line._PayrollCategory = s._PayrollCategory;
+                                line._PrCategory = payrollCat?._PrCategory;
+                                line._WorkSpace = s._WorkSpace;
+                                line._Task = s._Task;
+                                line._Invoiceable = s._Invoiceable;
+                                line._Text = s._Text ?? payrollCat._Name;
+                                line._Unit = s._RegistrationType == RegistrationType.Hours ? (byte)ItemUnit.Hours : (byte)ItemUnit.km;
+                                line._Date = s._Date.AddDays(x - 1);
 
-                            if (api.CompanyEntity._DimFromProject)
-                            {
-                                if (lastProject != s._Project)
+                                if (api.CompanyEntity._DimFromProject)
                                 {
-                                    project = (Uniconta.DataModel.Project)Projects.Get(s._Project);
-                                    lastProject = s._Project;
+                                    if (lastProject != s._Project)
+                                    {
+                                        project = (Uniconta.DataModel.Project)Projects.Get(s._Project);
+                                        lastProject = s._Project;
+                                    }
+
+                                    line._Dim1 = project._Dim1;
+                                    line._Dim2 = project._Dim2;
+                                    line._Dim3 = project._Dim3;
+                                    line._Dim4 = project._Dim4;
+                                    line._Dim5 = project._Dim5;
+                                }
+                                else
+                                {
+                                    line._Dim1 = rec.EmployeeTable._Dim1;
+                                    line._Dim2 = rec.EmployeeTable._Dim2;
+                                    line._Dim3 = rec.EmployeeTable._Dim3;
+                                    line._Dim4 = rec.EmployeeTable._Dim4;
+                                    line._Dim5 = rec.EmployeeTable._Dim5;
                                 }
 
-                                line._Dim1 = project._Dim1;
-                                line._Dim2 = project._Dim2;
-                                line._Dim3 = project._Dim3;
-                                line._Dim4 = project._Dim4;
-                                line._Dim5 = project._Dim5;
+                                double factor = 1;
+                                if (payrollCat != null && payrollCat._Factor != 0 && (payrollCat._InternalType == Uniconta.DataModel.InternalType.OverTime || payrollCat._InternalType == Uniconta.DataModel.InternalType.FlexTime))
+                                    factor = payrollCat._Factor;
+
+                                line._Qty = dayHours * factor;
+
+                                await priceLookup.GetEmployeePrice(s);
+                                line._CostPrice = s.GetCostPricesDayN(x);
+                                line._SalesPrice = s.GetSalesPricesDayN(x);
+
+                                timetransLst.Add(line);
                             }
-                            else
-                            {
-                                line._Dim1 = rec.EmployeeTable._Dim1;
-                                line._Dim2 = rec.EmployeeTable._Dim2;
-                                line._Dim3 = rec.EmployeeTable._Dim3;
-                                line._Dim4 = rec.EmployeeTable._Dim4;
-                                line._Dim5 = rec.EmployeeTable._Dim5;
-                            }
-                            timetransLst.Add(line);
                         }
                     }
                 }
 
                 busyIndicator.IsBusy = false;
+
             }
 
             if (timetransLst != null)
             {
-                var transLst = ((IEnumerable<ProjectTransClient>)dgProjectTransaction.ItemsSource).ToList();
-                transLst.AddRange(timetransLst);
-                dgProjectTransaction.SetSource(transLst.ToArray());
+                var listType = typeof(List<>).MakeGenericType(dgProjectTransaction.TableTypeUser);
+                var transLst = (IList)Activator.CreateInstance(listType, new object[] { dgProjectTransaction.ItemsSource});
+                foreach (var item in timetransLst)
+                {
+                    var userItem = Activator.CreateInstance(dgProjectTransaction.TableTypeUser);
+                   
+                    StreamingManager.Copy(item, userItem as UnicontaBaseEntity);
+                    var tmj = userItem as ProjectTransClient;
+                    tmj.IsTimeJournal = true;
+                    transLst.Add(userItem);
+                }
+                dgProjectTransaction.ItemsSource = transLst;
+                dgProjectTransaction.Visibility = Visibility.Visible;
             }
         }
 
@@ -534,6 +593,10 @@ namespace UnicontaClient.Pages.CustomPage
                         IncludeTimeJournals();
                     SetIncludeFilter();
                     break;
+                case "ViewOnlyOpen":
+                    viewOnlyOpen = IsChecked;
+                    ViewOnlyOpenTrans();
+                    break;
             }
         }
 
@@ -542,6 +605,12 @@ namespace UnicontaClient.Pages.CustomPage
             if (includeSubProject)
                 this.ProjectCol.Visible = true;
             iIncludeSubProBase.IsChecked = includeSubProject;
+            return LoadGrid();
+        }
+
+        Task ViewOnlyOpenTrans()
+        {
+            iViewOnlyOpenBase.IsChecked = viewOnlyOpen;
             return LoadGrid();
         }
 

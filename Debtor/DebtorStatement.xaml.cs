@@ -139,17 +139,21 @@ namespace UnicontaClient.Pages.CustomPage
     {
         [ForeignKeyAttribute(ForeignKeyTable = typeof(Debtor))]
         public string FromAccount { get; set; }
+        string LastSearch;
 
         SQLCache accountCache;
         ItemBase ibase, ibaseCurrent;
 
-        static public DateTime DefaultFromDate, DefaultToDate;
         static bool IsCollapsed = true;
+        bool OnlyOpen, OnlyDue = false;
+        CWServerFilter debtorFilterDialog = null;
+        bool debtorFilterCleared;
+        string includedJournals;
+        TableField[] DebtorUserFields { get; set; }
+        IEnumerable<PropValuePair> debtorFilterValues;
         static bool pageBreak, showCurrency = false;
         static int printIntPreview = 1, transaction;
-        bool OnlyOpen, OnlyDue = false;
-        string includedJournals;
-
+        static public DateTime DefaultFromDate, DefaultToDate;
         public static void SetDateTime(DateEditor frmDateeditor, DateEditor todateeditor)
         {
             if (frmDateeditor.Text == string.Empty)
@@ -163,14 +167,13 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         public override string NameOfControl { get { return TabControls.DebtorStatement; } }
-
         Debtor _master;
-
-        CWServerFilter debtorFilterDialog = null;
-        bool debtorFilterCleared;
-        TableField[] DebtorUserFields { get; set; }
-        IEnumerable<PropValuePair> debtorFilterValues;
-
+        public override void AssignMultipleGrid(List<CorasauDataGrid> gridCtrls)
+        {
+            gridCtrls.Add(dgDebtorTrans);
+            gridCtrls.Add(childDgDebtorTrans);
+            isChildGridExist = true;
+        }
         public DebtorStatement(BaseAPI API) : base(API, string.Empty)
         {
             Init();
@@ -237,6 +240,7 @@ namespace UnicontaClient.Pages.CustomPage
             cmbTrasaction.ItemsSource = AppEnums.TransToShow.Values;
             cmbTrasaction.SelectedIndex = transaction;
             GetMenuItem();
+
             var Comp = api.CompanyEntity;
             accountCache = Comp.GetCache(typeof(Uniconta.DataModel.Debtor));
             if (Comp.RoundTo100)
@@ -244,9 +248,9 @@ namespace UnicontaClient.Pages.CustomPage
 
             TransactionReport.SetDailyJournal(cmbJournals, api);
             dgDebtorTrans.RowDoubleClick += DgDebtorTrans_RowDoubleClick;
-            dgDebtorTrans.SelectedItemChanged += DgDebtorTrans_SelectedItemChanged; ;
-            dgDebtorTrans.MasterRowExpanded += DgDebtorTrans_MasterRowExpanded; ;
-            dgDebtorTrans.MasterRowCollapsed += DgDebtorTrans_MasterRowCollapsed; ;
+            dgDebtorTrans.SelectedItemChanged += DgDebtorTrans_SelectedItemChanged;
+            dgDebtorTrans.MasterRowExpanded += DgDebtorTrans_MasterRowExpanded;
+            dgDebtorTrans.MasterRowCollapsed += DgDebtorTrans_MasterRowCollapsed;
             dgDebtorTrans.ShowTotalSummary();
         }
 
@@ -315,95 +319,13 @@ namespace UnicontaClient.Pages.CustomPage
             return new AggregateOperand("ChildRecords", Aggregate.Exists, detailOperator);
         }
 
-        async private Task<IEnumerable<IPrintReport>> GeneratePrintReport(IEnumerable<DebtorStatementList> statementList, bool marked, bool hasCurrency, bool applyGridFilter)
-        {
-            var iprintReportList = new List<IPrintReport>();
-
-            //Get Company related details
-
-            var companyClient = api.CompanyEntity.CreateUserType<CompanyClient>();
-            StreamingManager.Copy(api.CompanyEntity, companyClient);
-            byte[] getLogoBytes = await UtilCommon.GetLogo(api);
-            int rowHandle = -1;
-            foreach (var db in statementList)
-            {
-                rowHandle = rowHandle + 1;
-
-                if (db.ChildRecords.Length == 0 || (marked && !db.Mark))
-                    continue;
-
-                if (applyGridFilter)
-                {
-                    var visibelDetails = dgDebtorTrans.GetVisibleDetail(rowHandle);
-                    if (visibelDetails == null || visibelDetails.VisibleItems?.Count == 0)
-                        continue;
-                }
-
-                var lan = UtilDisplay.GetLanguage(db.deb, companyClient);
-
-                //Setting the Localization for the debtor
-                var debtLocalize = Uniconta.ClientTools.Localization.GetLocalization(lan);
-                foreach (var rec in db.ChildRecords)
-                {
-                    rec.LocOb = debtLocalize;
-                    if (rec._Primo)
-                        rec._Text = debtLocalize.Lookup("Primo");
-                }
-
-                var debtorType = Uniconta.Reports.Utilities.ReportUtil.GetUserType(typeof(DebtorClient), api.CompanyEntity);
-                var debt = Activator.CreateInstance(debtorType) as DebtorClient;
-                StreamingManager.Copy(db.deb, debt);
-                debt.Transactions = applyGridFilter ? dgDebtorTrans.GetVisibleDetail(rowHandle).VisibleItems.Cast<DebtorTransClientTotal>() : db.ChildRecords;
-
-                if (lastMessage == null || messageLanguage != lan)
-                {
-                    messageLanguage = lan;
-                    var msg = await UtilCommon.GetDebtorMessageClient(api, lan, DebtorEmailType.AccountStatement);
-                    if (msg != null)
-                        lastMessage = msg._Text;
-                    else
-                        lastMessage = string.Empty;
-                }
-
-                var statementPrint = new DebtorStatementReportClient(companyClient, debt, txtDateFrm.DateTime, txtDateTo.DateTime, "Statement", getLogoBytes, lastMessage);
-                var standardReports = new[] { statementPrint };
-                var standardPrint = new StandardPrintReport(api, standardReports, hasCurrency ? (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.StatementCurrency : (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.Statement);
-                await standardPrint.InitializePrint();
-
-                if (standardPrint.Report != null)
-                    iprintReportList.Add(standardPrint);
-            }
-            return iprintReportList;
-        }
-
-        async private void OpenOutlook()
-        {
-            try
-            {
-                busyIndicator.IsBusy = true;
-                busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LaunchingWaitMsg");
-                var debtorStatementList = ((IEnumerable<DebtorStatementList>)dgDebtorTrans.ItemsSource).Where(m => m.Mark).FirstOrDefault();
-                if (debtorStatementList != null)
-                {
-                    var hasCurrency = debtorStatementList.ChildRecords.Where(p => p._AmountCur != 0.0d).Any();
-                    var debtStatementReport = await GeneratePrintReport(new List<DebtorStatementList>(1) { debtorStatementList }, true, hasCurrency, false);
-                    if (debtStatementReport != null && debtStatementReport.Count() == 1)
-                        InvoicePostingPrintGenerator.OpenReportInOutlook(api, debtStatementReport.Single(), debtorStatementList.deb,
-                            CompanyLayoutType.AccountStatement, DefaultFromDate, DefaultToDate, hasCurrency);
-                }
-
-            }
-            catch (Exception ex)
-            {
-                UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"));
-            }
-            finally { busyIndicator.IsBusy = false; }
-        }
+        
 
         public override Task InitQuery()
         {
             if (_master != null)
             {
+                txtAccount.Text = string.Empty;
                 cmbAccounts.EditValue = _master._Account;
                 return LoadDCTrans();
             }
@@ -416,52 +338,12 @@ namespace UnicontaClient.Pages.CustomPage
             debtorRow.SetMaster(api.CompanyEntity);
             DebtorUserFields = debtorRow.UserFieldDef();
         }
-
-        private void DgDebtorTrans_OnPrintClick()
+        void GetMenuItem()
         {
-            if (dgDebtorTrans.ItemsSource != null)
-                PrintData();
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            ibase = UtilDisplay.GetMenuCommandByName(rb, "ExpandAndCollapse");
+            ibaseCurrent = UtilDisplay.GetMenuCommandByName(rb, "ExpandCollapseCurrent");
         }
-
-        public override void AssignMultipleGrid(List<CorasauDataGrid> gridCtrls)
-        {
-            gridCtrls.Add(dgDebtorTrans);
-            gridCtrls.Add(childDgDebtorTrans);
-            isChildGridExist = true;
-        }
-
-        string lastMessage;
-        Language messageLanguage;
-
-        async private void PrintData()
-        {
-            busyIndicator.IsBusy = true;
-            busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
-
-            try
-            {
-                var debtorStatementList = dgDebtorTrans.VisibleItems.Cast<DebtorStatementList>();
-                var marked = debtorStatementList.Any(m => m.Mark == true);
-
-                var iReports = await GeneratePrintReport(debtorStatementList.ToList(), marked, chkShowCurrency.IsChecked == true, true);
-
-                if (iReports.Count() > 0)
-                {
-                    var dockJName = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Preview"), Uniconta.ClientTools.Localization.lookup("Statement"));
-                    AddDockItem(UnicontaTabs.StandardPrintReportPage, new object[] { iReports, Uniconta.ClientTools.Localization.lookup("Statement") }, dockJName);
-                }
-            }
-            catch (Exception ex)
-            {
-                busyIndicator.IsBusy = false;
-                api.ReportException(ex, string.Format("DebtorStatement.PrintData(), CompanyId={0}", api.CompanyId));
-                UnicontaMessageBox.Show(ex);
-            }
-            finally { busyIndicator.IsBusy = false; }
-        }
-
-
-
         Task<SQLCache> accountCacheTask;
         protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
@@ -641,13 +523,6 @@ namespace UnicontaClient.Pages.CustomPage
 
         }
 
-        void GetMenuItem()
-        {
-            RibbonBase rb = (RibbonBase)localMenu.DataContext;
-            ibase = UtilDisplay.GetMenuCommandByName(rb, "ExpandAndCollapse");
-            ibaseCurrent = UtilDisplay.GetMenuCommandByName(rb, "ExpandCollapseCurrent");
-        }
-
         void ExpandAndCollapseAll(bool IsCollapseAll)
         {
 
@@ -667,185 +542,7 @@ namespace UnicontaClient.Pages.CustomPage
                 ibase.LargeGlyph = Utilities.Utility.GetGlyph("Collapse_32x32");
             }
         }
-
-        void SendMail()
-        {
-            var fromAccount = txtAccount.Text; ;
-            var toAccount = string.Empty;
-            var lstDebtorTransLst = (IEnumerable<DebtorStatementList>)dgDebtorTrans.ItemsSource;
-            var VisibleItems = dgDebtorTrans.VisibleItems;
-
-            if (VisibleItems.Count == 0)
-                return;
-
-            if (VisibleItems.Count == 1)
-            {
-                var cwSendMail = new CWSendInvoice();
-                cwSendMail.DialogTableId = 2000000030;
-                cwSendMail.Closed += delegate
-                  {
-                      if (cwSendMail.DialogResult == true)
-                      {
-                          var rec = (VisibleItems[0] as DebtorStatementList);
-                          DoSendAsEmail(new[] { rec }, true, rec.Account, rec.Account, cwSendMail.Emails, cwSendMail.sendOnlyToThisEmail);
-                      }
-                  };
-                cwSendMail.Show();
-            }
-            else
-            {
-                CWSendStatementEmail cw = new CWSendStatementEmail();
-                var visibleDebtTranLst = VisibleItems.Cast<DebtorStatementList>();
-                var visibleCount = VisibleItems.Count;
-                cw.DialogTableId = 2000000031;
-                cw.UpdateCount(visibleCount, visibleDebtTranLst.Where(p => p.Mark == true).Count());
-                cw.Closed += delegate
-                {
-                    if (cw.DialogResult == true)
-                    {
-                        if (lstDebtorTransLst.Count() != visibleCount)
-                        {
-                            checkForMarked = false;
-                            if (cw.SendAll)
-                                foreach (var item in visibleDebtTranLst)
-                                    item._Mark = true;
-
-                            DoSendAsEmail(visibleDebtTranLst, false, fromAccount, toAccount, null, false);
-                        }
-                        else
-                        {
-                            checkForMarked = true;
-                            DoSendAsEmail(lstDebtorTransLst, cw.SendAll, fromAccount, toAccount, null, false);
-                        }
-                    }
-                };
-                cw.Show();
-            }
-        }
-
-        bool checkForMarked, running;
-        async void DoSendAsEmail(IEnumerable<DebtorStatementList> lstDebtorTransLst, bool SendAll, string fromAccount, string toAccount, string emails, bool onlyThisEmail)
-        {
-            if (running)
-                return;
-            try
-            {
-                running = true;
-                ribbonControl.DisableButtons(new string[] { "SendAsEmail" });
-                var transApi = new ReportAPI(api);
-                DebtorStatement.SetDateTime(txtDateFrm, txtDateTo);
-                DateTime fromDate = DebtorStatement.DefaultFromDate, toDate = DebtorStatement.DefaultToDate;
-                includedJournals = cmbJournals.Text;
-                if (!SendAll)
-                {
-                    // lets check if we will send all anyway.
-                    SendAll = checkForMarked;
-                    foreach (var t in lstDebtorTransLst)
-                    {
-                        if (!t._Mark)
-                        {
-                            SendAll = false;
-                            break;
-                        }
-                    }
-                }
-
-                if (SendAll)
-                {
-                    var skipBlank = cbxSkipBlank.IsChecked.GetValueOrDefault();
-                    busyIndicator.IsBusy = true;
-                    busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
-                    var result = await transApi.DebtorAccountStatement(fromDate, toDate, fromAccount, toAccount, OnlyOpen, null, false, debtorFilterValues, emails, onlyThisEmail, OnlyDue, skipBlank, includedJournals);
-                    busyIndicator.IsBusy = false;
-                    if (result == ErrorCodes.Succes)
-                        UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("SendEmailMsgOBJ"), Uniconta.ClientTools.Localization.lookup("AccountStatement")),
-                                                      Uniconta.ClientTools.Localization.lookup("Message"), MessageBoxButton.OK);
-                    else
-                        UtilDisplay.ShowErrorCode(result);
-                }
-                else
-                {
-                    List<string> errorList = new List<string>();
-                    busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
-                    busyIndicator.IsBusy = true;
-                    bool RunInBack = false;
-                    foreach (var t in lstDebtorTransLst.ToList())
-                    {
-                        if (!t._Mark)
-                            continue;
-                        var result = await transApi.DebtorAccountStatement(fromDate, toDate, t.Account, t.Account, OnlyOpen, null, RunInBack, debtorFilterValues, emails, onlyThisEmail, false, false, includedJournals);
-                        if (result != ErrorCodes.Succes)
-                        {
-                            string error = string.Format("{0}: {1}", t.Account, Uniconta.ClientTools.Localization.lookup(result.ToString()));
-                            errorList.Add(error);
-                            if (!RunInBack)
-                                break;
-                        }
-                        RunInBack = true;
-                        emails = null;
-                    }
-                    busyIndicator.IsBusy = false;
-
-                    if (errorList.Count > 0)
-                    {
-                        CWErrorBox errorDialog = new CWErrorBox(errorList.ToArray(), true);
-                        errorDialog.Show();
-                    }
-                    else if (RunInBack)
-                        UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("SendEmailMsgOBJ"), Uniconta.ClientTools.Localization.lookup("AccountStatement")),
-                                                      Uniconta.ClientTools.Localization.lookup("Message"), MessageBoxButton.OK);
-                    else
-                        UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("zeroRecords"), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OK);
-                }
-            }
-            finally
-            {
-                running = false;
-                ribbonControl.EnableButtons(new string[] { "SendAsEmail" });
-            }
-        }
-
-        private void CheckEditor_Checked(object sender, RoutedEventArgs e)
-        {
-            DebtorStatementClientSetMark(true);
-        }
-
-        private void CheckEditor_Unchecked(object sender, RoutedEventArgs e)
-        {
-            DebtorStatementClientSetMark(false);
-        }
-        /* cannot use Grid GetVisibleRows as class is local */
-        IEnumerable<DebtorStatementList> GetVisibleRows()
-        {
-            try
-            {
-                int n = dgDebtorTrans.VisibleRowCount;
-                var lst = dgDebtorTrans.ItemsSource as IEnumerable<DebtorStatementList>;
-                if (lst != null && lst.Count() == n)
-                    return lst;
-                var Arr = new DebtorStatementList[n];
-                for (int i = 0; i < n; i++)
-                {
-                    var dataRow = dgDebtorTrans.GetRow(dgDebtorTrans.GetRowHandleByVisibleIndex(i));
-                    Arr.SetValue(dataRow, i);
-                }
-                return Arr;
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        void DebtorStatementClientSetMark(bool value)
-        {
-            var lst = GetVisibleRows();
-            if (lst != null)
-            {
-                foreach (var row in lst)
-                    row.Mark = value;
-            }
-        }
+       
 
         async Task LoadDCTrans()
         {
@@ -866,7 +563,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 var t = accountCacheTask;
                 if (t != null)
-                    accountCache = await t;
+                    accountCache = await t; 
 
                 FillStatement(listTrans, OnlyOpen, toDate);
             }
@@ -882,6 +579,12 @@ namespace UnicontaClient.Pages.CustomPage
                 IsCollapsed = false;
             ExpandAndCollapseAll(IsCollapsed);
             maintainState = false;
+            LastSearch = txtAccount.Text;
+            if (_master == null)
+            {
+                cmbAccounts.SelectedIndex = -1;
+                txtAccount.Text = string.Empty;
+            }
         }
         List<DebtorStatementList> statementList = null;
         void FillStatement(DebtorTransClientTotal[] listTrans, bool OnlyOpen, DateTime toDate)
@@ -1002,6 +705,298 @@ namespace UnicontaClient.Pages.CustomPage
                     dgDebtorTrans.ExpandMasterRow(rowHandle);
             }
             return base.GetPrintParameter();
+        }
+        async private Task<IEnumerable<IPrintReport>> GeneratePrintReport(IEnumerable<DebtorStatementList> statementList, bool marked, bool hasCurrency, bool applyGridFilter)
+        {
+            var iprintReportList = new List<IPrintReport>();
+
+            //Get Company related details
+
+            var companyClient = api.CompanyEntity.CreateUserType<CompanyClient>();
+            StreamingManager.Copy(api.CompanyEntity, companyClient);
+            byte[] getLogoBytes = await UtilCommon.GetLogo(api);
+            int rowHandle = -1;
+            foreach (var db in statementList)
+            {
+                rowHandle = rowHandle + 1;
+
+                if (db.ChildRecords.Length == 0 || (marked && !db.Mark))
+                    continue;
+
+                if (applyGridFilter)
+                {
+                    var visibelDetails = dgDebtorTrans.GetVisibleDetail(rowHandle);
+                    if (visibelDetails == null || visibelDetails.VisibleItems?.Count == 0)
+                        continue;
+                }
+
+                var lan = UtilDisplay.GetLanguage(db.deb, companyClient);
+
+                //Setting the Localization for the debtor
+                var debtLocalize = Uniconta.ClientTools.Localization.GetLocalization(lan);
+                foreach (var rec in db.ChildRecords)
+                {
+                    rec.LocOb = debtLocalize;
+                    if (rec._Primo)
+                        rec._Text = debtLocalize.Lookup("Primo");
+                }
+
+                var debtorType = Uniconta.Reports.Utilities.ReportUtil.GetUserType(typeof(DebtorClient), api.CompanyEntity);
+                var debt = Activator.CreateInstance(debtorType) as DebtorClient;
+                StreamingManager.Copy(db.deb, debt);
+                debt.Transactions = applyGridFilter ? dgDebtorTrans.GetVisibleDetail(rowHandle).VisibleItems.Cast<DebtorTransClientTotal>() : db.ChildRecords;
+
+                if (lastMessage == null || messageLanguage != lan)
+                {
+                    messageLanguage = lan;
+                    var msg = await UtilCommon.GetDebtorMessageClient(api, lan, DebtorEmailType.AccountStatement);
+                    if (msg != null)
+                        lastMessage = msg._Text;
+                    else
+                        lastMessage = string.Empty;
+                }
+
+                var statementPrint = new DebtorStatementReportClient(companyClient, debt, txtDateFrm.DateTime, txtDateTo.DateTime, "Statement", getLogoBytes, lastMessage);
+                var standardReports = new[] { statementPrint };
+                var standardPrint = new StandardPrintReport(api, standardReports, hasCurrency ? (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.StatementCurrency : (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.Statement);
+                await standardPrint.InitializePrint();
+
+                if (standardPrint.Report != null)
+                    iprintReportList.Add(standardPrint);
+            }
+            return iprintReportList;
+        }
+        private void DgDebtorTrans_OnPrintClick()
+        {
+            if (dgDebtorTrans.ItemsSource != null)
+                PrintData();
+        }
+        async private void OpenOutlook()
+        {
+            try
+            {
+                busyIndicator.IsBusy = true;
+                busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LaunchingWaitMsg");
+                var debtorStatementList = ((IEnumerable<DebtorStatementList>)dgDebtorTrans.ItemsSource).Where(m => m.Mark).FirstOrDefault();
+                if (debtorStatementList != null)
+                {
+                    var hasCurrency = debtorStatementList.ChildRecords.Where(p => p._AmountCur != 0.0d).Any();
+                    var debtStatementReport = await GeneratePrintReport(new List<DebtorStatementList>(1) { debtorStatementList }, true, hasCurrency, false);
+                    if (debtStatementReport != null && debtStatementReport.Count() == 1)
+                        InvoicePostingPrintGenerator.OpenReportInOutlook(api, debtStatementReport.Single(), debtorStatementList.deb,
+                            CompanyLayoutType.AccountStatement, DefaultFromDate, DefaultToDate, hasCurrency);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"));
+            }
+            finally { busyIndicator.IsBusy = false; }
+        }
+        void SendMail()
+        {
+            var lstDebtorTransLst = (IEnumerable<DebtorStatementList>)dgDebtorTrans.ItemsSource;
+            var VisibleItems = dgDebtorTrans.VisibleItems;
+            if (VisibleItems.Count == 0)
+                return;
+
+            if (VisibleItems.Count == 1)
+            {
+                var cwSendMail = new CWSendInvoice();
+                cwSendMail.DialogTableId = 2000000030;
+                cwSendMail.Closed += delegate
+                {
+                    if (cwSendMail.DialogResult == true)
+                    {
+                        var rec = (VisibleItems[0] as DebtorStatementList);
+                        DoSendAsEmail(new[] { rec }, true, rec.Account, cwSendMail.Emails, cwSendMail.sendOnlyToThisEmail);
+                    }
+                };
+                cwSendMail.Show();
+            }
+            else
+            {
+                CWSendStatementEmail cw = new CWSendStatementEmail();
+                var visibleDebtTranLst = VisibleItems.Cast<DebtorStatementList>();
+                var visibleCount = VisibleItems.Count;
+                cw.DialogTableId = 2000000031;
+                cw.UpdateCount(visibleCount, visibleDebtTranLst.Where(p => p.Mark == true).Count());
+                cw.Closed += delegate
+                {
+                    if (cw.DialogResult == true)
+                    {
+                        if (lstDebtorTransLst.Count() != visibleCount)
+                        {
+                            checkForMarked = false;
+                            if (cw.SendAll)
+                                foreach (var item in visibleDebtTranLst)
+                                    item._Mark = true;
+
+                            DoSendAsEmail(visibleDebtTranLst, false, LastSearch, null, false);
+                        }
+                        else
+                        {
+                            checkForMarked = true;
+                            DoSendAsEmail(lstDebtorTransLst, cw.SendAll, LastSearch, null, false);
+                        }
+                    }
+                };
+                cw.Show();
+            }
+        }
+
+        bool checkForMarked, running;
+        async void DoSendAsEmail(IEnumerable<DebtorStatementList> lstDebtorTransLst, bool SendAll, string fromAccount, string emails, bool onlyThisEmail)
+        {
+            if (running)
+                return;
+            try
+            {
+                running = true;
+                ribbonControl.DisableButtons(new string[] { "SendAsEmail" });
+                var transApi = new ReportAPI(api);
+                DebtorStatement.SetDateTime(txtDateFrm, txtDateTo);
+                DateTime fromDate = DebtorStatement.DefaultFromDate, toDate = DebtorStatement.DefaultToDate;
+                includedJournals = cmbJournals.Text;
+                if (!SendAll)
+                {
+                    // lets check if we will send all anyway.
+                    SendAll = checkForMarked;
+                    foreach (var t in lstDebtorTransLst)
+                    {
+                        if (!t._Mark)
+                        {
+                            SendAll = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (SendAll)
+                {
+                    var skipBlank = cbxSkipBlank.IsChecked.GetValueOrDefault();
+                    busyIndicator.IsBusy = true;
+                    busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
+                    var result = await transApi.DebtorAccountStatement(fromDate, toDate, fromAccount, null, OnlyOpen, null, false, debtorFilterValues, emails, onlyThisEmail, OnlyDue, skipBlank, includedJournals);
+                    busyIndicator.IsBusy = false;
+                    if (result == ErrorCodes.Succes)
+                        UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("SendEmailMsgOBJ"), Uniconta.ClientTools.Localization.lookup("AccountStatement")),
+                                                      Uniconta.ClientTools.Localization.lookup("Message"), MessageBoxButton.OK);
+                    else
+                        UtilDisplay.ShowErrorCode(result);
+                }
+                else
+                {
+                    List<string> errorList = new List<string>();
+                    busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
+                    busyIndicator.IsBusy = true;
+                    bool RunInBack = false;
+                    foreach (var t in lstDebtorTransLst.ToList())
+                    {
+                        if (!t._Mark)
+                            continue;
+                        var result = await transApi.DebtorAccountStatement(fromDate, toDate, t.Account, t.Account, OnlyOpen, null, RunInBack, debtorFilterValues, emails, onlyThisEmail, false, false, includedJournals);
+                        if (result != ErrorCodes.Succes)
+                        {
+                            string error = string.Format("{0}: {1}", t.Account, Uniconta.ClientTools.Localization.lookup(result.ToString()));
+                            errorList.Add(error);
+                            if (!RunInBack)
+                                break;
+                        }
+                        RunInBack = true;
+                        emails = null;
+                    }
+                    busyIndicator.IsBusy = false;
+
+                    if (errorList.Count > 0)
+                    {
+                        CWErrorBox errorDialog = new CWErrorBox(errorList.ToArray(), true);
+                        errorDialog.Show();
+                    }
+                    else if (RunInBack)
+                        UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("SendEmailMsgOBJ"), Uniconta.ClientTools.Localization.lookup("AccountStatement")),
+                                                      Uniconta.ClientTools.Localization.lookup("Message"), MessageBoxButton.OK);
+                    else
+                        UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("zeroRecords"), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OK);
+                }
+            }
+            finally
+            {
+                running = false;
+                ribbonControl.EnableButtons(new string[] { "SendAsEmail" });
+            }
+        }
+
+        string lastMessage;
+        Language messageLanguage;
+
+        async private void PrintData()
+        {
+            busyIndicator.IsBusy = true;
+            busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
+
+            try
+            {
+                var debtorStatementList = dgDebtorTrans.VisibleItems.Cast<DebtorStatementList>();
+                var marked = debtorStatementList.Any(m => m.Mark == true);
+
+                var iReports = await GeneratePrintReport(debtorStatementList.ToList(), marked, chkShowCurrency.IsChecked == true, true);
+
+                if (iReports.Count() > 0)
+                {
+                    var dockJName = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Preview"), Uniconta.ClientTools.Localization.lookup("Statement"));
+                    AddDockItem(UnicontaTabs.StandardPrintReportPage, new object[] { iReports, Uniconta.ClientTools.Localization.lookup("Statement") }, dockJName);
+                }
+            }
+            catch (Exception ex)
+            {
+                busyIndicator.IsBusy = false;
+                api.ReportException(ex, string.Format("DebtorStatement.PrintData(), CompanyId={0}", api.CompanyId));
+                UnicontaMessageBox.Show(ex);
+            }
+            finally { busyIndicator.IsBusy = false; }
+        }
+        private void CheckEditor_Checked(object sender, RoutedEventArgs e)
+        {
+            DebtorStatementClientSetMark(true);
+        }
+
+        private void CheckEditor_Unchecked(object sender, RoutedEventArgs e)
+        {
+            DebtorStatementClientSetMark(false);
+        }
+        /* cannot use Grid GetVisibleRows as class is local */
+        IEnumerable<DebtorStatementList> GetVisibleRows()
+        {
+            try
+            {
+                int n = dgDebtorTrans.VisibleRowCount;
+                var lst = dgDebtorTrans.ItemsSource as IEnumerable<DebtorStatementList>;
+                if (lst != null && lst.Count() == n)
+                    return lst;
+                var Arr = new DebtorStatementList[n];
+                for (int i = 0; i < n; i++)
+                {
+                    var dataRow = dgDebtorTrans.GetRow(dgDebtorTrans.GetRowHandleByVisibleIndex(i));
+                    Arr.SetValue(dataRow, i);
+                }
+                return Arr;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        void DebtorStatementClientSetMark(bool value)
+        {
+            var lst = GetVisibleRows();
+            if (lst != null)
+            {
+                foreach (var row in lst)
+                    row.Mark = value;
+            }
         }
     }
     public class CustomTableView : TableView, ITableView

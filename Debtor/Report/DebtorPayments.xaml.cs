@@ -214,7 +214,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         string lastMessage;
         Language messageLanguage;
-
+        int messageType;
         async private void OpenOutlook()
         {
             try
@@ -229,7 +229,7 @@ namespace UnicontaClient.Pages.CustomPage
                 var companyClient = Comp.CreateUserType<CompanyClient>();
                 StreamingManager.Copy(Comp, companyClient);
 
-                lastMessage = null; // just to reload message in case it has changed
+                lastMessage = null; messageType = 0;// just to reload message in case it has changed
                 LoadDataForReport(code);
 
                 var debtor = accountCache.Get(selectedAccount) as Uniconta.DataModel.Debtor;
@@ -299,9 +299,12 @@ namespace UnicontaClient.Pages.CustomPage
             StreamingManager.Copy(dbClientTotal.Debtor, debtorClient);
 
             var lan = UtilDisplay.GetLanguage(debtorClient, companyClient);
-            if (lastMessage == null || messageLanguage != lan)
+            var msgType = (int)debtorEmailType;
+            if (messageType != msgType || messageLanguage != lan)
             {
                 messageLanguage = lan;
+                messageType = msgType;
+
                 var res = await UtilCommon.GetDebtorMessageClient(api, lan, debtorEmailType);
                 if (res != null)
                     lastMessage = res._Text;

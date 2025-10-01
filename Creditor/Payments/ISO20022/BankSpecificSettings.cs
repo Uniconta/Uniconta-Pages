@@ -219,7 +219,7 @@ namespace UnicontaISO20022CreditTransfer
         /// <summary>
         /// Used for Lithuania
         /// </summary>
-        public virtual string ExtProprietaryCode()
+        public virtual string ExtProprietaryCode(PaymentTypes paymentMethod)
         {
             return string.Empty;
         }
@@ -316,7 +316,14 @@ namespace UnicontaISO20022CreditTransfer
             return 0;
         }
 
-      
+
+        /// <summary>
+        /// Germany will in a transition phase - use two formats pain.001.001.03 and pain.001.001.09
+        /// </summary>
+        public virtual bool NewPaymentFormat()
+        {
+            return false;
+        }
 
         /// <summary>
         /// Activate Total of all individual amounts per PaymentInfoId, irrespective of currencies

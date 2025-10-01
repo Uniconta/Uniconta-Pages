@@ -12,7 +12,6 @@ using System.Collections.Generic;
 using Uniconta.DataModel;
 using Uniconta.ClientTools.Controls;
 using System.ComponentModel;
-using DevExpress.DataAccess.Excel;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -87,6 +86,17 @@ namespace UnicontaClient.Pages.CustomPage
                     var attr = (ClientTableAttribute)clientTableAttr[0];
                     if (!tableLst.ContainsKey(userTblNo))
                         tableLst.Add(userTblNo, new TableName(type, string.Format("{0} ({1})", type.Name, Uniconta.ClientTools.Localization.lookup(attr.LabelKey))));
+                    else
+                    {
+                        var existingTable = tableLst[userTblNo];
+                        if (type.Name.EndsWith("User"))
+                        {
+                            string baseKey = type.Name.Substring(0, type.Name.Length - 4);
+                            int index = existingTable.Name.IndexOf(baseKey);
+                            if (index != -1)
+                                tableLst[userTblNo] = new TableName(type, string.Format("{0} ({1})", type.Name, Uniconta.ClientTools.Localization.lookup(attr.LabelKey)));
+                        }
+                    }
                 }
             }
 

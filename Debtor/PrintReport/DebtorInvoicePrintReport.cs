@@ -217,7 +217,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 CompanyLogo = await UtilCommon.GetLogo(crudApi);
 
-                Language lang = ReportGenUtil.GetLanguage(debtorClientUser, Comp);
+                Language lang = layoutType != CompanyLayoutType.PickingList? ReportGenUtil.GetLanguage(debtorClientUser, Comp): ReportGenUtil.GetLanguageFromCompany(Comp);
                 InvTransInvoiceLines = LayoutPrintReport.SetInvTransLines(DebtorInvoice, InvTransInvoiceLines, InvCache, crudApi, debtorInvoiceLineUserType, lang, false);
 
                 //Setting ReportName and Version

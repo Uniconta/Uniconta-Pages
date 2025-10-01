@@ -504,7 +504,7 @@ namespace UnicontaClient.Pages.CustomPage
                         case ErrorCodes.Succes: dialogText = string.Concat(Uniconta.ClientTools.Localization.lookup("Unregistered"), " ", cwBank.BankServiceName); break;
                         case ErrorCodes.AutoBankingNotActivated: dialogText = Uniconta.ClientTools.Localization.lookup("AutoBankingNotActivated"); break;
                         case ErrorCodes.IgnoreUpdate: dialogText = string.Format("{0} {1}: ({2}) {3}", Uniconta.ClientTools.Localization.lookup("UnableToConnectTo"), Uniconta.ClientTools.Localization.lookup("Company"), cwBank.Company.CompanyId, cwBank.Company.Name); break;
-                        case ErrorCodes.NoSubscription:
+                        case ErrorCodes.NoBankConnection:
                         case ErrorCodes.CannotDeleteRecord: dialogText = Uniconta.ClientTools.Localization.lookup("ConnectionCannotUnregister"); break;
                         default: dialogText = Uniconta.ClientTools.Localization.lookup(err.ToString()); break;
                     }

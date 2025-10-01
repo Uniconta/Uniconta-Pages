@@ -376,13 +376,16 @@ namespace UnicontaClient.Pages.CustomPage
             if (selectedInvoices != null && selectedRowIds != null)
             {
                 var sb = StringBuilderReuse.Create();
-                if (selectedInvoices.Count > 0)
+                var invCount = selectedInvoices.Count;
+                var rowCount = selectedRowIds.Count;
+
+                if (invCount > 0 && invCount == rowCount)
                 {
                     sb.Append("I:");
                     foreach (var inv in selectedInvoices)
                         sb.Append(inv).Append(';');
                 }
-                else if (selectedRowIds.Count > 0)
+                else if (rowCount > 0)
                 {
                     sb.Append("R:");
                     foreach (var row in selectedRowIds)
@@ -406,7 +409,7 @@ namespace UnicontaClient.Pages.CustomPage
                         RemainingAmtCur,
                         settleCur != 0 ? CurrencyUtil.GetStringFromId(settleCur) : null,
                         OffSet,
-                        (selectedInvoices.Count > 1 && sumCashDiscount != 0 && UsedCachDiscount()) ? IdObject.get(Math.Abs(sumCashDiscount)) : null
+                        (invCount > 1 && sumCashDiscount != 0 && UsedCachDiscount()) ? IdObject.get(Math.Abs(sumCashDiscount)) : null
                     };
                 }
                 else if (SelectedBankStatemenLine != null)

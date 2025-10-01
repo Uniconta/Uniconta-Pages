@@ -18,6 +18,9 @@ using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
 using Uniconta.API.Service;
+using DevExpress.XtraSpreadsheet.Model;
+using Uniconta.API.System;
+using Uniconta.Common.User;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -49,10 +52,21 @@ namespace UnicontaClient.Pages.CustomPage
             cmbAccOnInvTrans.SelectedIndex = (editrow.InvoiceAccountOnInvTrans) ? 1 : 0;
             if (!api.CompanyEntity.Warehouse)
                 liChkWarehouse.Visibility = Visibility.Collapsed;
-            if (api.CompanyEntity.DocumentScanner == 0)
-                clgDocumentScanner.Visibility = Visibility.Collapsed;
+
             if (!api.CompanyEntity.CreditorBankApprovement)
                 liNemhandelUpdateBankDetails.Visibility = Visibility.Collapsed;
+
+            Loaded += async (s, e) => await InitAsync();
+        }
+
+        private async Task InitAsync()
+        {
+            if (api.CompanyEntity.DocumentScanner == 0)
+            {
+                var hasAutomationPackage = await HasAutomationPackage(api);
+                if (!hasAutomationPackage)
+                    clgDocumentScanner.Visibility = Visibility.Collapsed;
+            }
         }
 
         private void frmRibbon_OnItemClicked(string ActionType)
@@ -63,6 +77,27 @@ namespace UnicontaClient.Pages.CustomPage
         private void cmbAccOnInvTrans_SelectedIndexChanged(object sender, RoutedEventArgs e)
         {
             editrow.InvoiceAccountOnInvTrans = (cmbAccOnInvTrans.SelectedIndex != 0);
+        }
+
+        private async Task<bool> HasAutomationPackage(CrudAPI api)
+        {
+            var ownerId = api.CompanyEntity._OwnerUid;
+            if (ownerId == 0)
+                return false;
+
+            var propvalpair = new PropValuePair[1]
+            {
+                PropValuePair.GenereteWhereElements("Uid", ownerId, CompareOperator.Equal)
+            };
+
+            var owner = (await api.Query<UserClient>(propvalpair))?
+                .FirstOrDefault(o => o.Role == UserRoles.Accountant || o.PartnerId != 0);
+
+            if (owner == null)
+                return false;
+
+            propvalpair[0] = PropValuePair.GenereteWhereElements("UnivisorOwner", owner.PartnerId, CompareOperator.Equal);
+            return (await api.Query<SubscriptionClient>(propvalpair))?.Any(x => x != null && x.AutomationPackage) ?? false;
         }
     }
 }

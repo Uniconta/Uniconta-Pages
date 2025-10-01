@@ -122,6 +122,7 @@ namespace UnicontaISO20022CreditTransfer
         protected PmtInf pmtInf;
         protected Dbtr dbtr;
         protected bool companyCcyActive;
+        protected bool newPaymentFormat;
         protected bool paymentSoftware;
 
         protected DateTime dueDate;
@@ -131,6 +132,9 @@ namespace UnicontaISO20022CreditTransfer
 
         protected List<PmtInf> pmtInfList;
         protected List<CdtTrfTxInf> cdtTrfTxInfList;
+
+        protected double paymentAmount;
+
 
         #endregion
 
@@ -237,6 +241,19 @@ namespace UnicontaISO20022CreditTransfer
             set
             {
                 companyCcyActive = value;
+            }
+        }
+
+        public bool NewPaymentFormat
+        {
+            get
+            {
+                return newPaymentFormat;
+            }
+
+            set
+            {
+                newPaymentFormat = value;
             }
         }
 
@@ -373,6 +390,19 @@ namespace UnicontaISO20022CreditTransfer
             set
             {
                 currencyCode = value;
+            }
+        }
+
+        public double PaymentAmount
+        {
+            get
+            {
+                return paymentAmount;
+            }
+
+            set
+            {
+                paymentAmount = value;
             }
         }
 

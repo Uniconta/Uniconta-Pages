@@ -13,10 +13,12 @@ namespace UnicontaISO20022CreditTransfer
         private readonly string mmbId;
 
         private readonly bool excludeSection;
+        private readonly bool newPaymentFormat;
 
         private const string HCDTRAGT = "CdtrAgt";
         private const string HFININSTNID = "FinInstnId";
         private const string BIC = "BIC";
+        private const string BICFI = "BICFI";
         private const string NAME = "Nm";
         private const string HPSTLADR = "PstlAdr";
         private const string CTRY = "Ctry";
@@ -32,14 +34,15 @@ namespace UnicontaISO20022CreditTransfer
         /// <param name="name">Name by which a party is known and which is usually used to identify that party.</param>
         /// <param name="countryId">Country Id - Nation with its own government.</param>
         /// <param name="excludeSection"></param>
-        public CdtrAgt(string bic, string name, string countryId, string clrSysId, string mmbId, bool excludeSection)
+        public CdtrAgt(string bic, string name, string countryId, string clrSysId, string mmbId, CreditTransferDocument doc)
         {
             this.bic = bic;
             this.name = name;
             this.countryId = countryId;
             this.clrSysId = clrSysId;
             this.mmbId = mmbId;
-            this.excludeSection = excludeSection;
+            this.excludeSection = doc.ExcludeSectionCdtrAgt;
+            this.newPaymentFormat = doc.NewPaymentFormat;
         }
 
         internal virtual void Append(BaseDocument baseDoc, XmlDocument doc, XmlElement parent)
@@ -51,7 +54,7 @@ namespace UnicontaISO20022CreditTransfer
             XmlElement finInstnId = baseDoc.AppendElement(doc, cdtrAgt, HFININSTNID);
 
             if (!string.IsNullOrEmpty(bic))
-                baseDoc.AppendElement(doc, finInstnId, BIC, bic);
+                baseDoc.AppendElement(doc, finInstnId, newPaymentFormat ? BICFI : BIC, bic);
 
             if (clrSysId != null && mmbId != null)
             {

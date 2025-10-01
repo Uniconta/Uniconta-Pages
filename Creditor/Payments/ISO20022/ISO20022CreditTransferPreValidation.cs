@@ -13,6 +13,7 @@ using System.Text;
 using UnicontaClient.Pages;
 using System.Windows;
 using UnicontaClient.Pages.Creditor.Payments;
+using Uniconta.API.DebtorCreditor;
 
 namespace ISO20022CreditTransfer
 {
@@ -30,6 +31,7 @@ namespace ISO20022CreditTransfer
         private bool SWIFTok;
         private bool IBANok;
         private bool formatTypeISO;
+        private bool newPaymentFormat;
         List<PreCheckError> preCheckErrors = new List<PreCheckError>();
         #endregion
 
@@ -102,6 +104,7 @@ namespace ISO20022CreditTransfer
             this.credPaymFormat = credPaymFormat;
 
             companyBankEnum = bankSpecific.CompanyBank();
+            newPaymentFormat = bankSpecific.NewPaymentFormat();
         }
 
         /// <summary>
@@ -140,6 +143,9 @@ namespace ISO20022CreditTransfer
                         PreCheckErrors.Add(new PreCheckError(string.Format("Payment format '{0}' is not available for GL Journal generated payments", credPaymFormat._ExportFormat))); //TODO:Opret label
 
                     CompanyBankName(paymentformat);
+                    if (newPaymentFormat)
+                        CompanyAddress(company);
+
                     CustomerIdentificationId(bankAccount._BankCompanyId, paymentformat); //Field Bank "Kunde-Id"
                     BankIdentificationId(bankAccount._ContractId, paymentformat); //Field Bank "Identifikation af aftalen"
 
@@ -156,6 +162,18 @@ namespace ISO20022CreditTransfer
             }
 
             return new XMLDocumentGenerateResult(dummyDoc, PreCheckErrors.Count > 0, 0, PreCheckErrors);
+        }
+
+
+        private void CompanyAddress(Company company)
+        {
+            var zipCity = OIOUBL.GetZipCodeCity(company._Address3, company._CountryId);
+            if (zipCity == null)
+                zipCity = OIOUBL.GetZipCodeCity(company._Address2, company._CountryId);
+
+            if (zipCity == null)
+                preCheckErrors.Add(new PreCheckError("Company address need to be structured (zipcode in adresse2 or addres3)"));
+
         }
 
         /// <summary>

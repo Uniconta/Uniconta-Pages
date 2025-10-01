@@ -127,6 +127,8 @@ namespace UnicontaClient.Pages.CustomPage
                             AddDockItem(TabControls.CreditorOrders, selectedItem, string.Format("{0}:{2} {1}", Uniconta.ClientTools.Localization.lookup("CreditorOrders"), selectedItem.ItemName, Uniconta.ClientTools.Localization.lookup("Reservations")));
                         else if (selectedItem._DCType == Uniconta.DataModel.OrderType.Production)
                             AddDockItem(TabControls.ProductionOrders, selectedItem, string.Format("{0}:{2} {1}", Uniconta.ClientTools.Localization.lookup("ProductionOrders"), selectedItem.ItemName, Uniconta.ClientTools.Localization.lookup("Reservations")));
+                        else if (selectedItem._DCType == Uniconta.DataModel.OrderType.InvTransferOrder)
+                            AddDockItem(TabControls.InvTransferOrders, selectedItem, string.Format("{0}:{2} {1}", Uniconta.ClientTools.Localization.lookup("TransferOrders"), selectedItem.ItemName, Uniconta.ClientTools.Localization.lookup("Reservations")));
                     }
                     break;
                 default:
@@ -184,6 +186,12 @@ namespace UnicontaClient.Pages.CustomPage
                         break;
                     case OrderType.Production:
                         lookup.TableType = typeof(Uniconta.DataModel.ProductionOrder);
+                        break;
+                    case OrderType.ProjectReservation:
+                        lookup.TableType = typeof(Uniconta.DataModel.ProjectReservation);
+                        break;
+                    case OrderType.InvTransferOrder:
+                        lookup.TableType = typeof(Uniconta.DataModel.InvTransferOrder);
                         break;
                 }
             }

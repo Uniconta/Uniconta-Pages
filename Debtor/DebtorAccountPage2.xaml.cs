@@ -94,7 +94,8 @@ namespace UnicontaClient.Pages.CustomPage
                 if (!isCopiedRow)
                 {
                     editrow = CreateNew() as DebtorClient;
-                    editrow.Country = crudapi.CompanyEntity._CountryId;
+                    if (editrow.Country == 0)
+                        editrow.Country = crudapi.CompanyEntity._CountryId;
                 }
             }
             layoutItems.DataContext = editrow;

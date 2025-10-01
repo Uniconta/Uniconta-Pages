@@ -84,6 +84,7 @@ namespace ISO20022CreditTransfer
             doc.BatchBooking = bankSpecific.BatchBooking();
             doc.AuthstnCodeTest = bankSpecific.TestMarked();
             doc.AuthstnCodeFeedback = bankSpecific.AuthstnCodeFeedback();
+            doc.NewPaymentFormat = bankSpecific.NewPaymentFormat();
 
             var bankAccount = (BankStatement)bankAccountCache.Get(credPaymFormat._BankAccount);
 
@@ -273,16 +274,16 @@ namespace ISO20022CreditTransfer
 
                 credBankCountryId = creditorBankDetailsCountryId != CountryCode.Unknown ? UnicontaCountryToISO(company, creditorBankDetailsCountryId) : credBankCountryId ?? UnicontaCountryToISO(company, creditor._Country);
 
-                double amount = 0;
-                amount = rec.PaymentAmount;
 
+                doc.CurrencyCode = currency;
+                doc.PaymentAmount = rec.PaymentAmount;
                 doc.ISOPaymentType = bankSpecific.ISOPaymentType(currency, bankAccount._IBAN, isPaymentTypeIBAN ? creditorAcc : string.Empty, creditorBIC, credBankCountryId, doc.CompanyCountryId, creditorBankDetailsCountryId);
                 doc.ExtServiceCode = bankSpecific.ExtServiceCode(doc.ISOPaymentType);
                 doc.ExtServicePrtry = bankSpecific.ExtServicePrtry(doc.ISOPaymentType, creditorBIC);
                 doc.ExternalLocalInstrument = bankSpecific.ExternalLocalInstrument(currency, doc.RequestedExecutionDate, rec._PaymentMethod, doc.ISOPaymentType);
                 doc.InstructionPriority = bankSpecific.InstructionPriority();
                 doc.ExtCategoryPurpose = bankSpecific.ExtCategoryPurpose(doc.ISOPaymentType);
-                doc.ExtProprietaryCode = bankSpecific.ExtProprietaryCode();
+                doc.ExtProprietaryCode = bankSpecific.ExtProprietaryCode(rec._PaymentMethod);
                 doc.ExcludeSectionCdtrAgt = bankSpecific.ExcludeSectionCdtrAgt(doc.ISOPaymentType, creditorBIC);
 
                 PostalAddress creditorAddress = new PostalAddress();
@@ -303,7 +304,7 @@ namespace ISO20022CreditTransfer
                         new PmtTpInf(doc.ExtServiceCode, doc.ExtServicePrtry, doc.ExternalLocalInstrument, doc.ExtCategoryPurpose, doc.InstructionPriority, doc.ExtProprietaryCode, doc.ExcludeSectionPmtTpInf),
                         new Dbtr(doc.CompanyName, debtorAddress, doc.DebtorIdentificationCode),
                         new DbtrAcct(doc.CompanyCcy, companyAccountId, companyBIC, doc.CompanyCcyActive),
-                        new DbtrAgt(doc.CompanyBIC, doc.CompanyBankName), doc.ChargeBearer));
+                        new DbtrAgt(doc), doc.ChargeBearer));
                 }
 
                 var cdtrAgtCountryId = bankSpecific.CdtrAgtCountryId(credBankCountryId);
@@ -311,12 +312,12 @@ namespace ISO20022CreditTransfer
                 var cdtrAgtMmbId = bankSpecific.CdtrAgtMmbId(rec._PaymentMethod);
                 var instrForDbtrAgt = bankSpecific.InstrForDbtrAgt(doc.ISOPaymentType, creditorBankDetailsCountryId);
 
-                doc.CdtTrfTxInfList.Add(new CdtTrfTxInf(doc.PaymentInfoId, instructionId, doc.EndToEndId, amount, currency,
-                    new CdtrAgt(creditorBIC, credBankName, cdtrAgtCountryId, cdtrAgtClrSysId, cdtrAgtMmbId, doc.ExcludeSectionCdtrAgt),
+                doc.CdtTrfTxInfList.Add(new CdtTrfTxInf(doc.PaymentInfoId, instructionId, doc.EndToEndId, doc.PaymentAmount,doc.CurrencyCode,
+                    new CdtrAgt(creditorBIC, credBankName, cdtrAgtCountryId, cdtrAgtClrSysId, cdtrAgtMmbId, doc),
                     new Cdtr(credName, creditorAddress),
                     new CdtrAcct(creditorAcc, isPaymentTypeIBAN, OCRPaymentType, credPaymFormat._ExportFormat, rec),
                     new RgltryRptg(credPaymFormat._ExportFormat, doc.ISOPaymentType, rec.RgltryRptgCode, rec.RgltryRptgText, currency),
-                    new RmtInf(unstructuredPaymInfoList, remittanceInfo, creditorOCRPaymentId, OCRPaymentType), instrForDbtrAgt, chargeBearer));
+                    new RmtInf(unstructuredPaymInfoList, remittanceInfo, creditorOCRPaymentId, OCRPaymentType, doc), instrForDbtrAgt, chargeBearer));
             }
 
             var generatedFileName = bankSpecific.GenerateFileName(doc.NumberSeqPaymentFileId, doc.CompanyID);

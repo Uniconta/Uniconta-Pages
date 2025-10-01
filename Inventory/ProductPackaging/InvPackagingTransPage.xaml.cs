@@ -266,7 +266,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 foreach (var line in lines)
                                 {
                                     var item = (InvItem)items.Get(line._Item);
-                                    if (item != null && item._ItemType != (byte)Uniconta.DataModel.ItemType.Service)
+                                    if (item != null)
                                     {
                                         searchPack = new InvPackagingProductClient();
                                         searchPack._Item = line.Item;

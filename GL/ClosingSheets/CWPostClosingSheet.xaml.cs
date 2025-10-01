@@ -41,6 +41,13 @@ namespace UnicontaClient.Pages.CustomPage
         public int DialogTableId { get; set; }
         protected override bool ShowTableValueButton { get { return true; } }
 
+        public void HideCode()
+        {
+            rwCode.Height = new GridLength(0);
+            lblCode.Visibility = txtCode.Visibility = Visibility.Collapsed;
+        }
+       
+        public string Header { get { return this.Title; } set { this.Title = value; } }
         public CWPostClosingSheet(DateTime date, bool isDeletelines = false)
         {
             IsSimulation = true;

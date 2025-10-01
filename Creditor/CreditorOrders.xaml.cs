@@ -573,6 +573,11 @@ namespace UnicontaClient.Pages.CustomPage
                     lineMsg = "ProductionLines";
                     ctrl = TabControls.ProductionOrderLines;
                     break;
+                case 7:
+                    orderMsg = "TransferOrderCreated";
+                    lineMsg = "TransferOrderLines";
+                    ctrl = TabControls.InvTransferOrderLines;
+                    break;
                 default:
                     orderMsg = "SalesOrderCreated";
                     lineMsg = "OrdersLine";
@@ -783,6 +788,5 @@ namespace UnicontaClient.Pages.CustomPage
             if (order != null)
                 AddDockItem(TabControls.UserNotesPage, dgCreditorOrdersGrid.syncEntity);
         }
-
     }
 }

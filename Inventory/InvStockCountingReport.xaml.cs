@@ -362,7 +362,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (!Update)
                         dgInvStockStatus.ItemsSource = null;
                     var delim = UtilFunctions.GetDefaultDeLimiter();
-                    dgInvStockStatus.CopyFromExcel(sr, delim , true, true, false, true);
+                    dgInvStockStatus.CopyFromExcel(sr, delim, true, true, false, true, (char)0);
                 }
             }
             catch (Exception ex)

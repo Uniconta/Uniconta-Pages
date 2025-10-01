@@ -134,7 +134,7 @@ namespace UnicontaClient.Pages.CustomPage
                     dgNotesGrid.CurrentColumn = dgNotesGrid.Columns["Text"];
                     break;
                 case "SaveGrid":
-                    var list = dgNotesGrid.ItemsSource as List<UserNotesClient>;
+                    var list = dgNotesGrid.ItemsSource as IEnumerable<UserNotesClient>;
                     foreach (var item in list)
                     {
                         if (item.Created == DateTime.Now)

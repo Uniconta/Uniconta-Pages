@@ -102,6 +102,9 @@ namespace UnicontaClient.Pages.CustomPage
                 case "DeleteRow":
                     dgInvPurchaseAccount.DeleteRow();
                     break;
+                default:
+                    gridRibbon_BaseActions(ActionType);
+                    break;
             }
         }
     }

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <root>
 	<RibbonItem TabId="0" LocalizedNameKey="Home">
-		<RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="BudgetYear" Glyph="Add_16x16" LargeGlyph="Add_32x32"/>
+		<RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="Year" Glyph="Add_16x16" LargeGlyph="Add_32x32"/>
 		<RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="Delete" Glyph="Delete_16x16" LargeGlyph="Delete_32x32"/>
-		<RibbonItem Action="SaveDataGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16" LargeGlyph="save-32x32"/>
+		<RibbonItem Action="SaveDataGrid" ShortcutKey="Ctrl+S" LocalizedNameKey="Save" Glyph="save-16x16" LargeGlyph="save-32x32"/>
 	</RibbonItem>
 	<RibbonItem>
 		<RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh" LargeGlyph="refresh"/>

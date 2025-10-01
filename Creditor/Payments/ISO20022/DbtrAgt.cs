@@ -7,12 +7,15 @@ namespace UnicontaISO20022CreditTransfer
     {
         private readonly string bic;
         private readonly string name;
+        private readonly bool newPaymentFormat;
 
         private const string HDBTRAGT = "DbtrAgt";
         private const string HFININSTNID = "FinInstnId";
 
         
         private const string BIC = "BIC";
+        private const string BICFI = "BICFI";
+
         private const string NAME = "Nm";
         
 
@@ -43,10 +46,11 @@ namespace UnicontaISO20022CreditTransfer
         /// </summary>
         /// <param name="bic">Bank identifier code.</param> 
         /// <param name="name">Name by which an agent (normally a bank name) is known and which is usually used to identify that agent.</param>
-        public DbtrAgt(string bic, string name)
+        public DbtrAgt(CreditTransferDocument doc)
         {
-            this.bic = bic;
-            this.name = name;
+            this.bic = doc.CompanyBIC;
+            this.name = doc.CompanyBankName;
+            newPaymentFormat = doc.NewPaymentFormat;
         }
 
         internal virtual void Append(BaseDocument baseDoc, XmlDocument doc, XmlElement parent)
@@ -55,7 +59,7 @@ namespace UnicontaISO20022CreditTransfer
             XmlElement finInstnId = baseDoc.AppendElement(doc, dbtrAgt, HFININSTNID);
 
             if(!string.IsNullOrWhiteSpace(bic))
-                baseDoc.AppendElement(doc, finInstnId, BIC, bic);
+                baseDoc.AppendElement(doc, finInstnId, newPaymentFormat ? BICFI : BIC, bic);
 
             if(!string.IsNullOrEmpty(name))
                 baseDoc.AppendElement(doc, finInstnId, NAME, name);

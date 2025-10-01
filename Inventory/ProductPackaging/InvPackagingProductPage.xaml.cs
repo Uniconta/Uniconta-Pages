@@ -26,7 +26,8 @@ using UnicontaClient.Controls.Dialogs;
 using EnumsNET;
 using Uniconta.DataModel;
 using DevExpress.Diagram.Core.Shapes;
-using NPOI.SS.Formula.Functions; 
+using NPOI.SS.Formula.Functions;
+using UnicontaClient.Utilities;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -45,6 +46,28 @@ namespace UnicontaClient.Pages.CustomPage
             Init(master);
         }
 
+        public InvPackagingProductPage(SynchronizeEntity syncEntity) : base(syncEntity, true)
+        {
+            InitializeComponent();
+            Init(syncEntity.Row);
+            SetHeader();
+        }
+        protected override void SyncEntityMasterRowChanged(UnicontaBaseEntity args)
+        {
+            dgInvPackagingProductGrid.UpdateMaster(args);
+            SetHeader();
+            BindGrid();
+        }
+
+        private void SetHeader()
+        {
+            string key = Utility.GetHeaderString(dgInvPackagingProductGrid.masterRecord);
+            if (string.IsNullOrEmpty(key)) return;
+            string header = string.Concat(Uniconta.ClientTools.Localization.lookup("ProducerResponsibility"), ": ", key);
+            SetHeader(header);
+        }
+
+
         void Init(UnicontaBaseEntity master)
         {
             InitializeComponent();
@@ -56,6 +79,11 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
             dgInvPackagingProductGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
             dgInvPackagingProductGrid.tableView.ShowingEditor += TableView_ShowingEditor;
+        }
+
+        Task BindGrid()
+        {
+            return dgInvPackagingProductGrid.Filter(null);
         }
 
         private void TableView_ShowingEditor(object sender, ShowingEditorEventArgs e)

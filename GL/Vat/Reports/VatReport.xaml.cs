@@ -501,7 +501,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 int decm = 2;
                 bool RoundTo100 = false;
-                if (!qapi.CompanyEntity.HasDecimals)
+                if (!qapi.CompanyEntity.HasDecimals || qapi.CompanyEntity._CurrencyId == Currencies.DKK)
                 {
                     RoundTo100 = true;
                     decm = 0;
@@ -787,6 +787,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 double[] VatOperationValues = new double[256];
                 double[] VatOperationBases = new double[256];
+                bool[] VatOperationUsed = new bool[256];
 
                 double[] VatValues = new double[256];
                 double[] VatBases = new double[256];
@@ -851,6 +852,7 @@ namespace UnicontaClient.Pages.CustomPage
                             d4 += v._PostedVAT;
                         }
 
+                        VatOperationUsed[v._VatOperation] = true;
                         if (v.AccountIsVat == 1)
                         {
                             if (v.IsOffsetAccount == 0)
@@ -869,23 +871,27 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                 }
 
-                vDif = new VatReportLine();
-                vDif.Text = string.Format("{0}: {1}, {2}", Uniconta.ClientTools.Localization.lookup("FinalVatStatus"), Uniconta.ClientTools.Localization.lookup("AmountBase"), Uniconta.ClientTools.Localization.lookup("VATamount"));
+                vDif = new VatReportLine
+                {
+                    Text = string.Format("{0}: {1}, {2}", Uniconta.ClientTools.Localization.lookup("FinalVatStatus"), Uniconta.ClientTools.Localization.lookup("AmountBase"), Uniconta.ClientTools.Localization.lookup("VATamount"))
+                };
                 lst.Add(vDif);
 
                 foreach (var c in (GLVatType[])vattypes.GetNotNullArray)
                 {
-                    if (c == null)
+                    if (c == null || VatOperationUsed[c._RowNo] == false)
                         continue;
 
-                    vDif = new VatReportLine();
-                    vDif.VatOpr = c;
-                    vDif._Rate = c._Pct1;
-                    vDif.Text = string.Concat(c._Code, ", ", c._Name);
-                    vDif._setText = true;
-                    vDif.AmountWithVat = VatOperationBases[c._RowNo];
-                    vDif._PostedVAT = VatOperationValues[c._RowNo];
-                    vDif.AccountIsVat = 1;
+                    vDif = new VatReportLine
+                    {
+                        VatOpr = c,
+                        _Rate = c._Pct1,
+                        Text = string.Concat(c._Code, ", ", c._Name),
+                        _setText = true,
+                        AmountWithVat = VatOperationBases[c._RowNo],
+                        _PostedVAT = VatOperationValues[c._RowNo],
+                        AccountIsVat = 1
+                    };
                     lst.Add(vDif);
 
                     int pos = c._Position1;
@@ -908,14 +914,18 @@ namespace UnicontaClient.Pages.CustomPage
                 List<VatReportLine> vatlst = new List<VatReportLine>();
                 for (int k = 0; (k < 2); k++)
                 {
-                    vDif = new VatReportLine();
-                    vDif.Text = " ";
+                    vDif = new VatReportLine
+                    {
+                        Text = " "
+                    };
                     lst.Add(vDif);
 
-                    vDif = new VatReportLine();
-                    vDif.VatType = (byte)k;
-                    vDif.Order = -1;
-                    vDif.AccountIsVat = 1;
+                    vDif = new VatReportLine
+                    {
+                        VatType = (byte)k,
+                        Order = -1,
+                        AccountIsVat = 1
+                    };
                     lst.Add(vDif);
 
                     foreach (var c in (GLVat[])vats.GetNotNullArray)
@@ -928,14 +938,16 @@ namespace UnicontaClient.Pages.CustomPage
                                     continue;
                             }
 
-                            vDif = new VatReportLine();
-                            vDif.Vat = c;
-                            vDif.Text = string.Concat(c._Vat, ", ", c._Name);
-                            vDif._setText = true;
-                            vDif.AmountWithVat = VatBases[c.RowId];
-                            vDif._PostedVAT = VatValues[c.RowId];
-                            vDif.AccountIsVat = 1;
-                            vDif.FromDate = FromDate;
+                            vDif = new VatReportLine
+                            {
+                                Vat = c,
+                                Text = string.Concat(c._Vat, ", ", c._Name),
+                                _setText = true,
+                                AmountWithVat = VatBases[c.RowId],
+                                _PostedVAT = VatValues[c.RowId],
+                                AccountIsVat = 1,
+                                FromDate = FromDate
+                            };
                             vDif.CalcRate(RoundTo100);
                             lst.Add(vDif);
                             vatlst.Add(vDif);

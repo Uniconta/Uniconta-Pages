@@ -805,7 +805,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (!api.CompanyEntity._DeactivateSendNemhandel)
                 GenrateInvoiceDialog.SentByEInvoice(api, UtilCommon.GetEndPoint(dbOrder, debtor, api));
 
-            GenrateInvoiceDialog.ShowAllowCredMax(debtor._CreditMax != 0);
+            GenrateInvoiceDialog.ShowAllowCredMax(debtor?._CreditMax != 0);
             GenrateInvoiceDialog.Closed += async delegate
             {
                 if (GenrateInvoiceDialog.DialogResult == true)

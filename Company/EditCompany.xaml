@@ -203,6 +203,9 @@ x:Class="UnicontaClient.Pages.CustomPage.EditCompany"
                         <CorasauControls:CorasauLayoutItem FieldName="ApproveOnEmail" x:Name="liApproveOnEmail">
                             <CorasauControls:CheckEditor IsChecked="{Binding ApproveOnEmail,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="SaveRowIdForRef" x:Name="liSaveRowIdForReference">
+                            <CorasauControls:CheckEditor IsChecked="{Binding SaveRowIdForRef,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem> 
                     </CorasauControls:CorasauLayoutGroup>
 
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=EditCompany}"  Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" MinWidth="420">

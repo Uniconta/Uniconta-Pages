@@ -51,8 +51,8 @@ namespace UnicontaClient.Pages.CustomPage
         public override string NameOfControl { get { return TabControls.AccountsTransaction; } }
         string AccountNumber;
         List<UnicontaBaseEntity> masterlist;
-        DateTime filterDate;
-
+         DateTime filterDate;
+        public bool QueryonPageLoad = true;
         protected override Filter[] DefaultFilters()
         {
             if (masterlist == null || masterlist.First() is GLAccount)
@@ -204,10 +204,25 @@ namespace UnicontaClient.Pages.CustomPage
             useBinding = true;
             return true;
         }
-
+        public override void SetParameter(IEnumerable<ValuePair> Parameters)
+        {
+            foreach (var rec in Parameters)
+            {
+                if (string.Compare(rec.Name, "QueryonPageLoad", StringComparison.CurrentCultureIgnoreCase) == 0)
+                {
+                    bool callinitQuery;
+                    if (bool.TryParse(rec.Value, out callinitQuery))
+                        QueryonPageLoad = callinitQuery;
+                    break;
+                }
+            }
+            base.SetParameter(Parameters);
+        }
         IEnumerable<PropValuePair> filter;
         public override Task InitQuery()
         {
+            if (!QueryonPageLoad)
+                return null;
             if (filter != null)
                 return dgAccountsTransGrid.Filter(filter);
             else
@@ -554,8 +569,13 @@ namespace UnicontaClient.Pages.CustomPage
                 rbItem.Caption = string.Format("{0} ({1})", Uniconta.ClientTools.Localization.lookup("Converted"), AppEnums.Currencies.ToString((int)GLTransClient.Rates.CCY2));
             }
         }
-
-        async void FilterWithAccountingYear(bool prevYear)
+        public async void FilterWithDates(DateTime fromDate, DateTime toDate)
+        {
+            this.ribbonControl.ClearFilterDialog();
+            this.ribbonControl.SavedFilters = new List<FilterProperties>() { new FilterProperties() { PropertyName = "Date", ParameterType = typeof(DateTime), UserInput = fromDate.ToShortDateString() + ".." + toDate.ToShortDateString() } };
+            dgAccountsTransGrid.Filter(this.ribbonControl.filterValues);
+        }
+        public async void FilterWithAccountingYear(bool prevYear)
         {
             this.ribbonControl.ClearFilterDialog();
             var actYear = await Utility.GetCurrentAccountingYear(api, prevYear);

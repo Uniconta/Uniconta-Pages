@@ -118,6 +118,14 @@ namespace UnicontaClient.Pages.CustomPage
                 cmbContactName.Visibility = System.Windows.Visibility.Collapsed;
         }
 
+        protected override void OnLayoutLoaded()
+        {
+            base.OnLayoutLoaded();
+            if (api.CompanyEntity.HideCostPrice)
+            {
+                liCostValue.Visibility = lixCostValue.Visibility = liMargin.Visibility = liMarginRatio.Visibility = System.Windows.Visibility.Collapsed;
+            }
+        }
         private void LiContactName_ButtonClicked(object sender)
         {
             if (editrow.Debtor == null)

@@ -789,6 +789,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (!api.CompanyEntity._DeactivateSendNemhandel)
                 GenrateInvoiceDialog.SentByEInvoice(api, UtilCommon.GetEndPoint(dbOrder, debtor, api));
 
+            GenrateInvoiceDialog.ShowAllowCredMax(debtor?._CreditMax != 0);
             GenrateInvoiceDialog.Closed += async delegate
             {
                 if (GenrateInvoiceDialog.DialogResult == true)
@@ -807,6 +808,8 @@ namespace UnicontaClient.Pages.CustomPage
                         GenrateInvoiceDialog.NumberOfPages, GenrateInvoiceDialog.SendByEmail, !isSimulated && GenrateInvoiceDialog.SendByOutlook, GenrateInvoiceDialog.sendOnlyToThisEmail, GenrateInvoiceDialog.Emails,
                         GenrateInvoiceDialog.GenerateOIOUBLClicked);
                     invoicePostingResult.SetAdditionalOrders(GenrateInvoiceDialog.AdditionalOrders?.Cast<DCOrder>().ToList());
+                    if (api.CompanyEntity.AllowSkipCreditMax)
+                        invoicePostingResult.SetAllowCreditMax(GenrateInvoiceDialog.AllowSkipCreditMax);
 
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
                     busyIndicator.IsBusy = true;

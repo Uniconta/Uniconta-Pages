@@ -122,7 +122,7 @@ namespace UnicontaClient.Pages.CustomPage
                         dgEdeliveryMappingGroupGrid.ItemsSource = rows?
                             .Select(x =>
                             {
-                                if (x._DocVersion == rec._DocVersion && x._DocType == rec._DocType)
+                                if (x._Name != rec._Name && x._DocVersion == rec._DocVersion && x._DocType == rec._DocType)
                                     x.IsDefault = false;
 
                                 return x;

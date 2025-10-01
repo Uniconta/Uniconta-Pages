@@ -53,6 +53,9 @@ namespace UnicontaISO20022CreditTransfer
                 case dkBank.Handelsbanken:
                     companyBankEnum = CompanyBankENUM.Handelsbanken;
                     return companyBankEnum;
+                case dkBank.SEB:
+                    companyBankEnum = CompanyBankENUM.SEB;
+                    return companyBankEnum;
                 default:
                     return CompanyBankENUM.None;
             }
@@ -72,6 +75,7 @@ namespace UnicontaISO20022CreditTransfer
                 case CompanyBankENUM.BankData:
                 case CompanyBankENUM.BEC:
                 case CompanyBankENUM.SDC:
+                case CompanyBankENUM.SEB:
                     return companyBankEnum.ToString();
                 case CompanyBankENUM.Handelsbanken:
                     return "Handelsbanken"; 
@@ -126,6 +130,8 @@ namespace UnicontaISO20022CreditTransfer
                 case CompanyBankENUM.BEC:
                 case CompanyBankENUM.SDC:
                     return DateTimeOffset.Now.ToString("yyyy-MM-ddTHH:mm:ss.fffzzz");
+                case CompanyBankENUM.SEB:
+                    return DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss");
                 default:
                     return DateTimeOffset.Now.ToString("o");
             }
@@ -241,6 +247,7 @@ namespace UnicontaISO20022CreditTransfer
         {
             switch (companyBankEnum)
             {
+                case CompanyBankENUM.SEB:
                 case CompanyBankENUM.Nordea_DK:
                     return string.Empty;
                 case CompanyBankENUM.Handelsbanken:
@@ -638,10 +645,77 @@ namespace UnicontaISO20022CreditTransfer
         /// </summary>
         public override bool ExcludeSectionCdtrAgt(ISO20022PaymentTypes ISOPaymType, string creditorSWIFT)
         {
-            if (companyBankEnum == CompanyBankENUM.Nordea_DK && creditorSWIFT == string.Empty)
+            if ((companyBankEnum == CompanyBankENUM.Nordea_DK || companyBankEnum == CompanyBankENUM.SEB) && creditorSWIFT == string.Empty)
                 return true;
 
             return false;
+        }
+
+        /// <summary>
+        /// DOMESTIC Payment:
+        /// Transfers within the same country.
+        /// 
+        /// SEPA Payment:
+        /// The conditions for a SEPA payment
+        /// 1.Creditor payment has currency code 'EUR'
+        /// 2.Sender - Bank and Receiver-Bank has to be member of the  European Economic Area.
+        /// 3.Creditor account has to be IBAN
+        /// 4.Payment must be Non-urgent
+        /// 5.Countries where local currency is EUR and payment is in EUR 
+        /// 
+        /// CROSS BORDER Payment:
+        /// 
+        /// Ændring til BankData, BEC og SDC. Vejledning modtaget af Torben Borg Broustbo fra JyskeBank d. 15-09-2025
+        /// Selvom betalingen er i EUR mellem 2 danske banker, så skal betalingen laves som en SEPA/Udenlandsk betaling. Dette gælder alle valutaer
+        /// </summary>
+        public override ISO20022PaymentTypes ISOPaymentType(string paymentCcy, string companyIBAN, string creditorIBAN, string creditorSWIFT, string creditorCountryId, string companyCountryId, CountryCode creditorBankDetailsCountryId)
+        {
+            //Company
+            string companyBankCountryId = null;
+            if (companyIBAN != null && companyIBAN.Length >= 2)
+                companyBankCountryId = companyIBAN.Substring(0, 2);
+            else
+                companyBankCountryId = companyCountryId;
+
+            //Creditor
+            string creditorBankCountryId = null;
+            if (creditorBankDetailsCountryId != CountryCode.Unknown)
+                creditorBankCountryId = ((CountryISOCode)creditorBankDetailsCountryId).ToString();
+            else if (creditorIBAN != null && creditorIBAN.Length >= 2)
+                creditorBankCountryId = creditorIBAN.Substring(0, 2);
+            else if (creditorSWIFT != null && creditorSWIFT.Length > 6)
+                creditorBankCountryId = creditorSWIFT.Substring(4, 2);
+            else
+                creditorBankCountryId = creditorCountryId;
+
+
+            if (companyBankCountryId.Equals("GL", StringComparison.OrdinalIgnoreCase) || companyBankCountryId.Equals("FO", StringComparison.OrdinalIgnoreCase))
+                companyBankCountryId = "DK";
+
+            if (creditorBankCountryId.Equals("GL", StringComparison.OrdinalIgnoreCase) || creditorBankCountryId.Equals("FO", StringComparison.OrdinalIgnoreCase))
+                creditorBankCountryId = "DK";
+
+            //SEPA payment:
+            if (paymentCcy == BaseDocument.CCYEUR)
+            {
+                var bcDataCentral = companyBankEnum == CompanyBankENUM.BankData || companyBankEnum == CompanyBankENUM.BEC || companyBankEnum == CompanyBankENUM.SDC;
+                if (companyBankCountryId == creditorBankCountryId && LocalCurrency() != BaseDocument.CCYEUR && !bcDataCentral)
+                    return ISO20022PaymentTypes.DOMESTIC;
+                else if (SEPACountry(companyBankCountryId) && SEPACountry(creditorBankCountryId))
+                    return ISO20022PaymentTypes.SEPA;
+                else
+                    return ISO20022PaymentTypes.CROSSBORDER;
+            }
+            else if (companyBankCountryId == creditorBankCountryId)
+            {
+                return ISO20022PaymentTypes.DOMESTIC;
+            }
+            else
+            {
+                return ISO20022PaymentTypes.CROSSBORDER;
+            }
+
+            return ISO20022PaymentTypes.DOMESTIC;
         }
 
         /// <summary>
@@ -683,16 +757,43 @@ namespace UnicontaISO20022CreditTransfer
                 if (ISOPaymType == ISO20022PaymentTypes.SEPA)
                     return "97";
                 else if (ISOPaymType == ISO20022PaymentTypes.CROSSBORDER)
-                {
-                    if (creditorBankDetailsCountryId == CountryCode.Denmark)
-                        return "53";
-                    else
-                        return "83";
-                }
+                    return "53";
             }
             //TODO:Mangler dokumentation fra SDC!!
 
             return null;
         }
+
+        public override string OCRPaymentType(string creditorOCRPaymentId)
+        {
+            if (string.IsNullOrEmpty(creditorOCRPaymentId))
+                return null;
+
+            if (companyBankEnum == CompanyBankENUM.SEB)
+                return BaseDocument.NETS;
+
+            return BaseDocument.OCR;
+        }
+
+        public override string ExtProprietaryCode(PaymentTypes paymentMethod)
+        {
+            if (companyBankEnum == CompanyBankENUM.SEB)
+            {
+                if (paymentMethod == PaymentTypes.PaymentMethod3) //FIK71
+                    return "IBK71";
+                else if (paymentMethod == PaymentTypes.PaymentMethod5) //FIK75
+                    return "IBK75";
+                else if (paymentMethod == PaymentTypes.PaymentMethod4) //FIK73
+                    return "IBK73";
+                else if (paymentMethod == PaymentTypes.PaymentMethod6) //FIK04
+                    return "IBK04";
+                else
+                    return string.Empty;
+            }
+            
+            return string.Empty;
+
+        }
+
     }
 }

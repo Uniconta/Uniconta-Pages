@@ -22,7 +22,6 @@ namespace UnicontaISO20022CreditTransfer
         private const string SCHMENM = "SchmeNm";
         private const string PRTRY = "Prtry";
         private const string CD = "Cd";
-        private const string OCR = "OCR";
         private const string QRR = "QRR";
 
         private const string BGNR = "BGNR";
@@ -60,8 +59,8 @@ namespace UnicontaISO20022CreditTransfer
 
                 XmlElement schmeNm = baseDoc.AppendElement(doc, othr, SCHMENM);
 
-                if (ocrPaymentType == OCR && exportFormat == (byte)ExportFormatType.ISO20022_DK) 
-                    baseDoc.AppendElement(doc, schmeNm, PRTRY, OCR);
+                if ((ocrPaymentType == BaseDocument.OCR || ocrPaymentType == BaseDocument.NETS) && exportFormat == (byte)ExportFormatType.ISO20022_DK) 
+                    baseDoc.AppendElement(doc, schmeNm, PRTRY, ocrPaymentType);
                 else if (exportFormat == (byte)ExportFormatType.ISO20022_SE && trans._PaymentMethod == PaymentTypes.PaymentMethod3)
                     baseDoc.AppendElement(doc, schmeNm, PRTRY, BGNR);
                 else

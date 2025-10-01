@@ -1061,39 +1061,85 @@ namespace UnicontaClient.Pages.CustomPage
             var selectedItem = dgGLDailyJournalLine.SelectedItem as JournalLineGridClient;
             if (selectedItem != null && voucher != null)
             {
-                dgGLDailyJournalLine.SetLoadedRow(selectedItem);
-                selectedItem.DocumentRef = voucher.RowId;
-                if (voucher._Invoice != null)
-                    selectedItem.Invoice = voucher._Invoice;
-                if (voucher._Dim1 != null)
-                    selectedItem.Dimension1 = voucher._Dim1;
-                if (voucher._Dim2 != null)
-                    selectedItem.Dimension2 = voucher._Dim2;
-                if (voucher._Dim3 != null)
-                    selectedItem.Dimension3 = voucher._Dim3;
-                if (voucher._Dim4 != null)
-                    selectedItem.Dimension4 = voucher._Dim4;
-                if (voucher._Dim5 != null)
-                    selectedItem.Dimension5 = voucher._Dim5;
-                selectedItem.DocumentDate = voucher._DocumentDate;
-                if (selectedItem._Text == null && selectedItem._TransType == null && selectedItem._AccountType == 0 && selectedItem._OffsetAccountType == 0)
-                    selectedItem.Text = voucher._Text;
-                if (selectedItem.Amount == 0d || selectedItem.AmountSetBySystem)
+                if (selectedItem._DocumentRef == 0 || voucher._Envelope)
                 {
-                    selectedItem.AmountSetBySystem = true;
-                    selectedItem.Amount = voucher._Amount;
+                    SaveAttachmentToLine(voucher, selectedItem);
+                    return;
                 }
-                if (voucher._CostAccount != null && selectedItem._Account == null)
+
+                CWForAllTrans cwconfirm = new CWForAllTrans(false);
+                cwconfirm.Closing += async delegate
                 {
-                    if (selectedItem._AccountType != 0)
+                    if (cwconfirm.DialogResult == true)
                     {
-                        selectedItem._AccountType = 0;
-                        selectedItem.NotifyPropertyChanged("AccountType");
+                        if (cwconfirm.AppendDoc)
+                        {
+                            var rowId = VoucherCache.GetDocumentRowId(selectedItem);
+                            if (rowId != 0 && rowId != voucher.RowId)
+                            {
+                                var attachedvoucherClient = VoucherCache.GetGlobalVoucherCache(selectedItem.CompanyId, rowId);
+                                VoucherCache.RemoveGlobalVoucherCache(selectedItem.CompanyId, selectedItem._DocumentRef);
+
+                                var documentApi = new DocumentAPI(api);
+                                ErrorCodes result = ErrorCodes.NoSucces;
+                                VouchersClient voucherClientEnv = null;
+                                if (!attachedvoucherClient._Envelope)
+                                {
+                                    voucherClientEnv = new VouchersClient();
+                                    result = await documentApi.CreateEnvelope(voucherClientEnv, new List<Document>() { attachedvoucherClient, voucher });
+                                }
+                                else
+                                {
+                                    voucherClientEnv = attachedvoucherClient;
+                                    result = await documentApi.AppendToEnvelope(voucherClientEnv, new List<Document>() { voucher });
+                                }
+                                SaveAttachmentToLine(voucherClientEnv, selectedItem);
+                            }
+                            else
+                                SaveAttachmentToLine(voucher, selectedItem);
+                        }
+                        else
+                            SaveAttachmentToLine(voucher, selectedItem);
                     }
-                    selectedItem.Account = voucher._CostAccount;
-                }
-                dgGLDailyJournalLine.SetModifiedRow(selectedItem);
+                };
+                cwconfirm.Show();
             }
+        }
+
+        private void SaveAttachmentToLine(VouchersClient voucher, JournalLineGridClient selectedItem)
+        {
+            dgGLDailyJournalLine.SetLoadedRow(selectedItem);
+            selectedItem.DocumentRef = voucher.RowId;
+            if (voucher._Invoice != null)
+                selectedItem.Invoice = voucher._Invoice;
+            if (voucher._Dim1 != null)
+                selectedItem.Dimension1 = voucher._Dim1;
+            if (voucher._Dim2 != null)
+                selectedItem.Dimension2 = voucher._Dim2;
+            if (voucher._Dim3 != null)
+                selectedItem.Dimension3 = voucher._Dim3;
+            if (voucher._Dim4 != null)
+                selectedItem.Dimension4 = voucher._Dim4;
+            if (voucher._Dim5 != null)
+                selectedItem.Dimension5 = voucher._Dim5;
+            selectedItem.DocumentDate = voucher._DocumentDate;
+            if (selectedItem._Text == null && selectedItem._TransType == null && selectedItem._AccountType == 0 && selectedItem._OffsetAccountType == 0)
+                selectedItem.Text = voucher._Text;
+            if (selectedItem.Amount == 0d || selectedItem.AmountSetBySystem)
+            {
+                selectedItem.AmountSetBySystem = true;
+                selectedItem.Amount = voucher._Amount;
+            }
+            if (voucher._CostAccount != null && selectedItem._Account == null)
+            {
+                if (selectedItem._AccountType != 0)
+                {
+                    selectedItem._AccountType = 0;
+                    selectedItem.NotifyPropertyChanged("AccountType");
+                }
+                selectedItem.Account = voucher._CostAccount;
+            }
+            dgGLDailyJournalLine.SetModifiedRow(selectedItem);
         }
 
         static bool showDif(double settle, double journal, bool Offset)
@@ -2573,7 +2619,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        
+
 
         CorasauGridLookupEditorClient prevAccount;
         private void Account_GotFocus(object sender, RoutedEventArgs e)

@@ -71,7 +71,8 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     using (var stream = File.Create(sfd.FileName))
                     {
-                        var sw = new StreamWriter(stream, Encoding.Default);
+                        var encoding = api.CompanyEntity._CountryId == CountryCode.Germany ? Encoding.UTF8 : Encoding.Default;
+                        var sw = new StreamWriter(stream, encoding);
                         if (api.CompanyEntity._CountryId == CountryCode.Germany) //Erik
                         {
                             StreamToFileDE(result, sw);
@@ -332,11 +333,10 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void StreamToFileDE(List<EUSaleWithoutVAT> listOfImportExport, StreamWriter sw)
         {
-            sw.Write("Laenderkennzeichen"); sw.Write(';');
-            sw.Write("USt-IdNr."); sw.Write(';');
-            sw.Write("Betrag(EUR)"); sw.Write(';');
-            sw.Write("Art der Leistung");
-            sw.WriteLine();
+            sw.WriteLine("#v3.0");
+            sw.WriteLine("#ve3.2.0");
+            sw.WriteLine("USt-IdNr.,Betrag(Euro),Art der Leistung");
+
 
             long amount = 0;
             var exp = Localization.lookup("Exported");
@@ -348,8 +348,8 @@ namespace UnicontaClient.Pages.CustomPage
                 else
                     countryStr = ((CountryISOCode)rec.Country).ToString();
 
-                sw.Write(countryStr); sw.Write(';');
-                sw.Write(rec._DebtorRegNoFile); sw.Write(';');
+                sw.Write(countryStr);
+                sw.Write(rec._DebtorRegNoFile); sw.Write(',');
 
                 string type = null;
                 switch (rec.DeType)
@@ -360,7 +360,7 @@ namespace UnicontaClient.Pages.CustomPage
                     default: type = ""; break;
                 }
 
-                NumberConvert.ToStream(sw, amount); sw.Write(';');
+                NumberConvert.ToStream(sw, amount); sw.Write(',');
                 sw.Write(type);
                 sw.WriteLine();
 

@@ -39,7 +39,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorInvoiceLine"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesPrice" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="NetDiscount" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DiscountPct" Width="50"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceTotal" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NetAmount" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CostPrice" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CostValue" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Warehouse" Width="90" />
@@ -60,7 +60,6 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorInvoiceLine"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PartOfBOM" Width="50" Visible="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="HasSeriaBatch" Width="50" Visible="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderNumber" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NetAmount" Width="90" Visible="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="GrossAmount" Width="90" Visible="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="50" Visible="false"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="EndDiscountPct" Width="35" Visible="false"/>
@@ -86,7 +85,6 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorInvoiceLine"
                 </localPage:CreditorInvTransClientGrid.Columns>
                 <localPage:CreditorInvTransClientGrid.TotalSummary>
                     <localPage:SumColumn FieldName="InvoiceQty" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
-                    <localPage:SumColumn FieldName="InvoiceTotal" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <localPage:SumColumn FieldName="NetAmount" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <localPage:SumColumn FieldName="GrossAmount" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <localPage:SumColumn FieldName="Margin" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>

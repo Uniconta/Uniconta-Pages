@@ -1,4 +1,3 @@
-using UnicontaClient.Models;
 using DevExpress.Data.Filtering;
 using System;
 using System.Collections.Generic;
@@ -13,13 +12,15 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+using Uniconta.ClientTools;
 using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
+using Uniconta.Common.Utility;
 using Uniconta.DataModel;
-using Uniconta.ClientTools;
+using UnicontaClient.Models;
 using UnicontaClient.Utilities;
 
 using UnicontaClient.Pages;
@@ -28,6 +29,8 @@ namespace UnicontaClient.Pages.CustomPage
     public class VouchersGridLocal : VouchersGrid
     {
         public override Type TableType { get { return typeof(VouchersClientLocal); } }
+
+        public override bool Readonly => false;
         public override bool SingleBufferUpdate { get { return false; } }
     }
     public class GLDailyJournalLineGridLocal : GLDailyJournalLineGrid
@@ -56,7 +59,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgGldailyJournalLinesGrid.tableView.ShowGroupPanel = false;
             var Comp = api.CompanyEntity;
             if (!Comp._UseVatOperation)
-                VatOperation.Visible = VatOffsetOperation.Visible = false;
+                colVatOperation.Visible = VatOffsetOperation.Visible = false;
             if (!masterRecord._TwoVatCodes)
                 OffsetVat.Visible = VatOffsetOperation.Visible = VatAmountOffset.Visible = false;
             else
@@ -657,6 +660,10 @@ namespace UnicontaClient.Pages.CustomPage
                 case "AutoMatch":
                     AutoMatch();
                     break;
+                case "SaveVouchers":
+                    dgvoucherGrid.View.PostEditor();
+                    dgvoucherGrid.SaveData();
+                    break;
                 case "SaveLines":
                     SaveLines();
                     break;
@@ -729,18 +736,30 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     if (!voucher.IsAttached && (voucher._Amount != 0 || voucher._Invoice != null))
                     {
-                        DateTime date;
+                        DateTime date, date2;
                         if (i == 0)
+                        {
                             date = voucher._PostingDate != DateTime.MinValue ? voucher._PostingDate :
                                 (voucher._DocumentDate != DateTime.MinValue ? voucher._DocumentDate : voucher.Created.Date);
+                            int days;
+                            var dw = date.DayOfWeek;
+                            if (dw == DayOfWeek.Saturday)
+                                days = 2;
+                            else if (dw == DayOfWeek.Friday)
+                                days = 3;
+                            else
+                                days = 1;
+                            date2 = date.AddDays(days);
+                        }
                         else
-                            date = voucher._PayDate;
+                            date = date2 = voucher._PayDate;
+
                         if (date != DateTime.MinValue)
                         {
                             var inv = voucher._Invoice;
                             var amount = Math.Abs(voucher._Amount);
                             foreach (var p in journalLines)
-                                if ((Math.Abs(p.Amount) == amount && p._Date == date)
+                                if ((Math.Abs(p.Amount) == amount && (p._Date == date || p._Date == date2))
                                     || (inv != null && inv == p._Invoice))
                                 {
                                     Attach(voucher, p, true, visibleRowVouchers);

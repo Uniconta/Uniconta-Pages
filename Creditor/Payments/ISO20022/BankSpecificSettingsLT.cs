@@ -286,7 +286,7 @@ namespace UnicontaISO20022CreditTransfer
 
         /// <summary>
         /// </summary>
-        public override string ExtProprietaryCode()
+        public override string ExtProprietaryCode(PaymentTypes paymentMethod)
         {
             switch (CredPaymFormat.Bank)
             {

@@ -74,6 +74,7 @@ namespace UnicontaClient.Pages.CustomPage
             CheckTwoFactorLogin(session.TwoFactorLoginUsed);
             RemoveMenu();
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
+            txtStartupTime.Text = App.StartupTime.ToString("g");
         }
 
         private void CheckTwoFactorLogin(bool twoFactorLoginUsed)
@@ -141,7 +142,7 @@ namespace UnicontaClient.Pages.CustomPage
                         savePassword();
                     }
                     Uniconta.ClientTools.Controls.LookupEditor.DefaultImmediatePopup = editrow._AutoDropDown;
-                    Uniconta.ClientTools.Controls.LookupEditor.AlwaysImmediatePopup = editrow._AutoDropDownBigData;
+                    Uniconta.ClientTools.Controls.LookupEditor.BigDataPopup = editrow._AutoDropDownBigData;
                     frmRibbon_BaseActions(ActionType);
 
                     var user = api.session.User;

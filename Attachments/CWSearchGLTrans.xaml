@@ -95,7 +95,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWSearchGLTrans"
                     </local:CorasauDataGridTemplateColumnClient.HeaderTemplate>
                     <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                         <ControlTemplate>
-                            <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Attachments_16x16.svg}" Cursor="Hand"  Visibility="{Binding DataContext.RowData.Row.HasVoucher,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" Stretch="Fill" Width="16" Height="16" />
+                            <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Attachments_16x16.svg}" Cursor="Hand" MouseLeftButtonDown="Voucher_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.HasVoucher,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" Stretch="Fill" Width="16" Height="16" />
                         </ControlTemplate>
                     </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                 </local:CorasauDataGridTemplateColumnClient>

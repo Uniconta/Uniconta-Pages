@@ -220,9 +220,6 @@ namespace UnicontaClient.Pages.CustomPage
                     if (IndustryCodes != null)
                         code = IndustryCodes.Get(ci.industrycode?.code)?.KeyStr;
 
-                    if (code != null && Equal(ci.industrycode?.code, debtor._IndustryCode))
-                        continue;
-
                     var newDebtor = new DebtorClientLocal();
                     StreamingManager.Copy(debtor, newDebtor);
 

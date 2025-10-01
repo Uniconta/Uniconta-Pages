@@ -135,6 +135,8 @@ namespace UnicontaClient.Pages.CustomPage
             SetShowHideStatusInfoSection(true);
             this.PreviewKeyDown += RootVisual_KeyDown;
             this.BeforeClose += DebtorDirectDebit_BeforeClose;
+
+            btnSearch();
         }
 
         private void DebtorDirectDebit_BeforeClose()
@@ -999,8 +1001,8 @@ namespace UnicontaClient.Pages.CustomPage
             var today = BasePage.GetSystemDefaultDate();
             var company = api.CompanyEntity;
 
-            if (PaymentFormatCache == null)
-                PaymentFormatCache = await api.LoadCache(typeof(Uniconta.DataModel.DebtorPaymentFormat));
+            PaymentFormatCache = PaymentFormatCache ?? await api.LoadCache(typeof(Uniconta.DataModel.DebtorPaymentFormat));
+            DebtorCache = DebtorCache ?? await api.LoadCache(typeof(Uniconta.DataModel.Debtor));
 
             foreach (var rec in lst)
             {

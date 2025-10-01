@@ -413,7 +413,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "ProducerResponsibility":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.InvPackagingProductPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ProducerResponsibility"), selectedItem._Item));
+                        AddDockItem(TabControls.InvPackagingProductPage, dgInventoryItemsGrid.syncEntity);
                     break;
                 case "InStock":
                     AddDockItem(TabControls.InventoryItemOnHand, dgInventoryItemsGrid.syncEntity, true);

@@ -1223,7 +1223,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (!api.CompanyEntity._DeactivateSendNemhandel)
                 GenrateInvoiceDialog.SentByEInvoice(api, UtilCommon.GetEndPoint(dbOrder, debtor, api));
 
-            GenrateInvoiceDialog.ShowAllowCredMax(debtor._CreditMax != 0);
+            GenrateInvoiceDialog.ShowAllowCredMax(debtor?._CreditMax != 0);
 
             GenrateInvoiceDialog.Closed += async delegate
             {
@@ -1429,7 +1429,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void Item_Validate(object sender, GridCellValidationEventArgs e)
         {
             var selectedItem = dgDebtorOrderLineGrid.SelectedItem as DebtorOrderLineClient;
-            if (selectedItem == null || e.Row != selectedItem)
+            if (selectedItem == null || e.Row != selectedItem || e.Value == null)
                 return;
             if (!(selectedItem._QtyDelivered == 0 || (selectedItem._QtyDelivered == selectedItem._QtyInvoiced)))
             {

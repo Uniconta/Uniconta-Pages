@@ -10,9 +10,13 @@ x:Class="UnicontaClient.Pages.CustomPage.UserDocsPage"
            xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
            xmlns:converter="clr-namespace:UnicontaClient.Utilities"
            xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" 
-            xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+           xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
+           xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"
            d:DesignWidth="640" d:DesignHeight="480"
            >
+    <UserControl.Resources>
+        <Util:RowIndexConverter x:Key="RowIndexConverter" />
+    </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

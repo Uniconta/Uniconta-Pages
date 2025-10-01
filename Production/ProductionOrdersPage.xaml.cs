@@ -386,17 +386,17 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     else
                     {
-                        this.PostedDate = DateTime.MinValue;
-                        this.Txt = null;
-                        this.Comment = null;
-
                         if (!postingDialog.IsPartlyFinished)
                             dgProductionOrders.UpdateItemSource(3, dbOrder);
                         else
                         {
                             dbOrder._ProdQty -= postingDialog.Quantity;
+                            dbOrder._LastInvoice = this.PostedDate != DateTime.MinValue ? this.PostedDate : DateTime.Today;
                             dgProductionOrders.UpdateItemSource(2, dbOrder);
                         }
+
+                        this.Txt = null;
+                        this.Comment = null;
 
                         string msg;
                         if (postingResult.JournalPostedlId != 0)

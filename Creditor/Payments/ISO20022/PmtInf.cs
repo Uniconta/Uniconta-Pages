@@ -15,6 +15,7 @@ namespace UnicontaISO20022CreditTransfer
         private readonly bool pmtInfCtrlSumActive;
         private readonly bool pmtInfNumberOfTransActive;
         private readonly string chargeBearer;
+        private readonly bool newPaymentFormat;
 
         private readonly Dbtr dbtr;
         private readonly DbtrAcct dbtrAcct;
@@ -30,6 +31,7 @@ namespace UnicontaISO20022CreditTransfer
         private const string CTRLSUM = "CtrlSum";
         private const string NBOFTXS = "NbOfTxs";
         private const string CHRGBR = "ChrgBr";
+        private const string DT = "Dt";
 
 
         #region Properties
@@ -140,6 +142,7 @@ namespace UnicontaISO20022CreditTransfer
             requestedExecutionDate = doc.RequestedExecutionDate;
             pmtInfCtrlSumActive = doc.PmtInfCtrlSumActive;
             pmtInfNumberOfTransActive = doc.PmtInfNumberOfTransActive;
+            newPaymentFormat = doc.NewPaymentFormat;
             this.pmtTpInf = pmtTpInf;
             this.dbtr = dbtr;
             this.dbtrAcct = dbtrAcct;
@@ -171,7 +174,13 @@ namespace UnicontaISO20022CreditTransfer
 
             pmtTpInf.Append(baseDoc, doc, pmtInf);
 
-            baseDoc.AppendElement(doc, pmtInf, REQDEXCTNDT, requestedExecutionDate);
+            if (newPaymentFormat)
+            {
+                XmlElement reqexcdt = baseDoc.AppendElement(doc, pmtInf, REQDEXCTNDT);
+                baseDoc.AppendElement(doc, reqexcdt, DT, requestedExecutionDate);
+            }
+            else
+                baseDoc.AppendElement(doc, pmtInf, REQDEXCTNDT, requestedExecutionDate);
 
             dbtr.Append(baseDoc, doc, pmtInf);
             dbtrAcct.Append(baseDoc, doc, pmtInf);

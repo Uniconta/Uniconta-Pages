@@ -256,7 +256,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
             var regex = new Regex(pattern);
             result = regex.Replace(result, "");
 
-            return result;
+            return result.Trim();
         }
 
         public static void ParseOcr(string ocr, out string fiCreditor, out string fiMask, bool isGIRO04 = false)

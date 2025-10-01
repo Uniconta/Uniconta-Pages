@@ -114,6 +114,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override void PageClosing()
         {
+            //Clearing timers
             if (timer != null)
                 timer.Tick -= Timer_Tick;
 
@@ -123,6 +124,34 @@ namespace UnicontaClient.Pages.CustomPage
                 if (func is GetAppEnumIndexFunction appEnumFunc)
                     CriteriaOperator.UnregisterCustomFunction(appEnumFunc);
             }
+
+
+            //Removing registered handlers
+            if (filterDialog != null)
+                filterDialog.Closing -= FilterDialog_Closing;
+
+            dashboardViewerUniconta.AsyncDataLoading -= dashboardViewerUniconta_AsyncDataLoading;
+            dashboardViewerUniconta.DashboardLoaded -= DashboardViewerUniconta_DashboardLoaded;
+            dashboardViewerUniconta.SetInitialDashboardState -= DashboardViewerUniconta_SetInitialDashboardState;
+            dashboardViewerUniconta.DashboardChanged -= DashboardViewerUniconta_DashboardChanged;
+            dashboardViewerUniconta.DataLoadingError -= DashboardViewerUniconta_DataLoadingError;
+            dashboardViewerUniconta.Unloaded -= DashboardViewerUniconta_Unloaded;
+
+            //Dashboard dispose
+            _dashboard?.Dispose();
+            _dashboard = null;
+
+            //Removing local variables
+            dataSourceAndTypeMap = null;
+            lstOfNewFilters = null;
+            lstOfSorters = null;
+            ListOfReportTableTypes = null;
+            lstOfDataSources = null;
+            dashboardUserFields = null;
+            dashboardLocalizationLabels = null;
+            dataSourceLoadingParams = null;
+            dState = null;
+            dashboardViewerUniconta.Dashboard = null;
 
             base.PageClosing();
         }
@@ -520,10 +549,11 @@ namespace UnicontaClient.Pages.CustomPage
                                 {
                                     if (type == typeof(CompanyClient))
                                         data = LoadCurrentUserCompanies(api);
-                                    else if (type == typeof(UserClient))
-                                        data = LoadCurrentCompanyUser(api);
                                     else
                                         data = Query(type, api, masterRecords, filterValues).GetAwaiter().GetResult();
+
+                                    if (type == typeof(UserClient))
+                                        data = LoadCurrentCompanyUser(api, data);
                                 }
                                 else
                                 {
@@ -845,19 +875,6 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         /// <summary>
-        /// Get PropValue pair  list from the datasource selected
-        /// </summary>
-        private List<PropValuePair> GetPropValuePairForDataSource(Type TableType, List<FilterProperties> filterProps)
-        {
-            List<PropValuePair> propPairLst = new List<PropValuePair>();
-            Filter[] filters = filterProps.Select(p => new Filter() { name = p.PropertyName, value = p.UserInput, parameterType = p.ParameterType }).ToArray();
-            var filterSorthelper = new FilterSortHelper(TableType, filters, null);
-            List<string> errors;
-            propPairLst = filterSorthelper.GetPropValuePair(out errors);
-            return propPairLst;
-        }
-
-        /// <summary>
         /// Initialized the dashbaord
         /// </summary>
         private async void Initialise()
@@ -885,7 +902,7 @@ namespace UnicontaClient.Pages.CustomPage
                             ReadDataFromDB(_selectedDashBoard.Layout);
                         });
                     }
-                    dashboardViewerUniconta.TitleContent = !string.IsNullOrEmpty(titleText) ? titleText : _selectedDashBoard.Name;
+                    dashboardViewerUniconta.TitleContent = !string.IsNullOrEmpty(titleText) ? GetCustomLocalizedString(titleText) : _selectedDashBoard.Name;
                 }
                 else
                 {
@@ -1039,14 +1056,39 @@ namespace UnicontaClient.Pages.CustomPage
         /// Getting current user
         /// </summary>
         /// <param name="crudApi">Api instance</param>
+        /// <param name="userClients">List of user clients</param>
         /// <returns>List of Users</returns>
-        private UnicontaBaseEntity[] LoadCurrentCompanyUser(CrudAPI crudApi)
+        private UnicontaBaseEntity[] LoadCurrentCompanyUser(CrudAPI crudApi, UnicontaBaseEntity[] userClients)
         {
             var currentUser = session.User;
-            var userClient = crudApi.CompanyEntity.CreateUserType<UserClient>();
-            StreamingManager.Copy(currentUser, userClient);
 
-            return new[] { userClient };
+            if (currentUser != null)
+            {
+                if (userClients == null || userClients.Length == 0)
+                {
+                    var userClient = crudApi.CompanyEntity.CreateUserType<UserClient>();
+                    StreamingManager.Copy(currentUser, userClient);
+                    return new[] { userClient };
+                }
+
+                var users = new UserClient[userClients.Length];
+
+                for (int index = 0; index < userClients.Length; index++)
+                {
+                    var user = userClients[index] as UserClient;
+                    var userClient = crudApi.CompanyEntity.CreateUserType<UserClient>();
+
+                    if (user.Uid == currentUser.Uid)
+                        StreamingManager.Copy(currentUser, userClient);
+                    else
+                        StreamingManager.Copy(user, userClient);
+
+                    users[index] = userClient;
+                }
+
+                return users;
+            }
+            return userClients;
         }
 
         /// <summary>
@@ -1194,11 +1236,14 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     fullname = fullname.Replace("[]", "");
                     var tables = ListOfReportTableTypes.FirstOrDefault(x => x.Key == companyId).Value;
-                    retType = tables.Where(p => p.FullName == fullname).FirstOrDefault();
-                    if (retType == null)
-                        retType = tables.Where(p => p.FullName == dataSource).FirstOrDefault();
-                    if (retType == null)
-                        retType = tables.Where(p => p.FullName == tblType).FirstOrDefault();
+                    retType = tables.FirstOrDefault(p => p.FullName == fullname) ?? tables.FirstOrDefault(p => p.FullName == dataSource) ??
+                        tables.FirstOrDefault(p => p.FullName == tblType);
+
+                    // This is required because now the type is coming from the Plugin and not just Uniconta.ClientTools.DataModel.
+                    // Case where the Plugins are loaded.
+                    if (retType == null && data is Type dataType)
+                        retType = tables.FirstOrDefault(p => p.BaseType.IsAssignableFrom(dataType) && p.Name == dataType.Name);
+
                     if (retType != null)
                     {
                         if (!dataSourceAndTypeMap.ContainsKey(componentName))
@@ -1258,6 +1303,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             return Uniconta.ClientTools.Localization.lookup(keyString);
         }
+
         #endregion
     }
 }

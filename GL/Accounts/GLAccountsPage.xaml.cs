@@ -89,9 +89,24 @@ namespace UnicontaClient.Pages.CustomPage
             dgGLTable.Readonly = true;
         }
 
-        void dgGLTable_RowDoubleClick()
+        async void dgGLTable_RowDoubleClick()
         {
-            ribbonControl.PerformRibbonAction("GLTran");
+            if (dgGLTable.CurrentColumn == PrevYearCredit || dgGLTable.CurrentColumn == PrevYearDebit || dgGLTable.CurrentColumn == PrevYear)
+            {
+                var selectedItem = dgGLTable.SelectedItem as GLAccountClient;
+                var page = dockCtrl.AddDockItem(TabControls.AccountsTransaction, this.ParentControl, dgGLTable.syncEntity, Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("AccountsTransaction"), selectedItem._Name)) as AccountsTransaction;
+                if (page != null)
+                    page.FilterWithAccountingYear(true);
+            }
+            else if (dgGLTable.CurrentColumn == ThisYearCredit || dgGLTable.CurrentColumn == ThisYearDebit || dgGLTable.CurrentColumn == ThisYear)
+            {
+                var selectedItem = dgGLTable.SelectedItem as GLAccountClient;
+                var page = dockCtrl.AddDockItem(TabControls.AccountsTransaction, this.ParentControl, dgGLTable.syncEntity, Util.ConcatParenthesis(Uniconta.ClientTools.Localization.lookup("AccountsTransaction"), selectedItem._Name)) as AccountsTransaction;
+                if (page != null)
+                    page.FilterWithAccountingYear(false);
+            }
+            else
+                ribbonControl.PerformRibbonAction("GLTran");
         }
 
         void localMenu_OnItemClicked(string ActionType)
@@ -139,7 +154,8 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "GLTran":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.TransactionReport, dgGLTable.syncEntity);
+                        AddDockItem(TabControls.TransactionReport, dgGLTable.syncEntity,
+                            string.Format("{0}/{1}", Uniconta.ClientTools.Localization.lookup("AccountStatement"), selectedItem._Account));
                     break;
                 case "Trans":
                     if (selectedItem != null)

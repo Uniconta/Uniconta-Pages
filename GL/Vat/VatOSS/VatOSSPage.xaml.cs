@@ -166,25 +166,24 @@ namespace UnicontaClient.Pages.CustomPage
             if (glVatCache == null)
                 glVatCache = await api.LoadCache<Uniconta.DataModel.GLVat>();
 
-            var vatEUList = glVatCache.Where(s => s._VatOperationCode == 200 || s._VatOperationCode == 201).Select(x => x._Vat).Distinct();
+            var vatEUList = glVatCache.Where(s => s._VatOperationCode == 200 || s._VatOperationCode == 201).Select(x => x._Vat).Distinct().ToList();
+            var listOfLists = new List<List<string>>();
+            for (int i = 0; i < vatEUList.Count; i += 40)
+                listOfLists.Add(vatEUList.Skip(i).Take(40).ToList());
 
-            List<IEnumerable<string>> listOfLists = new List<IEnumerable<string>>();
-            for (int i = 0; i < vatEUList.Count(); i += 40)
-                listOfLists.Add(vatEUList.Skip(i).Take(40));
-
-            var listOfDebInvLines = new List<DebtorInvoiceLines>(500);
+            var listOfDebInvLines = new List<DebtorInvoiceLines>();
             foreach (var lst in listOfLists)
             {
                 List<PropValuePair> propValPair = new List<PropValuePair>();
                 if (propDate != null) propValPair.Add(propDate);
 
-                if (lst != null && lst.Count() > 0)
+                if (lst != null && lst.Count > 0)
                     propValPair.Add(PropValuePair.GenereteWhereElements(nameof(DebtorInvoiceLines.Vat), typeof(string), string.Join(";", lst)));
 
                 listOfDebInvLines.AddRange(await api.Query<DebtorInvoiceLines>(propValPair));
             }
 
-            List<VatOSSTable> vatOSSlst = new List<VatOSSTable>();
+            var vatOSSlst = new List<VatOSSTable>();
             if (listOfDebInvLines != null && listOfDebInvLines.Count > 0)
             {
                 vatOSSlst = UpdateValues(listOfDebInvLines);
@@ -241,7 +240,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             foreach (var invLine in listOfDebInvLines)
             {
-                if (invLine.NetAmount == 0 || invLine._DCAccount == null)
+                if (invLine._DCAccount == null)
                     continue;
 
                 if (debtor?._Account != invLine._DCAccount)
@@ -262,9 +261,10 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 if (lastGLVat == null)
                     continue;
-                var priceInclVat = invLine.InvoiceRef._PricesInclVat;
-                var vatAmount = lastGLVat.VatAmount(-invLine.NetAmount, invLine._Date, false, priceInclVat ? GLVatCalculationMethod.Brutto : GLVatCalculationMethod.Netto);
-                var amount = priceInclVat ? -invLine.NetAmount - vatAmount : -invLine.NetAmount;
+                var amount = -invLine._NetAmount();
+                if (amount == 0)
+                    continue;
+                var vatAmount = lastGLVat.VatAmount(amount, invLine._Date, false, GLVatCalculationMethod.Netto);
 
                 var vatOSS = new VatOSSTable
                 {

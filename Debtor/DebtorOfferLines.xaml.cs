@@ -155,7 +155,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgDebtorOfferLineGrid.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgDebtorOfferLineGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
-            layOutDebtorOfferLine.Caption = Uniconta.ClientTools.Localization.lookup("OrdersLine");
+            layOutDebtorOfferLine.Caption = Uniconta.ClientTools.Localization.lookup("OfferLine");
             layOutInvItemStorage.Caption = Uniconta.ClientTools.Localization.lookup("OnHand");
             OnHandScreenInOrder = api.CompanyEntity._OnHandScreenInOrder;
             layOutInvItemStorage.Visibility = OnHandScreenInOrder ? Visibility.Visible : Visibility.Collapsed;

@@ -59,6 +59,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CompanyPreferencePage"
                         <CorasauControls:CorasauLayoutItem FieldName="PurchaseLineEditDelivered">
                             <CorasauControls:CheckEditor IsChecked="{Binding PurchaseLineEditDelivered,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="OnHandScreenInPurchase">
+                            <CorasauControls:CheckEditor IsChecked="{Binding OnHandScreenInPurchase,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="InvoiceUseQtyNowCre">
                             <CorasauControls:CheckEditor IsChecked="{Binding InvoiceUseQtyNowCre,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
@@ -155,6 +158,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CompanyPreferencePage"
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem x:Name="liNemhandelUpdateBankDetails" FieldName="NemhandelUpdateBankDetails">
                             <CorasauControls:CheckEditor IsChecked="{Binding NemhandelUpdateBankDetails,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="NemhandelAutoCreateCreditor">
+                            <CorasauControls:CheckEditor IsChecked="{Binding NemhandelAutoCreateCreditor,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>

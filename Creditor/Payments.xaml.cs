@@ -105,6 +105,12 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "RegulatoryReportingText", ResourceType = typeof(DCTransText))]
         public string RgltryRptgText { get { return _RgltryRptgText; } set { _RgltryRptgText = value; NotifyPropertyChanged("RgltryRptgText"); } }
 
+        private bool _AllowBankApprovement;
+        [Display(Name = "AllowApproval", ResourceType = typeof(DCTransText))]
+        public bool AllowBankApprovement { get { return _AllowBankApprovement; } set { _AllowBankApprovement = value; NotifyPropertyChanged("AllowBankApprovement"); } }
+
+
+
         public string ISOPaymentType;
         public bool internationalPayment;
         public StringBuilder invoiceNumbers;
@@ -567,6 +573,8 @@ namespace UnicontaClient.Pages.CustomPage
                 JournalCache = await api.LoadCache(typeof(Uniconta.DataModel.GLDailyJournal)).ConfigureAwait(false);
             if (BankAccountCache == null)
                 BankAccountCache = await api.LoadCache(typeof(Uniconta.DataModel.BankStatement)).ConfigureAwait(false);
+            if (PaymentFormatCache == null)
+                PaymentFormatCache = await api.LoadCache(typeof(Uniconta.DataModel.CreditorPaymentFormat)).ConfigureAwait(false);
             if (api.CompanyEntity.CreditorBankApprovement)
                 api.LoadCache(typeof(Uniconta.DataModel.CreditorPaymentAccount), true).ConfigureAwait(false);
         }
@@ -620,6 +628,7 @@ namespace UnicontaClient.Pages.CustomPage
                 cols.GetColumnByName("PaymentId").AllowFocus = false;
                 cols.GetColumnByName("SWIFT").AllowFocus = false;
                 cols.GetColumnByName("PaymentDate").AllowFocus = false;
+                cols.GetColumnByName("AllowBankApprovement").AllowFocus = false;
 
                 ribbonControl.EnableButtons("ExpandGroups");
                 ribbonControl.EnableButtons("CollapseGroups");
@@ -644,6 +653,7 @@ namespace UnicontaClient.Pages.CustomPage
                 cols.GetColumnByName("SWIFT").AllowFocus = true;
                 cols.GetColumnByName("PaymentDate").AllowFocus = true;
                 cols.GetColumnByName("MergePaymId").Visible = false;
+                cols.GetColumnByName("AllowBankApprovement").AllowFocus = api.CompanyEntity.AllowApproval;
 
                 ribbonControl.DisableButtons("ExpandGroups");
                 ribbonControl.DisableButtons("CollapseGroups");
@@ -1316,7 +1326,8 @@ namespace UnicontaClient.Pages.CustomPage
                         rec._PaymentId = (creditorPaymId != transPaymentId && transPaymentId != null) ? transPaymentId : creditorPaymId;
                 }
 
-                if (rec._SWIFT == null && rec._PaymentMethod == PaymentTypes.IBAN)
+                var creditorBankApprovement = api.CompanyEntity.CreditorBankApprovement;
+                if (rec._SWIFT == null && (!creditorBankApprovement || (creditorBankApprovement && rec._PaymentMethod == PaymentTypes.IBAN || rec._PaymentMethod == PaymentTypes.VendorBankAccount && cred.CreditorPaymentAccountRef?.IBAN == null)))
                     rec._SWIFT = cred.SWIFT;
 
                 rec._Message = StandardPaymentFunctions.ExternalMessage(paymFormatClient, rec, company, cred, true);
