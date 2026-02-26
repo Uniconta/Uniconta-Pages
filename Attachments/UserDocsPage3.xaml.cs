@@ -38,8 +38,8 @@ namespace UnicontaClient.Pages.CustomPage
         public UserDocsPage3(SynchronizeEntity master)
             : base(true, GetUserDoc(master))
         {
-            this.DataContext = this;
             InitializeComponent();
+            this.DataContext = this;
             var corasauMaster = master.Row;
             InitMaster(corasauMaster, true);
             Loaded += UserDocsPage3_Loaded;

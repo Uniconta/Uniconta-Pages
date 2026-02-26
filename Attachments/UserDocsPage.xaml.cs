@@ -17,6 +17,7 @@ using Uniconta.ClientTools.Util;
 using Uniconta.API.Service;
 using Uniconta.Common.Utility;
 using UnicontaClient.Controls.Dialogs;
+using System.Collections.Generic;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -25,7 +26,8 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override Type TableType { get { return typeof(UserDocsClient); } }
         public override bool Readonly { get { return false; } }
-        public override bool CanInsert { get { return false; } }
+        bool canInsert;
+        public override bool CanInsert { get { return canInsert; } }
         public override bool IsAutoSave { get { return false; } }
         public override IComparer GridSorting { get { return new SortUserDocs(); } }
 
@@ -122,7 +124,7 @@ namespace UnicontaClient.Pages.CustomPage
             org.Copy(vouchersClient);
 
             int cnt = 0;
-        retry:
+            retry:
 
             try
             {
@@ -171,6 +173,32 @@ namespace UnicontaClient.Pages.CustomPage
                     goto retry;
                 throw ex;
             }
+        }
+        public override IList ModifyDraggedRows(DevExpress.Xpf.Grid.DragDrop.DataControlDropEventArgs e)
+        {
+            var tableArgs = e as DevExpress.Xpf.Grid.DragDrop.GridDropEventArgs;
+            if (tableArgs == null)
+                return base.ModifyDraggedRows(e);
+            var userDocs = new List<UserDocsClient>(e.DraggedRows.Count);
+
+            foreach (var row in e.DraggedRows)
+            {
+                if (row is UserDocsClient userDoc)
+                {
+                    if (userDoc._Data == null)
+                    {
+                        ErrorCodes result = api.Read(userDoc).Result;
+                    }
+                    var newUserDoc = Activator.CreateInstance(TableTypeUser) as UserDocsClient;
+                    StreamingManager.Copy(userDoc, newUserDoc);
+                    newUserDoc.SetMaster(this.masterRecord);
+                    userDocs.Add(newUserDoc);
+                }
+            }
+            canInsert = true;
+            PasteRows(userDocs);
+            e.Handled = true;
+            return null;
         }
     }
 

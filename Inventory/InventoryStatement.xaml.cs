@@ -106,8 +106,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         public InventoryStatement(BaseAPI API) : base(API, string.Empty)
         {
-            this.DataContext = this;
             InitializeComponent();
+            this.DataContext = this;
             cmbFromAccount.api = cmbToAccount.api = api;
             SetRibbonControl(localMenu, dgInvTran);
             localMenu.OnItemClicked += localMenu_OnItemClicked;
@@ -248,7 +248,7 @@ namespace UnicontaClient.Pages.CustomPage
             statementList = new List<InvItemStatementList>(Math.Min(20, dataRowCount));
 
             if (ItemCache == null)
-                ItemCache = api.LoadCache(typeof(Uniconta.DataModel.InvItem)).GetAwaiter().GetResult();
+                ItemCache = Task.Run(() => api.LoadCache(typeof(Uniconta.DataModel.InvItem))).GetAwaiter().GetResult();
             string curItem = " ";
             InvItemStatementList ob = null;
             var tlst = new List<InvTransClientTotal>(100);

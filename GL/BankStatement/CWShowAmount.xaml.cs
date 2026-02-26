@@ -27,12 +27,7 @@ namespace UnicontaClient.Pages.CustomPage
             InitializeComponent();
             SetAmountType();
             this.DataContext = this;
-#if !SILVERLIGHT
             this.Title = Uniconta.ClientTools.Localization.lookup("ShowAmount");
-#endif
-#if SILVERLIGHT
-            Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             this.Loaded += CWShowAmount_Loaded;
         }
 

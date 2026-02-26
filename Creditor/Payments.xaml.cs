@@ -678,7 +678,7 @@ namespace UnicontaClient.Pages.CustomPage
                 await savetask;
 
             CWImportPayment cwwin = new CWImportPayment(api);
-            cwwin.Closing += async delegate
+            cwwin.Closed += async delegate
             {
                 if (cwwin.DialogResult != true)
                     return;
@@ -1369,7 +1369,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (this.Vouchers == null)
             {
                 var filter = new[] { PropValuePair.GenereteWhereElements("RowId", typeof(int), NumberConvert.ToString(MinDocumentRef) + ".." + NumberConvert.ToString(MaxDocumentRef)) };
-                this.Vouchers = api.Query<VouchersClient>(filter).GetAwaiter().GetResult();
+                this.Vouchers = Task.Run(() => api.Query<VouchersClient>(filter)).GetAwaiter().GetResult();
                 search = new VouchersClient();
                 sort = new SortDocAttached();
                 Array.Sort(this.Vouchers, sort);

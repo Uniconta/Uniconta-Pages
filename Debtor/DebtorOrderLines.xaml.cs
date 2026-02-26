@@ -434,8 +434,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override void AssignMultipleGrid(List<Uniconta.ClientTools.Controls.CorasauDataGrid> gridCtrls)
         {
-            gridCtrls.Add(dgInvItemStorageClientGrid);
             gridCtrls.Add(dgDebtorOrderLineGrid);
+            gridCtrls.Add(dgInvItemStorageClientGrid);
         }
 
         private void DgDebtorOrderLineGrid_SelectedItemChanged(object sender, SelectedItemChangedEventArgs e)
@@ -547,6 +547,7 @@ namespace UnicontaClient.Pages.CustomPage
                         TableField.SetUserFieldsFromRecord(selectedItem, rec);
                         if (rec._Warehouse == null)
                             rec.Warehouse = dgDebtorOrderLineGrid.userWarehouse;
+                        rec.PurchaseAccount = selectedItem._PurchaseAccount;
                         if (selectedItem._Blocked)
                             UtilDisplay.ShowErrorCode(ErrorCodes.ItemIsOnHold, null);
 
@@ -558,6 +559,10 @@ namespace UnicontaClient.Pages.CustomPage
                         this.PriceLookup.GetCustomerPrice(rec, false);
                     if (company._InvoiceUseQtyNow)
                         rec.QtyNow = rec._Qty;
+                    break;
+                case "Unit":
+                    if (this.PriceLookup != null && this.PriceLookup.UseCustomerPrices)
+                        this.PriceLookup.GetCustomerPrice(rec, false);
                     break;
                 case "Subtotal":
                 case "Total":
@@ -961,13 +966,63 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem?.InvItem != null && selectedItem?.Item != null)
                         AddDockItem(TabControls.UserNotesPage, selectedItem.InvItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Notes"), selectedItem?.InvItem?._Name));
                     break;
+                case "ReturnReason":
+                    if (selectedItem != null)
+                    {
+                        InvTransReasonClient transReason = null;
+                        if (selectedItem._TransReason == null)
+                        {
+                            transReason = new InvTransReasonClient();
+                            transReason.SetMaster(api.CompanyEntity);
+                        }
+                        else
+                            transReason = selectedItem._TransReason;
+                        var returnDialog = new CWReturnReason(transReason, api);
+                        returnDialog.Closing += delegate
+                        {
+                            if (returnDialog.DialogResult == true)
+                            {
+                                if (selectedItem != null)
+                                {
+                                    dgDebtorOrderLineGrid.SetLoadedRow(selectedItem);
+                                    selectedItem._TransReason = returnDialog.Reason;
+                                    dgDebtorOrderLineGrid.SetModifiedRow(selectedItem);
+                                    DataChaged = true;
+                                }
+                            }
+                        };
+                        returnDialog.Show();
+                    }
+                    break;
+                case "RecalculateOrderPrices":
+                    RecalculateOrderPrices();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
             RecalculateAmount();
         }
-
+        private void RecalculateOrderPrices()
+        {
+            var orderLst = dgDebtorOrderLineGrid.GetVisibleRows();
+            if (orderLst == null || orderLst.Count == 0)
+                return;
+            CWConfirmationBox dialog = new CWConfirmationBox(Uniconta.ClientTools.Localization.lookup("AreYouSureToContinue"), Uniconta.ClientTools.Localization.lookup("Confirmation"), false);
+            dialog.Closing += async delegate
+            {
+                if (dialog.ConfirmationResult == CWConfirmationBox.ConfirmationResultEnum.Yes)
+                {
+                    busyIndicator.IsBusy = true;
+                    var err = await new OrderAPI(this.api).RecalcOrderPrices(new [] { Order });
+                    busyIndicator.IsBusy = false;
+                    UtilDisplay.ShowErrorCode(err);
+                    if (err == ErrorCodes.Succes)
+                        RefreshGrid();
+                }
+            };
+            dialog.Show();
+        }
         async void CreateProductionOrder(DebtorOrderLineClient orderLine)
         {
             var t = saveGridLocal();

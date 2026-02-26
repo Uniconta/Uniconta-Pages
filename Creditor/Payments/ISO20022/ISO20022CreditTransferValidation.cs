@@ -34,6 +34,7 @@ namespace ISO20022CreditTransfer
         private bool newPaymentFormat;
         private CrudAPI crudAPI;
         private Company company;
+        private bool isCreditAmount;
 
         private bool glJournalGenerated;
         private ISO20022PaymentTypes isoPaymentType;
@@ -167,6 +168,8 @@ namespace ISO20022CreditTransfer
             checkErrors.Clear();
 
             //Validations >>
+            isCreditAmount = trans.PaymentAmount <= 0;
+
             if (company.CreditorBankApprovement)
             {
                 creditorBank = (CreditorPaymentAccount)credBankCache.Get(creditor._Account);
@@ -199,37 +202,40 @@ namespace ISO20022CreditTransfer
             var countryCode = glJournalGenerated ? (CountryCode)company._Country : creditor._Country;
             ISOPaymentType(trans.CurrencyLocalStr, bankAccount._IBAN, trans._PaymentMethod, UnicontaCountryToISO(countryCode));
 
-            switch (trans._PaymentMethod)
+            if (!isCreditAmount)
             {
-                case PaymentTypes.VendorBankAccount:
-                    PaymentMethodBBAN(creditor, company, trans._PaymentId);
-                    CreditorBIC(trans._SWIFT, true);
-                    break;
+                switch (trans._PaymentMethod)
+                {
+                    case PaymentTypes.VendorBankAccount:
+                        PaymentMethodBBAN(creditor, company, trans._PaymentId);
+                        CreditorBIC(trans._SWIFT, true);
+                        break;
 
-                case PaymentTypes.IBAN:
-                    PaymentMethodIBAN(creditor, company, trans._PaymentId);
-                    CreditorBIC(trans._SWIFT);
-                    break;
+                    case PaymentTypes.IBAN:
+                        PaymentMethodIBAN(creditor, company, trans._PaymentId);
+                        CreditorBIC(trans._SWIFT);
+                        break;
 
-                case PaymentTypes.PaymentMethod3: //FIK71 + BankGirot
-                    PaymentMethodFIK71(creditor, trans._PaymentId);
-                    break;
+                    case PaymentTypes.PaymentMethod3: //FIK71 + BankGirot
+                        PaymentMethodFIK71(creditor, trans._PaymentId);
+                        break;
 
-                case PaymentTypes.PaymentMethod4: //FIK73 + PlusGirot
-                    PaymentMethodFIK73(trans._PaymentId);
-                    break;
+                    case PaymentTypes.PaymentMethod4: //FIK73 + PlusGirot
+                        PaymentMethodFIK73(trans._PaymentId);
+                        break;
 
-                case PaymentTypes.PaymentMethod5: //FIK75
-                    PaymentMethodFIK75(creditor, trans._PaymentId);
-                    break;
+                    case PaymentTypes.PaymentMethod5: //FIK75
+                        PaymentMethodFIK75(creditor, trans._PaymentId);
+                        break;
 
-                case PaymentTypes.PaymentMethod6: //FIK04
-                    PaymentMethodFIK04(trans._PaymentId);
-                    break;
+                    case PaymentTypes.PaymentMethod6: //FIK04
+                        PaymentMethodFIK04(trans._PaymentId);
+                        break;
+                }
+
+                CreditorBankApproved(trans, creditor);
+                await RegulatoryReporting(trans);
             }
-
-            CreditorBankApproved(trans, creditor);
-            await RegulatoryReporting(trans);
 
             //Validations <<
 
@@ -284,7 +290,10 @@ namespace ISO20022CreditTransfer
         /// </summary>
         private void RequestedExecutionDate(DateTime? executionDate, Company company)
         {
-            if (executionDate.HasValue == false)
+            if (isCreditAmount)
+                return;
+
+            if (executionDate == DateTime.MinValue)
             {
                 checkErrors.Add(new CheckError(fieldCannotBeEmpty("PaymentDate")));
             }

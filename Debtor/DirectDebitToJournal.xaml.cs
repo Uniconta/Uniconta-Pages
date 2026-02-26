@@ -37,12 +37,7 @@ namespace UnicontaClient.Pages.CustomPage
             Capi = api;
             this.DataContext = this;
             InitializeComponent();
-#if !SILVERLIGHT
             this.Title = Uniconta.ClientTools.Localization.lookup("GenerateJournalLines");
-#else
-            Utilities.Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
-            
             lookupJournal.api =lookupAccount.api= lookupTransType.api = api;
             this.Loaded += CW_Loaded;
         }

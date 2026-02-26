@@ -31,7 +31,8 @@
       <!---If we want Inner menu-->
       <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
       <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16" ShortcutKey="" />
-      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
+			<RibbonItem Action="AddExpressionColumn" LocalizedNameKey="AddOBJ" Parameter="CalculationExpression" Glyph="Accountant_16x16" ShortcutKey="" />
+      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" EnableSeperator="True" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
       <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16" ShortcutKey=""/>
       <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16" ShortcutKey="Ctrl+U"/>
       <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16" LargeGlyph="ExportLayout_16x16" ShortcutKey=""/>
@@ -68,15 +69,17 @@
       <RibbonItem Action="MarkOrderLineAgnstOL" LocalizedNameKey="MarkOBJ" Parameter="PurchaseLines"  Glyph="Marked_OrderLine_from_OrderLine_16x16" LargeGlyph="Marked_OrderLine_from_OrderLine_16x16"/>
       <RibbonItem Action="MarkOrderLineAgnstInvTrans" LocalizedNameKey="MarkOBJ" Parameter="InvTransactions"  Glyph="Marked_Inventory_from_Inventory_16x16" LargeGlyph="Marked_Inventory_from_Inventory_16x16"/>
     </RibbonItem>
+    <RibbonItem Action="ReturnReason" LocalizedNameKey="ReturnReason" LargeGlyph="CrmFollowUp" />
   </RibbonItem>
   <RibbonItem>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="InsertSubTotal" LocalizedNameKey="InsertSubTotal" Parameter="Line" Glyph="Add_16x16" LargeGlyph="Add_32x32"/>
     <RibbonItem Action="PartInvItems" LocalizedNameKey="BOM" Module="InvBOM" LargeGlyph="Order_Lines_Highlighted_32x32" ShortcutKey="ALT+L">
-      <RibbonItem Action="UnfoldBOM" LocalizedNameKey="UnfoldBOM" Module="InvBOM" Glyph="CopyUserTable_16x16" LargeGlyph="CopyUserTable_16x16"/>
-      <RibbonItem Action="CreateProduction" LocalizedNameKey="CreateOBJ" Parameter="Production" Module="Production" Glyph="Column_Head_16x16" LargeGlyph="Column_Head_16x16"/>
-    </RibbonItem>
+    <RibbonItem Action="UnfoldBOM" LocalizedNameKey="UnfoldBOM" Module="InvBOM" Glyph="CopyUserTable_16x16" LargeGlyph="CopyUserTable_16x16"/>
+    <RibbonItem Action="CreateProduction" LocalizedNameKey="CreateOBJ" Parameter="Production" Module="Production" Glyph="Column_Head_16x16" LargeGlyph="Column_Head_16x16"/>
+	<RibbonItem Action="RecalculateOrderPrices" LocalizedNameKey="RecalculatePrices" LargeGlyph="Calculator_32x32"/>
+  </RibbonItem>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="CreateFromInvoice" LocalizedNameKey="CopyOBJ" Parameter="Invoice"  LargeGlyph="Orders_32x32" />

@@ -1,81 +1,35 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Uniconta.API.DebtorCreditor;
 using Uniconta.API.System;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.Common;
 using Uniconta.DataModel;
+using Uniconta.Reports.Utilities;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
     /// <summary>
-    /// Class to Initialize before printing of Offers
+    /// Client class to Initialize before Printing the for debtor offer reoprt.
     /// </summary>
-    public class DebtorOfferPrintReport
+    public class DebtorOfferPrintReport : DebtorInvoicePrintReportBase<DebtorOfferClient>
     {
-        public DebtorClient Debtor { get; private set; }
-        public CompanyClient Company { get; private set; }
-        public DebtorOfferClient[] DebtorOffers { get; private set; }
-        public DebtorOfferLineClient[] DebtorOfferLines { get; private set; }
-        public byte[] CompanyLogo { get; private set; }
-
-        private CrudAPI crudApi;
-        private DebtorOfferClient debtorOffer;
-
-        /// <summary>
-        /// Initialization of DebtorOfferPrintReport
-        /// </summary>
-        /// <param name="debtOffer"></param>
-        /// <param name="api"></param>
-        public DebtorOfferPrintReport(DebtorOfferClient debtOffer,CrudAPI api)
+        public DebtorOfferClient DebtorOffer => BaseEntityClient; // keeps your old property name
+        public DebtorOfferPrintReport(InvoicePostingResult postingResult, CrudAPI api, CompanyLayoutType companyLayoutType)
+            : base(postingResult, api, companyLayoutType) { }
+        public DebtorOfferPrintReport(DebtorInvoiceClient debtorInvoiceClient, CrudAPI api, CompanyLayoutType companyLayoutType = CompanyLayoutType.Offer)
+            : base(debtorInvoiceClient, api, companyLayoutType) { }
+        public DebtorOfferPrintReport(InvoicePostingResult postingResult, CrudAPI api, CompanyLayoutType companyLayoutType, DebtorOfferClient orderClient)
+            : base(postingResult, api, companyLayoutType, orderClient) { }
+        protected override Type OrderCacheDataModelType => typeof(Uniconta.DataModel.DebtorOffer);
+        protected override DebtorOfferClient CreateOrderFromInvoice(Company Comp)
         {
-            debtorOffer = debtOffer;
-            Debtor = debtOffer.Debtor;
-            crudApi = api;
-        }
-
-        /// <summary>
-        /// Instantiate with User Fields
-        /// </summary>
-        /// <returns></returns>
-        async public Task InstantiateUserFields()
-        {
-            var Comp = crudApi.CompanyEntity;
-
-            if (debtorOffer != null)
-            {
-                //debtor
-                var debtorUserType = Global.GetTableWithUserFields(Comp, typeof(DebtorClient), true);
-                var debtorInstance = Activator.CreateInstance(debtorUserType) as UnicontaBaseEntity;
-                var debtor = await crudApi.Query(debtorInstance, new UnicontaBaseEntity[] { debtorOffer.Debtor }, null);
-
-                //DebtorOffer
-                var debtorOfferUserType = Global.GetTableWithUserFields(Comp, typeof(DebtorOfferClient), true);
-                var debtorOfferInstance = Activator.CreateInstance(debtorOfferUserType) as UnicontaBaseEntity;
-                var debtorOffers = (DebtorOfferClient[])await crudApi.Query(debtorOfferInstance, new UnicontaBaseEntity[] { debtorOffer }, null);
-                DebtorOffers = debtorOffers;
-
-                //DebtorOfferLines
-                var debtorOfferLineUserType = Global.GetTableWithUserFields(Comp, typeof(DebtorOfferLineClient), true);
-                var debtorOfferLineInstance = Activator.CreateInstance(debtorOfferLineUserType) as UnicontaBaseEntity;
-                var listDebtorOfferLines = new List<DebtorOfferLineClient>();
-                foreach (var debtOffer in debtorOffers)
-                {
-                    var debtorOfferLine = (DebtorOfferLineClient[])await crudApi.Query(debtorOfferLineInstance, new UnicontaBaseEntity[] { debtOffer }, null);
-                    listDebtorOfferLines.AddRange(debtorOfferLine);
-                }
-                DebtorOfferLines = listDebtorOfferLines.ToArray();
-            }
-
-            Company = Comp as CompanyClient;
-            if (Company == null || Company.GetType() != Company.GetUserTypeNotNull(typeof(CompanyClient)))
-            {
-                Company = Comp.CreateUserType<CompanyClient>();
-                StreamingManager.Copy(Comp, Company);
-            }
-
-            CompanyLogo = await UnicontaClient.Utilities.UtilCommon.GetLogo(crudApi);
+            var debtorOfferUserType = ReportUtil.GetUserType(typeof(DebtorOfferClient), Comp);
+            var debtorOfferUser = Activator.CreateInstance(debtorOfferUserType) as DebtorOfferClient;
+            debtorOfferUser.CopyFrom(DebtorInvoice, Debtor);
+            return debtorOfferUser;
         }
     }
 }

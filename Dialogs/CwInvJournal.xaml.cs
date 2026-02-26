@@ -27,16 +27,12 @@ namespace UnicontaClient.Pages
         public Uniconta.DataModel.InvJournal InvJournal;
         CrudAPI API;
         bool isDateTime;
-
+        public bool ClearCounted;
         public CwInvJournal(CrudAPI api, bool showDateTime = false)
         {
             this.DataContext = this;
             InitializeComponent();
-#if !SILVERLIGHT
             this.Title = Uniconta.ClientTools.Localization.lookup("GenerateJournalLines");
-#else
-            UnicontaClient.Utilities.Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             API = api;
             lookupJournal.api = api;
             isDateTime = showDateTime;
@@ -49,8 +45,8 @@ namespace UnicontaClient.Pages
         {
             if (isDateTime)
             {
-                this.txtDate.Visibility = Visibility.Visible;
-                this.dpDate.Visibility = Visibility.Visible;
+                this.txtDate.Visibility =  this.dpDate.Visibility = txtClearCounted.Visibility = 
+                chkClearCounted.Visibility = Visibility.Visible;
             }
 
             Dispatcher.BeginInvoke(new Action(() => { lookupJournal.Focus(); }));
@@ -74,7 +70,7 @@ namespace UnicontaClient.Pages
         {
             var cache = API.CompanyEntity.GetCache(typeof(Uniconta.DataModel.InvJournal));
             InvJournal = (Uniconta.DataModel.InvJournal)cache?.Get(Journal);
-
+            ClearCounted = chkClearCounted.IsChecked == true;
             if (isDateTime)
                 Date = dpDate.DateTime;
 

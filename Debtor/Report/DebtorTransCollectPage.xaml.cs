@@ -80,7 +80,9 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void localMenu_OnItemClicked(string ActionType)
         {
-            var selectedItem = dgDebtorTransCollect.SelectedItem as DebtorTransCollectClient;
+            var focusedRowHandle = dgDebtorTransCollect.tableView.FocusedRowHandle;
+            var selectedItem = focusedRowHandle != -1 ? dgDebtorTransCollect.GetRow(focusedRowHandle) as DebtorTransCollectClient : dgDebtorTransCollect.SelectedItem as DebtorTransCollectClient;
+            
             switch (ActionType)
             {
                 case "SendAsEmail":
@@ -113,7 +115,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 busyIndicator.IsBusy = true;
                 busyIndicator.BusyContent = ActionType == "Print" ? Uniconta.ClientTools.Localization.lookup("GeneratingPage") : Uniconta.ClientTools.Localization.lookup("LaunchingWaitMsg");
-                
+
                 var debtor = accountCache.Get(selectedItem.Trans._Account) as DebtorClient;
                 selectedItem.OpenTran._Code = selectedItem._Code;
                 var paymentStandardReport = await Utility.GenerateStandardCollectionReport(selectedItem.OpenTran, debtor, selectedItem._SendTime, selectedItem._Code, api, false);

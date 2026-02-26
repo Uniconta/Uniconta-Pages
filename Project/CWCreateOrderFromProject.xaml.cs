@@ -97,7 +97,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void SetItemSource(QueryAPI api)
         {
-            var prCache = api.GetCache(typeof(Uniconta.DataModel.PrCategory)) ?? api.LoadCache(typeof(Uniconta.DataModel.PrCategory)).GetAwaiter().GetResult();
+            var prCache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.PrCategory), api);
             cmbCategory.cacheFilter = new PrCategoryRevenueOnlyFilter(prCache);
         }
 

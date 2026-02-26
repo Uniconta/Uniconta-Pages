@@ -52,8 +52,8 @@ namespace UnicontaClient.Pages.CustomPage
         InvTrans invtrans;
         public InventoryTransactionsMarkedPage(UnicontaBaseEntity orderLine) : base(null)
         {
-            this.DataContext = this;
             InitializeComponent();
+            this.DataContext = this;
             debtorOrderLine = orderLine as DCOrderLineClient;
             if (debtorOrderLine != null)
             {

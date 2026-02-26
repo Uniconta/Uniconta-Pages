@@ -48,6 +48,24 @@ namespace UnicontaClient.Pages.CustomPage
             SetRibbonControl(localMenu, dgJournalLineStartStopPageGrid);
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
+            dgJournalLineStartStopPageGrid.SelectedItemChanged += DgJournalLineStartStopPageGrid_SelectedItemChanged;
+            ribbonControl.DisableButtons("Resume");
+        }
+
+        private void DgJournalLineStartStopPageGrid_SelectedItemChanged(object sender, DevExpress.Xpf.Grid.SelectedItemChangedEventArgs e)
+        {
+            ribbonControl.EnableButtons("Resume");
+            ribbonControl.EnableButtons("Pause");
+            ribbonControl.EnableButtons("Stop");
+            var selectedItem = dgJournalLineStartStopPageGrid.SelectedItem as ProjectJournalLineClient;
+            if (selectedItem != null && selectedItem.TimeFrom.TimeOfDay == TimeSpan.Zero)
+            {
+                ribbonControl.EnableButtons("Resume");
+                ribbonControl.DisableButtons("Pause");
+                ribbonControl.DisableButtons("Stop");
+            }
+            else
+                ribbonControl.DisableButtons("Resume");
         }
 
         public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)
@@ -76,13 +94,13 @@ namespace UnicontaClient.Pages.CustomPage
             var hdrString = new StringBuilder();
             if (employee != null)
             {
-                var cache = api.GetCache(typeof(Uniconta.DataModel.Employee)) ?? api.LoadCache(typeof(Uniconta.DataModel.Employee)).GetAwaiter().GetResult();
+                var cache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.Employee), api);
                 Employee = (Uniconta.DataModel.Employee)cache.Get(employee);
                 hdrString.Append(Uniconta.ClientTools.Localization.lookup("StartTimeRegistration")).Append(" : " + employee + "/");
             }
             if (prJournal != null)
             {
-                var cache = api.GetCache(typeof(Uniconta.DataModel.PrJournal)) ?? api.LoadCache(typeof(Uniconta.DataModel.PrJournal)).GetAwaiter().GetResult();
+                var cache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.PrJournal), api);
                 projectJournal = (Uniconta.DataModel.PrJournal)cache.Get(prJournal);
                 hdrString.Append(prJournal);
                 SetHeader(hdrString.ToString());
@@ -164,12 +182,64 @@ namespace UnicontaClient.Pages.CustomPage
                 case "UndoDelete":
                     dgJournalLineStartStopPageGrid.UndoDeleteRow();
                     break;
+                case "Pause":
+                    Pause(selectedItem);
+                    break;
+                case "Resume":
+                    Resume(selectedItem);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
-
+        async void Pause(ProjectJournalLineClient selectedItem)
+        {
+            if (selectedItem == null)
+                return;
+            Stop(selectedItem);
+            var projectJournalLine = Activator.CreateInstance(selectedItem.GetType()) as ProjectJournalLineClient;
+            CorasauDataGrid.CopyAndClearRowId(selectedItem, projectJournalLine, api);
+            projectJournalLine.TimeFrom = DateTime.MinValue;
+            projectJournalLine.TimeTo = DateTime.MinValue;
+            projectJournalLine.Date = DateTime.MinValue;
+            var err = await api.Insert(projectJournalLine);
+            if (err == ErrorCodes.Succes)
+                LoadGrid();
+            else
+                UtilDisplay.ShowErrorCode(err);
+        }
+        async void Resume(ProjectJournalLineClient selectedItem)
+        {
+            if (selectedItem?.TimeFrom.TimeOfDay == TimeSpan.Zero)
+            {
+                TimeFromRounding(selectedItem);
+                selectedItem.Date = BasePage.GetSystemDefaultDate();
+                var err = await api.Update(selectedItem);
+                if (err == ErrorCodes.Succes)
+                    LoadGrid();
+                else
+                    UtilDisplay.ShowErrorCode(err);
+            }
+        }
+        void TimeFromRounding(ProjectJournalLineClient lineClient)
+        {
+            switch (companySettings._RoundingStart)
+            {
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                    lineClient.TimeFrom = Utility.RoundUp(companySettings._RoundingStart, DateTime.Now);
+                    break;
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                    lineClient.TimeFrom = Utility.RoundDown(companySettings._RoundingStart, DateTime.Now);
+                    break;
+            }
+        }
         void CopyRecord(ProjectJournalLineClient selectedItem)
         {
             if (selectedItem == null)

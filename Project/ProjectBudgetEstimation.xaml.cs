@@ -399,6 +399,10 @@ namespace UnicontaClient.Pages.CustomPage
                         rec.Qty = (rec._ToTime - rec._FromTime) / 60d;
                     break;
 
+                case "Unit":
+                    if (this.PriceLookup != null && this.PriceLookup.UseCustomerPrices)
+                        this.PriceLookup.GetCustomerPrice(rec, false);
+                    break;
                 case "Qty":
                     if (this.PriceLookup != null && this.PriceLookup.UseCustomerPrices)
                         this.PriceLookup.GetCustomerPrice(rec, false);
@@ -685,14 +689,14 @@ namespace UnicontaClient.Pages.CustomPage
             if (string.IsNullOrEmpty(project))
                 return;
 
-            var projectCache = api.GetCache(typeof(ProjectClient)) ?? api.LoadCache(typeof(ProjectClient)).GetAwaiter().GetResult();
+            var projectCache = api.GetCache(typeof(ProjectClient)) ?? await api.LoadCache(typeof(ProjectClient));
             var prj = projectCache.Get(project) as ProjectClient;
             var deb = prj._DCAccount;
 
             if (string.IsNullOrEmpty(deb))
                 return;
 
-            var debtCache = api.GetCache(typeof(DebtorClient)) ?? api.LoadCache(typeof(DebtorClient)).GetAwaiter().GetResult();
+            var debtCache = api.GetCache(typeof(DebtorClient)) ?? await api.LoadCache(typeof(DebtorClient));
             var db = debtCache.Get(deb) as DebtorClient;
             var companyClient = UtilCommon.GetCompanyClientUserInstance(api.CompanyEntity);
             var getLogo = await UtilCommon.GetLogo(api);

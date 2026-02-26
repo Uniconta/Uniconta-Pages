@@ -106,9 +106,9 @@ namespace UnicontaClient.Pages.CustomPage
         }
         public CriteriaControl()
         {
-            this.DataContext = this;
             InitializeComponent();
-          
+            this.DataContext = this;
+
             SelectedCriteria ob = new SelectedCriteria();
             this.DataContext = ob;
             //  cmbBudgetModel.SelectedItem = null;

@@ -143,25 +143,24 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         dgEUSalesWithoutVATGrid.DeleteRow();
                     break;
-
                 case "Validate":
                     if (listEuSale != null && listEuSale.Count() > 0)
                         CallValidate(true);
                     break;
-
                 case "Compress":
                     if (listEuSale != null && listEuSale.Count() > 0)
                         Compress();
                     break;
-
                 case "Search":
                     if (listEuSale != null)
                         btnSearch();
                     break;
-
                 case "CreateFile":
                     if (listEuSale != null && listEuSale.Count() > 0)
                         CreateFile();
+                    break;
+                case "VIESLog":
+                    AddDockItem(TabControls.DebtorFieldLogPage, dgEUSalesWithoutVATGrid.syncEntity, true, "Log", null, new System.Windows.Point(180, 280));
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -352,7 +351,7 @@ namespace UnicontaClient.Pages.CustomPage
             return euSalesHelper.PreValidate();
         }
 
-        private IEnumerable<EUSaleWithoutVAT> CallValidate(bool onlyValidate)
+        private async Task<IEnumerable<EUSaleWithoutVAT>> CallValidate(bool onlyValidate)
         {
             if (!CallPrevalidate())
                 return null;
@@ -362,7 +361,7 @@ namespace UnicontaClient.Pages.CustomPage
             busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("BusyMessage");
             busyIndicator.IsBusy = true;
             var listOfEU = (IEnumerable<EUSaleWithoutVAT>)dgEUSalesWithoutVATGrid.GetVisibleRows();
-            euSalesHelper.Validate(listOfEU, compressed, onlyValidate);
+            await euSalesHelper.Validate(listOfEU, compressed, onlyValidate);
             busyIndicator.IsBusy = false;
 
             if (onlyValidate)
@@ -418,7 +417,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        private void CreateFile()
+        private async void CreateFile()
         {
             try
             {
@@ -428,7 +427,7 @@ namespace UnicontaClient.Pages.CustomPage
                     return;
                 }
 
-                var listOfEU = CallValidate(false);
+                var listOfEU = await CallValidate(false);
                 if (listOfEU == null)
                     return;
 
@@ -483,7 +482,6 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void CheckVIES_Reaction(object sender, RoutedEventArgs e)
         {
-            euSalesHelper.ClearVIESCache();
             DefaultVIES = checkVIES.IsChecked.GetValueOrDefault();
             euSalesHelper.validateVIES = DefaultVIES;
         }

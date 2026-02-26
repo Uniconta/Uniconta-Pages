@@ -60,10 +60,25 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (dgProjectTransaction.masterRecords != null)
                 return null;
-            Filter dateFilter = new Filter();
-            dateFilter.name = "Date";
-            dateFilter.value = String.Format("{0:d}..", BasePage.GetSystemDefaultDate().AddYears(-1).Date);
-            return new Filter[] { dateFilter };
+            Filter dateFilter = new Filter
+            {
+                name = "Date",
+                value = String.Format("{0:d}..", BasePage.GetSystemDefaultDate().AddYears(-1).Date)
+            };
+            Filter projectFilter = null;
+            if (api.CompanyEntity.HideInternalProjects)
+            {
+                projectFilter = new Filter
+                {
+                    name = "HideInternalProjects",
+                    value = "1"
+                };
+            }
+
+            if (projectFilter != null)
+                return new Filter[] { dateFilter, projectFilter };
+            else
+                return new Filter[] { dateFilter };
         }
 
         public ProjectTransactionPage(BaseAPI API) : base(API, string.Empty)
@@ -74,14 +89,6 @@ namespace UnicontaClient.Pages.CustomPage
         public ProjectTransactionPage(UnicontaBaseEntity master) : base(master)
         {
             InitializePage(master);
-        }
-
-        public ProjectTransactionPage(UnicontaBaseEntity master, string workspace) : base(master)
-        {
-            parmWorkspace = workspace;
-            InitializePage(master);
-            if (syncEntity != null)
-                dgProjectTransaction.UpdateMaster(master);
         }
 
         static UnicontaBaseEntity getMaster(UnicontaBaseEntity master)
@@ -103,6 +110,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             UnicontaBaseEntity argsProj = getMaster(syncEntity.Row);
             InitializePage(argsProj);
+            SetWorkspace(syncEntity.Row);
             SetHeader();
         }
         protected override void SyncEntityMasterRowChanged(UnicontaBaseEntity args)
@@ -112,10 +120,17 @@ namespace UnicontaClient.Pages.CustomPage
             UnicontaBaseEntity argsProj = getMaster(args);
             master = argsProj;
             dgProjectTransaction.UpdateMaster(argsProj);
+            SetWorkspace(args);
             SetHeader();
             InitQuery();
         }
 
+        private void SetWorkspace(UnicontaBaseEntity master)
+        {
+            var WIPreport = master as ProjectWIPTotalsClient;
+            if (WIPreport != null)
+                parmWorkspace = WIPreport.Workspace;
+        }
         private void SetHeader()
         {
             string header;
@@ -136,13 +151,17 @@ namespace UnicontaClient.Pages.CustomPage
                         return;
                 }
             }
+
+            if (parmWorkspace != null)
+                header += string.Format(" ({0}: {1})", Uniconta.ClientTools.Localization.lookup("Workspace"), parmWorkspace);
+
             SetHeader(header);
         }
 
         void InitializePage(UnicontaBaseEntity _master)
         {
-            this.DataContext = this;
             InitializeComponent();
+            this.DataContext = this;
             master = _master;
             SetRibbonControl(localMenu, dgProjectTransaction);
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
@@ -474,7 +493,11 @@ namespace UnicontaClient.Pages.CustomPage
                     if (rec.Date < approvedDateSunday)
                         continue;
 
-                    int dayOfStart = isApprovedSunday ? 0 : (int)approveDate.DayOfWeek;
+                    int dayOfStart;
+                    if (!isApprovedSunday && approvedDateSunday == rec.Date.AddDays(-1))
+                        dayOfStart = (int)approveDate.DayOfWeek;
+                    else
+                        dayOfStart = 0;
 
                     search._Employee = rec.Employee;
                     search._Date = rec.Date;

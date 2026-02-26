@@ -110,8 +110,7 @@ namespace UnicontaClient.Pages.CustomPage.GL.Vat.UK.Models
             get { return _totalValueSalesExVAT; }
             set
             {
-
-                _totalValueSalesExVAT = value;
+                _totalValueSalesExVAT = Math.Round(value, 0);
                 NotifyPropertyChanged("TotalValueSalesExVAT");
             }
         }

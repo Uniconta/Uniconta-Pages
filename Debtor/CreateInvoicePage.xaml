@@ -38,6 +38,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateInvoicePage"
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="5"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="5"/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="150" />
@@ -93,6 +94,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateInvoicePage"
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="5"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="5"/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="150" />
@@ -136,6 +138,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateInvoicePage"
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="5"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="5"/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="150" />
@@ -179,6 +182,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateInvoicePage"
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="5"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="5"/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="100" />
@@ -240,6 +244,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateInvoicePage"
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="5"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="5"/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="150" />
@@ -371,7 +376,6 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateInvoicePage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim5" Width="70" FieldName="Dimension5" Visible="False"/>
                 </localPage:DebtorOrderLineGrid.Columns>
             </localPage:DebtorOrderLineGrid>
-
         </Grid>
     </CorasauControls:BusyIndicator>
 </Pages:GridBasePage>

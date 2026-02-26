@@ -864,7 +864,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var invoicePostingResult = new InvoicePostingPrintGenerator(api, this);
             invoicePostingResult.SetUpInvoicePosting(dbOrder, lines, CompanyLayoutType.Invoice, generateDate, null, isSimulation, showInvoice, postOnlyDelivered, isQuickPrint, pagePrintCount,
-                invoiceSendByEmail, !isSimulation && invoiceSendByOutlook, sendOnlyToEmail, sendOnlyToEmailList, OIOUBLgenerate, attachedDocs, returnAsPdf);
+                invoiceSendByEmail, invoiceSendByOutlook, sendOnlyToEmail, sendOnlyToEmailList, OIOUBLgenerate, attachedDocs, returnAsPdf);
 
 
             return invoicePostingResult;

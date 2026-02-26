@@ -567,6 +567,10 @@ namespace UnicontaClient.Pages.CustomPage
                     if (api.CompanyEntity._InvoiceUseQtyNowCre)
                         rec.QtyNow = rec._Qty;
                     break;
+                case "Unit":
+                    if (this.PriceLookup != null && this.PriceLookup.UseCustomerPrices)
+                        this.PriceLookup.GetCustomerPrice(rec, false);
+                    break;
                 case "Warehouse":
                     if (warehouse != null)
                     {
@@ -810,13 +814,35 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem?._Item != null)
                         AddDockItem(TabControls.UserNotesPage, selectedItem.InvItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Notes"), selectedItem?.InvItem?._Name));
                     break;
+                case "RecalculateOrderPrices":
+                    RecalculateOrderPrices();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
             RecalculateAmount();
         }
-
+        private void RecalculateOrderPrices()
+        {
+            var orderLst = dgCreditorOrderLineGrid.GetVisibleRows();
+            if (orderLst == null || orderLst.Count == 0)
+                return;
+            CWConfirmationBox dialog = new CWConfirmationBox(Uniconta.ClientTools.Localization.lookup("AreYouSureToContinue"), Uniconta.ClientTools.Localization.lookup("Confirmation"), false);
+            dialog.Closing += async delegate
+            {
+                if (dialog.ConfirmationResult == CWConfirmationBox.ConfirmationResultEnum.Yes)
+                {
+                    busyIndicator.IsBusy = true;
+                    var err = await new OrderAPI(this.api).RecalcOrderPrices(new[] { orderMaster });
+                    busyIndicator.IsBusy = false;
+                    UtilDisplay.ShowErrorCode(err);
+                    if (err == ErrorCodes.Succes)
+                        RefreshGrid();
+                }
+            };
+            dialog.Show();
+        }
         async void UnfoldBOM(CreditorOrderLineClient selectedItem, bool usePriceFromBOM)
         {
             var items = this.items;
@@ -1074,7 +1100,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                     var isSimulated = GenrateInvoiceDialog.IsSimulation;
                     var invoicePostingResult = SetupInvoicePostingPrintGenerator(dbOrder, GenrateInvoiceDialog.GenrateDate, GenrateInvoiceDialog.InvoiceNumber, isSimulated, GenrateInvoiceDialog.ShowInvoice,
-                        GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.NumberOfPages, GenrateInvoiceDialog.SendByOutlook, GenrateInvoiceDialog.sendOnlyToThisEmail, GenrateInvoiceDialog.Emails);
+                        GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.NumberOfPages, GenrateInvoiceDialog.SendByEmail, GenrateInvoiceDialog.SendByOutlook, GenrateInvoiceDialog.sendOnlyToThisEmail, GenrateInvoiceDialog.Emails);
                     invoicePostingResult.SetAdditionalOrders(GenrateInvoiceDialog.AdditionalOrders?.Cast<DCOrder>().ToList());
                     invoicePostingResult.SetDocumentRef(GenrateInvoiceDialog.PhysicalVoucherRef);
                     if (api.CompanyEntity.AllowSkipCreditMax)
@@ -1112,17 +1138,17 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         private InvoicePostingPrintGenerator SetupInvoicePostingPrintGenerator(CreditorOrderClient crOrder, DateTime generateDate, string invoiceNumber, bool isSimulated, bool showInvoice,
-            bool isQuickPrint, int printPageCount, bool sendInvoiceByOutlook, bool sendOnlyToEmail, string SendOnlyEmailList)
+            bool isQuickPrint, int printPageCount, bool sendByEmail, bool sendInvoiceByOutlook, bool sendOnlyToEmail, string SendOnlyEmailList)
         {
             var invoicePostingResult = new InvoicePostingPrintGenerator(api, this);
             invoicePostingResult.SetUpInvoicePosting(crOrder, null, CompanyLayoutType.PurchaseInvoice, generateDate, invoiceNumber, isSimulated, showInvoice,
-                        false, isQuickPrint, printPageCount, false, sendInvoiceByOutlook, sendOnlyToEmail, SendOnlyEmailList, false, null, false);
+                        false, isQuickPrint, printPageCount, sendByEmail, sendInvoiceByOutlook, sendOnlyToEmail, SendOnlyEmailList, false, null, false);
             return invoicePostingResult;
         }
 
         async private void ShowProformaInvoice(CreditorOrderClient crOrder)
         {
-            var invoicePostingResult = SetupInvoicePostingPrintGenerator(crOrder, DateTime.Now, null, true, true, false, 0, false, false, null);
+            var invoicePostingResult = SetupInvoicePostingPrintGenerator(crOrder, DateTime.Now, null, true, true, false, 0, false, false, false, null);
             invoicePostingResult.SetAllowCreditMax(api.CompanyEntity.AllowSkipCreditMax);
 
             busyIndicator.IsBusy = true;

@@ -31,7 +31,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateIntraStatFilePage"
                 <ColumnDefinition Width="170"/>
                 <ColumnDefinition Width="90"/>
                 <ColumnDefinition Width="70"/>
-                <ColumnDefinition Width="170"/>
+                <ColumnDefinition Width="180"/>
             </Grid.ColumnDefinitions>
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FromDate}" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center"/>
             <CorasauControls:DateEditor x:Name="txtDateFrm" Grid.Column="1" Grid.Row="0" Height="23" />
@@ -47,7 +47,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateIntraStatFilePage"
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Group}" Margin="10,0,5,0" Grid.Column="3" Grid.Row="0" VerticalAlignment="Center"/>
             <CorasauControls:DimComboBoxEditor x:Name="cmbExportGroup" Grid.Column="4" Grid.Row="0" IsTextEditable="False" SelectedIndexChanged="cmbExportGroup_SelectedIndexChanged" />
 
-            <TextBlock x:Name="lbVIESCheck" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CheckVIES}" Margin="10,0,5,0" Grid.Row="1" Grid.Column="3" Grid.ColumnSpan="2" VerticalAlignment="Center"></TextBlock>
+            <TextBlock x:Name="lbVIESCheck" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=VatNumberValidationService}" Margin="10,0,5,0" Grid.Row="1" Grid.Column="3" Grid.ColumnSpan="2" VerticalAlignment="Center"></TextBlock>
             <CorasauControls:CheckEditor Grid.Row="1" x:Name="checkVIES" Grid.Column="4" Height="23" HorizontalAlignment="Right" VerticalAlignment="Center" Checked="CheckVIES_Reaction" Unchecked="CheckVIES_Reaction"></CorasauControls:CheckEditor>
 
         </Grid>
@@ -60,6 +60,8 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateIntraStatFilePage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="TransType" FieldName="TransType" Width="75" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DCAccount" FieldName="DCAccount" Width="90" ReadOnly="True" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AccountName" FieldName="AccountName" Width="90" ReadOnly="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DebtorVIESDate" ReadOnly="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DebtorVIESStatus" ReadOnly="True" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DebtorRegNo" Width="150" Visible="False" ReadOnly="True" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="IsTriangularTrade" FieldName="IsTriangularTrade" Width="50" ReadOnly="True" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Country" FieldName="Country" Width="80" ReadOnly="True" />

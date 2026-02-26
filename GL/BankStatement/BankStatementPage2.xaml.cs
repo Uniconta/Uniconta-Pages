@@ -55,7 +55,7 @@ namespace UnicontaClient.Pages.CustomPage
         void InitPage(CrudAPI crudapi)
         {
             layoutControl = layoutItems;
-            leAccount.api = lkJournal.api = cmbDim1.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api = crudapi;
+            leAccount.api = lkJournal.api = lkAutoPostJournal.api = cmbDim1.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api = crudapi;
             if (crudapi.CompanyEntity.NumberOfDimensions == 0)
                 usedim.Visibility = Visibility.Collapsed;
             else
@@ -63,8 +63,8 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (LoadedRow == null)
             {
-                frmRibbon.DisableButtons( "Delete" );
-                editrow =CreateNew() as BankStatementClient;
+                frmRibbon.DisableButtons("Delete");
+                editrow = CreateNew() as BankStatementClient;
                 editrow._DaysSlip = 3;
                 editrow._BankAsOffset = true;
                 editrow._BankConnect2Journal = false;
@@ -85,11 +85,11 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "Save":
-                    if(editrow.BankConnect2Journal == true && string.IsNullOrWhiteSpace(lkJournal.Text))
+                    if (editrow.BankConnect2Journal == true && string.IsNullOrWhiteSpace(lkJournal.Text))
                     {
-                        var errTxt = string.Format("{0} ({1}: {2})",Uniconta.ClientTools.Localization.lookup("FieldCannotBeEmpty"),
+                        var errTxt = string.Format("{0} ({1}: {2})", Uniconta.ClientTools.Localization.lookup("FieldCannotBeEmpty"),
                          Uniconta.ClientTools.Localization.lookup("Field"), Uniconta.ClientTools.Localization.lookup("Journal"));
-                         UnicontaMessageBox.Show(errTxt, string.Concat(Uniconta.ClientTools.Localization.lookup("Error"), " - ", string.Concat(Uniconta.ClientTools.Localization.lookup("BankConnect"))));
+                        UnicontaMessageBox.Show(errTxt, string.Concat(Uniconta.ClientTools.Localization.lookup("Error"), " - ", string.Concat(Uniconta.ClientTools.Localization.lookup("BankConnect"))));
                         return;
                     }
                     if (!editMode)

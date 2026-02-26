@@ -14,7 +14,8 @@
       <!---If we want Inner menu-->
       <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
       <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16" ShortcutKey="" />
-      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
+			<RibbonItem Action="AddExpressionColumn" LocalizedNameKey="AddOBJ" Parameter="CalculationExpression" Glyph="Accountant_16x16" ShortcutKey="" />
+      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" EnableSeperator="True" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
       <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16" ShortcutKey=""/>
       <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16" ShortcutKey="CTRL+U"/>
       <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16" LargeGlyph="ExportLayout_16x16" ShortcutKey=""/>
@@ -23,8 +24,8 @@
     </RibbonItem>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="GLDailyJournalLine" LocalizedNameKey="Journallines" ControlName="GL_DailyJournalLine" Glyph="Cover_16x16" LargeGlyph="Journal_Lines_Highlighted_32x32" ShortcutKey="ALT+L"/>
-    <RibbonItem Action="GLDailyJournalPosted" LocalizedNameKey="PostedJournals" ControlName="PostedJournals" Glyph="Cover_16x16" LargeGlyph="Posted_Journal_32x32" />
+    <RibbonItem Action="GLDailyJournalLine" LocalizedNameKey="Journallines" ControlName="GL_DailyJournalLine" LargeGlyph="Journal_Lines_Highlighted_32x32" ShortcutKey="ALT+L"/>
+    <RibbonItem Action="GLDailyJournalPosted" LocalizedNameKey="PostedJournals" ControlName="PostedJournals" LargeGlyph="Posted_Journal_32x32" />
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="MatchVoucherToLines" LocalizedNameKey="MatchVoucherToLines" ControlName="MatchPhysicalVoucherToGLDailyJournalLines" LargeGlyph="Match_32x32" />

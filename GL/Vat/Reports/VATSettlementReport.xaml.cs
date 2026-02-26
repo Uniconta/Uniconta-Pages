@@ -15,7 +15,7 @@ namespace UnicontaClient.Pages.CustomPage
     /// <summary>
     /// Interaction logic for VATSettlementReport.xaml
     /// </summary>
-    public partial class VATSettlementReport : BasePage
+    public partial class VATSettlementReport : ControlBasePage
     {
         public override string NameOfControl
         {

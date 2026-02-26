@@ -5,7 +5,7 @@
     <RibbonItem Action="AddTask" LocalizedNameKey="AddOBJ" Parameter="Task" Glyph="Add_16x16" LargeGlyph="Add_32x32"/>
     <RibbonItem Action="EditTask" LocalizedNameKey="EditOBJ" Parameter="Task" Glyph="Edit_16x16" LargeGlyph="Edit_32x32"/>
     <RibbonItem Action="DeleteTask"  LocalizedNameKey="DeleteOBJ" Parameter="Task" Glyph="Delete_16x16" LargeGlyph="Delete_32x32"/>
-    <RibbonItem Action="Cancel" LocalizedNameKey="Cancel" Glyph="close-16x16" LargeGlyph="close-32x32"/>
+    <RibbonItem Action="Cancel" LocalizedNameKey="Cancel" Glyph="Close_16x16" LargeGlyph="close-32x32"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="Backward" LocalizedNameKey="Backward"   LargeGlyph="Back_32x32"/>

@@ -209,7 +209,11 @@ namespace UnicontaClient.Pages.CustomPage
                 var count = packNotelist.Count;
                 string dockName = null, reportName = null;
                 bool exportAsPdf = false;
+#if MAC
+                Microsoft.Win32.OpenFolderDialog folderDialogSaveInvoice = null;
+#else
                 DevExpress.Xpf.Dialogs.DXFolderBrowserDialog folderDialogSaveInvoice = null;
+#endif
                 hasLookups = false;
                 if (count > 1)
                 {
@@ -246,10 +250,18 @@ namespace UnicontaClient.Pages.CustomPage
                                     folderDialogSaveInvoice = UtilDisplay.LoadFolderBrowserDialog;
                                     var dialogResult = folderDialogSaveInvoice.ShowDialog();
                                     if (dialogResult == true)
+#if MAC
+                                        directoryPath = folderDialogSaveInvoice.FolderName;
+#else
                                         directoryPath = folderDialogSaveInvoice.SelectedPath;
+#endif
                                 }
                                 else
+#if MAC
+                                    directoryPath = folderDialogSaveInvoice.FolderName;
+#else
                                     directoryPath = folderDialogSaveInvoice.SelectedPath;
+#endif
 
                                 Utilities.Utility.ExportReportAsPdf(printreport.Report, directoryPath, docName, docNumber);
                             }
@@ -323,7 +335,7 @@ namespace UnicontaClient.Pages.CustomPage
             var isInitializedSuccess = await creditorPrint.InstantiateFields();
             if (isInitializedSuccess)
             {
-                var standardCreditorInvoice = new CreditorStandardReportClient(creditorPrint.Company, creditorPrint.Creditor, creditorPrint.CreditorInvoice, creditorPrint.InvTransInvoiceLines, creditorPrint.CreditorOrder,
+                var standardCreditorInvoice = new CreditorStandardReportClient(creditorPrint.Company, creditorPrint.Creditor, creditorPrint.CreditorInvoice, creditorPrint.CreditorInvoiceLines, creditorPrint.CreditorOrder,
                     creditorPrint.CompanyLogo, creditorPrint.ReportName, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.PurchasePackNote, creditorPrint.CreditorMessage);
 
                 var standardReports = new[] { standardCreditorInvoice };

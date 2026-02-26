@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -87,7 +88,7 @@ namespace UnicontaClient.Pages.CustomPage.Attachments
             }
         }
 
-        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        private async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             if (folderCache == null)
                 return;
@@ -101,30 +102,33 @@ namespace UnicontaClient.Pages.CustomPage.Attachments
                 UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("Invalid"), Uniconta.ClientTools.Localization.lookup("Error"));
                 return;
             }
-            ErrorCodes result = ErrorCodes.NoSucces;
+            Task<ErrorCodes> result = null;
             switch (Action)
             {
                 case 0:
                     var folderClient = new DocumentFolderClient();
                     folderClient._Name = FolderName;
-                    result = api.Insert(folderClient).GetAwaiter().GetResult();
+                    result = api.Insert(folderClient);
                     break;
                 case 1:
                     if (folder != null)
                     {
                         folder._Name = FolderName;
-                        result = api.Update(folder).GetAwaiter().GetResult();
+                        result = api.Update(folder);
                     }
                     break;
                 case 2:
                     if (folder != null)
-                        result = api.Delete(folder).GetAwaiter().GetResult();
+                        result = api.Delete(folder);
                     break;
             }
 
-            if (result != ErrorCodes.Succes)
-                Uniconta.ClientTools.Util.UtilDisplay.ShowErrorCode(result);
-
+            if (result != null)
+            {
+                var res = await result;
+                if (res != ErrorCodes.Succes)
+                    Uniconta.ClientTools.Util.UtilDisplay.ShowErrorCode(res);
+            }
             SetDialogResult(true);
         }
 

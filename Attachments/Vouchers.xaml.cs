@@ -243,7 +243,7 @@ namespace UnicontaClient.Pages.CustomPage
                     menuToRemove = new string[2]
                     {
                         "Bilagscan",
-                        api.CompanyEntity._AutoScanVoucher ? "UnicontaScan" : ""
+                        api.CompanyEntity._AutoScanVoucher ? "DocumentScanUpload" : ""
                     };
                     break;
             }
@@ -1030,6 +1030,10 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         AddDockItem(TabControls.AccountsTransaction, dgVoucherGrid.SelectedItem, string.Format("{0}: {1}", Localization.lookup("Transactions"), selectedItem.RowId));
                     break;
+                case "CorrectScannedData":
+                    if (selectedItem != null)
+                        CorrectScannedData(selectedItem);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -1174,7 +1178,7 @@ namespace UnicontaClient.Pages.CustomPage
                     fileExt != FileextensionsTypes.MHT && fileExt != FileextensionsTypes.ODT && fileExt != FileextensionsTypes.JPEG &&
                     fileExt != FileextensionsTypes.PNG && fileExt != FileextensionsTypes.MSG && fileExt != FileextensionsTypes.EML)
                 {
-                    UnicontaMessageBox.Show(Localization.lookup("ConversionNotSupport"),Localization.lookup("Information"));
+                    UnicontaMessageBox.Show(Localization.lookup("ConversionNotSupport"), Localization.lookup("Information"));
                     return;
                 }
 
@@ -1373,28 +1377,28 @@ namespace UnicontaClient.Pages.CustomPage
                 cwJoinPdfDoc = new CWJoinPDFDocument();
 
             cwJoinPdfDoc.Closed += delegate
-             {
-                 if (cwJoinPdfDoc.DialogResult == true)
-                 {
-                     var mergedContents = cwJoinPdfDoc.MergedPDFContents;
-                     var deleteMsg = string.Empty;
+            {
+                if (cwJoinPdfDoc.DialogResult == true)
+                {
+                    var mergedContents = cwJoinPdfDoc.MergedPDFContents;
+                    var deleteMsg = string.Empty;
 
-                     if (cwJoinPdfDoc.IsLeftPdfDelete)
-                         deleteMsg = string.Format(Localization.lookup("ConfirmDeleteOBJ"), string.Format("{0} {1}",
-                             Localization.lookup("Left"), Localization.lookup("Voucher")));
-                     else if (cwJoinPdfDoc.IsRightPdfDelete)
-                         deleteMsg = string.Format(Localization.lookup("ConfirmDeleteOBJ"), string.Format("{0} {1}",
-                            Localization.lookup("Right"), Localization.lookup("Voucher")));
+                    if (cwJoinPdfDoc.IsLeftPdfDelete)
+                        deleteMsg = string.Format(Localization.lookup("ConfirmDeleteOBJ"), string.Format("{0} {1}",
+                            Localization.lookup("Left"), Localization.lookup("Voucher")));
+                    else if (cwJoinPdfDoc.IsRightPdfDelete)
+                        deleteMsg = string.Format(Localization.lookup("ConfirmDeleteOBJ"), string.Format("{0} {1}",
+                           Localization.lookup("Right"), Localization.lookup("Voucher")));
 
-                     var deleteVoucher = !string.IsNullOrEmpty(deleteMsg) && voucher1.RowId > 0 && UnicontaMessageBox.Show(deleteMsg, Localization.lookup("Warning"), MessageBoxButton.YesNo)
-                            == MessageBoxResult.Yes ? true : false;
+                    var deleteVoucher = !string.IsNullOrEmpty(deleteMsg) && voucher1.RowId > 0 && UnicontaMessageBox.Show(deleteMsg, Localization.lookup("Warning"), MessageBoxButton.YesNo)
+                           == MessageBoxResult.Yes ? true : false;
 
-                     if (cwJoinPdfDoc.IsLeftJoin)
-                         UpdateJoinedPDFContents(voucher1, voucher2, mergedContents, deleteVoucher);
-                     else
-                         UpdateJoinedPDFContents(voucher2, voucher1, mergedContents, deleteVoucher);
-                 }
-             };
+                    if (cwJoinPdfDoc.IsLeftJoin)
+                        UpdateJoinedPDFContents(voucher1, voucher2, mergedContents, deleteVoucher);
+                    else
+                        UpdateJoinedPDFContents(voucher2, voucher1, mergedContents, deleteVoucher);
+                }
+            };
 
             cwJoinPdfDoc.Show();
         }
@@ -1530,8 +1534,27 @@ namespace UnicontaClient.Pages.CustomPage
                             voucher._Uid = selectedItem._Uid;
                             voucher._Created = selectedItem._Created;
                             voucher._Content = selectedItem._Content;
-                            voucher._ScanDoc = true;
-                            voucher._SentToScanner = false;
+
+                            if (api.CompanyEntity.DocumentScanner != PayableDocumentScanners.None &&
+                                api.CompanyEntity._AutoScanVoucher)
+                            {
+                                voucher._ScanDoc = true;
+                                voucher._Reference = null;
+                                voucher._Invoice = null;
+                                voucher._DocumentDate = DateTime.MinValue;
+                                voucher._PostingDate = DateTime.MinValue;
+                                voucher._DueDate = DateTime.MinValue;
+                                voucher._PayDate = DateTime.MinValue;
+                                voucher._Currency = 0;
+                                voucher._Amount = 0;
+                                voucher._CreditorAccount = null;
+                                voucher._PaymentId = null;
+                                voucher._PaymentMethod = 0;
+                                voucher._PurchaseNumber = 0;
+                                voucher._Content = 0;
+                                voucher._SentToScanner = false;
+                            }
+
                             // voucher._NoCompress = true;
                             voucherClients[iVoucher++] = voucher;
                             size += voucher._Data.Length;
@@ -1866,6 +1889,26 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             return orgNo;
+        }
+
+        private async void CorrectScannedData(VouchersClient voucher)
+        {
+            if (!voucher.SentToScanner)
+            {
+                UnicontaMessageBox.Show(Localization.lookup("NotSentToScanner"), Localization.lookup("Error"), MessageBoxButton.OK);
+                return;
+            }
+            busyIndicator.IsBusy = true;
+
+            var cw = new CWCorrectScannedData(voucher, api);
+            cw.Closed += delegate
+            {
+                if (cw.SaveSucceeded == true)
+                    CreditorCacheReload(true);
+            };
+
+            cw.Show();
+            busyIndicator.IsBusy = false;
         }
 
         private void Save(bool saveGridData = true)

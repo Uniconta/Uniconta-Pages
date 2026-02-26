@@ -21,23 +21,28 @@ x:Class="UnicontaClient.Pages.CustomPage.InvPackagingProductPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Category">
                         <local:CorasauDataGridTemplateColumnClient.CellTemplate>
                             <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" SelectedItem="{Binding DataContext.RowData.Row.Category,Mode=TwoWay}" ItemsSource="{Binding DataContext.RowData.Row.CategorySource,Mode= OneWay,RelativeSource={RelativeSource TemplatedParent}, UpdateSourceTrigger=PropertyChanged}" GotFocus="PART_Editor_GotFocus"/>
+                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" SelectedItem="{Binding DataContext.RowData.Row.Category,Mode=TwoWay}" ItemsSource="{Binding DataContext.RowData.Row.CategorySource,Mode= OneWay,RelativeSource={RelativeSource TemplatedParent}, UpdateSourceTrigger=PropertyChanged}" GotFocus="Category_GotFocus"/>
                             </DataTemplate>
                         </local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                        <!--<local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
-                            <ControlTemplate>
-                                <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Category,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" />
-                            </ControlTemplate>
-                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>-->
                     </local:CorasauDataGridTemplateColumnClient>
-                    <local:ComboBoxColumnClient x:Name="PackagingType"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PackagingType">
+                        <local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" SelectedItem="{Binding DataContext.RowData.Row.PackagingType,Mode=TwoWay}" ItemsSource="{Binding DataContext.RowData.Row.TypeSource,Mode= OneWay,RelativeSource={RelativeSource TemplatedParent}, UpdateSourceTrigger=PropertyChanged}" GotFocus="Type_GotFocus"/>
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
                     <local:ComboBoxColumnClient x:Name="WasteSorting" />
                     <local:ComboBoxColumnClient x:Name="PackagingRateLevel" />
                     <local:ComboBoxColumnClient x:Name="PackagingConsumer" />
                     <local:ComboBoxColumnClient x:Name="PrimaryKeyId" Width="60" Visible="false" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Qty" Width="80" AllowThousandMask="True"  Mask="#######0.########"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Unit" Width="50" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Qty" AllowThousandMask="True" Mask="N4"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Text" Width="300" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PriceBusiness" AllowThousandMask="True"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PriceTotalBusiness" AllowThousandMask="True"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PriceHousehold" AllowThousandMask="True"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PriceTotalHousehold" AllowThousandMask="True"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Text" Width="250" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="NoReporting" />
                 </local:InvPackagingProductPageGrid.Columns>
             </local:InvPackagingProductPageGrid>

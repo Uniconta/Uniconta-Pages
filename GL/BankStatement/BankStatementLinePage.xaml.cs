@@ -115,6 +115,12 @@ namespace UnicontaClient.Pages.CustomPage
                 fromDate = firstDayOfMonth.AddMonths(-2);
             }
 
+            if (master != null && fromDate < master._StartDate)
+            {
+                fromDate = master._StartDate;
+                toDate = fromDate.AddMonths(1).AddDays(-1);
+            }
+
             dgBankStatementLine.api = api;
             tranApi = new Uniconta.API.GeneralLedger.ReportAPI(api);
             bankTransApi = new BankStatementAPI(api);
@@ -174,7 +180,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (string.Compare(rec.Name, "Bank", StringComparison.CurrentCultureIgnoreCase) == 0)
                 {
-                    var cache = api.GetCache(typeof(Uniconta.DataModel.BankStatement)) ?? api.LoadCache(typeof(Uniconta.DataModel.BankStatement)).GetAwaiter().GetResult();
+                    var cache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.BankStatement), api);
                     master = (Uniconta.DataModel.BankStatement)cache.Get(rec.Value);
                     if (master != null)
                         UpdateMaster();
@@ -182,7 +188,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             base.SetParameter(Parameters);
         }
-
+        public override bool FilterOnLoadLayout => false;
         public override void PageClosing()
         {
             if (dgBankStatementLine.IsAutoSave && IsDataChaged)
@@ -1080,7 +1086,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     master._Journal = winTransfer.Journal;
                     PostingAPI pApi = new PostingAPI(api);
-                    var res = await pApi.TransferBankStatementToJournal(master, winTransfer.FromDate, winTransfer.ToDate, winTransfer.BankAsOffset, winTransfer.isMarkLine, winTransfer.HasPhysicalVoucher, winTransfer.AddVoucherNumber);
+                    var res = await pApi.TransferBankStatementToJournal(master, winTransfer.FromDate, winTransfer.ToDate, winTransfer.BankAsOffset, winTransfer.isMarkLine, winTransfer.HasPhysicalVoucher, winTransfer.AddVoucherNumber, winTransfer.LineWithAutoPost);
                     if (res == ErrorCodes.Succes)
                     {
                         string strmsg = string.Format("{0}; {1}! {2} ?", Localization.lookup("GenerateJournalLines"), Localization.lookup("Completed"),

@@ -90,8 +90,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void InitPage()
         {
-            this.DataContext = this;
             InitializeComponent();
+            this.DataContext = this;
             SetRibbonControl(localMenu, dgInvJournalLine);
             dgInvJournalLine.api = api;
             dgInvJournalLine.BusyIndicator = busyIndicator;
@@ -117,7 +117,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (string.Compare(rec.Name, "Journal", StringComparison.CurrentCultureIgnoreCase) == 0)
                 {
-                    var cache = api.GetCache(typeof(Uniconta.DataModel.InvJournal)) ?? api.LoadCache(typeof(Uniconta.DataModel.InvJournal)).GetAwaiter().GetResult();
+                    var cache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.InvJournal), api);
                     journal = (Uniconta.DataModel.InvJournal)cache.Get(rec.Value);
                     if (journal != null)
                     {

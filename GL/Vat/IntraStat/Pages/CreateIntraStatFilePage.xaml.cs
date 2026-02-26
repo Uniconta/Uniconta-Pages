@@ -4,12 +4,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
+using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
-using UnicontaClient.Models;
 using Uniconta.API.Service;
 using Uniconta.ClientTools;
 using Uniconta.ClientTools.Controls;
@@ -17,15 +18,11 @@ using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
-using Uniconta.DataModel;
-using Uniconta.API.System;
 using Uniconta.Common.Enums;
-using Uniconta.Common.Utility;
-using Localization = Uniconta.ClientTools.Localization;
+using Uniconta.DataModel;
+using UnicontaClient.Models;
 using static UnicontaClient.Pages.CreateIntraStatFilePage;
-using System.IO;
-using System.Text.RegularExpressions;
-using System.Reflection;
+using Localization = Uniconta.ClientTools.Localization;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -133,7 +130,9 @@ namespace UnicontaClient.Pages.CustomPage
                     if (listIntraStat != null)
                         CreateFile();
                     break;
-
+                case "VIESLog": 
+                    AddDockItem(TabControls.DebtorFieldLogPage, dgIntraStatGrid.syncEntity, true, "Log", null, new System.Windows.Point(180, 280));
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -253,7 +252,7 @@ namespace UnicontaClient.Pages.CustomPage
             return dictionaryColumnIndices;
         }
       
-        private void CreateFile()
+        private async void CreateFile()
         {
             if (compressed == false)
             {
@@ -261,7 +260,7 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
             }
 
-            var intralst = CallValidate(false);
+            var intralst = await CallValidate(false);
             if (intralst == null)
                 return;
             
@@ -577,7 +576,7 @@ namespace UnicontaClient.Pages.CustomPage
             return intraHelper.PreValidate();
         }
 
-        private IEnumerable<IntrastatClient> CallValidate(bool onlyValidate)
+        private async Task<IEnumerable<IntrastatClient>> CallValidate(bool onlyValidate)
         {
             if (!CallPrevalidate())
                 return null;
@@ -589,7 +588,7 @@ namespace UnicontaClient.Pages.CustomPage
             busyIndicator.IsBusy = true;
 
             var intralst = (IEnumerable<IntrastatClient>)dgIntraStatGrid.GetVisibleRows();
-            intraHelper.Validate(intralst, compressed, onlyValidate);
+            await intraHelper.Validate(intralst, compressed, onlyValidate);
             busyIndicator.IsBusy = false;
 
             if (onlyValidate)
@@ -647,7 +646,6 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void CheckVIES_Reaction(object sender, RoutedEventArgs e)
         {
-            intraHelper.ClearVIESCache();
             DefaultVIES = checkVIES.IsChecked.GetValueOrDefault();
             intraHelper.validateVIES = DefaultVIES;
         }
@@ -794,6 +792,14 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
         }
+
+        [Display(Name = "VIESDate", ResourceType = typeof(DCAccountText))]
+        public DateTime? VIESDate { get { return Debtor?.VIESDate; } }
+
+
+        [Display(Name = "VIESStatus", ResourceType = typeof(DCAccountText))]
+        public string DebtorVIESStatus { get { return Debtor?.VIESStatus; } }
+
 
         private string _debtorRegNoVIES;
         [Display(Name = "DebtorRegNoVIES", ResourceType = typeof(IntrastatClassText))]

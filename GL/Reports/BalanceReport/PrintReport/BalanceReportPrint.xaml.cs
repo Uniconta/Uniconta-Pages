@@ -29,7 +29,7 @@ using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
 
-    public partial class BalanceReportPrint : BasePage
+    public partial class BalanceReportPrint : ControlBasePage
     {
         public string PrintBalanceReportPageFormat;
         public override object GetPrintParameter()
@@ -100,7 +100,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (frontPageReport is DevExpress.XtraReports.UI.XtraReport)
                 {
-                    var balanceFrontPageList = StandardPrintReportPage.AssignWatermark(frontPageReport as DevExpress.XtraReports.UI.XtraReport);
+                    var balanceFrontPageList = StandardPrintReportPage.AssignWatermarks(frontPageReport as DevExpress.XtraReports.UI.XtraReport);
                     ps.Pages.AddRange(balanceFrontPageList);
                 }
                 else

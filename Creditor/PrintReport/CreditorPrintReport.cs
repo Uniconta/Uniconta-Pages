@@ -9,28 +9,36 @@ using Uniconta.DataModel;
 using Uniconta.Reports.Utilities;
 using Uniconta.Common.Utility;
 using UnicontaClient.Utilities;
+using System.Collections.Generic;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
-    public class CreditorPrintReport
+    /// <summary>
+    /// Class to Initialize before Printing the any purchase document
+    /// </summary>
+    public class CreditorPrintReport : PrintReportBaseClient<CreditorInvoiceClient, CreditorInvoiceLines, CreditorOrderClient>
     {
+        #region Properties
+
         public CreditorClient Creditor { get; private set; }
-        public CompanyClient Company { get; private set; }
-        public CreditorInvoiceClient CreditorInvoice { get; private set; }
-        public InvTransInvoice[] InvTransInvoiceLines { get; private set; }
-        public byte[] CompanyLogo { get; private set; }
+        public CreditorInvoiceClient CreditorInvoice { get { return PrintHeader; } }
+        public InvTransInvoice[] CreditorInvoiceLines { get { return PrintLines; } } 
         public string ReportName { get; private set; }
         public CreditorOrderClient CreditorOrder { get; private set; }
         public bool IsCreditNote { get; private set; }
         public string CreditorMessage { get; private set; }
-        
-        private bool isRePrint;
-        private readonly CrudAPI crudApi;
-        private InvoicePostingResult invoicePostingResult;
-        private CompanyLayoutType layoutType;
+
+        #endregion
+
+        #region Fields
+
         private DebtorMessagesClient[] debtorMessageLookup;
-        private bool isMultiInvoice;
+        private bool isMultiInvoicePrint;
+
+        #endregion
+
+        #region Constructor
 
         /// <summary>
         /// Initialization for Post invoice
@@ -38,12 +46,9 @@ namespace UnicontaClient.Pages.CustomPage
         /// <param name="invPostingResult">Result from postinvoice</param>
         /// <param name="api">Api instacce</param>
         /// <param name="companyLayoutType">Layout type</param>
-        public CreditorPrintReport(InvoicePostingResult invPostingResult, CrudAPI api, CompanyLayoutType companyLayoutType)
+        public CreditorPrintReport(InvoicePostingResult invPostingResult, CrudAPI api, CompanyLayoutType companyLayoutType) : base(invPostingResult, api, companyLayoutType)
         {
-            invoicePostingResult = invPostingResult;
-            crudApi = api;
-            isRePrint = true;
-            layoutType = companyLayoutType;
+
         }
 
         /// <summary>
@@ -52,12 +57,9 @@ namespace UnicontaClient.Pages.CustomPage
         /// <param name="creditorInvoiceClient">Invoice client </param>
         /// <param name="api">Api instance</param>
         /// <param name="companyLayoutType">Layout type</param>
-        public CreditorPrintReport(CreditorInvoiceClient creditorInvoiceClient, CrudAPI api, CompanyLayoutType companyLayoutType = CompanyLayoutType.PurchaseInvoice)
+        public CreditorPrintReport(CreditorInvoiceClient creditorInvoiceClient, CrudAPI api, CompanyLayoutType companyLayoutType = CompanyLayoutType.PurchaseInvoice) : base(creditorInvoiceClient, api, companyLayoutType)
         {
-            CreditorInvoice = creditorInvoiceClient;
-            crudApi = api;
-            isRePrint = false;
-            layoutType = companyLayoutType;
+
         }
 
         /// <summary>
@@ -67,134 +69,14 @@ namespace UnicontaClient.Pages.CustomPage
         /// <param name="api">Api instance</param>
         /// <param name="companyLayoutType">Layout type</param>
         /// <param name="orderClient">Creditor Order client instance</param>
-        public CreditorPrintReport(InvoicePostingResult postingResult, CrudAPI api, CompanyLayoutType companyLayoutType, CreditorOrderClient orderClient) : this(postingResult, api, companyLayoutType)
+        public CreditorPrintReport(InvoicePostingResult postingResult, CrudAPI api, CompanyLayoutType companyLayoutType, CreditorOrderClient orderClient) : base(postingResult, api, companyLayoutType, orderClient)
         {
-            CreditorOrder = orderClient;
+
         }
 
-        async public Task<bool> InstantiateFields()
-        {
-            try
-            {
-                var crudApi = this.crudApi;
-                var Comp = crudApi.CompanyEntity;
-                var creditorInvoiceLineUserType = ReportUtil.GetUserType(typeof(CreditorInvoiceLines), Comp);
-                var creditorInvoiceUserType = ReportUtil.GetUserType(typeof(CreditorInvoiceClient), Comp);
-                if (!isRePrint)
-                {
-                    var invApi = new InvoiceAPI(crudApi);
-                    var invoiceLIneInstance = Activator.CreateInstance(creditorInvoiceLineUserType) as CreditorInvoiceLines;
-#if !UNIREPORT
-                    InvTransInvoiceLines = (CreditorInvoiceLines[])await invApi.GetInvoiceLines(CreditorInvoice, invoiceLIneInstance);
-#else
-                    InvTransInvoiceLines = (CreditorInvoiceLines[])await invApi.GetInvoiceLines(CreditorInvoice, invoiceLIneInstance).ConfigureAwait(false);
-#endif
-                }
-                else
-                {
-                    //for Gettting user firlds for Creditor Invoice
-                    var dcInvoice = (DCInvoiceClient)invoicePostingResult.Header;
-                    CreditorInvoice = new CreditorInvoiceClient();
-                    StreamingManager.Copy(dcInvoice, CreditorInvoice);
+        #endregion
 
-                    var linesCount = invoicePostingResult.Lines.Count();
-                    if (linesCount > 0)
-                    {
-                        var lines = invoicePostingResult.Lines;
-                        InvTransInvoiceLines = Array.CreateInstance(creditorInvoiceLineUserType, linesCount) as CreditorInvoiceLines[];
-                        int i = 0;
-                        foreach (var invtrans in invoicePostingResult.Lines)
-                        {
-                            CreditorInvoiceLines creditorInvoiceLines;
-                            if (invtrans.GetType() != creditorInvoiceLineUserType)
-                            {
-                                creditorInvoiceLines = Activator.CreateInstance(creditorInvoiceLineUserType) as CreditorInvoiceLines;
-                                StreamingManager.Copy(invtrans, creditorInvoiceLines);
-                            }
-                            else
-                                creditorInvoiceLines = invtrans as CreditorInvoiceLines;
-                            InvTransInvoiceLines[i++] = creditorInvoiceLines;
-                        }
-                    }
-                }
-
-                //For Getting User-Fields for CreditorInvoice
-                CreditorInvoiceClient creditorInvoiceClientUser;
-                if (CreditorInvoice.GetType() != creditorInvoiceUserType)
-                {
-                    creditorInvoiceClientUser = Activator.CreateInstance(creditorInvoiceUserType) as CreditorInvoiceClient;
-                    StreamingManager.Copy(CreditorInvoice, creditorInvoiceClientUser);
-                }
-                else
-                    creditorInvoiceClientUser = CreditorInvoice as CreditorInvoiceClient;
-                CreditorInvoice = creditorInvoiceClientUser;
-
-                //for Gettting user fields for Creditor
-                var dcCahce = Comp.GetCache(typeof(Uniconta.DataModel.Creditor)) ?? await crudApi.LoadCache(typeof(Uniconta.DataModel.Creditor));
-                var cred = dcCahce.Get(CreditorInvoice._DCAccount);
-
-                var creditorUserType = ReportUtil.GetUserType(typeof(CreditorClient), Comp);
-                if (creditorUserType != cred?.GetType())
-                {
-                    var creditorClientUser = Activator.CreateInstance(creditorUserType) as CreditorClient;
-                    if (cred != null)
-                        StreamingManager.Copy((UnicontaBaseEntity)cred, creditorClientUser);
-                    Creditor = creditorClientUser;
-                }
-                else
-                    Creditor = cred as CreditorClient;
-
-                if (Comp.Contacts)
-                {
-                    var contactCache = Comp.GetCache(typeof(Contact)) ?? await crudApi.LoadCache(typeof(Contact));
-                    var contactCacheFilter = new ContactCacheFilter(contactCache, Creditor.__DCType(), Creditor._Account);
-                    if (contactCacheFilter.Any())
-                    {
-                        try
-                        {
-                            Creditor.Contacts = contactCacheFilter.Cast<ContactClient>().ToArray();
-                        }
-                        catch { }
-                    }
-                }
-                UtilCommon.SetDeliveryAdress(creditorInvoiceClientUser, Creditor, crudApi);
-
-                /*In case debtor order is null, fill from DCInvoice*/
-                if (CreditorOrder == null)
-                {
-                    CreditorOrder = Comp.GetCache(typeof(Uniconta.DataModel.CreditorOrder))?.Get(NumberConvert.ToStringNull(creditorInvoiceClientUser._OrderNumber)) as CreditorOrderClient;
-                    if (CreditorOrder == null)
-                    {
-                        var creditorOrderUserType = ReportUtil.GetUserType(typeof(CreditorOrderClient), Comp);
-                        var creditorOrderUser = Activator.CreateInstance(creditorOrderUserType) as CreditorOrderClient;
-                        creditorOrderUser.CopyFrom(creditorInvoiceClientUser, Creditor);
-                        CreditorOrder = creditorOrderUser;
-                    }
-                }
-
-                Company = UtilCommon.GetCompanyClientUserInstance(Comp);
-
-                var InvCache = Comp.GetCache(typeof(InvItem)) ?? await crudApi.LoadCache(typeof(InvItem));
-
-                CompanyLogo = await UtilCommon.GetLogo(crudApi);
-
-                Language lang = ReportGenUtil.GetLanguage(Creditor, Comp);
-                InvTransInvoiceLines = LayoutPrintReport.SetInvTransLines(CreditorInvoice, InvTransInvoiceLines, InvCache, crudApi, creditorInvoiceLineUserType, lang, false);
-
-                var lineTotal = CreditorInvoice._LineTotal;
-                IsCreditNote = CreditorInvoice._LineTotal < -0.0001d && layoutType == CompanyLayoutType.PurchaseInvoice;
-                ReportName = IsCreditNote ? "CreditNote" : layoutType.ToString();
-
-                CreditorMessage = isMultiInvoice? LayoutPrintReport.GetDebtorMessageClient(debtorMessageLookup, lang, GetEmailTypeForCreditor())?._Text:
-                    await GetMessageClientText(lang);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                crudApi.ReportException(ex, "Error Occured in CreditorPrintReport");
-                return false;
-            }
-        }
+        #region Methods
 
         /// <summary>
         /// Gets Message Client text    
@@ -232,9 +114,96 @@ namespace UnicontaClient.Pages.CustomPage
         /// <returns></returns>
         public void SetLookUpForMessageClient(DebtorMessagesClient[] debtorMessageClients)
         {
-            isMultiInvoice = true;
+            isMultiInvoicePrint = true;
             if (debtorMessageLookup == null)
                 debtorMessageLookup = debtorMessageClients;
         }
+
+        /// <summary>
+        /// Gets the language for prit
+        /// </summary>
+        /// <returns>Language enum</returns>
+        protected override Language GetLanguage()
+        {
+            return ReportGenUtil.GetLanguage(Creditor, base.Company);
+        }
+
+        /// <summary>
+        /// Sets the Entity
+        /// </summary>
+        /// <returns></returns>
+        async protected override Task SetEntityTask()
+        {
+            try
+            {
+                var Comp = crudApi.CompanyEntity;
+                var creditorUser = Comp.CreateUserType<CreditorClient>();
+
+                var dcCahce = Comp.GetCache(typeof(Uniconta.DataModel.Creditor)) ?? await crudApi.LoadCache(typeof(Uniconta.DataModel.Creditor));
+                var cred = dcCahce.Get(CreditorInvoice._DCAccount) as UnicontaBaseEntity;
+
+                StreamingManager.Copy(cred, creditorUser);
+
+                Creditor = creditorUser;
+            }
+            catch(Exception ex)
+            {
+                crudApi?.ReportException(ex, $"Error Occured in SetEntityTask for SetEntityTask - {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        ///  Method to finalize set action for print
+        /// </summary>
+        /// <returns></returns>
+        async protected override Task FinalizeTask()
+        {
+            try
+            {
+                var Comp = crudApi.CompanyEntity;
+
+                if (Comp.Contacts)
+                {
+                    var contactCache = Comp.GetCache(typeof(Contact)) ?? await crudApi.LoadCache(typeof(Contact));
+                    var contactCacheFilter = new ContactCacheFilter(contactCache, Creditor.__DCType(), Creditor._Account);
+                    if (contactCacheFilter.Any())
+                    {
+                        try
+                        {
+                            Creditor.Contacts = contactCacheFilter.Cast<ContactClient>().ToArray();
+                        }
+                        catch { }
+                    }
+                }
+                UtilCommon.SetDeliveryAdress(CreditorInvoice, Creditor, crudApi);
+
+                /*In case creditor order is null, fill from DCInvoice*/
+                if (CreditorOrder == null)
+                {
+                    CreditorOrder = Comp.GetCache(typeof(Uniconta.DataModel.CreditorOrder))?.Get(NumberConvert.ToStringNull(CreditorInvoice._OrderNumber)) as CreditorOrderClient;
+                    if (CreditorOrder == null)
+                    {
+                        var creditorOrderUserType = ReportUtil.GetUserType(typeof(CreditorOrderClient), Comp);
+                        var creditorOrderUser = Activator.CreateInstance(creditorOrderUserType) as CreditorOrderClient;
+                        creditorOrderUser.CopyFrom(CreditorInvoice, Creditor);
+                        SetOrder(creditorOrderUser);
+                    }
+                }
+
+                //Setting ReportName and Version
+                var lineTotal = CreditorInvoice._LineTotal;
+                IsCreditNote = CreditorInvoice._LineTotal < -0.0001d && layoutType == CompanyLayoutType.PurchaseInvoice;
+                ReportName = IsCreditNote ? "CreditNote" : layoutType.ToString();
+
+                CreditorMessage = isMultiInvoicePrint ? LayoutPrintReport.GetDebtorMessageClient(debtorMessageLookup, GetLanguage(), GetEmailTypeForCreditor())?._Text :
+                    await GetMessageClientText(GetLanguage());
+            }
+            catch(Exception ex)
+            {
+                crudApi?.ReportException(ex, $"Error Occured in FinalizeTask for CreditorPrintReport - {ex.Message}");
+            }
+
+        }
+        #endregion
     }
 }

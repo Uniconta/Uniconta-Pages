@@ -581,8 +581,11 @@ namespace UnicontaClient.Pages.CustomPage
 
         void SendReport(IEnumerable<DebtorTransPayment> dcTransOpenClientlist, string emails = null, bool onlyThisEmail = false)
         {
-            if (dcTransOpenClientlist.Count() > 0)
-                ExecuteDebtorCollection(api, busyIndicator, dcTransOpenClientlist, chkShowCurrency.IsChecked == true, emails, onlyThisEmail, AddInterest);
+            //Filter out on hold transactions
+            var nonHoldDcOpenList = dcTransOpenClientlist.Where(o => o._OnHold == false);
+
+            if (nonHoldDcOpenList.Count() > 0)
+                ExecuteDebtorCollection(api, busyIndicator, nonHoldDcOpenList, chkShowCurrency.IsChecked == true, emails, onlyThisEmail, AddInterest);
         }
 
         static public void ExecuteDebtorCollection(CrudAPI Api, BusyIndicator busyIndicator, IEnumerable<DCTransOpen> dcTransOpenList, bool isCurrencyReport, string emails, bool onlyThisEmail, bool AddInterest)

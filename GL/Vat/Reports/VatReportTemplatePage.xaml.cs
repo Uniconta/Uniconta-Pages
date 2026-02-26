@@ -80,7 +80,7 @@ namespace UnicontaClient.Pages.CustomPage
             e.Data = SapinVatArray;
         }
     }
-    public partial class VatReportTemplatePage : BasePage
+    public partial class VatReportTemplatePage : ControlBasePage
     {
         public override string NameOfControl
         {

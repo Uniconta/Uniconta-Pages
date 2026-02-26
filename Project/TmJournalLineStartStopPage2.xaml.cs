@@ -66,7 +66,6 @@ namespace UnicontaClient.Pages.CustomPage
             StartLoadCache();
             layoutControl = layoutItems;
             leTask.api= leProject.api = lePayrollCategory.api = lePrCategory.api = leWorkSpace.api = leItem.api = crudApi;
-            
             if (LoadedRow == null)
                 frmRibbon.DisableButtons("Delete");
             layoutItems.DataContext = editrow;
@@ -87,6 +86,8 @@ namespace UnicontaClient.Pages.CustomPage
             if (ActionType == "Save" && editrow.RowId==0)
             {
                 TimeFromRounding(editrow);
+                if (string.IsNullOrEmpty(editrow.Text))
+                    editrow.Text = api.CompanyId.ToString();
                 editrow.Date= BasePage.GetSystemDefaultDate();
             }
             frmRibbon_BaseActions(ActionType);

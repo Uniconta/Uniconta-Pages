@@ -62,7 +62,7 @@ namespace UnicontaClient.Pages.CustomPage
             cbCountry.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.CountryCode));
             leAlternativeItem.api = leGroup.api = cmbDim1.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api = cmbPrCategory.api =
                 leBrandGrp.api = leCategoryGrp.api = cmbPayrollCategory.api = cmbPurchaseAccount.api = cmbWarehouse.api = cmbLocation.api =
-                leDiscountGroup.api = leUnitGroup.api = leDutyGroup.api = leStatisticsGroup.api = crudapi;
+                leDiscountGroup.api = leUnitGroup.api = leDutyGroup.api = leStatisticsGroup.api = cmbPackagingModel.api = crudapi;
 
             if (LoadedRow == null)
             {
@@ -243,7 +243,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         bool lookupIsSet;
-        private void liPhoto_LookupButtonClicked(object sender)
+        private async void liPhoto_LookupButtonClicked(object sender)
         {
             var lookupEditor = sender as LookupEditor;
             if (!lookupIsSet)
@@ -252,7 +252,7 @@ namespace UnicontaClient.Pages.CustomPage
                 lookupEditor.ValueMember = "RowId";
                 lookupEditor.SelectedIndexChanged += LookupEditor_SelectedIndexChanged;
                 lookupIsSet = true;
-                lookupEditor.ItemsSource = api.Query<UserDocsClient>(editrow).GetAwaiter().GetResult();
+                lookupEditor.ItemsSource = await api.Query<UserDocsClient>(editrow);
             }
         }
 
@@ -270,7 +270,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         bool isUrlLookupSet;
-        private void liURL_LookupButtonClicked(object sender)
+        private async void liURL_LookupButtonClicked(object sender)
         {
             var lookupUrlEditor = sender as LookupEditor;
             if (!isUrlLookupSet)
@@ -280,7 +280,7 @@ namespace UnicontaClient.Pages.CustomPage
                 lookupUrlEditor.SelectedIndexChanged += LookupUrlEditor_SelectedIndexChanged;
                 isUrlLookupSet = true;
                 var filter = PropValuePair.GenereteWhereElements("DocumentType", FileextensionsTypes.WWW, CompareOperator.Equal);
-                lookupUrlEditor.ItemsSource = api.Query<UserDocsClient>(editrow, new PropValuePair[] { filter }).GetAwaiter().GetResult();
+                lookupUrlEditor.ItemsSource = await api.Query<UserDocsClient>(editrow, new PropValuePair[] { filter });
             }
         }
 
@@ -316,7 +316,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         bool isAttachmentLookupset;
-        private void liInvoiceAttachment_LookupButtonClicked(object sender)
+        private async void liInvoiceAttachment_LookupButtonClicked(object sender)
         {
             var lookupInvAttachmentEditor = sender as LookupEditor;
             if (!isAttachmentLookupset)
@@ -325,7 +325,7 @@ namespace UnicontaClient.Pages.CustomPage
                 lookupInvAttachmentEditor.ValueMember = "RowId";
                 lookupInvAttachmentEditor.SelectedIndexChanged += LookupInvAttachmentEditor_SelectedIndexChanged;
                 isAttachmentLookupset = true;
-                lookupInvAttachmentEditor.ItemsSource = api.Query<UserDocsClient>(editrow).GetAwaiter().GetResult();
+                lookupInvAttachmentEditor.ItemsSource = await api.Query<UserDocsClient>(editrow);
             }
         }
 

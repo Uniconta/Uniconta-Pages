@@ -205,7 +205,16 @@ x:Class="UnicontaClient.Pages.CustomPage.EditCompany"
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="SaveRowIdForRef" x:Name="liSaveRowIdForReference">
                             <CorasauControls:CheckEditor IsChecked="{Binding SaveRowIdForRef,Mode=TwoWay}" />
-                        </CorasauControls:CorasauLayoutItem> 
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="MaxVersion" x:Name="liMaxVersion">
+                            <CorasauControls:IntegerEditor EditValue="{Binding MaxVersion,Mode=TwoWay}" SetMask="False" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="RunNetCore" x:Name="liRunNetCore">
+                            <CorasauControls:CheckEditor x:Name="chkRunNetCore" IsChecked="{Binding RunNetCore,Mode=TwoWay}" Unchecked="CheckEditor_Unchecked"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="RunNetFramework" x:Name="liRunNetFramework">
+                            <CorasauControls:CheckEditor x:Name="chkRunNetFramework" IsChecked="{Binding RunNetFramework,Mode=TwoWay}" Unchecked="CheckEditor_Unchecked" />
+                        </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
 
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=EditCompany}"  Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" MinWidth="420">

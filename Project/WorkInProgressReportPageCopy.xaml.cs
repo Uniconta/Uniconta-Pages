@@ -67,8 +67,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         public WorkInProgressReportPageCopy(BaseAPI API) : base(API, string.Empty)
         {
-            this.DataContext = this;
             InitializeComponent();
+            this.DataContext = this;
             localMenu.dataGrid = dgWorkInProgressRpt;
             dgWorkInProgressRpt.RowDoubleClick += dgWorkInProgressRpt_RowDoubleClick;
             SetRibbonControl(localMenu, dgWorkInProgressRpt);

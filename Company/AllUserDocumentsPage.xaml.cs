@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +13,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Uniconta.API.Service;
 using Uniconta.API.System;
@@ -18,8 +21,9 @@ using Uniconta.ClientTools;
 using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
-using UnicontaClient.Models;
+using Uniconta.ClientTools.Util;
 using Uniconta.Common;
+using UnicontaClient.Models;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -74,7 +78,23 @@ namespace UnicontaClient.Pages.CustomPage
                         ViewDocument(dgDocsGrid.syncEntity, header);
                     }
                     break;
-
+                case "Export":
+                    if (exporting)
+                        return;
+                    string tableName = "All";
+                    if (dgDocsGrid.masterRecord != null)
+                    {
+                        var type = dgDocsGrid.masterRecord.GetType();
+                        var clientTableAttr = type.GetCustomAttributes(typeof(ClientTableAttribute), true);
+                        tableName = type.Name;
+                        if (clientTableAttr.Length > 0)
+                        {
+                            var attr = (ClientTableAttribute)clientTableAttr[0];
+                            tableName = Uniconta.ClientTools.Localization.lookup(attr.LabelKey);
+                        }
+                    }
+                    ExportDocs(tableName);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -99,7 +119,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 docViewer = new DocumentViewerWindow(api, header);
                 docViewer.InitViewer(sourceData);
-                docViewer.Owner = System.Windows.Application.Current.MainWindow;
+                docViewer.Owner = System.Windows.Application.Current.Windows.OfType<NavigationWindow>().FirstOrDefault(w => w.IsActive) ?? System.Windows.Application.Current.MainWindow;
                 docViewer.Closed += delegate { docViewer = null; };
             }
             if (DocumentViewerWindow.lastHeight != 0)
@@ -110,6 +130,58 @@ namespace UnicontaClient.Pages.CustomPage
             if (DocumentViewerWindow.isMaximized)
                 docViewer.WindowState = WindowState.Maximized;
             docViewer.Show();
+        }
+        bool exporting = false;
+        async void ExportDocs(string tableName)
+        {
+            try
+            {
+                exporting = true;
+                busyIndicator.IsBusy = true;
+                var files = new Dictionary<string, byte[]>();
+                foreach (var row in dgDocsGrid.GetVisibleRows())
+                {
+                    if (row is UserDocsClient doc)
+                    {
+                        await api.Read(doc);
+                        var buffer = doc._Data;
+
+                        if (buffer != null && buffer.Length > 0)
+                        {
+                            string fileName = string.Concat(doc.TableId, "_", doc.TableRowId, "_", doc.RowId, "_", doc.KeyStr ?? "", ".", doc._DocumentType.ToString().ToLower());
+                            files[fileName] = buffer;
+                        }
+                    }
+                }
+                var sfd = UtilDisplay.LoadSaveFileDialog;
+                sfd.FileName = string.Concat(tableName,"_Docs.zip");
+                sfd.Filter = UtilFunctions.GetFilteredExtensions(FileextensionsTypes.ZIP);
+                if (sfd.ShowDialog() == true)
+                {
+                    using (var zipStream = new FileStream(sfd.FileName, FileMode.Create))
+                    {
+                        using (var archive = new ZipArchive(zipStream, ZipArchiveMode.Create))
+                        {
+                            foreach (var file in files)
+                            {
+                                var entry = archive.CreateEntry(file.Key, CompressionLevel.Optimal);
+                                using (var entryStream = entry.Open())
+                                {
+                                    entryStream.Write(file.Value, 0, file.Value.Length);
+                                }
+                            }
+                        }
+                    }
+                }
+                UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("SavedOBJ"), "Zip"), Uniconta.ClientTools.Localization.lookup("Succes"));
+            }
+            catch (Exception ex)
+            {
+                UnicontaMessageBox.Show($"Error: {ex.Message}", Uniconta.ClientTools.Localization.lookup("Error"));
+            }
+            exporting = false;
+            busyIndicator.IsBusy = false;
+
         }
     }
 }

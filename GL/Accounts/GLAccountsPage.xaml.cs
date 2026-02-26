@@ -187,6 +187,10 @@ namespace UnicontaClient.Pages.CustomPage
                 case "UndoDelete":
                     dgGLTable.UndoDeleteRow();
                     break;
+                case "SettleTran":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.GLTransSettlePage, dgGLTable.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("SettleTran"), selectedItem._Account));
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;

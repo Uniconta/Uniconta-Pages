@@ -216,8 +216,8 @@ namespace UnicontaClient.Pages.CustomPage
         }
         void Init()
         {
-            this.DataContext = this;
             InitializeComponent();
+            this.DataContext = this;
             SetDebtorFilterUserFields();
             cmbAccounts.api = api;
             SetRibbonControl(localMenu, dgDebtorTrans);

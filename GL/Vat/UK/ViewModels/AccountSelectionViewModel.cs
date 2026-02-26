@@ -1,5 +1,4 @@
 using Newtonsoft.Json;
-using NPOI.SS.Formula.Functions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -7,16 +6,14 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using Uniconta.API.System;
+using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using UnicontaClient.Pages.GL.Vat.UK.GetVatReport;
 using UnicontaClient.Pages.GL.Vat.UK.Models;
-using Uniconta.ClientTools;
-using Uniconta.ClientTools.Controls;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage.GL.Vat.UK.ViewModels
@@ -35,7 +32,7 @@ namespace UnicontaClient.Pages.CustomPage.GL.Vat.UK.ViewModels
             HMRCFromDate = new DateTime(DateTime.Today.Year, 1, 1);
             HMRCToDate = new DateTime(DateTime.Today.Year, 12, 31);
         }
-    
+
         #endregion
 
         #region properties
@@ -224,10 +221,10 @@ namespace UnicontaClient.Pages.CustomPage.GL.Vat.UK.ViewModels
                     default:
                         return;
                 }
-}
-try
-{
-//sets cursor to busy
+            }
+            try
+            {
+                //sets cursor to busy
                 IsBusy = true;
 
                 GetVatBoxes vat = new GetVatBoxes(_crudApi, FromDate, ToDate);
@@ -438,9 +435,6 @@ try
         }
         void SetObligations(VatObligationsDetailsModel model)
         {
-
-            var cto = new HMRCConnection.CreateTestOrg();
-            cto.CreateNewOrg();
             if (model == null)
             {
                 System.Windows.MessageBox.Show("No obligation was selected, or an error occured.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);

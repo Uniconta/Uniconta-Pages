@@ -47,8 +47,8 @@ namespace UnicontaClient.Pages.CustomPage
         public CrmDebtorProspectReport(BaseAPI API)
             : base(API, string.Empty)
         {
-            this.DataContext = this;
             InitializeComponent();
+            this.DataContext = this;
             localMenu.dataGrid = dgCrmDebtorProspect;
             dgCrmDebtorProspect.api = api;
             dgCrmDebtorProspect.BusyIndicator = busyIndicator;

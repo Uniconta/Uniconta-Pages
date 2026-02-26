@@ -1,19 +1,20 @@
-using UnicontaClient.Pages;
+using ISO20022CreditTransfer;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using Uniconta.Common;
-using Uniconta.DataModel;
-using UnicontaISO20022CreditTransfer;
-using ISO20022CreditTransfer;
-using System.Globalization;
-using Uniconta.ClientTools.Controls;
-using Uniconta.Common.Utility;
+using System.Windows.Input;
 using Uniconta.API.System;
+using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
+using Uniconta.Common;
+using Uniconta.Common.Utility;
+using Uniconta.DataModel;
+using UnicontaClient.Pages;
+using UnicontaISO20022CreditTransfer;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
@@ -53,6 +54,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
             PaymentISO20022Validate paymentISO20022Validate = new PaymentISO20022Validate(crudAPI, credPaymFormat);
             BankSpecificSettings bankSpecific = BankSpecificSettings.BankSpecTypeInstance(credPaymFormat);
 
+            var EXCLUDED = Uniconta.ClientTools.Localization.lookup("Excluded");
             try
             {
                 var grid = dgCreditorTranOpenGrid.GetVisibleRows() as IEnumerable<CreditorTransPayment>;
@@ -60,9 +62,11 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
                 {
                     if (rec._PaymentFormat != credPaymFormat._Format || rec._OnHold || rec._Paid)
                     {
-                        rec.MergePaymId = Uniconta.ClientTools.Localization.lookup("Excluded"); 
+                        rec.MergePaymId = EXCLUDED; 
                         continue;
                     }
+
+                    var isCreditAmount = rec.PaymentAmount <= 0;
 
                     //Validate payments >>
                     var validateRes = await paymentISO20022Validate.ValidateISO20022(rec, bankAccountCache);
@@ -72,7 +76,7 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
                         {
                             rec.ErrorInfo += rec.ErrorInfo == null ? error.ToString() : Environment.NewLine + rec.ErrorInfo;
                         }
-                        rec.MergePaymId = Uniconta.ClientTools.Localization.lookup("Excluded");
+                        rec.MergePaymId = EXCLUDED;
                         continue;
                     }
                     else
@@ -176,18 +180,71 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
                     rec.MergePaymId = mergePaymId.ToStringAndRelease();
                 }
 
-                var noDuplicates = grid.Where(x => x.MergePaymId != Uniconta.ClientTools.Localization.lookup("Excluded")).GroupBy(s => s.MergePaymId).Where(grp => grp.Count() == 1).SelectMany(x => x);
 
-                foreach (var rec in noDuplicates)
+                var firstPositiveMergeByAccount = new Dictionary<string, string>();
+                foreach (var r in grid)
                 {
-                    if (rec.PaymentAmount <= 0)
+                    if (r.PaymentAmount > 0 && !firstPositiveMergeByAccount.ContainsKey(r.Account))
+                        firstPositiveMergeByAccount[r.Account] = r.MergePaymId;
+                }
+
+                foreach (var rec in grid)
+                {
+                    if (rec.PaymentAmount <= 0 && rec.MergePaymId != EXCLUDED && firstPositiveMergeByAccount.TryGetValue(rec.Account, out var fromPositive))
+                        rec.MergePaymId = fromPositive;
+                }
+
+                var countDict = new Dictionary<string, int>();
+                var sumDict = new Dictionary<string, double>(); 
+                var currencyDict = new Dictionary<string, byte>();
+                foreach (var r in grid)
+                {
+                    var key = r.MergePaymId;
+                    if (string.IsNullOrEmpty(key) || key == EXCLUDED)
+                        continue;
+
+                    countDict[key] = countDict.TryGetValue(key, out var c) ? c + 1 : 1;
+                    sumDict[key] = sumDict.TryGetValue(key, out var s) ? s + r.PaymentAmount : r.PaymentAmount;
+                        
+                    if (r.PaymentAmount > 0 && !currencyDict.TryGetValue(key, out var cc))
+                        currencyDict[key] = (byte)r.Currency.GetValueOrDefault();
+                }
+
+                foreach (var rec in grid)
+                {
+                    var key = rec.MergePaymId;
+                    if (string.IsNullOrEmpty(key) || key == EXCLUDED)
+                        continue;
+
+                    if (sumDict.TryGetValue(key, out var sumForGroup) && sumForGroup < 0)
                     {
-                        rec.MergePaymId = Uniconta.ClientTools.Localization.lookup("Excluded");
-                        rec.ErrorInfo = string.Concat(Uniconta.ClientTools.Localization.lookup("PaymentAmount"), "< 0");
+                        rec.ErrorInfo = string.Concat(Uniconta.ClientTools.Localization.lookup("MergePayment"), " < 0");
+                        continue;
                     }
-                    else
+
+                    var isUnique = countDict.TryGetValue(key, out var cnt) && cnt == 1;
+                    if (isUnique)
                     {
-                        rec.MergePaymId = MERGEID_SINGLEPAYMENT;
+                        if (rec.PaymentAmount <= 0)
+                        {
+                            rec.MergePaymId = EXCLUDED;
+                            rec.ErrorInfo = string.Concat(Uniconta.ClientTools.Localization.lookup("PaymentAmount"), " < 0");
+                        }
+                        else
+                        {
+                            rec.MergePaymId = MERGEID_SINGLEPAYMENT;
+                        }
+                        continue;
+                    }
+
+                    if (rec.PaymentAmount <= 0 && currencyDict.TryGetValue(key, out var cc))
+                    {
+                        var othersExist = cnt > 1;
+                        if (othersExist && (byte)rec.Currency.GetValueOrDefault() != cc)
+                        {
+                            rec.MergePaymId = EXCLUDED;
+                            rec.ErrorInfo = "Cannot be included in merge payment as it has a different currency code";
+                        }
                     }
                 }
 

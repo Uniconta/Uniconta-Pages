@@ -192,8 +192,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         void Init(GLClosingSheet sheet)
         {
-            this.DataContext = this;
             InitializeComponent();
+            this.DataContext = this;
             cmbFromAccount.api = cmbToAccount.api = api;
             SetRibbonControl(localMenu, dgGLTrans);
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;

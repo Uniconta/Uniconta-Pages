@@ -44,6 +44,8 @@ x:Class="UnicontaClient.Pages.CustomPage.InvPackagingTransPage"
             <UnicontaControls:DateEditor x:Name="ToDate" Grid.Column="6" Grid.Row="1"  Margin="0,3,3,3" ShowToday="True"/>
             <TextBlock x:Name="lbAppendNotPosted" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AppendNotPosted}" Grid.Column="7" Grid.Row="0"  Margin="10,0,5,0" Grid.ColumnSpan="2" VerticalAlignment="Center"></TextBlock>
             <CorasauControls:CheckEditor x:Name="AppendNotPosted" Grid.Column="9" Grid.Row="0" Margin="0,3,3,3" ></CorasauControls:CheckEditor>
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ReportedByCustomer}" Grid.Column="7" Grid.Row="1"  Margin="10,0,5,0" Grid.ColumnSpan="2" VerticalAlignment="Center"></TextBlock>
+            <CorasauControls:CheckEditor x:Name="ReportedByCustomer" Grid.Column="9" Grid.Row="1" Margin="0,3,3,3" ></CorasauControls:CheckEditor>
         </Grid>
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="2" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <local:InvPackagingTransGrid x:Name="dgInvPackagingTransGrid" AutoGenerateColumns="None">
@@ -58,14 +60,20 @@ x:Class="UnicontaClient.Pages.CustomPage.InvPackagingTransPage"
                     <local:ComboBoxColumnClient x:Name="WasteSorting" />
                     <local:ComboBoxColumnClient x:Name="PackagingRateLevel" />
                     <local:ComboBoxColumnClient x:Name="PackagingConsumer" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Unit"  Width="50"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Qty" AllowThousandMask="True" Mask="N4"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Unit"  Width="50"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Price" AllowThousandMask="True"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PriceTotal" AllowThousandMask="True"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Country" AllowEditing="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DebtorAccount" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DebtorName" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="InvoiceNumber" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" Visible="False"/>
                 </local:InvPackagingTransGrid.Columns>
                 <local:InvPackagingTransGrid.TotalSummary >
                     <local:SumColumn FieldName="Category" SummaryType="Count"/>
                     <local:SumColumn FieldName="Qty" SummaryType="Sum"/>
+                    <local:SumColumn FieldName="PriceTotal" SummaryType="Sum"/>
                 </local:InvPackagingTransGrid.TotalSummary>
             </local:InvPackagingTransGrid>
         </CorasauControls:BusyIndicator>

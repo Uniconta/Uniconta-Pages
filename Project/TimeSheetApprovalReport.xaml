@@ -62,7 +62,8 @@ x:Class="UnicontaClient.Pages.CustomPage.TimeSheetApprovalReport"
                     <local:CorasauDataGridTemplateColumnClient x:Name="TMClosedBy"  Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="TMApprovedBy" Visible="False" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="ConfirmWarning" Visible="False" AllowEditing="True"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="ErrorInfo" Visible="False" AllowEditing="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="JournalStatus" Width="80" Visible="False" AllowEditing="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ErrorInfo" Width="250" Visible="False" AllowEditing="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Status" Width="120">
                         <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                             <ControlTemplate>

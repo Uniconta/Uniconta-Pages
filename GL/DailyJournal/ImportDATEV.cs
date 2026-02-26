@@ -23,13 +23,17 @@ namespace UnicontaClient.Pages.CustomPage
         int DebtorLower, CreditorLower;
         public HashSet<string> faultyAccounts;
         GLDailyJournalClient GLDailyJournal;
+        private int kost1;
+        private int kost2;
 
-        public ImportDATEV(CrudAPI api, GLDailyJournalClient GLDailyJournal)
+        public ImportDATEV(CrudAPI api, GLDailyJournalClient GLDailyJournal, int Kost1, int Kost2)
         {
             InitCaches(api);
             faultyAccounts = new HashSet<string>();
             _api = api;
             this.GLDailyJournal = GLDailyJournal;
+            this.kost1 = Kost1;
+            this.kost2 = Kost2;
         }
 
         async private void InitCaches(CrudAPI api)
@@ -39,7 +43,7 @@ namespace UnicontaClient.Pages.CustomPage
             CreditorCache = api.GetCache(typeof(Uniconta.DataModel.Creditor));
             VATCache = api.GetCache(typeof(Uniconta.DataModel.GLVat));
             if (GLAccCache == null)
-                GLAccCache =  await api.LoadCache(typeof(Uniconta.DataModel.GLAccount)).ConfigureAwait(false);
+                GLAccCache = await api.LoadCache(typeof(Uniconta.DataModel.GLAccount)).ConfigureAwait(false);
             if (DebtorCache == null)
                 DebtorCache = await api.LoadCache(typeof(Uniconta.DataModel.Debtor)).ConfigureAwait(false);
             if (CreditorCache == null)
@@ -57,7 +61,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             var rawLine = reader.ReadLine();
             sp.Split(rawLine, line);
-            if (! await ValidateHeader(line))
+            if (!await ValidateHeader(line))
                 return null;
 
             var year = GetYearFromHeader(line);
@@ -69,7 +73,7 @@ namespace UnicontaClient.Pages.CustomPage
             reader.ReadLine();
 
             var _journalLines = new List<GLDailyJournalLineClient>(2000);
-            for(;;)
+            for (; ; )
             {
                 rawLine = await reader.ReadLineAsync().ConfigureAwait(false);
                 if (rawLine == null)
@@ -82,7 +86,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 string vatcode = null;
                 var extcode = line[8];
-                if (! string.IsNullOrEmpty(extcode))
+                if (!string.IsNullOrEmpty(extcode))
                 {
                     for (int i = 0; (i < vats.Length); i++)
                     {
@@ -130,12 +134,12 @@ namespace UnicontaClient.Pages.CustomPage
                     return rec.KeyStr;
             }
             faultyAccounts.Add(ac);
-            return ac; 
+            return ac;
         }
 
         private GLDailyJournalLineClient GetJournalLine(List<string> line, int year, string account, string contraAccount, string VAT)
         {
-            var date = DateTime.ParseExact(line[9], "ddMM", null);
+            var date = DateTime.ParseExact(line[9] + year, "ddMMyyyy", null);
             date = new DateTime(year, date.Month, date.Day);
             int accInt = (int)NumberConvert.ToInt(account);
             int offaccInt = (int)NumberConvert.ToInt(contraAccount);
@@ -150,8 +154,11 @@ namespace UnicontaClient.Pages.CustomPage
                 _AccountType = (accInt < DebtorLower ? (byte)GLJournalAccountType.Finans : (accInt < CreditorLower ? (byte)GLJournalAccountType.Debtor : (byte)GLJournalAccountType.Creditor)),
                 _OffsetAccountType = (offaccInt < DebtorLower ? (byte)GLJournalAccountType.Finans : (offaccInt < CreditorLower ? (byte)GLJournalAccountType.Debtor : (byte)GLJournalAccountType.Creditor)),
                 _Text = line[13],
-                _Dim1 = line[36],
-                _Dim2 = line[37],
+                _Dim1 = this.kost1 == 0 || this.kost1 == 1 ? line[36] : this.kost2 == 1 ? line[37] : null,
+                _Dim2 = this.kost2 == 0 || this.kost2 == 2 ? line[37] : this.kost1 == 2 ? line[36] : null,
+                _Dim3 = this.kost1 == 3 ? line[36] : this.kost2 == 3 ? line[37] : null,
+                _Dim4 = this.kost1 == 4 ? line[36] : this.kost2 == 4 ? line[37] : null,
+                _Dim5 = this.kost1 == 5 ? line[36] : this.kost2 == 5 ? line[37] : null,
                 _Invoice = line[10]
             };
 
@@ -180,7 +187,7 @@ namespace UnicontaClient.Pages.CustomPage
             int DebtorLower = 1;
             int CreditorLower = 7;
 
-            for (var i = length; (--i >= 0); )
+            for (var i = length; (--i >= 0);)
             {
                 DebtorLower *= 10;
                 CreditorLower *= 10;

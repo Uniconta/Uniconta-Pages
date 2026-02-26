@@ -96,7 +96,11 @@ namespace UnicontaClient.Pages.CustomPage
                 var openFolderDialog = UtilDisplay.LoadFolderBrowserDialog;
                 dialogResult = openFolderDialog.ShowDialog();
                 if (dialogResult == true)
+#if MAC
+                    path = openFolderDialog.FolderName;
+#else
                     path = openFolderDialog.SelectedPath;
+#endif
             }
             if (dialogResult == true)
             {
@@ -198,7 +202,7 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                         else
                         {
-                            attachment = UtilFunctions.LoadFile(voucher._Url).GetAwaiter().GetResult();
+                            attachment = Task.Run(() => UtilFunctions.LoadFile(voucher._Url)).GetAwaiter().GetResult();
                         }
                         if (attachment == null)
                             return;

@@ -37,12 +37,7 @@ namespace UnicontaClient.Pages.CustomPage
             InitializeComponent();
             lePaymentFormat.api = api;
             SetPaymentFormat();
-#if !SILVERLIGHT
             this.Title = Uniconta.ClientTools.Localization.lookup("MergePayments");
-#endif
-#if SILVERLIGHT
-            Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             this.Loaded += CW_Loaded;
         }
 

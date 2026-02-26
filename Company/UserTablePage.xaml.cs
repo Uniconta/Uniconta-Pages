@@ -31,7 +31,16 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override void DataLoaded(UnicontaBaseEntity[] Arr)
         {
-            api.CompanyEntity.UserTables = new List<TableHeader>((TableHeader[])Arr);
+            var lst = api.CompanyEntity.UserTables;
+            if (lst != null && lst.Count < Arr.Length)
+            {
+                for (int i = 0; i < Arr.Length; i++)
+                {
+                    var tableHeader = (TableHeader)Arr[i];
+                    if (!lst.Any(x => x.RowId == tableHeader.RowId))
+                        lst.Add(tableHeader);
+                }
+            }
         }
     }
 
@@ -93,11 +102,31 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (screenName == TabControls.UserTablePage2)
             {
+                object[] argumentParams = (object[])argument;
+                var Row = argumentParams[1] as TableHeaderClient;
+                if (Row == null)
+                    return;
+
                 dgUserTable.UpdateItemSource(argument);
 
                 var items = (IList)dgUserTable.ItemsSource;
-                IEnumerable<TableHeader> castItem = items.Cast<TableHeader>();
-                api.CompanyEntity.UserTables = castItem.ToList();
+                var lst = api.CompanyEntity.UserTables;
+                if (lst != null)
+                {
+                    for (int i = 0; i < lst.Count; i++)
+                    {
+                        if (lst[i].RowId == Row.RowId)
+                        {
+                            lst[i] = Row;
+                            return;
+                        }
+                    }
+                    lst.Add(Row);
+                }
+                else
+                {
+                    api.CompanyEntity.UserTables = new List<TableHeader>((IEnumerable<TableHeader>)items);
+                }
             }
             else if (screenName == TabControls.AddUserFields)
             {

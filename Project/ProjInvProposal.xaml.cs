@@ -356,6 +356,8 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 if (reload)
                     await api.LoadCache(typeof(Uniconta.DataModel.Debtor), true);
+                else
+                    await api.UpdateCache();
             }
             if (refresh)
                 gridRibbon_BaseActions("RefreshGrid");
@@ -443,7 +445,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private Task BindGrid()
         {
-            return dgProjInvProposalGrid.Filter(null);
+             return dgProjInvProposalGrid.Filter(null);
         }
 
         protected override void LoadCacheInBackGround()
@@ -558,7 +560,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var isSimulated = GenrateInvoiceDialog.IsSimulation;
                     var invoicePostingResult = new InvoicePostingPrintGenerator(api, this);
                     invoicePostingResult.SetUpInvoicePosting(projInvProp, null, companyLayout, GenrateInvoiceDialog.GenrateDate, null, isSimulated, GenrateInvoiceDialog.ShowInvoice, GenrateInvoiceDialog.PostOnlyDelivered,
-                        GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.NumberOfPages, GenrateInvoiceDialog.SendByEmail, !isSimulated && GenrateInvoiceDialog.SendByOutlook, GenrateInvoiceDialog.sendOnlyToThisEmail,
+                        GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.NumberOfPages, GenrateInvoiceDialog.SendByEmail, GenrateInvoiceDialog.SendByOutlook, GenrateInvoiceDialog.sendOnlyToThisEmail,
                         GenrateInvoiceDialog.Emails, GenrateInvoiceDialog.GenerateOIOUBLClicked, null, false);
                     invoicePostingResult.SetAdditionalOrders(GenrateInvoiceDialog.AdditionalOrders?.Cast<DCOrder>().ToList());
                     if (api.CompanyEntity.AllowSkipCreditMax)

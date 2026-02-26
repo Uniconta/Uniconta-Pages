@@ -48,8 +48,8 @@ namespace UnicontaClient.Pages.CustomPage
         }
         private void Initialize()
         {
-            this.DataContext = this;
             InitializeComponent();
+            this.DataContext = this;
             SetRibbonControl(localMenu, dgInvStatsGrid);
             dgInvStatsGrid.api = api;
             dgInvStatsGrid.BusyIndicator = busyIndicator;

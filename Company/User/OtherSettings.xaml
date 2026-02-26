@@ -31,6 +31,11 @@ x:Class="UnicontaClient.Pages.CustomPage.OtherSettings"
                         <CorasauControls:CheckEditor IsChecked="{Binding AllowSkipCreditMax,Mode=TwoWay}" />
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grp" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TwoFactorLogin}" HorizontalAlignment="Left" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" >
+                    <CorasauControls:CorasauLayoutItem FieldName="IgnoreTwoFactor" x:Name="liIgnoreTwoFactor">
+                        <CorasauControls:CheckEditor IsChecked="{Binding IgnoreTwoFactor,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutGroup>
         </CorasauControls:CorasauLayoutControl>
     </Grid>

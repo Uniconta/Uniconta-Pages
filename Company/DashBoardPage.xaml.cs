@@ -57,7 +57,14 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (selectedItem == null)
                 return;
+#if MAC
+            var hdr = string.Concat(Uniconta.ClientTools.Localization.lookup("Dashboard"), ": ", selectedItem._Name);
+            var webDashboardUrl = BasePage.session.Connection.Target == APITarget.Live ? $"https://web.uniconta.com/DashBoards/DashBoardViewer?DashBoardsId={selectedItem._Name}" : 
+            $"https://test.uniconta.com:8080/DashBoards/DashBoardViewer?DashBoardsId={selectedItem._Name}";
+            AddDockItem(TabControls.ViewUrlPage, new object[] { api.CompanyEntity, webDashboardUrl }, hdr);
+#else
             AddDockItem(TabControls.DashBoardViewerPage, selectedItem, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("Dashboard"), selectedItem._Name));
+#endif
         }
 
         public override Task InitQuery()

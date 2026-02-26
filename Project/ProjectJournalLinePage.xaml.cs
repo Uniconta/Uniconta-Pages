@@ -167,7 +167,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (string.Compare(rec.Name, "Journal", StringComparison.CurrentCultureIgnoreCase) == 0)
                 {
-                    var cache = api.GetCache(typeof(Uniconta.DataModel.PrJournal)) ?? api.LoadCache(typeof(Uniconta.DataModel.PrJournal)).GetAwaiter().GetResult();
+                    var cache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.PrJournal), api);
                     masterJournal = (Uniconta.DataModel.PrJournal)cache.Get(rec.Value);
                     if (masterJournal != null)
                     {

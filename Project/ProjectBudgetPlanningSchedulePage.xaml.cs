@@ -67,8 +67,8 @@ namespace UnicontaClient.Pages.CustomPage
         void InitPage(UnicontaBaseEntity master)
         {
             StartLoadCache();
-            this.DataContext = this;
             InitializeComponent();
+            this.DataContext = this;
             var api = this.api;
             Comp = api.CompanyEntity;
             MainControl = projBudgetPlanScheduler;

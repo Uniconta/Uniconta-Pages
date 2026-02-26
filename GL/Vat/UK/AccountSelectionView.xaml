@@ -1,4 +1,4 @@
-<Pages:BasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
+<Pages:ControlBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
         xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
 x:Class="UnicontaClient.Pages.CustomPage.AccountSelectionView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -8,7 +8,7 @@ x:Class="UnicontaClient.Pages.CustomPage.AccountSelectionView"
         xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
         xmlns:cnv="clr-namespace:UnicontaClient.Pages.CustomPage.GL.Vat.UK.Converter"
       >
-    <Pages:BasePage.Resources>
+    <Pages:ControlBasePage.Resources>
         <Style TargetType="Label">
             <Setter Property="Margin"
                     Value="5,0,5,0" />
@@ -48,11 +48,11 @@ x:Class="UnicontaClient.Pages.CustomPage.AccountSelectionView"
         
         <cnv:BusyToCursorConverter x:Key="BusyToCursorConverter" />
         
-    </Pages:BasePage.Resources>
-    <Pages:BasePage.Cursor>
+    </Pages:ControlBasePage.Resources>
+    <Pages:ControlBasePage.Cursor>
         <Binding Path="IsBusy"
                  Converter="{StaticResource BusyToCursorConverter}" />
-    </Pages:BasePage.Cursor>
+    </Pages:ControlBasePage.Cursor>
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <DockPanel LastChildFill="True">
             <Grid DockPanel.Dock="Top"
@@ -268,4 +268,4 @@ x:Class="UnicontaClient.Pages.CustomPage.AccountSelectionView"
             </StackPanel>
         </DockPanel>
     </ScrollViewer>
-</Pages:BasePage>
+</Pages:ControlBasePage>

@@ -3,7 +3,7 @@
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <RibbonItem Action="Attach" LocalizedNameKey="Attach" LargeGlyph="Upload_32x32"/>
     <RibbonItem Action="ShowAll" LocalizedNameKey="ShowOBJ" Parameter="All" LargeGlyph="Detailed_View_32x32"/>
-    <RibbonItem Action="Cancel" LocalizedNameKey="Cancel" Glyph="close-16x16" LargeGlyph="close-32x32"/>
+    <RibbonItem Action="Cancel" LocalizedNameKey="Cancel" Glyph="Close_16x16" LargeGlyph="close-32x32"/>
   </RibbonItem>
   <RibbonItem>
     <!---If we want to create a new group in same PageTab-->
@@ -11,7 +11,8 @@
       <!---If we want Inner menu-->
       <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
       <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16" ShortcutKey="" />
-      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
+			<RibbonItem Action="AddExpressionColumn" LocalizedNameKey="AddOBJ" Parameter="CalculationExpression" Glyph="Accountant_16x16" ShortcutKey="" />
+      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" EnableSeperator="True" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
       <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16" ShortcutKey=""/>
       <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16" ShortcutKey="Ctrl+U"/>
       <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16" LargeGlyph="ExportLayout_16x16" ShortcutKey=""/>

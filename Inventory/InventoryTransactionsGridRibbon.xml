@@ -10,7 +10,8 @@
       <!---If we want Inner menu-->
       <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
       <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16" ShortcutKey="" />
-      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
+			<RibbonItem Action="AddExpressionColumn" LocalizedNameKey="AddOBJ" Parameter="CalculationExpression" Glyph="Accountant_16x16" ShortcutKey="" />
+      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" EnableSeperator="True" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
       <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16" ShortcutKey=""/>
       <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16" ShortcutKey="Ctrl+U"/>
       <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16" LargeGlyph="ExportLayout_16x16" ShortcutKey=""/>
@@ -34,6 +35,7 @@
     <RibbonItem Action="MarkInvTrans" LocalizedNameKey="MarkedTransactions"  LargeGlyph="Check_Journal_32x32" />
     <RibbonItem Action="MarkOrderLineAgnstInvTrans" LocalizedNameKey="MarkOBJ" Parameter="InvTransactions"  LargeGlyph="Order_Confirmation_32x32" />
     <RibbonItem Action="ChangeCostValue" LocalizedNameKey="ChangeObj" Parameter="CostValue" Glyph="Default_Values_32x32" LargeGlyph="Default_Values_32x32"/>
+    <RibbonItem Action="ClearRestateCostflag" LocalizedNameKey="ClearRestateCostflag" LargeGlyph="Close-32x32" Module="Warehouse"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="TransInBOM" LocalizedNameKey="TransInBOM" Module="InvBOM" Glyph="Voucher_Transactions_32x32" LargeGlyph="Order_Lines_Highlighted_32x32" ShortcutKey="ALT+L" />

@@ -30,9 +30,6 @@ namespace UnicontaClient.Controls.Dialogs
             InitializeComponent();
 
             this.Title = Uniconta.ClientTools.Localization.lookup("Item");
-#if SILVERLIGHT
-            UnicontaClient.Utilities.Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             API = api;
             leInvItem.api = api;
             this.Loaded += CW_Loaded;

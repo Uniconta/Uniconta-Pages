@@ -36,11 +36,7 @@ namespace UnicontaClient.Pages.CustomPage
             this.smtps = smtps;
             this.api = api;
             InitializeComponent();
-#if SILVERLIGHT
-            Utility.SetThemeBehaviorOnChildWindow(this);
-#else
             this.Title = string.Format(Uniconta.ClientTools.Localization.lookup("EmailForOBJ"), Uniconta.ClientTools.Localization.lookup("Approval")); ;
-#endif
             this.Loaded += CWApprovalEmailSetup_Loaded;
         }
 

@@ -15,6 +15,7 @@
       <!---If we want Inner menu-->
       <RibbonItem Action="StartEdit" LocalizedNameKey="StartEdit" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
       <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16" ShortcutKey="" />
+			<RibbonItem Action="AddExpressionColumn" LocalizedNameKey="AddOBJ" Parameter="CalculationExpression" Glyph="Accountant_16x16" ShortcutKey="" />
       <RibbonItem Action="EndEdit" LocalizedNameKey="SaveOBJ" Parameter="Layout" Glyph="save-as-16x16" LargeGlyph="save-as-32x32" ShortcutKey=""/>
       <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16" LargeGlyph="Delete_32x32" ShortcutKey=""/>
       <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16" LargeGlyph="Delete_32x32" ShortcutKey="Ctrl+U"/>
@@ -24,7 +25,7 @@
     </RibbonItem> 
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem LocalizedNameKey="PhysicalVoucher" Glyph="Cover_16x16" LargeGlyph="View_Voucher_32x32" >
+    <RibbonItem LocalizedNameKey="PhysicalVoucher" LargeGlyph="View_Voucher_32x32" >
       <RibbonItem Action="ViewVoucher" LocalizedNameKey="View" ShortcutKey="F7" Glyph="View_16x16" LargeGlyph="View_32x32" />
       <RibbonItem Action="RefVoucher" LocalizedNameKey="Attach" ShortcutKey="Ctrl+T" Glyph="Attachments_16x16" LargeGlyph="Attachments_32x32" />
       <RibbonItem Action="ImportVoucher" LocalizedNameKey="ImportFile" Glyph="Add_16x16" LargeGlyph="Add_32x32" ShortcutKey="Ctrl+J"/>

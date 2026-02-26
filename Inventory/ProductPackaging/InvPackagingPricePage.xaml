@@ -1,0 +1,35 @@
+<Pages:GridBasePage xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.InvPackagingPricePage"
+             xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+             xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
+             xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Inventory/ProductPackaging/InvPackagingPricePageRibbon.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <local:InvPackagingPricePageGrid x:Name="dgInvPackagingPriceGrid" AutoGenerateColumns="None">
+                <local:InvPackagingPricePageGrid.Columns>
+                    <local:ComboBoxColumnClient FieldName="ReportingType" x:Name="colReportingType" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Category">
+                        <local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" SelectedItem="{Binding DataContext.RowData.Row.Category,Mode=TwoWay}" ItemsSource="{Binding DataContext.RowData.Row.CategorySource,Mode= OneWay,RelativeSource={RelativeSource TemplatedParent}, UpdateSourceTrigger=PropertyChanged}" GotFocus="Category_GotFocus"/>
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:ComboBoxColumnClient x:Name="PackagingRateLevel" />
+                    <local:ComboBoxColumnClient x:Name="PackagingConsumer" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Unit" Width="50" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Price" AllowThousandMask="True"/>
+                </local:InvPackagingPricePageGrid.Columns>
+            </local:InvPackagingPricePageGrid>
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

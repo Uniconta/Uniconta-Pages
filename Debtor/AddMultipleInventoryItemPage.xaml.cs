@@ -43,7 +43,6 @@ namespace UnicontaClient.Pages.CustomPage
         public override string NameOfControl { get { return TabControls.AddMultipleInventoryItem; } }
         public AddMultipleInventoryItemPage(SQLCacheFilter cache, Type tp, DCOrder master) : base(null)
         {
-            DataContext = this;
             InitializeComponent();
             localMenu.dataGrid = dgMultipleInventoryItems;
             SetRibbonControl(localMenu, dgMultipleInventoryItems);

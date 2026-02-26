@@ -15,7 +15,8 @@
 	  <!---If we want Inner menu-->
 	  <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
 	  <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16" ShortcutKey="" />
-	  <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
+			<RibbonItem Action="AddExpressionColumn" LocalizedNameKey="AddOBJ" Parameter="CalculationExpression" Glyph="Accountant_16x16" ShortcutKey="" />
+	  <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" EnableSeperator="True" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
 	  <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16" ShortcutKey=""/>
 	  <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16" ShortcutKey="Ctrl+U"/>
 	  <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16" LargeGlyph="ExportLayout_16x16" ShortcutKey=""/>
@@ -48,7 +49,8 @@
 		<RibbonItem Action="AiiaUnregister" LocalizedNameKey="UnregisterBank" Glyph="Bank_Disconnect_32x32"/>
 		<RibbonItem Action="ConnectToND" LocalizedNameKey="ConnectToNordea" EnableSeperator="True" Glyph="Bank_Connect_32x32"/>
 	    <RibbonItem Action="ConnectToBC" LocalizedNameKey="ConnectToBC" Glyph="Bank_Connect_32x32"/>
-		<RibbonItem Action="AiiaAdmin" LocalizedNameKey="Administrator" EnableSeperator="True" Glyph="Download-32x32"/>
+		<RibbonItem Action="AiiaAdmin" LocalizedNameKey="AdministratorOBJ" Parameter="MCOpenBanking" EnableSeperator="True" Glyph="Download-32x32"/>
+		<RibbonItem Action="NordeaAdmin" LocalizedNameKey="AdministratorOBJ" Parameter="Nordea" Glyph="Download-32x32"/>
 	  </RibbonItem>
   </RibbonItem>
 </root>

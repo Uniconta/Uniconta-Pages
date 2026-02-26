@@ -352,10 +352,28 @@ namespace UnicontaClient.Pages.CustomPage
         {
             try
             {
-                var selectedItems = dgCrdInvoicesGrid.SelectedItems.Cast<CreditorInvoiceClient>();
                 busyIndicator.IsBusy = true;
                 busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
 
+#if MAC
+                var invClient = dgCrdInvoicesGrid.SelectedItem as CreditorInvoiceClient;
+                var iprintReport = isInvoice ? await PrintInvoice(invClient) : await PrintPackNote(invClient);
+
+                if (iprintReport != null)
+                {
+                    var report = iprintReport.Report;
+                    var memoryStream = UnistreamReuse.Create();
+                    report.ExportToPdf(memoryStream);
+                    var control = UtilDisplay.LoadControl(memoryStream.ToArrayAndRelease(), FileextensionsTypes.PDF, false, false, null);
+
+                    var docNumber = isInvoice ? invClient._InvoiceNumber : invClient._PackNote;
+                    var dockName = string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("Preview"), string.Format("{0}: {1}", isInvoice ? Uniconta.ClientTools.Localization.lookup("Invoice") :
+                               Uniconta.ClientTools.Localization.lookup("Packnote"), NumberConvert.ToString(docNumber)));
+
+                    AddDockItem(TabControls.ShowControlPage, new object[] { control }, dockName);
+                }
+#else
+                var selectedItems = dgCrdInvoicesGrid.SelectedItems.Cast<CreditorInvoiceClient>();
                 var failedPrints = new List<long>();
                 var count = selectedItems.Count();
                 string dockName = null, reportName = null;
@@ -440,6 +458,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var failedList = string.Join(",", failedPrints);
                     UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("FailedPrintmsg") + failedList, Uniconta.ClientTools.Localization.lookup("Error"), MessageBoxButton.OK);
                 }
+#endif
             }
             catch (Exception ex)
             {
@@ -483,7 +502,7 @@ namespace UnicontaClient.Pages.CustomPage
             var isCreditorInitialized = await creditorInvoicePrint.InstantiateFields();
             if (isCreditorInitialized)
             {
-                var creditorStandardInvoice = new CreditorStandardReportClient(creditorInvoicePrint.Company, creditorInvoicePrint.Creditor, creditorInvoicePrint.CreditorInvoice, creditorInvoicePrint.InvTransInvoiceLines, creditorInvoicePrint.CreditorOrder,
+                var creditorStandardInvoice = new CreditorStandardReportClient(creditorInvoicePrint.Company, creditorInvoicePrint.Creditor, creditorInvoicePrint.CreditorInvoice, creditorInvoicePrint.CreditorInvoiceLines, creditorInvoicePrint.CreditorOrder,
                     creditorInvoicePrint.CompanyLogo, creditorInvoicePrint.ReportName, (int)Uniconta.ClientTools.Controls.Reporting.StandardReports.PurchaseInvoice, creditorInvoicePrint.CreditorMessage, creditorInvoicePrint.IsCreditNote);
 
                 var creditorStandardReport = new[] { creditorStandardInvoice };
@@ -530,7 +549,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (isInitializedSuccess)
             {
-                var standardCreditorInvoice = new CreditorStandardReportClient(creditorInvoicePrint.Company, creditorInvoicePrint.Creditor, creditorInvoicePrint.CreditorInvoice, creditorInvoicePrint.InvTransInvoiceLines, creditorInvoicePrint.CreditorOrder,
+                var standardCreditorInvoice = new CreditorStandardReportClient(creditorInvoicePrint.Company, creditorInvoicePrint.Creditor, creditorInvoicePrint.CreditorInvoice, creditorInvoicePrint.CreditorInvoiceLines, creditorInvoicePrint.CreditorOrder,
                     creditorInvoicePrint.CompanyLogo, creditorInvoicePrint.ReportName, (int)packnote, creditorInvoicePrint.CreditorMessage);
 
                 var standardReports = new[] { standardCreditorInvoice };

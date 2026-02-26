@@ -62,8 +62,8 @@ namespace UnicontaClient.Pages.CustomPage
         ItemBase ibase;
         public InventoryBOMStatement(BaseAPI API) : base(API, string.Empty)
         {
-            this.DataContext = this;
             InitializeComponent();
+            this.DataContext = this;
             SetRibbonControl(localMenu, dgInvItem);
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             GetMenuItem();

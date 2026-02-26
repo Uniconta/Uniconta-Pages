@@ -337,13 +337,13 @@ namespace UnicontaClient.Pages.CustomPage
 
             try
             {
-                var debtorInvoicePrint = new DebtorInvoicePrintReport(invoicePostingResult, api, layoutType);
-                var isInitializedSuccess = await debtorInvoicePrint.InstantiateFields();
+                var projectInvoicePropsal = new ProjectInvoiceProposalPrintReport(invoicePostingResult, api, layoutType);
+                var isInitializedSuccess = await projectInvoicePropsal.InstantiateFields();
 
                 if (isInitializedSuccess)
                 {
-                    var standardDebtorInvoice = new DebtorInvoiceReportClient(debtorInvoicePrint.Company, debtorInvoicePrint.Debtor, debtorInvoicePrint.DebtorInvoice, debtorInvoicePrint.InvTransInvoiceLines, debtorInvoicePrint.DebtorOrder,
-                        debtorInvoicePrint.CompanyLogo, debtorInvoicePrint.ReportName, isCreditNote: debtorInvoicePrint.IsCreditNote, messageClient: debtorInvoicePrint.MessageClient);
+                    var standardDebtorInvoice = new DebtorInvoiceReportClient(projectInvoicePropsal.Company, projectInvoicePropsal.Debtor, projectInvoicePropsal.DebtorInvoice, projectInvoicePropsal.DebtorInvoiceLines, projectInvoicePropsal.ProjectInvoiceProposal,
+                        projectInvoicePropsal.CompanyLogo, projectInvoicePropsal.ReportName, isCreditNote: projectInvoicePropsal.IsCreditNote, messageClient: projectInvoicePropsal.MessageClient);
                     standardPrint = new StandardPrintReport(api, new[] { standardDebtorInvoice }, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.Invoice);
                     standardPrint = new LayoutPrintReport(api, invoicePostingResult, layoutType);
                 }

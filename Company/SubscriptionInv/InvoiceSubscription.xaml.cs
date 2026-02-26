@@ -29,13 +29,13 @@ using UnicontaClient.Controls;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
-    public partial class InvoiceSubscription : BasePage
+    public partial class InvoiceSubscription : ControlBasePage
     {
         public override string NameOfControl
         {
             get { return TabControls.InvoiceSubscriptionPage.ToString(); }
         }
-        public InvoiceSubscription(SubscriptionInvDetails InvDetails) : base(null, false)
+        public InvoiceSubscription(SubscriptionInvDetails InvDetails)
         {
             InitializeComponent();
 
@@ -43,7 +43,7 @@ namespace UnicontaClient.Pages.CustomPage
             CreateDocument(report);
         }
        
-        public InvoiceSubscription(PartnerInvDetails partnerInvDetails) : base(null, false)
+        public InvoiceSubscription(PartnerInvDetails partnerInvDetails)
         {
             InitializeComponent();
 

@@ -79,8 +79,8 @@ namespace UnicontaClient.Pages.CustomPage
         UnicontaBaseEntity master;
         void InitPage(UnicontaBaseEntity _master)
         {
-            this.DataContext = this;
             InitializeComponent();
+            this.DataContext = this;
             master = _master;
             SetRibbonControl(localMenu, dgInvSeriesBatch);
             statementlist = new List<InvItemTransStatementList>();

@@ -90,6 +90,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             dAddress.Header = Uniconta.ClientTools.Localization.lookup("DeliveryAddr");
             layoutControl = layoutItems;
+            leWarehouse.api = leWarehouseFrom.api =
             Employeelookupeditor.api = lePayment.api = cmbDim1.api
                  = leTransType.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api = leGroup.api = leShipment.api =
                  PrCategorylookupeditor.api = Projectlookupeditor.api = leApprover.api = leDeliveryTerm.api =

@@ -187,6 +187,9 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccount"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryContactEmail" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PackagingConsumer" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="MicroEnterprise" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NoPackagingReporting" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VIESDate" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VIESStatus" Visible="False" />
                 </localPage:DebtorAccountGrid.Columns>
                 <localPage:DebtorAccountGrid.TotalSummary>
                     <localPage:SumColumn FieldName="CurBalance" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>

@@ -42,12 +42,7 @@ namespace UnicontaClient.Pages.CustomPage
             VarianceDays = variantdays;
             this.DataContext = this;
             InitializeComponent();
-#if !SILVERLIGHT
             this.Title = Uniconta.ClientTools.Localization.lookup("Interval");
-#endif
-#if SILVERLIGHT
-            Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             if (!isShowVarDays)
             {
                 RowVarDays.Height = new GridLength(0);

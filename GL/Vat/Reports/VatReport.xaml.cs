@@ -177,7 +177,10 @@ namespace UnicontaClient.Pages.CustomPage
             if (country != CountryCode.Estonia)
                 UtilDisplay.RemoveMenuCommand(rb, "VatReportEstonia");
             if (country != CountryCode.Netherlands)
+            {
                 UtilDisplay.RemoveMenuCommand(rb, "VatReportHolland");
+                UtilDisplay.RemoveMenuCommand(rb, "VatReportHollandSum");
+            }
             if (country != CountryCode.Iceland)
                 UtilDisplay.RemoveMenuCommand(rb, "VatReportIceland");
             if (master != null && master._MaxJournalPostedId > 0 && master._Data != null)
@@ -232,6 +235,50 @@ namespace UnicontaClient.Pages.CustomPage
                     if (sum != null)
                         AddDockItem(TabControls.VatReportHolland, new object[] { sum, fromDate, toDate }, "BTW Aangifte", null, closeIfOpened: true);
                     break;
+                case "VatReportHollandSum":
+                    if (this.sumPeriod != null)
+                    {
+                        sum = this.sumPeriod;
+                        if (this.sumPrevPeriod != null)
+                        {
+                            var foundPrev = new HashSet<int>();
+                            sum = new List<VatSumOperationReport>(this.sumPeriod.Count);
+                            foreach (var r in this.sumPeriod)
+                            {
+                                bool found = false;
+                                if (r.Acc != null)
+                                {
+                                    var RowId = r.Acc.RowId;
+                                    foreach (var r2 in this.sumPrevPeriod)
+                                        if (r2.Acc.RowId == RowId)
+                                        {
+                                            var rx = new VatSumOperationReport()
+                                            {
+                                                _Amount = r._Amount + r2._Amount,
+                                                _AmountBase = r._AmountBase + r2._AmountBase,
+                                                _ExtraBase = r._ExtraBase + r2._ExtraBase,
+                                                _Pct = r._Pct,
+                                                _Text = r._Text,
+                                                _UnicontaOperation = r._UnicontaOperation,
+                                                _Line = r._Line,
+                                                Acc = r.Acc
+                                            };
+                                            found = true;
+                                            foundPrev.Add(RowId);
+                                            sum.Add(rx);
+                                            break;
+                                        }
+                                }
+                                if (!found)
+                                    sum.Add(r);
+                            }
+                            foreach (var r2 in this.sumPrevPeriod)
+                                if (r2.Acc != null && !foundPrev.Contains(r2.Acc.RowId))
+                                    sum.Add(r2);
+                        }
+                        AddDockItem(TabControls.VatReportHolland, new object[] { sum, txtDateFrm.DateTime, txtDateTo.DateTime }, "BTW Aangifte totaal", null, closeIfOpened: true);
+                    }
+                    break;
                 case "VatReportEstonia":
                     if (sum != null)
                         AddDockItem(TabControls.VatReportEstonia, new object[] { sum, fromDate, toDate }, "KM avaldus", null, closeIfOpened: true);
@@ -261,7 +308,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 if (rdbLastPeriod.IsChecked == true)
                                 {
                                     var rec = new GLVatReported() { _ToDate = toDate };
-                                    api.Read(rec).GetAwaiter().GetResult();
+                                    Task.Run(() => api.Read(rec)).GetAwaiter().GetResult();
                                     if (rec._MaxJournalPostedId != 0)
                                     {
                                         var f = node.OrList[0];
@@ -810,7 +857,7 @@ namespace UnicontaClient.Pages.CustomPage
                         v.AmountWithVat = Math.Round(d1, decm);
                         var AmountWithout = Math.Round(d2, decm);
                         v.AmountWithout = AmountWithout;
-                        v._CalculatedVAT = Math.Round(d3, decm);
+                        v._CalculatedVAT = Math.Round(d3, 2);
                         v._PostedVAT = Math.Round(d4, decm);
                         d1 = d2 = d3 = d4 = 0d;
 

@@ -49,10 +49,10 @@ namespace UnicontaClient.Pages.CustomPage
 
     public partial class InvPackagingTransPage : GridBasePage
     {
-        SQLTableCache<Debtor> debtors;
-        SQLTableCache<InvItem> items;
-        SQLTableCache<WorkInstallation> installations;
-
+        SQLTableCache<Uniconta.DataModel.Debtor> debtors;
+        SQLTableCache<Uniconta.DataModel.DebtorGroup> debtorGroups;
+        SQLTableCache<Uniconta.DataModel.InvItem> items;
+        SQLTableCache<Uniconta.DataModel.WorkInstallation> installations;
 
         static DateTime fromDate, toDate;
         Company comp;
@@ -85,6 +85,7 @@ namespace UnicontaClient.Pages.CustomPage
             ToDate.DateTime = toDate == DateTime.MinValue ? new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month)) : toDate;
 
             debtors = api.GetCache<Uniconta.DataModel.Debtor>();
+            debtorGroups = api.GetCache<Uniconta.DataModel.DebtorGroup>();
             items = api.GetCache<Uniconta.DataModel.InvItem>();
             installations = api.GetCache<Uniconta.DataModel.WorkInstallation>();
         }
@@ -137,201 +138,234 @@ namespace UnicontaClient.Pages.CustomPage
 
             IsCreated.Visible = AppendNotPosted.IsChecked.GetValueOrDefault();
 
-            PropValuePair prop;
-            var filters = new List<PropValuePair>();
+            var dateFilter = new List<PropValuePair>();
             if (fromDate != DateTime.MinValue || toDate != DateTime.MinValue)
             {
-                string datefilter = (fromDate != DateTime.MinValue ? $"{fromDate:d}" : "") + ".." + (toDate != DateTime.MinValue ? $"{toDate:d}" : "");
-                prop = PropValuePair.GenereteWhereElements(nameof(InvPackagingTransClient._Date), typeof(DateTime), datefilter);
-                filters.Add(prop);
-            }
-
-            if (cmbCountry.SelectedIndex > 0)
-            {
-                var country = cmbCountry.SelectedIndex == comp._Country ? 0 : cmbCountry.SelectedIndex;
-                var countryFilter = PropValuePair.GenereteWhereElements(nameof(InvPackagingTransClient._Country), typeof(Int32), Convert.ToString(country));
-                filters.Add(countryFilter);
+                string dfilter = (fromDate != DateTime.MinValue ? $"{fromDate:d}" : "") + ".." + (toDate != DateTime.MinValue ? $"{toDate:d}" : "");
+                var prop = PropValuePair.GenereteWhereElements(nameof(InvPackagingTransClient._Date), typeof(DateTime), dfilter);
+                dateFilter.Add(prop);
             }
 
             ReportingType reportingType = ReportingType.Packing;
-            if (cmbReportingType.SelectedIndex == 0)
-            {
-                reportingType = ReportingType.Packing;
-                PackagingType.Visible = true;
-                PackagingRateLevel.Visible = true;
-                WasteSorting.Visible = true;
-                PackagingConsumer.Visible = true;
 
-                prop = PropValuePair.GenereteWhereElements(nameof(InvPackagingTransClient._Category), typeof(byte), string.Concat(Convert.ToString((byte)InvPackagingCategoryEnum.Aluminum), "..", Convert.ToString((byte)InvPackagingCategoryEnum.PlasticFoam)));
-                filters.Add(prop);
-            }
-            else if (cmbReportingType.SelectedIndex == 1)
+            switch (cmbReportingType.SelectedIndex)
             {
-                reportingType = ReportingType.Batteries;
-                prop = PropValuePair.GenereteWhereElements(nameof(InvPackagingTransClient._Category), typeof(byte), string.Concat(Convert.ToString((byte)InvPackagingCategoryEnum.BB), "..", Convert.ToString((byte)InvPackagingCategoryEnum.SLI)));
-                filters.Add(prop);
-            }
-            else if (cmbReportingType.SelectedIndex == 2)
-            {
-                PackagingConsumer.Visible = true;
-                reportingType = ReportingType.Electronic;
-                prop = PropValuePair.GenereteWhereElements(nameof(InvPackagingTransClient._Category), typeof(byte), string.Concat(Convert.ToString((byte)InvPackagingCategoryEnum.Temp), "..", Convert.ToString((byte)InvPackagingCategoryEnum.Photovoltic)));
-                filters.Add(prop);
-            }
-            else if (cmbReportingType.SelectedIndex == 3)
-            {
-
-                reportingType = ReportingType.OneTimeUsePlastic;
-                prop = PropValuePair.GenereteWhereElements(nameof(InvPackagingTransClient._Category), typeof(byte), string.Concat(Convert.ToString((byte)InvPackagingCategoryEnum.FoodContainers), "..", Convert.ToString((byte)InvPackagingCategoryEnum.FiltersTobacco)));
-                filters.Add(prop);
+                case 0:
+                    reportingType = ReportingType.Packing;
+                    PackagingType.Visible = true;
+                    PackagingRateLevel.Visible = true;
+                    WasteSorting.Visible = true;
+                    PackagingConsumer.Visible = true;
+                    break;
+                case 1:
+                    reportingType = ReportingType.Batteries;
+                    PackagingType.Visible = true;
+                    break;
+                case 2:
+                    PackagingConsumer.Visible = true;
+                    reportingType = ReportingType.Electronic;
+                    break;
+                case 3:
+                    reportingType = ReportingType.OneTimeUsePlastic;
+                    break;
             }
 
             busyIndicator.IsBusy = true;
-            
-            var packagingTrans = await api.Query<InvPackagingTransClient>(filters);
+            busyIndicator.BusyContent = string.Concat(Uniconta.ClientTools.Localization.lookup("Loading"));
+            var country = (CountryCode)cmbCountry.SelectedIndex;
+            var reporting = AppEnums.PackagingReportingType.ToString((byte)reportingType);
+            var reportedByCustomer = ReportedByCustomer.IsChecked.GetValueOrDefault();
 
-            List<InvPackagingTransClient> packLst = null;
+            if (reportedByCustomer)
+            {
+                DebtorAccount.Visible = true;
+                DebtorName.Visible = true;
+                InvoiceNumber.Visible = true;
+            }
+
+            var packLst = (await api.Query<InvPackagingTransClient>(dateFilter)).Where(p => p.ReportingType == reporting && p._ReportedByCustomer == reportedByCustomer && (p.Country == country || p.Country == null)).ToList();
+
             if (AppendNotPosted.IsChecked.GetValueOrDefault())
             {
-                filters = new List<PropValuePair>();
-                if (fromDate != DateTime.MinValue || toDate != DateTime.MinValue)
-                {
-                    string datefilter = (fromDate != DateTime.MinValue ? $"{fromDate:d}" : "") + ".." + (toDate != DateTime.MinValue ? $"{toDate:d}" : "");
-                    prop = PropValuePair.GenereteWhereElements(nameof(DebtorInvoice._Date), typeof(DateTime), datefilter);
-                    filters.Add(prop);
-                }
-                var invoices = await api.Query<DebtorInvoiceClient>(filters);
-                var mInvoices = new List<DebtorInvoiceClient>();
+                var packLstByJournalAndItem = packLst.GroupBy(l => (l.JournalPostedId, l.Item)).ToDictionary(g => g.Key, g => g.ToArray());
+
+                var invoices = await api.Query<DebtorInvoiceClient>(dateFilter);
                 if (invoices.Length > 0)
                 {
-                    SortInvPackJournalPostedId sort;
-                    InvPackagingTransClient search;
-                    foreach (var rec in invoices)
+                    var allLines = await api.Query<DebtorInvoiceLines>(dateFilter);
+                    if (allLines == null || allLines.Length == 0)
                     {
-                        search = new InvPackagingTransClient();
-                        sort = new SortInvPackJournalPostedId();
-                        Array.Sort(packagingTrans, sort);
+                        busyIndicator.IsBusy = false;
+                        return;
+                    }
+                    var linesByJournal = allLines.GroupBy(l => l.JournalPostedId).ToDictionary(g => g.Key, g => g.ToArray());
 
-                        search._JournalPostedId = rec._JournalPostedId;
-                        var pos = Array.BinarySearch(packagingTrans, search, sort);
-                        if (pos >= 0 && pos < packagingTrans.Length)
-                            continue;
-                        mInvoices.Add(rec);
+                    var packagingProducts = (await api.Query<InvPackagingProductClient>()).Where(p => p.ReportingType == reporting).ToArray();
+                    var packagingProductsByItem = new Dictionary<string, List<InvPackagingProductClient>>();
+                    if (packagingProducts != null && packagingProducts.Length > 0)
+                    {
+                        foreach (var p in packagingProducts.Where(p => !string.IsNullOrEmpty(p._Item)))
+                        {
+                            if (!packagingProductsByItem.TryGetValue(p._Item, out var list))
+                            {
+                                list = new List<InvPackagingProductClient>();
+                                packagingProductsByItem[p._Item] = list;
+                            }
+                            list.Add(p);
+                        }
                     }
 
-                    var cntTotal = mInvoices.Count;
-                    if (cntTotal > 0)
+                    var itemsWithModel = items?.Where(s => s._PackingModel != null);
+                    if (itemsWithModel != null && itemsWithModel.Any())
                     {
-                        int cnt = 0;
-                        packLst = new List<InvPackagingTransClient>();
-                        var packagingProducts = await api.Query<InvPackagingProductClient>();
-                        foreach (var rec in mInvoices)
+                        var invPackModelLines = (await api.Query<InvPackingProductModelLine>()).Where(p => p._Reporting == reportingType).ToArray();
+                        if (invPackModelLines != null && invPackModelLines.Length > 0)
                         {
-                            busyIndicator.IsBusy = true;
-
-                            cnt++;
-                            if (cnt == 1 || cnt == cntTotal || (cnt % 100) == 0)
+                            var invPackModelLinesDict = invPackModelLines.GroupBy(l => l._Model).ToDictionary(g => g.Key, g => g.ToArray());
+                            foreach (var item in itemsWithModel)
                             {
-                                busyIndicator.BusyContent = string.Concat(Uniconta.ClientTools.Localization.lookup("Loading") + " " + NumberConvert.ToString(cnt), " af ", cntTotal);
-                                busyIndicator.IsBusy = false;
-                            }
-
-                            var debtor = (Debtor)debtors.Get(rec._DCAccount);
-                            var lines = await api.Query<DebtorInvoiceLines>(rec);
-                            if (lines.Length > 0)
-                            {
-                                var delCountry = debtor._Country;
-                                if (rec.DeliveryCountry != null)
-                                    delCountry = rec.DeliveryCountry.GetValueOrDefault();
-                                else if (rec.Installation != null)
-                                {
-                                    var ins = installations.Get(rec.Installation);
-                                    if (ins != null && ins._Country != null)
-                                        delCountry = ins._Country;
-                                }
-                                else if (rec.DeliveryAccount != null && rec.DeliveryAccount != rec.Account)
-                                {
-                                    var dc = debtors.Get(rec.DeliveryAccount);
-                                    if (dc != null)
-                                        delCountry = dc._Country;
-                                }
-
-                                if ((byte)delCountry != cmbCountry.SelectedIndex)
+                                if (!invPackModelLinesDict.TryGetValue(item._PackingModel, out var modelLines))
                                     continue;
-
-                                var sortPack = new SortPackProductItem();
-                                Array.Sort(packagingProducts, sortPack);
-
-                                InvPackagingProductClient searchPack;
-                                foreach (var line in lines)
+                                foreach (var line in modelLines)
                                 {
-                                    var item = (InvItem)items.Get(line._Item);
-                                    if (item != null)
+                                    packagingProductsByItem.TryGetValue(item._Item, out var existingPacks);
+                                    var packList = existingPacks != null ? existingPacks.ToList() : new List<InvPackagingProductClient>();
+
+                                    packList.Add(new InvPackagingProductClient
                                     {
-                                        searchPack = new InvPackagingProductClient();
-                                        searchPack._Item = line.Item;
-                                        var pos = Array.BinarySearch(packagingProducts, searchPack, sortPack);
-                                        if (pos < 0)
-                                            pos = ~pos;
+                                        CompanyId = api.CompanyId,
+                                        _Item = item._Item,
+                                        _Category = line._Category,
+                                        _Packaging = line._Packaging,
+                                        _WasteSorting = line._WasteSorting,
+                                        _PackagingRateLevel = line._PackagingRateLevel,
+                                        _PaymentGrouping = line._PaymentGrouping,
+                                        _NoReporting = line._NoReporting,
+                                        _Weight = line._Weight,
+                                        _Price1 = line._Price1,
+                                        _Price2 = line._Price2,
+                                    });
 
-                                        while (pos < packagingProducts.Length)
-                                        {
-                                            var pack = packagingProducts[pos++];
-                                            if (pack.Item != line.Item)
-                                                break;
-
-                                            if (pack.NoReporting && !debtor._MicroEnterprise || pack._Reporting != reportingType)
-                                                continue;
-
-                                            packLst.Add(new InvPackagingTransClient()
-                                            {
-                                                CompanyId = api.CompanyId,
-                                                _Category = pack._Category,
-                                                _WasteSorting = pack._WasteSorting,
-                                                _PackagingRateLevel = pack._PackagingRateLevel,
-                                                _Consumer = pack._PaymentGrouping == Uniconta.DataModel.PackagingConsumer.None ? (debtor._Consumer ? true : false) : pack._PaymentGrouping == Uniconta.DataModel.PackagingConsumer.Business ? true : false,
-                                                _Country = delCountry == comp._CountryId ? 0 : delCountry,
-                                                _Item = item._Item,
-                                                _Date = line._Date,
-                                                _JournalPostedId = line.JournalPostedId,
-                                                _Packaging = pack._Packaging,
-                                                _Weight = -line.Qty * pack._Weight,
-                                                IsCreated = true,
-                                            });
-                                        }
-                                    }
+                                    packagingProductsByItem[item._Item] = packList;
                                 }
                             }
                         }
                     }
+
+                    int cntTotal = invoices.Length;
+                    int cnt = 0;
+                   
+                    foreach (var rec in invoices)
+                    {
+                        cnt++;
+                        if (cnt == 1 || cnt == cntTotal || (cnt % 100) == 0)
+                            busyIndicator.BusyContent = string.Concat(Uniconta.ClientTools.Localization.lookup("Loading") + " " + NumberConvert.ToString(cnt), " af ", cntTotal);
+
+                        var debtor = (Debtor)debtors.Get(rec._DCAccount);
+                        if (debtor == null)
+                            continue;
+
+                        var delCountry = ResolveDeliveryCountry(rec, debtor, installations, debtors);
+                        if (delCountry != country)
+                            continue;
+
+                        if (!linesByJournal.TryGetValue(rec._JournalPostedId, out var lines))
+                            continue;
+
+                        var consumer = debtor.GetConsumer();
+
+                        var cntTest = lines.Length;
+                        foreach (var line in lines)
+                        {
+                            var item = (InvItem)items.Get(line._Item);
+                            if (item == null)
+                                continue;
+
+                            if (!packagingProductsByItem.TryGetValue(line.Item, out var packsForItem))
+                                continue;
+
+                            if (packLstByJournalAndItem.TryGetValue((line.JournalPostedId, line.Item), out var packTransLst))
+                                continue;
+
+                            foreach (var pack in packsForItem)
+                            {
+                                var isReportByCustomer = (pack._NoReporting || debtor._NoPackagingReporting) && !debtor._MicroEnterprise;
+                                if (!isReportByCustomer && reportedByCustomer)
+                                    continue;
+
+                                if (pack._PaymentGrouping != Uniconta.DataModel.PackagingConsumer.None)
+                                    consumer = pack._PaymentGrouping == Uniconta.DataModel.PackagingConsumer.Household;
+
+                                packLst.Add(new InvPackagingTransClient
+                                {
+                                    CompanyId = api.CompanyId,
+                                    _Category = pack._Category,
+                                    _WasteSorting = pack._WasteSorting,
+                                    _PackagingRateLevel = pack._PackagingRateLevel,
+                                    _Consumer = consumer,
+                                    _Country = delCountry == api.CompanyEntity._CountryId ? 0 : delCountry,
+                                    _Item = item._Item,
+                                    _Date = line._Date,
+                                    _JournalPostedId = line.JournalPostedId,
+                                    _Packaging = pack._Packaging,
+                                    _Weight = -line.Qty * pack._Weight,
+                                    _Price = consumer ? pack.PriceHousehold : pack.PriceBusiness,
+                                    IsCreated = true,
+                                });
+                            }
+                        }
+                    }
                 }
+
             }
 
-            var packagingTransLst = packagingTrans.ToList();
-            if (packLst != null)
-                packagingTransLst.AddRange(packLst);
-
-            if (packagingTransLst == null)
+            if (packLst == null)
                 dgInvPackagingTransGrid.ItemsSource = null;
             else
-                dgInvPackagingTransGrid.SetSource(packagingTransLst.ToArray());
-
+            {
+                dgInvPackagingTransGrid.SetSource(packLst.ToArray());
+                dgInvPackagingTransGrid.SortBy(JournalPostedId);
+            }
             busyIndicator.IsBusy = false;
+        }
+
+        private static CountryCode ResolveDeliveryCountry(DebtorInvoiceClient invoice, Debtor debtor, SQLTableCache<WorkInstallation> installations, SQLTableCache<Debtor> debtorsCache)
+        {
+            var delCountry = debtor != null ? debtor._Country : CountryCode.Unknown;
+            if (invoice.DeliveryCountry != null)
+                return invoice.DeliveryCountry.GetValueOrDefault();
+
+            if (invoice.Installation != null)
+            {
+                var ins = (WorkInstallation)installations.Get(invoice.Installation);
+                if (ins != null && ins._Country != CountryCode.Unknown)
+                    return ins._Country;
+            }
+
+            if (invoice.DeliveryAccount != null && invoice.DeliveryAccount != invoice.Account)
+            {
+                var dc = (Debtor)debtorsCache.Get(invoice.DeliveryAccount);
+                if (dc != null)
+                    return dc._Country;
+            }
+
+            return delCountry;
         }
 
         private void Compress()
         {
             if (string.IsNullOrWhiteSpace(comp._Id))
             {
-                UnicontaMessageBox.Show(string.Format(Localization.lookup("MissingOBJ"), Localization.lookup("CompanyRegNo")), Localization.lookup("Warning"));
+                UnicontaMessageBox.Show(string.Concat(Localization.lookup("Company"), " ", string.Format(Localization.lookup("MissingOBJ"), Localization.lookup("CompanyRegNo"))), Localization.lookup("Warning"));
                 return;
             }
 
             try
             {
                 var lst = (IEnumerable<InvPackagingTransClient>)dgInvPackagingTransGrid.GetVisibleRows();
-                var dict = new Dictionary<InvPackagingTransClient, InvPackagingTransClient>(new CompressCompare());
 
+                var reportingBatteries = cmbReportingType.SelectedIndex == 1;
+                var dict = new Dictionary<InvPackagingTransClient, InvPackagingTransClient>(new CompressCompare(reportingBatteries));
                 foreach (var rec in lst)
                 {
                     InvPackagingTransClient found;
@@ -349,11 +383,14 @@ namespace UnicontaClient.Pages.CustomPage
                     Period.Visible = true;
                     Date.Visible = false;
                     JournalPostedId.Visible = false;
-                    PackagingType.Visible = false;
+                    PackagingType.Visible = reportingBatteries;
                     Country.Visible = false;
                     Item.Visible = false;
                     Name.Visible = false;
                     IsCreated.Visible = false;
+                    DebtorAccount.Visible = false;
+                    DebtorName.Visible = false;
+                    InvoiceNumber.Visible = false;
 
                     dgInvPackagingTransGrid.ItemsSource = dictlst;
                     dgInvPackagingTransGrid.Visibility = Visibility.Visible;
@@ -372,6 +409,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         class CompressCompare : IEqualityComparer<InvPackagingTransClient>
         {
+            private readonly bool includePackagingType;
+
+            public CompressCompare(bool _includePackagingType)
+            {
+                includePackagingType = _includePackagingType;
+            }
             public bool Equals(InvPackagingTransClient x, InvPackagingTransClient y)
             {
                 var c = string.Compare(x.Period, y.Period);
@@ -389,14 +432,15 @@ namespace UnicontaClient.Pages.CustomPage
                 c = string.Compare(x.PackagingConsumer, y.PackagingConsumer);
                 if (c != 0)
                     return false;
-                return true;
+
+                return !includePackagingType || string.Compare(x.PackagingType, y.PackagingType) == 0;
             }
             public int GetHashCode(InvPackagingTransClient x)
             {
-                return Util.GetHashCode(x.Period) * Util.GetHashCode(x.Category) * Util.GetHashCode(x.WasteSorting) * Util.GetHashCode(x.PackagingRateLevel) * Util.GetHashCode(x.PackagingConsumer);
+                var hash =  Util.GetHashCode(x.Period) * Util.GetHashCode(x.Category) * Util.GetHashCode(x.WasteSorting) * Util.GetHashCode(x.PackagingRateLevel) * Util.GetHashCode(x.PackagingConsumer);
+                return includePackagingType ? hash * Util.GetHashCode(x.PackagingConsumer) : hash;
             }
         }
-
 
         private void CreateFile(Type recordType)
         {
@@ -455,6 +499,13 @@ namespace UnicontaClient.Pages.CustomPage
             if (!dictionaryColumnIndices.ContainsKey(key))
                 dictionaryColumnIndices.Add(key, idx);
 
+            if (cmbReportingType.SelectedIndex == 1)
+            {
+                key = "PackagingType";
+                if (!dictionaryColumnIndices.ContainsKey(key))
+                    dictionaryColumnIndices.Add(key, idx++);
+            }
+
             if (cmbReportingType.SelectedIndex == 0)
             {
                 key = "WasteSorting";
@@ -508,13 +559,15 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void cmbReportingType_SelectedIndexChanged(object sender, RoutedEventArgs e)
         {
-            lbAppendNotPosted.Text = string.Format(Localization.lookup("CreateNotPostedOBJ"), cmbReportingType.Text.ToLower());
+            lbAppendNotPosted.Text = string.Format(Localization.lookup("CreateMissingTransactionsOBJ"), cmbReportingType.Text.ToLower());
         }
 
         protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             if (debtors == null)
                 debtors = await api.LoadCache<Uniconta.DataModel.Debtor>().ConfigureAwait(false);
+            if (debtorGroups == null)
+                debtorGroups = await api.LoadCache<Uniconta.DataModel.DebtorGroup>().ConfigureAwait(false);
             if (items == null)
                 items = await api.LoadCache<Uniconta.DataModel.InvItem>().ConfigureAwait(false);
             if (installations == null)

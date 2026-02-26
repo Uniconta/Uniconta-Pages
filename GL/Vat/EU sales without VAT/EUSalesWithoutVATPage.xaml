@@ -28,17 +28,17 @@ x:Class="UnicontaClient.Pages.CustomPage.EUSalesWithoutVATPage"
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="70"/>
                 <ColumnDefinition Width="170"/>
-                <ColumnDefinition Width="90"/>
-                <ColumnDefinition Width="180"/>
+                <ColumnDefinition Width="240"/>
+                <ColumnDefinition Width="170"/>
             </Grid.ColumnDefinitions>
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FromDate}" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center"/>
             <CorasauControls:DateEditor x:Name="txtDateFrm" Grid.Column="1" Grid.Row="0" Height="23" />
-            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ToDate}" Margin="0,5,0,0" Grid.Column="0" Grid.Row="10" VerticalAlignment="Center"/>
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ToDate}" Margin="0,5,0,0" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center"/>
             <CorasauControls:DateEditor x:Name="txtDateTo" Grid.Column="1" Grid.Row="1" Height="23" Margin="0,5,0,0"/>
-            <TextBlock x:Name="lbVIESCheck" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CheckVIES}" Margin="20,0,5,0" Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2" VerticalAlignment="Center"></TextBlock>
-            <CorasauControls:CheckEditor Grid.Row="0" x:Name="checkVIES" Grid.Column="4" Height="23" HorizontalAlignment="Center" VerticalAlignment="Center" Checked="CheckVIES_Reaction" Unchecked="CheckVIES_Reaction"></CorasauControls:CheckEditor>
-            <TextBlock x:Name="lbRegistrarRegNo" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=RegistrarRegNo}" Margin="20,0,5,0" Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="2" VerticalAlignment="Center"></TextBlock>
-            <CorasauControls:TextEditor Grid.Row="2" x:Name="txtRegistrarRegNo" Grid.Column="4" Height="23" Width="100" HorizontalAlignment="Right" VerticalAlignment="Center" EditValueChanged="TxtRegistrarRegNo_EditValueChanged" ></CorasauControls:TextEditor>
+            <TextBlock x:Name="lbVIESCheck" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=VatNumberValidationService}" Margin="20,0,5,0" Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2" VerticalAlignment="Center"></TextBlock>
+            <CorasauControls:CheckEditor Grid.Row="0" x:Name="checkVIES" Grid.Column="3" Height="23" VerticalAlignment="Center" Checked="CheckVIES_Reaction" Unchecked="CheckVIES_Reaction"></CorasauControls:CheckEditor>
+            <TextBlock x:Name="lbRegistrarRegNo" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=RegistrarRegNo}" Margin="20,0,5,0" Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" VerticalAlignment="Center"></TextBlock>
+            <CorasauControls:TextEditor Grid.Row="1" x:Name="txtRegistrarRegNo" Grid.Column="3" Height="23"  VerticalAlignment="Center" EditValueChanged="TxtRegistrarRegNo_EditValueChanged" ></CorasauControls:TextEditor>
         </Grid>
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="2" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <localPage:EUSalesWithoutVATGrid x:Name="dgEUSalesWithoutVATGrid" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
@@ -47,6 +47,8 @@ x:Class="UnicontaClient.Pages.CustomPage.EUSalesWithoutVATPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Country" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Account" Width="90" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DebtorName" Width="200" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VIESDate" ReadOnly="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VIESStatus" ReadOnly="True" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DebtorRegNo" Width="150"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DebtorRegNoFile" Width="150"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="InvoiceNumber" Width="70" ReadOnly="True"/>

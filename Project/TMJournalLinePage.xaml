@@ -289,6 +289,7 @@ x:Class="UnicontaClient.Pages.CustomPage.TMJournalLinePage"
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="CopyLine" Visible="True" AllowEditing="True"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="LineStatus" Visible="False" Width="80" AllowEditing="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="ErrorInfo" Visible="False" AllowEditing="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="InternalType" Visible="False" AllowEditing="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" Visible="False" AllowEditing="False"/>
@@ -433,7 +434,6 @@ x:Class="UnicontaClient.Pages.CustomPage.TMJournalLinePage"
                                         </DataTemplate>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
-
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="colDay1" Width="75" FieldName="Day1" AllowMath="True">
                                     <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                                         <ControlTemplate>
@@ -552,6 +552,7 @@ x:Class="UnicontaClient.Pages.CustomPage.TMJournalLinePage"
                                     </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                                 </localPage:CorasauDataGridTemplateColumnClient>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="colInternalType" FieldName="InternalType" Visible="False" AllowEditing="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="colLineStatus" FieldName="LineStatus" Visible="False" Width="80" AllowEditing="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="colErrorInfo" FieldName="ErrorInfo" Visible="False" AllowEditing="False"/>
                             </localPage:TMJournalLinePageGrid.Columns>
                             <localPage:TMJournalLinePageGrid.TotalSummary >

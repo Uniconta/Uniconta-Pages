@@ -126,8 +126,8 @@ namespace UnicontaClient.Pages.CustomPage
         }
         private void InitializePage(UnicontaBaseEntity master = null)
         {
-            this.DataContext = this;
             InitializeComponent();
+            this.DataContext = this;
             if (master != null)
                 filterDate = BasePage.GetSystemDefaultDate().AddYears(-2);
             localMenu.dataGrid = dgDeletedTransGrid;

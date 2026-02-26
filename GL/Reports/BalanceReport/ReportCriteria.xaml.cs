@@ -92,8 +92,8 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var t = api.Query<Balance>();
             StartLoadCache(t);
-            this.DataContext = this;
             InitializeComponent();
+            this.DataContext = this;
             FocusManager.SetFocusedElement(txtbalanceName, txtbalanceName);
             cbFromAccount.api = cbToAccount.api = cbTemplate.api = api;
             ribbonControl = frmRibbon;

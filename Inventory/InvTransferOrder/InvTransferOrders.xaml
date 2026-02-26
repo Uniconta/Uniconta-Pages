@@ -52,6 +52,8 @@ x:Class="UnicontaClient.Pages.CustomPage.InvTransferOrders"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Group"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderNumber" AllowThousandMask="false" Width="70"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryDate"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="WarehouseFrom"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Warehouse"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryDateConfirmed" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="NoLines" Width="50" ReadOnly="True" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderTotal" Width="80" ReadOnly="True" />

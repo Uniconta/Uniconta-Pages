@@ -23,6 +23,7 @@ using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using UnicontaClient.Controls.Dialogs;
 using UnicontaClient.Models;
+using Uniconta.API.GeneralLedger;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
@@ -155,12 +156,34 @@ namespace UnicontaClient.Pages.CustomPage
                             if ((!string.IsNullOrEmpty(selectedItem._SendToDatevDOC)) || (!string.IsNullOrEmpty(selectedItem.SendToDatevEXTF)))
                                 if (UnicontaMessageBox.Show(String.Format("Sie haben {0:d} - {1:d} Version {3} ({2}) bereits zu DATEV hochgeladen. Möchten Sie noch einmal hochladen?", selectedItem._FromDate, selectedItem._ToDate, selectedItem.Comment, selectedItem._SuppVersion), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                                 {
-                                    FilUpload(selectedItem);
+                                    FilUpload(selectedItem, false);
                                     break;
                                 }
                                 else
                                     break;
-                            FilUpload(selectedItem);
+                            FilUpload(selectedItem, false);
+                            break;
+                        }
+                        else
+                            break;
+                    }
+                    else
+                        UnicontaMessageBox.Show("Der DATEV Zugangstoken ist ungültig oder abgelaufen", "Fehler", MessageBoxButton.OK);
+                    break;
+                case "UploadOld":
+                    if (!string.IsNullOrEmpty(DatevDetails.AccessToken) && DatevDetails.Tokenvalidto > DateTime.Now)
+                    {
+                        if (UnicontaMessageBox.Show(String.Format("Möchten Sie {0:d} - {1:d} Version {3} ({2}) zu DATEV hochladen?", selectedItem._FromDate, selectedItem._ToDate, selectedItem.Comment, selectedItem._SuppVersion), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.YesNoCancel) == MessageBoxResult.Yes)
+                        {
+                            if ((!string.IsNullOrEmpty(selectedItem._SendToDatevDOC)) || (!string.IsNullOrEmpty(selectedItem.SendToDatevEXTF)))
+                                if (UnicontaMessageBox.Show(String.Format("Sie haben {0:d} - {1:d} Version {3} ({2}) bereits zu DATEV hochgeladen. Möchten Sie noch einmal hochladen?", selectedItem._FromDate, selectedItem._ToDate, selectedItem.Comment, selectedItem._SuppVersion), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                                {
+                                    FilUpload(selectedItem, true);
+                                    break;
+                                }
+                                else
+                                    break;
+                            FilUpload(selectedItem, true);
                             break;
                         }
                         else
@@ -183,6 +206,11 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void SaveDatev()
         {
+            //var docAPI = new DocumentAPI(api);
+            //var datevHeader = await CreateDatevHeader();
+            //var selectedItem = dgGLTransExported.SelectedItem as GLTransExportedClient;
+            //await docAPI.DatevDocumentUpload(DatevDetails.AccessToken, DatevDetails.RefreshToken, selectedItem, datevHeader.RowId);
+
             var datev = await UnicontaClient.Pages.GLTransPage.CreateDatevHeader(api);
             var cw = new CwDatevHeaderParams(datev.Consultant, datev.Client, datev.Path, datev.DefaultAccount, datev.LanguageId, datev.FiscalYearBegin, datev.Active, datev.Dim1, datev.Dim2, api);
             cw.Closed += delegate
@@ -714,7 +742,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
         int MaxJournalPostId;
-        public async void FilUpload(GLTransExportedClient selectedItem)
+        public async void FilUpload(GLTransExportedClient selectedItem, bool old)
         {
             byte status = 0;
             var statusText = "";
@@ -856,15 +884,22 @@ namespace UnicontaClient.Pages.CustomPage
                         UnicontaMessageBox.Show(UpTextEXTF + " " + UpText, "DATEV", MessageBoxButton.OK);
                         if (DatevDetails.UCService == 2 || DatevDetails.UCService == 3)
                         {
-                            //Server Call UploadDatevDoc(selectedItem (or selectedItem._ToDate, selectedItem._SuppVersion) , DatevDetails.AccessToken, DatevDetails.RefreshToken); //Aunrag0 02.06
-                            //PG Call to test pdf upload                                
-                            var Cmp = api.CompanyEntity;
-                            Cmp.SetUserField("AccessToken", DatevDetails.AccessToken);
-                            Cmp.SetUserField("RefreshToken", DatevDetails.RefreshToken);
-                            Cmp.SetUserField("MaxJournalPostedId", selectedItem._MaxJournalPostedId);
-                            Cmp.SetUserField("SuppVersion", selectedItem.SuppVersion);
-                            Cmp.SetUserField("ToDate", selectedItem._ToDate);
-                            api.Update(Cmp);
+                            if (old)
+                            {
+                                var Cmp = api.CompanyEntity;
+                                Cmp.SetUserField("AccessToken", DatevDetails.AccessToken);
+                                Cmp.SetUserField("RefreshToken", DatevDetails.RefreshToken);
+                                Cmp.SetUserField("MaxJournalPostedId", selectedItem._MaxJournalPostedId);
+                                Cmp.SetUserField("SuppVersion", selectedItem.SuppVersion);
+                                Cmp.SetUserField("ToDate", selectedItem._ToDate);
+                                api.Update(Cmp);
+                            }
+                            else
+                            {
+                                var docAPI = new DocumentAPI(api);
+                                var datevHeader = await CreateDatevHeader();
+                                await docAPI.DatevDocumentUpload(DatevDetails.AccessToken, DatevDetails.RefreshToken, selectedItem, datevHeader.RowId);
+                            }
                         }
 
                     };

@@ -42,16 +42,18 @@ namespace UnicontaClient.Controls.Dialogs
         [Display(Name = "UpdateCost", ResourceType = typeof(InputFieldDataText))]
         public bool UpdateCost { get { return !KeepCostprices; } set { KeepCostprices = !value; } }
         CrudAPI _api;
-
+        [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.InvItem))]
+        [Display(Name = "Item", ResourceType = typeof(InputFieldDataText))]
+        public string Item { get; set; }
         protected override int DialogId { get { return DialogTableId; } }
         public int DialogTableId { get; set; }
         protected override bool ShowTableValueButton { get { return true; } }
-
+        public bool AllowClosedPeriods { get; set; }
         public CWCalculatingPrices(CrudAPI api)
         {
             InitializeComponent();
             _api = api;
-            leNumberSeries.api = api;
+            leNumberSeries.api = leItem.api = api;
             this.Title = $"{Uniconta.ClientTools.Localization.lookup("RecalculateCostPrices")} ({Uniconta.ClientTools.Localization.lookup("AlwaysCheckUnipedia")})";
             txtPostingPer.Text = $"{Uniconta.ClientTools.Localization.lookup("PostingPer")} ({Uniconta.ClientTools.Localization.lookup("UseOnlyInvoice")})";
             this.DataContext = this;

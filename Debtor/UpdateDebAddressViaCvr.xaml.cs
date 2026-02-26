@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.ServiceModel.Syndication;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -14,7 +15,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Uniconta.API.Service;
-using Uniconta.API.System;
 using Uniconta.ClientTools;
 using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
@@ -23,10 +23,6 @@ using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using Uniconta.Common.Utility;
 using Uniconta.DataModel;
-using UnicontaClient.Controls.Dialogs;
-using UnicontaClient.Models;
-using UnicontaClient.Pages;
-using UnicontaClient.Utilities;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -54,7 +50,11 @@ namespace UnicontaClient.Pages.CustomPage
     {
         UnicontaBaseEntity[] records;
         bool isSearch;
-            
+
+        static bool? updName, updAddress, updIndustryCode, updCompanyState;
+        ItemBase iUpdName, iUpdAddress, iUpdIndustryCode, iUpdCompanyState;
+
+
         public UpdateDebAddressViaCvr(BaseAPI API) : base(API, string.Empty)
         {
             InitPage();
@@ -87,6 +87,14 @@ namespace UnicontaClient.Pages.CustomPage
             gridControl.api = api;
             gridControl.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
+            localMenu.OnChecked += LocalMenu_OnChecked;
+            GetMenuItem();
+            updName = updName ?? true;
+            updAddress = updAddress ?? true;
+            updIndustryCode = updIndustryCode ?? true;
+            updCompanyState = updCompanyState ?? true;
+
+            SetFieldsVisibility();
             IndustryCodes = api.GetCache(typeof(IndustryCode));
         }
 
@@ -105,6 +113,71 @@ namespace UnicontaClient.Pages.CustomPage
                     SaveGrid();
                     break;
             }
+        }
+
+        private void LocalMenu_OnChecked(string actionType, bool IsChecked)
+        {
+            switch (actionType)
+            {
+                case "UpdName":
+                    updName = IsChecked;
+                    iUpdName.IsChecked = updName.GetValueOrDefault();
+                    
+                    break;
+                case "UpdAddress":
+                    updAddress = IsChecked;
+                    iUpdAddress.IsChecked = updAddress.GetValueOrDefault();
+                    break;
+                case "UpdIndustryCode":
+                    updIndustryCode = IsChecked;
+                    iUpdIndustryCode.IsChecked = updIndustryCode.GetValueOrDefault();
+                    break;
+                case "UpdCompanyState":
+                    updCompanyState = IsChecked;
+                    iUpdCompanyState.IsChecked = updCompanyState.GetValueOrDefault();
+                    break;
+            }
+            SetFieldsVisibility();
+        }
+
+        private void SetFieldsVisibility()
+        {
+            iUpdName.IsChecked = updName.GetValueOrDefault();
+            iUpdAddress.IsChecked = updAddress.GetValueOrDefault();
+            iUpdIndustryCode.IsChecked = updIndustryCode.GetValueOrDefault();
+            iUpdCompanyState.IsChecked = updCompanyState.GetValueOrDefault();
+
+            NewName.Visible = updName.GetValueOrDefault();
+            DifName.Visible = updName.GetValueOrDefault();
+            NewAddress.Visible = updAddress.GetValueOrDefault();
+            Address1.Visible = updAddress.GetValueOrDefault();
+            NewAddress2.Visible = updAddress.GetValueOrDefault();
+            Address2.Visible = updAddress.GetValueOrDefault();
+            DifAddress.Visible = updAddress.GetValueOrDefault();
+            NewZipCode.Visible = updAddress.GetValueOrDefault();
+            ZipCode.Visible = updAddress.GetValueOrDefault();
+            DifZipCode.Visible = updAddress.GetValueOrDefault();
+            
+            NewCity.Visible = updAddress.GetValueOrDefault();
+            City.Visible = updAddress.GetValueOrDefault();
+            DifCity.Visible = updAddress.GetValueOrDefault();
+            
+            NewIndustryCode.Visible = updIndustryCode.GetValueOrDefault();
+            IndustryCode.Visible = updIndustryCode.GetValueOrDefault();
+            DifIndustryCode.Visible = updIndustryCode.GetValueOrDefault();
+            NewCompanyState.Visible = updCompanyState.GetValueOrDefault();
+            CompanyState.Visible = updCompanyState.GetValueOrDefault();
+            DifCompanyState.Visible = updCompanyState.GetValueOrDefault();
+        }
+
+
+        void GetMenuItem()
+        {
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            iUpdName = UtilDisplay.GetMenuCommandByName(rb, "UpdName");
+            iUpdAddress = UtilDisplay.GetMenuCommandByName(rb, "UpdAddress");
+            iUpdIndustryCode = UtilDisplay.GetMenuCommandByName(rb, "UpdIndustryCode");
+            iUpdCompanyState = UtilDisplay.GetMenuCommandByName(rb, "UpdCompanyState");
         }
 
         public override void SetParameter(IEnumerable<ValuePair> Parameters)
@@ -212,22 +285,39 @@ namespace UnicontaClient.Pages.CustomPage
                     counterFound++;
                     var address = ci.address;
                     var streetAddress = address.CompleteStreet;
-                    if (Equal(ci.life.name, debtor._Name) && Equal(streetAddress, debtor._Address1) && Equal(address.street2, debtor._Address2) &&
-                               Equal(address.zipcode, debtor._ZipCode))
-                        continue;
 
                     string code = null;
                     if (IndustryCodes != null)
                         code = IndustryCodes.Get(ci.industrycode?.code)?.KeyStr;
 
+                    var difName = ci.life.name != null && !Equal(ci.life.name, debtor._Name);
+                    var difAddress = streetAddress != null && !Equal(streetAddress, debtor._Address1);  
+                    var difAddress2 = address.street2 != null && !Equal(address.street2, debtor._Address2);  
+                    var difZipCode = address.zipcode != null && !Equal(address.zipcode, debtor._ZipCode);
+                    var difCity = address.cityname != null && !Equal(address.cityname, debtor._City);
+                    var difIndustryCode = code != null && !Equal(ci.industrycode?.code, debtor._IndustryCode);
+                    var difCompanyState = ci.companystatus != null && ci.companystatus.StatusCode() != debtor._StateOfCompany;
+
+                    if (!difName && !difAddress && !difZipCode && !difCity && !difIndustryCode && !difCompanyState)
+                        continue;
+
                     var newDebtor = new DebtorClientLocal();
                     StreamingManager.Copy(debtor, newDebtor);
 
-                    newDebtor.NewAddress = streetAddress;
+                    newDebtor.NewAddress = streetAddress?.Substring(0, Math.Min(60, streetAddress.Length));
                     newDebtor.NewAddress2 = address.street2;
                     newDebtor.NewZipCode = address.zipcode;
-                    newDebtor.NewCity = address.cityname;
+                    newDebtor.NewCity = address.cityname?.Substring(0, Math.Min(30, address.cityname.Length));
                     newDebtor.NewName = ci.life.name;
+
+                    newDebtor.DifName = difName;
+                    newDebtor.DifAddress = difAddress;
+                    newDebtor.DifAddress2 = difAddress2;
+                    newDebtor.DifZipCode = difZipCode;
+                    newDebtor.DifCity = difCity;
+                    newDebtor.DifIndustryCode = difIndustryCode;
+                    newDebtor.DifCompanyState = difCompanyState;
+
                     if (IndustryCodes != null)
                         newDebtor.NewIndustryCode = code;
                     else
@@ -238,6 +328,8 @@ namespace UnicontaClient.Pages.CustomPage
                         newDebtor._companyState = state.StatusCode();
                         newDebtor.NotifyPropertyChanged("NewCompanyState");
                     }
+                  
+                    
                     newDebList.Add(newDebtor);
                     busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("Loading") + " " + NumberConvert.ToString(newDebList.Count);
                     busyIndicator.IsBusy = false;
@@ -290,8 +382,20 @@ namespace UnicontaClient.Pages.CustomPage
                     counterFound++;
                     var address = ci.address;
                     var streetAddress = address.CompleteStreet;
-                    if (Equal(ci.life.name, creditor._Name) && Equal(streetAddress, creditor._Address1) && Equal(address.street2, creditor._Address2) &&
-                               Equal(address.zipcode, creditor._ZipCode) && Equal(ci.industrycode?.code, creditor._IndustryCode))
+
+                    string code = null;
+                    if (IndustryCodes != null)
+                        code = IndustryCodes.Get(ci.industrycode?.code)?.KeyStr;
+
+                    var difName = ci.life.name != null && !Equal(ci.life.name, creditor._Name);
+                    var difAddress = streetAddress != null && !Equal(streetAddress, creditor._Address1);
+                    var difAddress2 = address.street2 != null && !Equal(address.street2, creditor._Address2);
+                    var difZipCode = address.zipcode != null && !Equal(address.zipcode, creditor._ZipCode);
+                    var difCity = address.cityname != null && !Equal(address.cityname, creditor._City);
+                    var difIndustryCode = code != null && !Equal(ci.industrycode?.code, creditor._IndustryCode);
+                    var difCompanyState = ci.companystatus != null && ci.companystatus.StatusCode() != creditor._StateOfCompany;
+
+                    if (!difName && !difAddress && !difZipCode && !difCity && !difIndustryCode && !difCompanyState)
                         continue;
 
                     var newCreditor = new CreditorClientLocal();
@@ -302,7 +406,20 @@ namespace UnicontaClient.Pages.CustomPage
                     newCreditor.NewZipCode = address.zipcode;
                     newCreditor.NewCity = address.cityname;
                     newCreditor.NewName = ci.life.name;
-                    newCreditor.NewIndustryCode = IndustryCodes.Get(ci.industrycode?.code)?.KeyStr;
+
+                    newCreditor.DifName = difName;
+                    newCreditor.DifAddress = difAddress;
+                    newCreditor.DifAddress2 = difAddress2;
+                    newCreditor.DifZipCode = difZipCode;
+                    newCreditor.DifCity = difCity;
+                    newCreditor.DifIndustryCode = difIndustryCode;
+                    newCreditor.DifCompanyState = difCompanyState;
+
+                    if (IndustryCodes != null)
+                        newCreditor.NewIndustryCode = code;
+                    else
+                        newCreditor.NewIndustryCode = ci.industrycode?.code;
+
                     var state = ci.companystatus;
                     if (state != null)
                     {
@@ -359,8 +476,20 @@ namespace UnicontaClient.Pages.CustomPage
                     counterFound++;
                     var address = ci.address;
                     var streetAddress = address.CompleteStreet;
-                    if (Equal(ci.life.name, prospect._Name) && Equal(streetAddress, prospect._Address1) && Equal(address.street2, prospect._Address2) &&
-                            Equal(address.zipcode, prospect._ZipCode) && Equal(ci.industrycode?.code, prospect._IndustryCode))
+
+                    string code = null;
+                    if (IndustryCodes != null)
+                        code = IndustryCodes.Get(ci.industrycode?.code)?.KeyStr;
+
+                    var difName = ci.life.name != null && !Equal(ci.life.name, prospect._Name);
+                    var difAddress = streetAddress != null && !Equal(streetAddress, prospect._Address1);
+                    var difAddress2 = address.street2 != null && !Equal(address.street2, prospect._Address2);
+                    var difZipCode = address.zipcode != null && !Equal(address.zipcode, prospect._ZipCode);
+                    var difCity = address.cityname != null && !Equal(address.cityname, prospect._City);
+                    var difIndustryCode = code != null && !Equal(ci.industrycode?.code, prospect._IndustryCode);
+                    var difCompanyState = ci.companystatus != null && ci.companystatus.StatusCode() != prospect._StateOfCompany;
+
+                    if (!difName && !difAddress && !difZipCode && !difCity && !difIndustryCode && !difCompanyState)
                         continue;
 
                     var newProspect = new CrmProspectClientLocal();
@@ -371,7 +500,20 @@ namespace UnicontaClient.Pages.CustomPage
                     newProspect.NewZipCode = address.zipcode;
                     newProspect.NewCity = address.cityname;
                     newProspect.NewName = ci.life.name;
-                    newProspect.NewIndustryCode = IndustryCodes.Get(ci.industrycode?.code)?.KeyStr;
+
+                    newProspect.DifName = difName;
+                    newProspect.DifAddress = difAddress;
+                    newProspect.DifAddress2 = difAddress2;
+                    newProspect.DifZipCode = difZipCode;
+                    newProspect.DifCity = difCity;
+                    newProspect.DifIndustryCode = difIndustryCode;
+                    newProspect.DifCompanyState = difCompanyState;
+
+                    if (IndustryCodes != null)
+                        newProspect.NewIndustryCode = code;
+                    else
+                        newProspect.NewIndustryCode = ci.industrycode?.code;
+
                     var state = ci.companystatus;
                     if (state != null)
                     {
@@ -419,18 +561,40 @@ namespace UnicontaClient.Pages.CustomPage
             int i = 0;
             foreach (var item in lst)
             {
+                var doUpdateName = updName.GetValueOrDefault() && item.DifName;
+                var doUpdateAddress = updAddress.GetValueOrDefault() && (item.DifAddress || item.DifAddress2 || item.DifZipCode || item.DifCity);
+                var doUpdateIndustryCode = updIndustryCode.GetValueOrDefault() && item.DifIndustryCode;
+                var doUpdateCompanyState = updCompanyState.GetValueOrDefault() && item.DifCompanyState;
+
+                if (!doUpdateName && !doUpdateAddress && !doUpdateIndustryCode && !doUpdateCompanyState)
+                    continue;
+
                 lst1[i] = StreamingManager.Clone(item) as DebtorClientLocal;
-                item._Address1 = item.NewAddress;
-                item._Address2 = item.NewAddress2;
-                item._ZipCode = item.NewZipCode;
-                item._City = item.NewCity;
-                item._Name = item.NewName;
-                item._IndustryCode= item.NewIndustryCode;
-                item.CompanyState = item.NewCompanyState;
+                if (doUpdateName)
+                    item._Name = item.NewName;
+               
+                if (doUpdateAddress)
+                {
+                    item._Address1 = item.NewAddress;
+                    item._Address2 = item.NewAddress2;
+                    item._ZipCode = item.NewZipCode;
+                    item._City = item.NewCity;
+                }
+                
+                if (doUpdateIndustryCode)
+                    item._IndustryCode= item.NewIndustryCode;
+                
+                if (doUpdateCompanyState)
+                    item.CompanyState = item.NewCompanyState;
+                
                 lst2[i] = item;
                 i++;
             }
-            return api.Update(lst1, lst2);
+
+            if (lst1.Length > 0)
+                return api.Update(lst1, lst2);
+
+            return Task.FromResult(ErrorCodes.NoLinesToUpdate);
         }
 
         Task<ErrorCodes> UpdateCreditorList()
@@ -443,17 +607,40 @@ namespace UnicontaClient.Pages.CustomPage
             int i = 0;
             foreach (var item in lst)
             {
+                var doUpdateName = updName.GetValueOrDefault() && item.DifName;
+                var doUpdateAddress = updAddress.GetValueOrDefault() && (item.DifAddress || item.DifAddress2 || item.DifZipCode || item.DifCity);
+                var doUpdateIndustryCode = updIndustryCode.GetValueOrDefault() && item.DifIndustryCode;
+                var doUpdateCompanyState = updCompanyState.GetValueOrDefault() && item.DifCompanyState;
+
+                if (!doUpdateName && !doUpdateAddress && !doUpdateIndustryCode && !doUpdateCompanyState)
+                    continue;
+
                 lst1[i] = StreamingManager.Clone(item) as CreditorClientLocal;
-                item._Address1 = item.NewAddress;
-                item._Address2 = item.NewAddress2;
-                item._ZipCode = item.NewZipCode;
-                item._City = item.NewCity;
-                item._IndustryCode= item.NewIndustryCode;
-                item.CompanyState = item.NewCompanyState;
+                if (doUpdateName)
+                    item._Name = item.NewName;
+
+                if (doUpdateAddress)
+                {
+                    item._Address1 = item.NewAddress;
+                    item._Address2 = item.NewAddress2;
+                    item._ZipCode = item.NewZipCode;
+                    item._City = item.NewCity;
+                }
+
+                if (doUpdateIndustryCode)
+                    item._IndustryCode= item.NewIndustryCode;
+               
+                if (doUpdateCompanyState)
+                    item.CompanyState = item.NewCompanyState;
+
                 lst2[i] = item;
                 i++;
             }
-            return api.Update(lst1, lst2);
+
+            if (lst1.Length > 0)
+                return api.Update(lst1, lst2);
+
+            return Task.FromResult(ErrorCodes.NoLinesToUpdate);  
         }
 
         Task<ErrorCodes> UpdateProspectList()
@@ -466,17 +653,40 @@ namespace UnicontaClient.Pages.CustomPage
             int i = 0;
             foreach (var item in lst)
             {
+                var doUpdateName = updName.GetValueOrDefault() && item.DifName;
+                var doUpdateAddress = updAddress.GetValueOrDefault() && (item.DifAddress || item.DifAddress2 || item.DifZipCode || item.DifCity);
+                var doUpdateIndustryCode = updIndustryCode.GetValueOrDefault() && item.DifIndustryCode;
+                var doUpdateCompanyState = updCompanyState.GetValueOrDefault() && item.DifCompanyState;
+
+                if (!doUpdateName && !doUpdateAddress && !doUpdateIndustryCode && !doUpdateCompanyState)
+                    continue;
+
                 lst1[i] = StreamingManager.Clone(item) as CrmProspectClientLocal;
-                item._Address1 = item.NewAddress;
-                item._Address2 = item.NewAddress2;
-                item._ZipCode = item.NewZipCode;
-                item._City = item.NewCity;
-                item._IndustryCode= item.NewIndustryCode;
-                item.CompanyState = item.NewCompanyState;
+                if (doUpdateName)
+                    item._Name = item.NewName;
+
+                if (doUpdateAddress)
+                {
+                    item._Address1 = item.NewAddress;
+                    item._Address2 = item.NewAddress2;
+                    item._ZipCode = item.NewZipCode;
+                    item._City = item.NewCity;
+                }
+
+                if (doUpdateIndustryCode)
+                    item._IndustryCode= item.NewIndustryCode;
+
+                if (doUpdateCompanyState)
+                    item.CompanyState = item.NewCompanyState;
+                
                 lst2[i] = item;
                 i++;
             }
-            return api.Update(lst1, lst2);
+
+            if (lst1.Length > 0)
+                return api.Update(lst1, lst2);
+
+            return Task.FromResult(ErrorCodes.NoLinesToUpdate);
         }
 
         void SetStatusText(int total, int found, int newRecord)
@@ -520,6 +730,8 @@ namespace UnicontaClient.Pages.CustomPage
     public class DebtorClientLocal : DebtorClient
     {
         private string _address, _address2, _city, _zipCode, _name, _industryCode;
+        private bool _difName, _difAddress, _difAddress2, _difCity, _difZipCode, _difIndustryCode, _difCompanyState;
+
         public byte _companyState;
         [StringLength(60)]
         [Display(Name = "NewAddress", ResourceType = typeof(DCAccountText))]
@@ -547,11 +759,33 @@ namespace UnicontaClient.Pages.CustomPage
         [AppEnum(EnumName = "CompanyState")]
         [Display(Name = "NewCompanyState", ResourceType = typeof(DCAccountText))]
         public string NewCompanyState { get { return AppEnums.CompanyState.ToString((int)_companyState); } set { if (value == null) return; _companyState = (byte)AppEnums.CompanyState.IndexOf(value); NotifyPropertyChanged("NewCompanyState"); } }
+
+        [Display(Name = "DifName", ResourceType = typeof(DCAccountText))]
+        public bool DifName { get { return _difName; } set { _difName = value; NotifyPropertyChanged("DifName"); } }
+
+        [Display(Name = "DifAddress", ResourceType = typeof(DCAccountText))]
+        public bool DifAddress { get { return _difAddress; } set { _difAddress = value; NotifyPropertyChanged("DifAddress"); } }
+
+        [Display(Name = "DifAddress2", ResourceType = typeof(DCAccountText))]
+        public bool DifAddress2 { get { return _difAddress2; } set { _difAddress2 = value; NotifyPropertyChanged("DifAddress2"); } }
+
+        [Display(Name = "DifZipCode", ResourceType = typeof(DCAccountText))]
+        public bool DifZipCode { get { return _difZipCode; } set { _difZipCode = value; NotifyPropertyChanged("DifZipCode"); } }
+
+        [Display(Name = "DifCity", ResourceType = typeof(DCAccountText))]
+        public bool DifCity { get { return _difCity; } set { _difCity = value; NotifyPropertyChanged("DifCity"); } }
+
+        [Display(Name = "DifIndustryCode", ResourceType = typeof(DCAccountText))]
+        public bool DifIndustryCode { get { return _difIndustryCode; } set { _difIndustryCode = value; NotifyPropertyChanged("DifIndustryCode"); } }
+
+        [Display(Name = "DifCompanyState", ResourceType = typeof(DCAccountText))]
+        public bool DifCompanyState { get { return _difCompanyState; } set { _difCompanyState = value; NotifyPropertyChanged("DifCompanyState"); } }
     }
 
     public class CreditorClientLocal : CreditorClient
     {
         private string _address, _address2, _city, _zipCode, _name, _industryCode;
+        private bool _difName, _difAddress, _difAddress2, _difCity, _difZipCode, _difIndustryCode, _difCompanyState;
         public byte _companyState;
         [StringLength(60)]
         [Display(Name = "NewAddress", ResourceType = typeof(DCAccountText))]
@@ -578,11 +812,33 @@ namespace UnicontaClient.Pages.CustomPage
         [AppEnum(EnumName = "CompanyState")]
         [Display(Name = "NewCompanyState", ResourceType = typeof(DCAccountText))]
         public string NewCompanyState { get { return AppEnums.CompanyState.ToString((int)_companyState); } set { if (value == null) return; _companyState = (byte)AppEnums.CompanyState.IndexOf(value); NotifyPropertyChanged("NewCompanyState"); } }
+
+        [Display(Name = "DifName", ResourceType = typeof(DCAccountText))]
+        public bool DifName { get { return _difName; } set { _difName = value; NotifyPropertyChanged("DifName"); } }
+
+        [Display(Name = "DifAddress", ResourceType = typeof(DCAccountText))]
+        public bool DifAddress { get { return _difAddress; } set { _difAddress = value; NotifyPropertyChanged("DifAddress"); } }
+
+        [Display(Name = "DifAddress2", ResourceType = typeof(DCAccountText))]
+        public bool DifAddress2 { get { return _difAddress2; } set { _difAddress2 = value; NotifyPropertyChanged("DifAddress2"); } }
+
+        [Display(Name = "DifZipCode", ResourceType = typeof(DCAccountText))]
+        public bool DifZipCode { get { return _difZipCode; } set { _difZipCode = value; NotifyPropertyChanged("DifZipCode"); } }
+
+        [Display(Name = "DifCity", ResourceType = typeof(DCAccountText))]
+        public bool DifCity { get { return _difCity; } set { _difCity = value; NotifyPropertyChanged("DifCity"); } }
+
+        [Display(Name = "DifIndustryCode", ResourceType = typeof(DCAccountText))]
+        public bool DifIndustryCode { get { return _difIndustryCode; } set { _difIndustryCode = value; NotifyPropertyChanged("DifIndustryCode"); } }
+
+        [Display(Name = "DifCompanyState", ResourceType = typeof(DCAccountText))]
+        public bool DifCompanyState { get { return _difCompanyState; } set { _difCompanyState = value; NotifyPropertyChanged("DifCompanyState"); } }
     }
 
     public class CrmProspectClientLocal : CrmProspectClient
     {
         private string _address, _address2, _city, _zipCode, _name, _industryCode;
+        private bool _difName, _difAddress, _difAddress2, _difCity, _difZipCode, _difIndustryCode, _difCompanyState;
         public byte _companyState;
         [StringLength(60)]
         [Display(Name = "NewAddress", ResourceType = typeof(DCAccountText))]
@@ -610,6 +866,27 @@ namespace UnicontaClient.Pages.CustomPage
         [AppEnum(EnumName = "CompanyState")]
         [Display(Name = "NewCompanyState", ResourceType = typeof(DCAccountText))]
         public string NewCompanyState { get { return AppEnums.CompanyState.ToString((int)_companyState); } set { if (value == null) return; _companyState = (byte)AppEnums.CompanyState.IndexOf(value); NotifyPropertyChanged("NewCompanyState"); } }
+
+        [Display(Name = "DifName", ResourceType = typeof(DCAccountText))]
+        public bool DifName { get { return _difName; } set { _difName = value; NotifyPropertyChanged("DifName"); } }
+
+        [Display(Name = "DifAddress", ResourceType = typeof(DCAccountText))]
+        public bool DifAddress { get { return _difAddress; } set { _difAddress = value; NotifyPropertyChanged("DifAddress"); } }
+
+        [Display(Name = "DifAddress2", ResourceType = typeof(DCAccountText))]
+        public bool DifAddress2 { get { return _difAddress2; } set { _difAddress2 = value; NotifyPropertyChanged("DifAddress2"); } }
+
+        [Display(Name = "DifZipCode", ResourceType = typeof(DCAccountText))]
+        public bool DifZipCode { get { return _difZipCode; } set { _difZipCode = value; NotifyPropertyChanged("DifZipCode"); } }
+
+        [Display(Name = "DifCity", ResourceType = typeof(DCAccountText))]
+        public bool DifCity { get { return _difCity; } set { _difCity = value; NotifyPropertyChanged("DifCity"); } }
+
+        [Display(Name = "DifIndustryCode", ResourceType = typeof(DCAccountText))]
+        public bool DifIndustryCode { get { return _difIndustryCode; } set { _difIndustryCode = value; NotifyPropertyChanged("DifIndustryCode"); } }
+
+        [Display(Name = "DifCompanyState", ResourceType = typeof(DCAccountText))]
+        public bool DifCompanyState { get { return _difCompanyState; } set { _difCompanyState = value; NotifyPropertyChanged("DifCompanyState"); } }
     }
 }
 

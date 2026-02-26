@@ -98,8 +98,8 @@ x:Class="UnicontaClient.Pages.CustomPage.AccountStatement"
                     <editor:CheckedComboBoxStyleSettings />
                 </CorasauControls:ComboBoxEditor.StyleSettings>
             </CorasauControls:ComboBoxEditor>
-            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ShowDimOnPrimo}" Grid.Column="6" Grid.Row="3" Margin="3,3,3,3"/>
-            <CorasauControls:ComboBoxEditor x:Name="cmbShowDimOnPrimo" Width="170"  Grid.Column="8" Grid.Row="3" Margin="0,3,3,3"/>
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ShowDimOnPrimo}" Grid.Column="9" Grid.Row="1" Margin="3,3,3,3"/>
+            <CorasauControls:ComboBoxEditor x:Name="cmbShowDimOnPrimo" Width="170"  Grid.Column="11" Grid.Row="1" Margin="0,3,3,3"/>
         </Grid>
         <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{StaticResource WindowHeaderGradient}" />
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="3" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">

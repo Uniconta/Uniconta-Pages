@@ -61,7 +61,7 @@ namespace UnicontaClient.Controls.Dialogs
                 case StandardReports.Quotation:
                 case StandardReports.OrderConfirmation:
                 case StandardReports.SalesPickingList:
-                    unicontaReports = new UnicontaReports[]
+                    unicontaReports = new []
                     {
                         new UnicontaReports((int)StandardReports.PackNote),
                         new UnicontaReports((int)StandardReports.Invoice),
@@ -74,7 +74,7 @@ namespace UnicontaClient.Controls.Dialogs
 
                 case StandardReports.InterestNote:
                 case StandardReports.CollectionLetter:
-                    unicontaReports = new UnicontaReports[]
+                    unicontaReports = new []
                     {
                         new UnicontaReports((int)StandardReports.CollectionLetter),
                         new UnicontaReports((int)StandardReports.InterestNote)
@@ -84,7 +84,7 @@ namespace UnicontaClient.Controls.Dialogs
 
                 case StandardReports.Statement:
                 case StandardReports.StatementCurrency:
-                    unicontaReports = new UnicontaReports[]
+                    unicontaReports = new []
                     {
                         new UnicontaReports((int)StandardReports.Statement),
                         new UnicontaReports((int)StandardReports.StatementCurrency)
@@ -95,7 +95,7 @@ namespace UnicontaClient.Controls.Dialogs
                 case StandardReports.PurchaseInvoice:
                 case StandardReports.PurchasePackNote:
                 case StandardReports.PurchaseRequisition:
-                    unicontaReports = new UnicontaReports[]
+                    unicontaReports = new []
                     {
                         new UnicontaReports((int)StandardReports.PurchaseRequisition),
                         new UnicontaReports((int)StandardReports.PurchasePackNote),
@@ -105,17 +105,25 @@ namespace UnicontaClient.Controls.Dialogs
                     break;
                 case StandardReports.CollectionLetterCurrency:
                 case StandardReports.InterestNoteCurrency:
-                    unicontaReports = new UnicontaReports[]
+                    unicontaReports = new []
                     {
                         new UnicontaReports((int)StandardReports.CollectionLetterCurrency),
                         new UnicontaReports((int)StandardReports.InterestNoteCurrency)
                     };
                     break;
                 case StandardReports.BalanceFrontPage:
-                    unicontaReports = new UnicontaReports[] { new UnicontaReports((int)standardReport) };
+                    unicontaReports = new [] { new UnicontaReports((int)standardReport) };
                     break;
                 case StandardReports.ProjectEstimate:
-                    unicontaReports = new UnicontaReports[] { new UnicontaReports((int)standardReport) };
+                    unicontaReports = new [] { new UnicontaReports((int)standardReport) };
+                    break;
+                case StandardReports.TransferPackNote:
+                case StandardReports.TransferPickList:
+                    unicontaReports = new[]
+                    {
+                        new UnicontaReports((int)StandardReports.TransferPackNote),
+                        new UnicontaReports((int)StandardReports.TransferPickList),
+                    };
                     break;
             }
             return unicontaReports;

@@ -96,7 +96,7 @@ namespace Corasau.Client.Pages
                 element = FocusManager.GetFocusedElement();
                 if (element is SLTextBox)
                 {
-                    var dp = (element as TextBox).Tag as DateEditor;
+                    var dp = (element as System.Windows.Controls.TextBox).Tag as DateEditor;
                     if (dp != null)
                         dp.UpdateEditValueSource();
                 }

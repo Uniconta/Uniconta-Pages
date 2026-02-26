@@ -3,6 +3,6 @@
   <RibbonItem TabId="0" LocalizedNameKey="Home">
     <!---When we create new TabPage -->
     <RibbonItem Action="Save" ShortcutKey="Ctrl+S" LocalizedNameKey="CreateOBJ" Parameter="Company" Glyph="save-16x16" LargeGlyph="save-32x32"/>
-    <RibbonItem Action="Cancel" LocalizedNameKey="Cancel" Glyph="close-16x16" LargeGlyph="close-32x32"/>
+    <RibbonItem Action="Cancel" LocalizedNameKey="Cancel" Glyph="Close_16x16" LargeGlyph="close-32x32"/>
   </RibbonItem>
 </root>

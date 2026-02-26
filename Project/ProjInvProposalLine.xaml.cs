@@ -321,6 +321,7 @@ namespace UnicontaClient.Pages.CustomPage
                         orderlines.ForEach(u => (u as DCOrderLine)._Qty = (u as DCOrderLine)._Qty * sign);
                     if (IsDeleteLines)
                         dgProjInvProposedLineGrid.DeleteAllRows();
+                    DataChaged = true;
                     dgProjInvProposedLineGrid.PasteRows(orderlines);
                 }
                 else if (screenName == TabControls.CopyOfferLines)
@@ -416,7 +417,10 @@ namespace UnicontaClient.Pages.CustomPage
                         globalEvents.NotifyRefreshViewer(NameOfControl, rec);
                     }
                     break;
-                case "Qty":
+                case "Unit":
+                    if (this.PriceLookup != null && this.PriceLookup.UseCustomerPrices)
+                        this.PriceLookup.GetCustomerPrice(rec, false);
+                    break;
                     if (this.PriceLookup != null && this.PriceLookup.UseCustomerPrices)
                         this.PriceLookup.GetCustomerPrice(rec, false);
                     if (company._InvoiceUseQtyNow)
@@ -695,13 +699,35 @@ namespace UnicontaClient.Pages.CustomPage
                 case "CopyBudget":
                     CopyLinesFromBudget();
                     break;
+                case "RecalculateOrderPrices":
+                    RecalculateOrderPrices();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
             RecalculateAmount();
         }
-
+        private void RecalculateOrderPrices()
+        {
+            var orderLst = dgProjInvProposedLineGrid.GetVisibleRows();
+            if (orderLst == null || orderLst.Count == 0)
+                return;
+            CWConfirmationBox dialog = new CWConfirmationBox(Uniconta.ClientTools.Localization.lookup("AreYouSureToContinue"), Uniconta.ClientTools.Localization.lookup("Confirmation"), false);
+            dialog.Closing += async delegate
+            {
+                if (dialog.ConfirmationResult == CWConfirmationBox.ConfirmationResultEnum.Yes)
+                {
+                    busyIndicator.IsBusy = true;
+                    var err = await new OrderAPI(this.api).RecalcOrderPrices(new[] { Order });
+                    busyIndicator.IsBusy = false;
+                    UtilDisplay.ShowErrorCode(err);
+                    if (err == ErrorCodes.Succes)
+                        RefreshGrid();
+                }
+            };
+            dialog.Show();
+        }
         void CopyLinesFromOffer()
         {
             try
@@ -805,7 +831,7 @@ namespace UnicontaClient.Pages.CustomPage
                     InvoiceAPI Invapi = new InvoiceAPI(api);
                     var isSimulated = GenrateInvoiceDialog.IsSimulation;
                     var invoicePostingResult = SetupInvoicePostingPrintGenerator(dbOrder, GenrateInvoiceDialog.GenrateDate, isSimulated, GenrateInvoiceDialog.ShowInvoice, GenrateInvoiceDialog.PostOnlyDelivered, GenrateInvoiceDialog.InvoiceQuickPrint,
-                        GenrateInvoiceDialog.NumberOfPages, GenrateInvoiceDialog.SendByEmail, !isSimulated && GenrateInvoiceDialog.SendByOutlook, GenrateInvoiceDialog.sendOnlyToThisEmail, GenrateInvoiceDialog.Emails,
+                        GenrateInvoiceDialog.NumberOfPages, GenrateInvoiceDialog.SendByEmail, GenrateInvoiceDialog.SendByOutlook, GenrateInvoiceDialog.sendOnlyToThisEmail, GenrateInvoiceDialog.Emails,
                         GenrateInvoiceDialog.GenerateOIOUBLClicked);
                     invoicePostingResult.SetAdditionalOrders(GenrateInvoiceDialog.AdditionalOrders?.Cast<DCOrder>().ToList());
                     if (api.CompanyEntity.AllowSkipCreditMax)
@@ -850,7 +876,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var invoicePostingResult = new InvoicePostingPrintGenerator(api, this);
             invoicePostingResult.SetUpInvoicePosting(dbOrder, null, CompanyLayoutType.Invoice, generateDate, null, isSimulation, showInvoice, postOnlyDelivered, isQuickPrint, pagePrintCount,
-                invoiceSendByEmail, !isSimulation && invoiceSendByOutlook, sendOnlyToEmail, sendOnlyToEmailList, OIOUBLgenerate, null, false);
+                invoiceSendByEmail, invoiceSendByOutlook, sendOnlyToEmail, sendOnlyToEmailList, OIOUBLgenerate, null, false);
             return invoicePostingResult;
         }
 
@@ -879,7 +905,7 @@ namespace UnicontaClient.Pages.CustomPage
         protected override async Task<ErrorCodes> saveGrid()
         {
             var orderLine = dgProjInvProposedLineGrid.SelectedItem as ProjectInvoiceProposalLineClient;
-            if (dgProjInvProposedLineGrid.HasUnsavedData)
+            if (dgProjInvProposedLineGrid.HasUnsavedData || DataChaged)
             {
                 ErrorCodes res = await dgProjInvProposedLineGrid.SaveData();
                 if (res == ErrorCodes.Succes)

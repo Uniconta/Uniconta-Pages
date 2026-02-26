@@ -131,6 +131,7 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "CategoryName", ResourceType = typeof(ProjectTransClientText))]
         public string PrCategoryName { get { return ClientHelper.GetName(CompanyId, typeof(Uniconta.DataModel.PrCategory), _PrCategory); } }
 
+        public object PayrollSource { get; set; }
 
         [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.EmpPayrollCategory))]
         [Display(Name = "PayrollCategory", ResourceType = typeof(ProjectTransClientText))]
@@ -234,7 +235,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        protected void NotifyPropertyChanged(string propertyName)
+        public void NotifyPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
@@ -266,6 +267,18 @@ namespace UnicontaClient.Pages.CustomPage
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             return value;
+        }
+    }
+
+    public class BudgetYearPayrollFilter : SQLCacheFilter
+    {
+        readonly bool Invoiceable;
+        public BudgetYearPayrollFilter(SQLCache cache, bool Invoiceable) : base(cache) { this.Invoiceable = Invoiceable; }
+
+        public override bool IsValid(object rec)
+        {
+            var p = ((Uniconta.DataModel.EmpPayrollCategory)rec);
+                return (p._Invoiceable == this.Invoiceable && p._InternalType < Uniconta.DataModel.InternalType.Mileage);
         }
     }
 

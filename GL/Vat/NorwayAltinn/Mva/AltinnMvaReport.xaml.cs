@@ -76,7 +76,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
     }
 
-    public partial class AltinnMvaReport : BasePage
+    public partial class AltinnMvaReport : ControlBasePage
     {
         protected const int TERMINTYPE_YEAR = 1;
         protected const int TERMINTYPE_TWOMTH = 4;

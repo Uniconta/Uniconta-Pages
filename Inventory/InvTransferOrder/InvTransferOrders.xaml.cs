@@ -225,32 +225,6 @@ namespace UnicontaClient.Pages.CustomPage
                         cwOrderFromOrder.Show();
                     }
                     break;
-                case "RefVoucher":
-                    if (selectedItem == null)
-                        return;
-                    var _refferedVouchers = new List<int>();
-                    if (selectedItem._DocumentRef != 0)
-                        _refferedVouchers.Add(selectedItem._DocumentRef);
-
-                    VoucherOpen = true;
-                    AddDockItem(TabControls.AttachVoucherGridPage, new object[] { _refferedVouchers }, true);
-                    break;
-                case "ViewVoucher":
-                    if (selectedItem != null)
-                        ViewVoucher(TabControls.VouchersPage3, dgInvTransferOrdersGrid.syncEntity);
-                    break;
-                case "DragDrop":
-                case "ImportVoucher":
-                    if (selectedItem != null)
-                    {
-                        dgInvTransferOrdersGrid.SetLoadedRow(selectedItem);
-                        AddVoucher(selectedItem, ActionType);
-                    }
-                    break;
-                case "RemoveVoucher":
-                    if (selectedItem != null)
-                        RemoveVoucher(selectedItem);
-                    break;
                 case "EditAll":
                     if (dgInvTransferOrdersGrid.Visibility == Visibility.Visible)
                         EditAll();
@@ -274,21 +248,13 @@ namespace UnicontaClient.Pages.CustomPage
                 case "SaveGrid":
                     Save();
                     break;
-                case "CreateInvoice":
+                case "UpdatePickList":
+                case "UpdateDeliveryNote":
                     if (selectedItem != null)
-                    {
-                        if (Utility.HasControlRights("GenerateInvoice", api.CompanyEntity))
-                            GenerateInvoice(selectedItem);
-                        else
-                            UtilDisplay.ShowControlAccessMsg("GenerateInvoice");
-                    }
+                        OrderConfirmation(selectedItem, ActionType == "UpdateDeliveryNote" ? CompanyLayoutType.TransferPacknote : CompanyLayoutType.PickingList);
                     break;
                 case "RefreshGrid":
                     TestCreditorReload(true, dgInvTransferOrdersGrid.ItemsSource as IEnumerable<InvTransferOrder>);
-                    break;
-                case "ApproveOrder":
-                    if (selectedItem != null && api.CompanyEntity.ApprovePurchaseOrders)
-                        Utility.ApproveOrder(api, selectedItem);
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -417,101 +383,45 @@ namespace UnicontaClient.Pages.CustomPage
         //    };
         //    postingDialog.Show();
         //}
-        private void AddVoucher(InvTransferOrderClient selectedItem, string actionType)
+
+        static bool showInvPrintPreview = true;
+        private void OrderConfirmation(InvTransferOrderClient InvTransferOrderClient, CompanyLayoutType doctype)
         {
-            var voucher = new VouchersClient();
-            voucher._Content = ContentTypes.PurchaseInvoice;
-            voucher._PurchaseNumber = selectedItem._OrderNumber;
-            voucher._Project = selectedItem._Project;
-            voucher._Approver1 = selectedItem._Approver;
-            voucher._CreditorAccount = selectedItem._InvoiceAccount ?? selectedItem._DCAccount;
-            if (actionType == "DragDrop")
+            InvoiceAPI Invapi = new InvoiceAPI(api);
+            bool showSendByMail = true;
+            var comp = api.CompanyEntity;
+            bool showUpdateInv = comp.Storage || ((doctype == CompanyLayoutType.TransferPacknote || doctype == CompanyLayoutType.PickingList) && comp.CreditorPacknote);
+            CWGenerateInvoice GenrateOfferDialog = new CWGenerateInvoice(false, doctype.ToString(), showInputforInvNumber: false, isShowInvoiceVisible: true,
+                askForEmail: false, showNoEmailMsg: !showSendByMail, isShowUpdateInv: showUpdateInv);
+            switch (doctype)
             {
-                var dragDropWindow = new UnicontaDragDropWindow(false);
-                Utility.PauseLastAutoSaveTime();
-                dragDropWindow.Closed += delegate
+                case CompanyLayoutType.PickingList:
+                    GenrateOfferDialog.DialogTableId = 2000000113;
+                    break;
+                case CompanyLayoutType.TransferPacknote:
+                    GenrateOfferDialog.DialogTableId = 2000000114;
+                    break;
+            }
+            GenrateOfferDialog.SetInvPrintPreview(showInvPrintPreview);
+
+            GenrateOfferDialog.Closed += async delegate
+            {
+                if (GenrateOfferDialog.DialogResult == true)
                 {
-                    if (dragDropWindow.DialogResult == true)
-                    {
-                        var fileInfo = dragDropWindow.FileInfoList?.SingleOrDefault();
-                        if (fileInfo != null)
-                        {
-                            voucher._Data = fileInfo.FileBytes;
-                            voucher._Text = fileInfo.FileName;
-                            voucher._Fileextension = DocumentConvert.GetDocumentType(fileInfo.FileExtension);
-                        }
-                        Utility.ImportVoucher(selectedItem, api, voucher, true);
-                    }
-                };
-                dragDropWindow.Show();
-            }
-            else
-                Utility.ImportVoucher(selectedItem, api, voucher, false);
-        }
+                    showInvPrintPreview = GenrateOfferDialog.ShowInvoice || GenrateOfferDialog.InvoiceQuickPrint || GenrateOfferDialog.SendByOutlook;
 
-        InvTransferOrderClient prevOrder;
-        DateTime prevDateTime;
-        string prevInvoiceNumber;
-        List<DCOrder> prevAddtionalOrdsSel;
-        private void GenerateInvoice(InvTransferOrderClient InvTransferOrderClient)
-        {
-            var accountName = Util.ConcatParenthesis(InvTransferOrderClient._DCAccount, InvTransferOrderClient.KeyName);
-            var creditor = ClientHelper.GetRef(InvTransferOrderClient.CompanyId, typeof(Uniconta.DataModel.Creditor), InvTransferOrderClient._DCAccount) as Uniconta.DataModel.Creditor;
-            bool showSendByEmail = creditor != null ? (!string.IsNullOrEmpty(creditor._InvoiceEmail) || creditor._EmailDocuments) : false;
-
-            CWGenerateInvoice GenrateInvoiceDialog = new CWGenerateInvoice(true, string.Empty, true, true, showNoEmailMsg: !showSendByEmail, AccountName: accountName);
-            GenrateInvoiceDialog.DialogTableId = 2000000002;
-            GenrateInvoiceDialog.SetSendAsEmailCheck(false);
-           
-            var additionalOrdersList = Utility.GetAdditionalOrders(api, InvTransferOrderClient);
-
-            //Save values when the Simulation was setup in the previous action
-            if (prevOrder != null && prevOrder.OrderNumber == InvTransferOrderClient.OrderNumber)
-            {
-                GenrateInvoiceDialog.SetInvoiceDate(prevDateTime);
-                GenrateInvoiceDialog.SetInvoiceNumber(prevInvoiceNumber);
-                if (additionalOrdersList != null)
-                    GenrateInvoiceDialog.SetAdditionalOrders(additionalOrdersList, prevAddtionalOrdsSel);
-            }
-            else
-            {
-                if (InvTransferOrderClient._InvoiceDate != DateTime.MinValue)
-                    GenrateInvoiceDialog.SetInvoiceDate(InvTransferOrderClient._InvoiceDate);
-                GenrateInvoiceDialog.SetInvoiceNumber(InvTransferOrderClient._InvoiceNumber);
-                if (additionalOrdersList != null)
-                    GenrateInvoiceDialog.SetAdditionalOrders(additionalOrdersList);
-            }
-
-           // GenrateInvoiceDialog.SetVouchersFromInvTransferOrder(api, InvTransferOrderClient);
-            GenrateInvoiceDialog.ShowAllowCredMax(creditor._CreditMax != 0);
-
-            GenrateInvoiceDialog.Closed += async delegate
-            {
-                if (GenrateInvoiceDialog.DialogResult == true)
-                {
-
-                    var isSimulated = GenrateInvoiceDialog.IsSimulation;
+                    var openOutlook = doctype == CompanyLayoutType.TransferPacknote || doctype == CompanyLayoutType.PickingList ? GenrateOfferDialog.UpdateInventory && GenrateOfferDialog.SendByOutlook : GenrateOfferDialog.SendByOutlook;
                     var invoicePostingResult = new InvoicePostingPrintGenerator(api, this);
-                    invoicePostingResult.SetUpInvoicePosting(InvTransferOrderClient, null, CompanyLayoutType.PurchaseInvoice, GenrateInvoiceDialog.GenrateDate, GenrateInvoiceDialog.InvoiceNumber, isSimulated,
-                        GenrateInvoiceDialog.ShowInvoice, false, GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.NumberOfPages, GenrateInvoiceDialog.SendByEmail, GenrateInvoiceDialog.SendByOutlook,
-                        GenrateInvoiceDialog.sendOnlyToThisEmail, GenrateInvoiceDialog.Emails, false, null, false);
-                    invoicePostingResult.SetAdditionalOrders(GenrateInvoiceDialog.AdditionalOrders?.Cast<DCOrder>().ToList());
-                    invoicePostingResult.SetDocumentRef(GenrateInvoiceDialog.PhysicalVoucherRef);
+                    invoicePostingResult.SetUpInvoicePosting(InvTransferOrderClient, null, doctype, GenrateOfferDialog.GenrateDate, null, !GenrateOfferDialog.UpdateInventory, GenrateOfferDialog.ShowInvoice, false,
+                        GenrateOfferDialog.InvoiceQuickPrint, GenrateOfferDialog.NumberOfPages, GenrateOfferDialog.SendByEmail, openOutlook, GenrateOfferDialog.sendOnlyToThisEmail,
+                        GenrateOfferDialog.Emails, false, null, false);
                     if (api.CompanyEntity.AllowSkipCreditMax)
-                        invoicePostingResult.SetAllowCreditMax(GenrateInvoiceDialog.AllowSkipCreditMax);
+                        invoicePostingResult.SetAllowCreditMax(GenrateOfferDialog.AllowSkipCreditMax);
 
-                    busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
+                    busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
                     busyIndicator.IsBusy = true;
                     var result = await invoicePostingResult.Execute();
                     busyIndicator.IsBusy = false;
-
-                    if (isSimulated)
-                    {
-                        prevOrder = InvTransferOrderClient;
-                        prevDateTime = GenrateInvoiceDialog.GenrateDate;
-                        prevInvoiceNumber = GenrateInvoiceDialog.InvoiceNumber;
-                        prevAddtionalOrdsSel = GenrateInvoiceDialog.AdditionalOrders?.Cast<DCOrder>().ToList();
-                    }
 
                     if (result)
                     {
@@ -522,7 +432,7 @@ namespace UnicontaClient.Pages.CustomPage
                         Utility.ShowJournalError(invoicePostingResult.PostingResult.ledgerRes, dgInvTransferOrdersGrid);
                 }
             };
-            GenrateInvoiceDialog.Show();
+            GenrateOfferDialog.Show();
         }
 
         bool editAllChecked;
@@ -734,8 +644,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (n >= 5)
                     lst.Add(typeof(Uniconta.DataModel.InvVariant5));
             }
-            if (Comp.Warehouse)
-                lst.Add(typeof(Uniconta.DataModel.InvWarehouse));
+            lst.Add(typeof(Uniconta.DataModel.InvWarehouse));
             lst.Add(typeof(Uniconta.DataModel.InvGroup));
             if (Comp.NumberOfDimensions >= 1)
                 lst.Add(typeof(Uniconta.DataModel.GLDimType1));

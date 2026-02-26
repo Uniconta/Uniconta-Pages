@@ -95,6 +95,7 @@ x:Class="UnicontaClient.Pages.CustomPage.WorkInProgressReportPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="cldim3" Width="70" FieldName="Dimension3" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="cldim4" Width="70" FieldName="Dimension4" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="cldim5" Width="70" FieldName="Dimension5" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="EnterAdjustmentAmount" AllowEditing="True"  Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="OpeningBalance">
                         <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                             <ControlTemplate>
@@ -261,6 +262,7 @@ x:Class="UnicontaClient.Pages.CustomPage.WorkInProgressReportPage"
                     <local:SumColumn FieldName="InvoicedCostValue" SummaryType="Sum" ShowInGroupColumnFooter="InvoicedCostValue"/>
                     <local:SumColumn FieldName="TotalInvoiced" SummaryType="Sum" ShowInGroupColumnFooter="TotalInvoiced"/>
                     <local:SumColumn FieldName="TotalInvoicedCostValue" SummaryType="Sum" ShowInGroupColumnFooter="TotalInvoicedCostValue"/>
+                    <local:SumColumn FieldName="EnterAdjustmentAmount" SummaryType="Sum" ShowInGroupColumnFooter="EnterAdjustment"/>
                     <local:SumColumn FieldName="Adjustment" SummaryType="Sum" ShowInGroupColumnFooter="Adjustment"/>
                     <local:SumColumn FieldName="AdjustmentCostValue" SummaryType="Sum" ShowInGroupColumnFooter="AdjustmentCostValue"/>
                     <local:SumColumn FieldName="OpeningBalance" SummaryType="Sum" ShowInGroupColumnFooter="OpeningBalance"/>
@@ -284,6 +286,7 @@ x:Class="UnicontaClient.Pages.CustomPage.WorkInProgressReportPage"
                     <local:SumColumn FieldName="InvoicedCostValue" SummaryType="Sum"/>
                     <local:SumColumn FieldName="TotalInvoiced" SummaryType="Sum"/>
                     <local:SumColumn FieldName="TotalInvoicedCostValue" SummaryType="Sum"/>
+                    <local:SumColumn FieldName="EnterAdjustmentAmount" SummaryType="Sum"/>
                     <local:SumColumn FieldName="Adjustment" SummaryType="Sum"/>
                     <local:SumColumn FieldName="AdjustmentCostValue" SummaryType="Sum"/>
                     <local:SumColumn FieldName="OpeningBalance" SummaryType="Sum"/>

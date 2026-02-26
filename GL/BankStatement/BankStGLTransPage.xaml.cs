@@ -105,7 +105,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (string.Compare(rec.Name, "Bank", StringComparison.CurrentCultureIgnoreCase) == 0)
                 {
-                    var cache = api.GetCache(typeof(Uniconta.DataModel.BankStatement)) ?? api.LoadCache(typeof(Uniconta.DataModel.BankStatement)).GetAwaiter().GetResult();
+                    var cache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.BankStatement), api);
                     master = (Uniconta.DataModel.BankStatement)cache.Get(rec.Value);
                     if (master != null)
                         UpdateMaster();

@@ -63,12 +63,20 @@ namespace UnicontaClient.Controls.Dialogs
                 return;
             if (api.CompanyEntity._CountryId == CountryCode.Germany)
             {
+#if MAC
+                GermanGDPdUExport.Export(api, FromDate, ToDate, folderBrowserDialog.FolderName);
+#else
                 GermanGDPdUExport.Export(api, FromDate, ToDate, folderBrowserDialog.SelectedPath);
+#endif
                 SetDialogResult(true);
             }
             else
             {
+#if MAC
+                var docInfo = new SAFTDocumentInfo() { Api = api, FromDate = FromDate, ToDate = ToDate, FileName = folderBrowserDialog.FolderName };
+#else
                 var docInfo = new SAFTDocumentInfo() { Api = api, FromDate = FromDate, ToDate = ToDate, FileName = folderBrowserDialog.SelectedPath };
+#endif
                 try
                 {
                     if (busyIndicator != null)
@@ -80,8 +88,11 @@ namespace UnicontaClient.Controls.Dialogs
                     if (busyIndicator != null)
                         busyIndicator.IsBusy = false;
                 }
-
+#if MAC
+                docInfo.XmlDoc.Save(Path.Combine(folderBrowserDialog.FolderName, docInfo.FileName));
+#else
                 docInfo.XmlDoc.Save(Path.Combine(folderBrowserDialog.SelectedPath, docInfo.FileName));
+#endif
                 SetDialogResult(true);
             }
         }

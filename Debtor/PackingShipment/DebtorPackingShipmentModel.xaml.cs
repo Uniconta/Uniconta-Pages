@@ -1,5 +1,3 @@
-using UnicontaClient.Models;
-using UnicontaClient.Pages;
 using DevExpress.Xpf.Grid;
 using System;
 using System.Collections.Generic;
@@ -21,6 +19,7 @@ using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
+using UnicontaClient.Models;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -35,6 +34,10 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override string NameOfControl { get { return TabControls.DebtorPackingShipmentModelPage; } }
         
+        public DebtorPackingShipmentModelPage(BaseAPI API, string lookupKey) : base(API, lookupKey)
+        {
+            Init();
+        }
         public DebtorPackingShipmentModelPage(BaseAPI API) : base(API, string.Empty)
         {
             Init();
@@ -77,10 +80,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             if (selectedItem.RowId != 0)
-            {
-                AddDockItem(TabControls.DebtorPackingShipmentLinePage, selectedItem,
-                    string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Lines"), selectedItem._Code));
-            }
+                AddDockItem(TabControls.DebtorPackingShipmentLinePage, dgDebtorPackingShipmentModelGrid.syncEntity);
         }
 
         private void Name_PreviewMouseDown(object sender, MouseButtonEventArgs e)

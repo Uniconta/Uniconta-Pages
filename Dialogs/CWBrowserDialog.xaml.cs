@@ -12,15 +12,17 @@ namespace UnicontaClient.Controls.Dialogs
     /// </summary>
     public partial class CWBrowserDialog : ChildWindow
     {
-        public CWBrowserDialog(string url, string title = null)
+        public CWBrowserDialog(string url, string title = null) : this(new UnicontaWebViewer(new Uri(url)))
+        {
+            Title = title ?? Uniconta.ClientTools.Localization.lookup("UseDefaultBrowser");
+        }
+
+        public CWBrowserDialog(UnicontaWebViewer browserControl)
         {
             InitializeComponent();
-            Title = title ?? string.Empty;
-            var browserControl = new UnicontaWebViewer(new Uri(url));
             browserControl.ShowNavigationError = false;
             layoutGrid.Children.Add(browserControl);
             System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
-
         }
 
         protected override void OnClosing(CancelEventArgs e)

@@ -150,7 +150,7 @@ namespace UnicontaClient.Pages.CustomPage
             });
             sbWork.Clear();
 
-            companyAddressCache = companyAddressCache ?? crudApi.LoadCache<Uniconta.DataModel.CompanyAddress>().GetAwaiter().GetResult();
+            companyAddressCache = companyAddressCache ?? Task.Run(() => crudApi.LoadCache<Uniconta.DataModel.CompanyAddress>()).GetAwaiter().GetResult();
             if (companyAddressCache != null)
             {
                 foreach (var cAddress in companyAddressCache)

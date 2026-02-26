@@ -531,10 +531,80 @@ namespace UnicontaClient.Pages.CustomPage
                 case "UpdateCostPrices":
                     UpdateCostPrice();
                     break;
+                case "ReportAsFinished":
+                    PostProduction(Order);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
+        }
+        DateTime PostedDate;
+        string Comment, Txt;
+        private void PostProduction(ProductionOrder dbOrder)
+        {
+            if(dbOrder == null)
+                return;
+            CWInvPosting postingDialog = new CWInvPosting(api, "ReportAsFinished", true)
+            {
+                DialogTableId = 2000000041,
+                Date = this.PostedDate,
+                Comment = this.Comment,
+                Text = this.Txt
+            };
+            postingDialog.Closed += async delegate
+            {
+                if (postingDialog.DialogResult == true)
+                {
+                    this.PostedDate = postingDialog.Date;
+                    this.Comment = postingDialog.Comment;
+                    this.Txt = postingDialog.Text;
+
+                    busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
+                    busyIndicator.IsBusy = true;
+                    var papi = new Uniconta.API.Inventory.ProductionAPI(api);
+                    var postingResult = await papi.ReportAsFinished(dbOrder, postingDialog.Date, postingDialog.Text, postingDialog.TransType,
+                        postingDialog.Comment, postingDialog.FixedVoucher, postingDialog.Simulation, new GLTransClientTotal(), 0, postingDialog.NumberSeries,
+                        postingDialog.IsPartlyFinished ? postingDialog.Quantity : 0);
+                    busyIndicator.IsBusy = false;
+                    busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LoadingMsg");
+                    if (postingResult == null)
+                        return;
+                    if (postingResult.Err != ErrorCodes.Succes)
+                        Utility.ShowJournalError(postingResult, null, goToLinesMsg: false);
+                    else if (postingDialog.Simulation)
+                    {
+                        if (postingResult.SimulatedTrans != null)
+                            AddDockItem(TabControls.SimulatedTransactions, postingResult.SimulatedTrans, Uniconta.ClientTools.Localization.lookup("SimulatedTransactions"), null, true);
+                        else
+                        {
+                            var msg = string.Format(Uniconta.ClientTools.Localization.lookup("OBJisEmpty"), Uniconta.ClientTools.Localization.lookup("LedgerTransList"));
+                            msg = Uniconta.ClientTools.Localization.lookup("JournalOK") + Environment.NewLine + msg;
+                            UnicontaMessageBox.Show(msg, Uniconta.ClientTools.Localization.lookup("Message"));
+                        }
+                    }
+                    else
+                    {
+                        if (postingDialog.IsPartlyFinished)
+                        {
+                            dbOrder._ProdQty -= postingDialog.Quantity;
+                            dbOrder._LastInvoice = this.PostedDate != DateTime.MinValue ? this.PostedDate : DateTime.Today;
+                        }
+
+                        this.Txt = null;
+                        this.Comment = null;
+
+                        string msg;
+                        if (postingResult.JournalPostedlId != 0)
+                            msg = string.Format("{0} {1}={2}", Uniconta.ClientTools.Localization.lookup("JournalHasBeenPosted"), Uniconta.ClientTools.Localization.lookup("JournalPostedId"), postingResult.JournalPostedlId);
+                        else
+                            msg = Uniconta.ClientTools.Localization.lookup("JournalHasBeenPosted");
+                        UnicontaMessageBox.Show(msg, Uniconta.ClientTools.Localization.lookup("Message"));
+                        RefreshGrid();
+                    }
+                }
+            };
+            postingDialog.Show();
         }
         async void RefreshGrid()
         {

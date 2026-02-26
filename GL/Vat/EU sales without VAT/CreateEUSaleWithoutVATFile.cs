@@ -8,7 +8,6 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Serialization;
 using Uniconta.API.System;
@@ -20,7 +19,7 @@ using Uniconta.Common;
 using Uniconta.Common.Enums;
 using Uniconta.Common.Utility;
 using Uniconta.DataModel;
-using UnicontaClient.Creditor.Payments;
+using Uniconta.WindowsAPI.ClientTools;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -37,7 +36,8 @@ namespace UnicontaClient.Pages.CustomPage
         public string companyRegNo;
         private CountryCode companyCountryId;
         public bool validateVIES;
-        private Dictionary<string, bool> dictVatNumber;
+        public DateTime viesDate;
+        private SQLCache debtors;
         #endregion
 
         public CreateEUSaleWithoutVATFile(CrudAPI api, string companyRegNo, CountryCode companyCountryId, bool validateVIES)
@@ -46,7 +46,7 @@ namespace UnicontaClient.Pages.CustomPage
             this.companyRegNo = companyRegNo;
             this.companyCountryId = companyCountryId;
             this.validateVIES = validateVIES;
-            dictVatNumber = new Dictionary<string, bool>();
+            debtors = api.GetCache(typeof(Uniconta.DataModel.Debtor));
         }
 
         public bool CreateFile(IEnumerable<EUSaleWithoutVAT> listOfEUSaleWithoutVAT)
@@ -176,8 +176,11 @@ namespace UnicontaClient.Pages.CustomPage
             return true;
         }
 
-        public void Validate(IEnumerable<EUSaleWithoutVAT> listOfEU, bool compressed, bool onlyValidate)
+        public async Task Validate(IEnumerable<EUSaleWithoutVAT> listOfEU, bool compressed, bool onlyValidate)
         {
+            if (validateVIES)
+                await VIESValidate(listOfEU);
+
             var countErr = 0;
             foreach (var euSale in listOfEU)
             {
@@ -245,16 +248,9 @@ namespace UnicontaClient.Pages.CustomPage
                         euSale.SystemInfo += Environment.NewLine + string.Format(Localization.lookup("FieldTooLongOBJ"), Localization.lookup("CompanyRegNo"));
                 }
 
-                if (!hasErrors && validateVIES && euSale._DebtorRegNoFile != null)
+                if (!hasErrors && validateVIES)
                 {
-                    bool validVatNumber = false;
-                    if (!dictVatNumber.TryGetValue(euSale._DebtorRegNoFile, out validVatNumber))
-                    {
-                        validVatNumber = CheckEuropeanVatInformation(euSale._DebtorRegNoFile, euSale.Country);
-                        dictVatNumber.Add(euSale._DebtorRegNoFile, validVatNumber);
-                    }
-
-                    if (!validVatNumber)
+                    if (debtor._VIESStatus != VIESStatus.Valid)
                     {
                         hasErrors = true;
                         if (euSale.SystemInfo == VALIDATE_OK)
@@ -280,21 +276,57 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        private bool CheckEuropeanVatInformation(string cvr, CountryCode country)
+
+        async Task VIESValidate(IEnumerable<EUSaleWithoutVAT> listOfEU)
         {
-            if (string.IsNullOrEmpty(cvr))
-                return false;
-           
-            int countryCode = (int)country;
-            var twolettercode = Enum.GetName(typeof(CountryISOCode), countryCode);
-            
-            if (twolettercode != null)
+            try
             {
-                var vatInfo = EuropeanVatInformation.Get(twolettercode, cvr);
-                if (vatInfo == null || vatInfo.VatNumber != null)
-                    return true;
+                const int Grouping = 20;
+                int cntTotal = listOfEU.Count();
+                int cnt = 0;
+                int cntAll = 0;
+                var lst2 = new List<DebtorClient>();
+                string oldAccount = null;
+                DebtorClient debtor;
+
+                debtors = debtors ?? await api.LoadCache(typeof(Uniconta.DataModel.Debtor));
+                foreach (var trans in listOfEU.OrderBy(s => s.Account))
+                {
+                    bool rejected = false;
+                    cntAll++;
+                    if (oldAccount == trans.Account || trans._DebtorRegNoFile == null || !Country2Language.IsEU(trans.Country))
+                        rejected = true;
+
+                    oldAccount = trans.Account;
+                    debtor = debtors.Get(trans.Account) as DebtorClient;
+                    if (debtor._VIESStatus != VIESStatus.None)
+                        rejected = true;
+
+                    if (!rejected)
+                    {
+                        cnt++;
+                        lst2.Add(debtor);
+                    }
+
+                    if (lst2.Count > 0 && ((cnt % Grouping) == 0 || cntAll == cntTotal))
+                    {
+                        var viesReportLst = await VIES.CheckVatApprox(lst2, api);
+                        lst2.Clear();
+
+                        if (viesReportLst.Count == 1 && viesReportLst[0].FaultCode == VIES.UC_FAULTCODE_GENERALERROR)
+                        {
+                            UnicontaMessageBox.Show(viesReportLst[0].FaultString, Uniconta.ClientTools.Localization.lookup("Error"), System.Windows.MessageBoxButton.OK);
+                            return;
+                        }
+                    }
+                }
+                if (cnt > 0)
+                    debtors = await api.LoadCache(typeof(Uniconta.DataModel.Debtor), true);
             }
-            return false;
+            catch (Exception ex)
+            {
+                return;
+            }
         }
 
         private long StreamToFile(List<EUSaleWithoutVAT> listOfImportExport, StreamWriter sw)
@@ -415,11 +447,11 @@ namespace UnicontaClient.Pages.CustomPage
 
         public void CreateXml(VD_deklaratsioon_Type declaration)
         {
-            SaveFileDialog sfd = new SaveFileDialog();
+            System.Windows.Forms.SaveFileDialog sfd = new System.Windows.Forms.SaveFileDialog();
             sfd.FileName = "VIES_declaration_" + declaration.perioodAasta + declaration.perioodKuu + ".xml";
             sfd.Filter = "XML failid (*.xml)|*.xml";
             var savefile = sfd.ShowDialog();
-            if (savefile == DialogResult.OK)
+            if (savefile == System.Windows.Forms.DialogResult.OK)
             {
                 CreateXmlFile(sfd.OpenFile(), declaration);
             }
@@ -471,10 +503,6 @@ namespace UnicontaClient.Pages.CustomPage
                     Uniconta.ClientTools.Localization.lookup("FieldCannotBeEmpty"),
                     Uniconta.ClientTools.Localization.lookup(field));
         }
-        public void ClearVIESCache()
-        {
-            dictVatNumber.Clear();
-        }
     }
 
 
@@ -517,6 +545,14 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "Country", ResourceType = typeof(DCAccountText))]
         [NoSQL]
         public CountryCode Country { get { return DebtorRef._Country; } }
+
+        [Display(Name = "VIESStatus", ResourceType = typeof(DCAccountText))]
+        [NoSQL]
+        public string VIESStatus { get { return DebtorRef.VIESStatus; } }
+
+        [Display(Name = "VIESDate", ResourceType = typeof(DCAccountText))]
+        [NoSQL]
+        public DateTime? VIESDate { get { return DebtorRef.VIESDate; } }
 
         public string _DebtorRegNo;
         [Display(Name = "DebtorRegNo", ResourceType = typeof(EUSaleWithoutVATText))]

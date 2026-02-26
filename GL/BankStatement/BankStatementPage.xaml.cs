@@ -94,7 +94,7 @@ namespace UnicontaClient.Pages.CustomPage
             var Comp = api.CompanyEntity;
 
             if (api.session.User._Role < (int)UserRoles.Admin)
-                UtilDisplay.RemoveMenuCommand(rb, new string[] { "AiiaAdmin" });
+                UtilDisplay.RemoveMenuCommand(rb, new string[] { "AiiaAdmin", "NordeaAdmin" });
         }
 
         void dgBankStatement_RowDoubleClick()
@@ -169,7 +169,9 @@ namespace UnicontaClient.Pages.CustomPage
                 case "AiiaAdmin":
                     if (selectedItem == null) return;
                     BankAiia(7, selectedItem); break;
-
+                case "NordeaAdmin":
+                    if (selectedItem == null) return;
+                    BankAiia(8, selectedItem); break;
                 case "ConnectToND":
                     if (selectedItem == null) return;
 
@@ -320,7 +322,8 @@ namespace UnicontaClient.Pages.CustomPage
                 case 4: AiiaGetTrans(bankApi, selectedItem); break;
                 case 5: await AiiaAccounts(bankApi); break;
                 case 6: await AiiaHub(bankApi); break;
-                case 7: AiiaAdmin(bankApi, selectedItem); break;
+                case 7: AiiaAdmin(0, bankApi, selectedItem); break;
+                case 8: AiiaAdmin(1, bankApi, selectedItem); break;
             }
         }
 
@@ -351,14 +354,14 @@ namespace UnicontaClient.Pages.CustomPage
                 UnicontaMessageBox.Show(string.Concat(Uniconta.ClientTools.Localization.lookup("UnableToConnectTo"), " ", Uniconta.ClientTools.Localization.lookup("MCOpenBanking")), Uniconta.ClientTools.Localization.lookup("Information"));
         }
 
-        void AiiaAdmin(BankStatementAPI bankApi, BankStatementClient selectedItem)
+        void AiiaAdmin(byte action, BankStatementAPI bankApi, BankStatementClient selectedItem)
         {
             CWBankAPI cwBank = new CWBankAPI(api, selectedItem, 0);
             cwBank.Closing += async delegate
             {
                 if (cwBank.DialogResult == true)
                 {
-                    var logText = await bankApi.AiiaAdmin(selectedItem.Account, CWBankAPI.FromDate, CWBankAPI.ToDate);
+                    var logText = await bankApi.AiiaAdmin(action, selectedItem.Account, CWBankAPI.FromDate, CWBankAPI.ToDate);
                     if (logText != null)
                     {
                         var index = logText.IndexOf('\r');

@@ -1,3 +1,4 @@
+using DevExpress.Xpf.Grid;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -67,7 +68,14 @@ namespace UnicontaClient.Pages.CustomPage
         private NHRAPI nhrApi;
         private SQLCache mapppingGrpCache;
         private SQLCache xmlCache;
+
         private DebtorInvoiceClient invoice;
+        private string xmlDocument;
+
+        // Either fallback changes (no validation needed) or non-fallback changes (validation needed)
+        private bool _fallbackChanged;
+        private bool _nonFallbackChanged;
+        private bool HasUnsavedChanges => _fallbackChanged || _nonFallbackChanged;
 
         public EDeliveryMappingPage(BaseAPI api) : base(api, string.Empty) => Init(null);
         public EDeliveryMappingPage(eDeliveryMappingGroupClient master) : base(null) => Init(master);
@@ -102,43 +110,68 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override void SyncEntityMasterRowChanged(UnicontaBaseEntity args)
         {
-            if (args is eDeliveryMappingGroupClient master && master != null)
+            var currentMaster = dgEdeliveryMappingGrid.masterRecord as eDeliveryMappingGroupClient;
+            if (args is eDeliveryMappingGroupClient master && master != null &&
+                master?.RowId != currentMaster?.RowId)
             {
                 dgEdeliveryMappingGrid.UpdateMaster(master);
                 InitQuery();
                 SetXmlTags(master);
                 cmbTableIds.ItemsSource = master?.GetTableAndProperties(api.CompanyEntity)?.OrderBy(x => x.DisplayName)?.ToList();
+                ClearGridCache();
             }
         }
 
-        bool hasTableIdChanged;
-        private void DataControl_CurrentItemChanged(object sender, DevExpress.Xpf.Grid.CurrentItemChangedEventArgs e)
+        private int? _lastSelectedRowTableId;
+        private void DataControl_CurrentItemChanged(object sender, CurrentItemChangedEventArgs e)
         {
-            var oldselectedItem = e.OldItem as EDeliveryMappingClientExtended;
-            if (oldselectedItem != null)
-                oldselectedItem.PropertyChanged += eDeliveryMappingClient_PropertyChanged;
-            var selectedItem = e.NewItem as EDeliveryMappingClientExtended;
-            if (selectedItem != null)
+            if (e.OldItem is EDeliveryMappingClientExtended oldItem)
+                oldItem.PropertyChanged -= eDeliveryMappingClient_PropertyChanged;
+
+            if (e.NewItem is EDeliveryMappingClientExtended newItem)
             {
-                hasTableIdChanged = oldselectedItem == null || oldselectedItem.TableId != selectedItem.TableId;
-                selectedItem.PropertyChanged += eDeliveryMappingClient_PropertyChanged;
+                _lastSelectedRowTableId = newItem.TableId;
+                newItem.PropertyChanged += eDeliveryMappingClient_PropertyChanged;
             }
         }
 
         private void eDeliveryMappingClient_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             var rec = sender as EDeliveryMappingClientExtended;
+            if (rec == null)
+                return;
+
             switch (e.PropertyName)
             {
+                case "FallbackDefaultValue":
+                    _fallbackChanged = true;
+                    _shouldRefreshViewer = true;
+                    return;
+                case "TagId":
+                    MarkNonFallbackChanged();
+                    return;
                 case "TableId":
-                    if (hasTableIdChanged)
+                    MarkNonFallbackChanged();
+                    if (_lastSelectedRowTableId != rec.TableId)
+                    {
+                        _lastSelectedRowTableId = rec.TableId;
                         SetProperty(rec, true);
-                    break;
+                    }
+                    return;
                 case "Property":
+                    MarkNonFallbackChanged();
                     SetValue(rec);
-                    break;
+                    return;
             }
         }
+
+        private void MarkNonFallbackChanged()
+        {
+            _nonFallbackChanged = true;
+            _shouldRefreshViewer = true;
+            xmlDocument = null; // Non-fallback changes invalidate the validated doc
+        }
+
 
         private void LocalMenu_OnItemClicked(string ActionType)
         {
@@ -152,14 +185,13 @@ namespace UnicontaClient.Pages.CustomPage
                         return;
                     }
                     dgEdeliveryMappingGrid.AddRow();
-                    xmlDocument = null;
+                    MarkNonFallbackChanged();
                     break;
                 case "DeleteRow":
                     if (selectedItem != null)
                     {
                         dgEdeliveryMappingGrid.DeleteRow();
-                        gridRibbon_BaseActions("SaveGrid");
-                        xmlDocument = null;
+                        MarkNonFallbackChanged();
                     }
                     break;
                 case "SaveGrid":
@@ -175,15 +207,20 @@ namespace UnicontaClient.Pages.CustomPage
                         UnicontaMessageBox.Show(Localization.lookup("ZeroInvoice"), Localization.lookup("Error"));
                         return;
                     }
-                    if (xmlDocument == null)
+                    if (HasUnsavedChanges)
                     {
-                        var msg = UnicontaMessageBox.Show(string.Format(Localization.lookup("SaveChangesFor"), Localization.lookup("EDeliveryMapping")), Localization.lookup("EDeliveryMapping"), MessageBoxButton.YesNo);
+                        var msg = UnicontaMessageBox.Show(
+                            string.Format(Localization.lookup("SaveChangesFor"), Localization.lookup("EDeliveryMapping")),
+                            Localization.lookup("EDeliveryMapping"),
+                            MessageBoxButton.YesNo);
+
                         if (msg != MessageBoxResult.Yes)
                             return;
+
                         ValidateAndSave();
                     }
                     if ("SendUBL" == ActionType)
-                            Invoices.SendUBL(new DebtorInvoiceClient[1] { invoice }, api, null, busyIndicator);
+                        Invoices.SendUBL(new DebtorInvoiceClient[1] { invoice }, api, null, busyIndicator);
                     if ("ExportUBL" == ActionType)
                         Invoices.ExportUBL(new DebtorInvoiceClient[1] { invoice }, api, null, null, null, mapppingGrpCache, false);
                     break;
@@ -202,72 +239,71 @@ namespace UnicontaClient.Pages.CustomPage
 
         private async void ValidateAndSave()
         {
-            var result = await GetValidatedeDeliveryMappingDoc();
-            if (result != null)
-                await saveGrid();
-        }
-
-        private string xmlDocument = null;
-        private async Task<string> GetValidatedeDeliveryMappingDoc()
-        {
-            if (xmlDocument != null)
-                return xmlDocument;
-
-            if (dgEdeliveryMappingGrid.ItemsSource is List<EDeliveryMappingClientExtended> mappings &&
-                mappings != null && mappings.Count > 0)
+            // Only skip validation if fallback is the ONLY thing changed
+            if (!_fallbackChanged || _nonFallbackChanged)
             {
-                if (mappings.Any(m => m.TagId == 0))
+                var result = await ValidateReturnErrMsg();
+                if (result != null)
                 {
-                    UnicontaMessageBox.Show(Localization.lookup(ErrorCodes.FieldCannotBeBlank.ToString() + ": Tag"),
-                        Localization.lookup("Error"));
-                    return null;
+                    UnicontaMessageBox.Show(result, Localization.lookup("Error"));
+                    return;
                 }
-                if (mappings.GroupBy(x => x.TagId).Any(g => g.Count() > 1))
-                {
-                    UnicontaMessageBox.Show(Localization.lookup("eDeliveryMappingDuplicateTags"), Localization.lookup("Error"));
-                    return null;
-                }
-
-                var emptyLabel = "{" + Localization.lookup("Empty") + "}";
-                var xmlTagsAndValues = mappings
-                    .Select(x =>
-                    {
-                        if (x.Value == null)
-                            SetValue(x);
-
-                        return new { x.eDeliveryTag.Name, x.Value };
-                    })
-                    .Where(x => !string.IsNullOrEmpty(x.Value) && x.Value != emptyLabel)
-                    .ToDictionary(x => x.Name, y => y.Value);
-
-                var result = await nhrApi.GetValidatedeDeliveryMappingDoc(invoice, xmlTagsAndValues);
-                if (result == null)
-                    UnicontaMessageBox.Show(Localization.lookup(api.LastError.ToString()), Localization.lookup("Error"));
-
-                xmlDocument = result;
             }
 
-            return xmlDocument;
+            await saveGrid();
+            _fallbackChanged = false;
+            _nonFallbackChanged = false;
+            _shouldRefreshViewer = xmlDocument == null;
         }
 
-        VoucherViewerWindow voucherViewer;
+        private async Task<string> ValidateReturnErrMsg()
+        {
+            if (xmlDocument == null)
+            {
+                if (!(dgEdeliveryMappingGrid.ItemsSource is List<EDeliveryMappingClientExtended> mappings) ||
+                    mappings == null || mappings.Count == 0)
+                    return Localization.lookup(ErrorCodes.CouldNotFind.ToString());
+
+                if (mappings.Any(m => m.TagId == 0))
+                    return Localization.lookup(ErrorCodes.FieldCannotBeBlank + ": Tag");
+
+                if (mappings.GroupBy(x => x.TagId).Any(g => g.Count() > 1))
+                    return Localization.lookup("eDeliveryMappingDuplicateTags");
+
+                xmlDocument = await nhrApi.GetValidatedeDeliveryMappingDoc(invoice, mappings.Select(m => (eDeliveryMapping)m).ToList());
+                if (xmlDocument == null)
+                    return Localization.lookup(api.LastError.ToString());
+            }
+
+            return null;
+        }
+
+        private bool _shouldRefreshViewer;
         protected async void ViewVoucher()
         {
-            var header = string.Format(Localization.lookup("ViewOBJ"), "XML");
-            if (voucherViewer == null || xmlDocument == null)
-            {
-                var xmlDocument = await GetValidatedeDeliveryMappingDoc();
-                var voucher = new VouchersClient
-                {
-                    _Data = Encoding.UTF8.GetBytes(xmlDocument),
-                    _Fileextension = FileextensionsTypes.XML
-                };
+            if (_shouldRefreshViewer)
+                this.xmlDocument = null;
 
-                voucherViewer = new VoucherViewerWindow(invoice, this.api, header);
-                voucherViewer._LoadInitMaster(invoice, voucher, 0, true);
-                voucherViewer.Owner = UtilDisplay.GetCurentWindow();
-                voucherViewer.Closed += delegate { voucherViewer = null; };
+            var header = string.Format(Localization.lookup("ViewOBJ"), "XML");
+            if (xmlDocument == null)
+            {
+                var err = await ValidateReturnErrMsg();
+                if (err != null)
+                {
+                    UnicontaMessageBox.Show(err, Localization.lookup("Error"));
+                    return;
+                }
             }
+
+            var voucher = new VouchersClient
+            {
+                _Data = Encoding.UTF8.GetBytes(xmlDocument),
+                _Fileextension = FileextensionsTypes.XML
+            };
+
+            var voucherViewer = new VoucherViewerWindow(invoice, this.api, header);
+            voucherViewer._LoadInitMaster(invoice, voucher, 0, true);
+            voucherViewer.Owner = UtilDisplay.GetCurentWindow();
             if (VoucherViewerWindow.lastHeight != 0)
             {
                 voucherViewer.Width = VoucherViewerWindow.lastWidth;
@@ -277,6 +313,7 @@ namespace UnicontaClient.Pages.CustomPage
                 voucherViewer.WindowState = WindowState.Maximized;
 
             voucherViewer.Show();
+            _shouldRefreshViewer = false;
         }
 
         private async void CustomXmlFile()
@@ -410,6 +447,7 @@ namespace UnicontaClient.Pages.CustomPage
             Value.Visible = true;
         }
 
+        private bool _documentlookupEditorAlreadyFocused;
         private void leDocumentNum_GotFocus(object sender, RoutedEventArgs e)
         {
             var lookup = sender as LookupEditor;
@@ -417,7 +455,12 @@ namespace UnicontaClient.Pages.CustomPage
             lookup.PopupContentTemplate = System.Windows.Application.Current.Resources["LookUpUrlInvoiceClientPopupContent"] as ControlTemplate;
             lookup.ValueMember = "InvoiceNumber";
             lookup.DisplayMember = "InvoiceNum";
+
+            if (_documentlookupEditorAlreadyFocused)
+                return;
+
             lookup.SelectedIndexChanged += leDocumentNum_SelectedIndexChanged;
+            _documentlookupEditorAlreadyFocused = true;
         }
 
         private void leDocumentNum_SelectedIndexChanged(object sender, RoutedEventArgs e)
@@ -440,10 +483,20 @@ namespace UnicontaClient.Pages.CustomPage
                         return x;
                     })
                     .ToList();
+
+                _shouldRefreshViewer = true;
             }
         }
 
         private void PART_Editor_GotFocus(object sender, RoutedEventArgs e) =>
             SetProperty(dgEdeliveryMappingGrid.SelectedItem as EDeliveryMappingClientExtended, false);
+
+        private void ClearGridCache()
+        {
+            _fallbackChanged = false;
+            _nonFallbackChanged = false;
+            _shouldRefreshViewer = true;
+            xmlDocument = null;
+        }
     }
 }

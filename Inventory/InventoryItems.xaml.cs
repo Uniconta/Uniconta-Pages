@@ -153,6 +153,8 @@ namespace UnicontaClient.Pages.CustomPage
                 lst.Add(typeof(Uniconta.DataModel.InvDiscountGroup));
             if (Comp.InvDuty)
                 lst.Add(typeof(Uniconta.DataModel.InvDutyGroup));
+            if (Comp.InvPackaging)
+                lst.Add(typeof(Uniconta.DataModel.InvPackingProductModel));
             if (Comp._InvGroups)
             {
                 lst.Add(typeof(Uniconta.DataModel.InvStatisticsGroup));
@@ -418,6 +420,10 @@ namespace UnicontaClient.Pages.CustomPage
                 case "InStock":
                     AddDockItem(TabControls.InventoryItemOnHand, dgInventoryItemsGrid.syncEntity, true);
                     break;
+                case "ReturnReasonTransactions":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.InvTransReasonReport, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ReturnReason"), selectedItem._Item));
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -427,6 +433,7 @@ namespace UnicontaClient.Pages.CustomPage
         static void ClearValues(InvItem item)
         {
             item._EAN = null;
+            item._SupplierItemId = null;
             item._Qty = 0;
             item._CostValue = 0;
             item._qtyOnStock = 0;

@@ -63,6 +63,7 @@ x:Class="UnicontaClient.Pages.CustomPage.EDeliveryMappingPage"
                         </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Value" Width="150" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="FallbackDefaultValue" Width="190"/>
                 </localPage:EDeliveryMappingGrid.Columns>
             </localPage:EDeliveryMappingGrid>
         </CorasauControls:BusyIndicator>

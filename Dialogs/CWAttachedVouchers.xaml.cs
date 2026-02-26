@@ -31,7 +31,7 @@ namespace UnicontaClient.Controls.Dialogs
         public IdKey SelectRow;
         static int lastCopyMove;
 
-        int SalesIndex, PurchaseIndex, ProjectIndex, ProdIndex;
+        int SalesIndex, PurchaseIndex, ProjectIndex, ProdIndex,ProspectIndex;
         private CrudAPI Api;
         public CWAttachedVouchers(CrudAPI api, Document doc)
         {
@@ -72,7 +72,11 @@ namespace UnicontaClient.Controls.Dialogs
                 ProdIndex = src.Count;
                 src.Add(Uniconta.ClientTools.Localization.lookup("Production"));
             }
-
+            if (api.CompanyEntity.CRM)
+            {
+                ProspectIndex = src.Count;
+                src.Add(Uniconta.ClientTools.Localization.lookup("Prospect"));
+            }
             cmbEntityType.ItemsSource = src;
 
             leEntitySource.api = api;
@@ -178,6 +182,8 @@ namespace UnicontaClient.Controls.Dialogs
                 return typeof(Uniconta.DataModel.CreditorOrder);
             if (index == ProdIndex)
                 return typeof(Uniconta.DataModel.ProductionOrder);
+            if (index == ProspectIndex)
+                return typeof(Uniconta.DataModel.CrmProspect);
             return null;
         }
     }

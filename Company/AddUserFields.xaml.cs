@@ -8,17 +8,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
-using UnicontaClient.Controls.Dialogs;
 using Uniconta.API.Service;
+using Uniconta.DataModel;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -87,25 +78,44 @@ namespace UnicontaClient.Pages.CustomPage
                 if (Row == null)
                     return;
 
+                int pageMasterTableId = Row.TableNo;
                 var rowType = Row.master.GetType();
                 var pageMasterType = master.GetType();
 
                 var rowMaster = Row.master as Uniconta.DataModel.TableHeader;
                 if (rowMaster != null)
                 {
-                    int pageMasterTableId = 0;
-                    var argumentMasterTableId = rowMaster.RowId;
+                    var MasterTableId = rowMaster.RowId;
+                    if (master is Uniconta.DataModel.TableHeader mst)
+                        pageMasterTableId = mst.RowId;
 
-                    if (master is Uniconta.DataModel.TableHeader)
-                        pageMasterTableId = ((Uniconta.DataModel.TableHeader)master).RowId;
-
-                    if (rowType == pageMasterType && argumentMasterTableId == pageMasterTableId)
+                    if (rowType == pageMasterType && MasterTableId == pageMasterTableId)
                         dgUserField.UpdateItemSource(argument);
+
+                    var lst = api.CompanyEntity.UserTables;
+                    if (lst != null)
+                    {
+                        var tbl = lst.FirstOrDefault(x => x.RowId == pageMasterTableId);
+                        if (tbl != null)
+                            tbl.ClearGeneratedType();
+                        else
+                            lst.Add(rowMaster);
+
+                        pageMasterTableId = TableData.GetClassIdSpecial(pageMasterTableId);
+                    }
                 }
                 else if (rowType == pageMasterType)
                     dgUserField.UpdateItemSource(argument);
-                api.CompanyEntity.UserTables = null;
-                session.OpenCompany(api.CompanyEntity.CompanyId, false);
+                else
+                    return;
+
+                api.CompanyEntity.UpdateUserField(pageMasterTableId, (dgUserField.ItemsSource as IEnumerable<Uniconta.DataModel.TableField>).ToArray());
+
+                if (rowMaster == null)
+                    api.CompanyEntity.UpdateUserType(Global.BaseType2ClientRefType(rowType));
+
+                //api.CompanyEntity.UserTables = null;
+                //session.OpenCompany(api.CompanyEntity.CompanyId, false);
             }
         }
         public override void PageClosing()

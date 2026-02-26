@@ -77,7 +77,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
     }
 
-    public partial class VatReportSingapore : BasePage
+    public partial class VatReportSingapore : ControlBasePage
     {
         public override string NameOfControl
         {

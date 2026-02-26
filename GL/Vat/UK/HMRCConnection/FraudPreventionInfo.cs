@@ -1,14 +1,13 @@
-using NPOI.SS.Formula.Functions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Management;
 using System.Net.NetworkInformation;
+using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using Uniconta.API.System;
 using Uniconta.ClientTools.Page;
+using UnicontaClient;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage.GL.Vat.UK.HMRCConnection
@@ -19,37 +18,84 @@ namespace UnicontaClient.Pages.CustomPage.GL.Vat.UK.HMRCConnection
         public static string ClientUserIds { get { return GetUserId(); } }
         public static string ClientTimezone { get { return GetTimezone(); } }
         public static string ClientLocalIps { get { return GetLocalIps(); } }
+        public static string ClientLocalIpsTimestamp { get { return GetLocalIpsTimestamp(); } }
+
         public static string ClientScreens { get { return GetClientScreens(); } }
         public static string WindowSize { get { return GetWindowSize(); } }
         public static string UserAgent { get { return GetUserAgent(); } }
+        public static string VendorName { get { return GetVendorName(); } }
+
         public static string VendorVersion { get { return GetVendorVersion(); } }
         public static string LicenseId { get { return GetLicenseId(); } }
         public static string MacAddresses { get { return GetMacAddresses(); } }
 
         static string GetDeviceId()
         {
-            string moboString = GetWMIProperty("SELECT * FROM Win32_BaseBoard", "SerialNumber");
-            string procId = GetWMIProperty("SELECT * FROM Win32_Processor", "ProcessorID");
-            bool moboNull = string.IsNullOrWhiteSpace(moboString);
-            bool procNull = string.IsNullOrWhiteSpace(procId);
-            if (moboNull && procNull)
-                return "";
-            byte[] seedBytes = CreateGuidBytes(new string[2] { moboString, procId }).ToArray();
-            if (seedBytes.Length != 16)
-                return "";
+            try
+            {
+                string moboString = GetWMIProperty("SELECT * FROM Win32_BaseBoard", "SerialNumber");
 
-            Guid output = new Guid(seedBytes);
-            return output.ToString();
+                //Alternative method of getting the serial number, if the first one did not work
+                if (String.IsNullOrEmpty(moboString))
+                    moboString = GetWMIProperty("SELECT * FROM win32_bios", "SerialNumber");
+
+                string procId = GetWMIProperty("SELECT * FROM Win32_Processor", "ProcessorID");
+                bool moboNull = string.IsNullOrWhiteSpace(moboString);
+                bool procNull = string.IsNullOrWhiteSpace(procId);
+                if (moboNull && procNull)
+                    return GetOrGenerateAndSaveDeviceId();
+                byte[] seedBytes = CreateGuidBytes(new string[2] { moboString, procId }).ToArray();
+                if (seedBytes.Length != 16)
+                    return GetOrGenerateAndSaveDeviceId();
+
+                Guid output = new Guid(seedBytes);
+                return output.ToString();
+            }
+            catch
+            {
+                return GetOrGenerateAndSaveDeviceId();
+            }
         }
+
         static string GetUserId()
         {
             string userName = Environment.UserName;
             string vendorAccount = BasePage.session.User._Name;
+
+            //Remove lithuanian diacritics from windows name and username
+            var lithuanianDiacritics = new Dictionary<string, string>()
+            {
+                { "ą", "a" },
+                { "č", "c" },
+                { "ę", "e" },
+                { "ė", "e" },
+                { "į", "i" },
+                { "š", "s" },
+                { "ų", "u" },
+                { "ū", "u" },
+                { "ž", "z" },
+                { "Ą", "A" },
+                { "Č", "C" },
+                { "Ę", "E" },
+                { "Ė", "E" },
+                { "Į", "I" },
+                { "Š", "S" },
+                { "Ų", "U" },
+                { "Ū", "U" },
+                { "Ž", "Z" }
+            };
+
+            foreach (var symbol in lithuanianDiacritics)
+            {
+                userName = userName.Replace(symbol.Key, symbol.Value);
+                vendorAccount = vendorAccount.Replace(symbol.Key, symbol.Value);
+            }
+
             StringBuilder sb = new StringBuilder();
             sb.Append("os=");
-            sb.Append(userName);
+            sb.Append(Uri.EscapeDataString(userName));
             sb.Append("&uniconta-account=");
-            sb.Append(vendorAccount);
+            sb.Append(Uri.EscapeDataString(vendorAccount));
 
             return sb.ToString();
         }
@@ -83,19 +129,28 @@ namespace UnicontaClient.Pages.CustomPage.GL.Vat.UK.HMRCConnection
                             continue;
                         if (ip.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
                         {
-                            addresses.Add(ip.Address.ToString());
-
+                            addresses.Add(Uri.EscapeDataString(ip.Address.ToString()));
                         }
                     }
                 }
             }
             return string.Join(",", addresses);
         }
+
+        static string GetLocalIpsTimestamp()
+        {
+            return DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
+        }
+
         static string GetMacAddresses()
         {
-            string[] macs = NetworkInterface.GetAllNetworkInterfaces()
-                .Where(ni => ni.OperationalStatus == OperationalStatus.Up && ni.NetworkInterfaceType != NetworkInterfaceType.Loopback)
-                .Select(ni => ni.GetPhysicalAddress().ToString()).ToArray();
+            var macs = NetworkInterface.GetAllNetworkInterfaces()
+                                       .Where(ni => ni.OperationalStatus == OperationalStatus.Up && ni.NetworkInterfaceType != NetworkInterfaceType.Loopback)
+                                       .Select(ni => ni.GetPhysicalAddress().ToString())
+                                       .Where(x => !String.IsNullOrEmpty(x))
+                                       .Select(x => Uri.EscapeDataString(x))
+                                       .ToArray();
+
             return string.Join(",", macs);
         }
 
@@ -110,8 +165,17 @@ namespace UnicontaClient.Pages.CustomPage.GL.Vat.UK.HMRCConnection
                 sb.Append(screen.Bounds.Width);
                 sb.Append("&height=");
                 sb.Append(screen.Bounds.Height);
+
+                var dm = new DEVMODE();
+                dm.dmSize = (short)Marshal.SizeOf(typeof(DEVMODE));
+                EnumDisplaySettings(screen.DeviceName, -1, ref dm);
+
+                var scalingFactor = Math.Round(Decimal.Divide(dm.dmPelsWidth, screen.Bounds.Width), 0);
+
                 sb.Append("&scaling-factor=");
-                //sb.Append();
+                sb.Append(scalingFactor);
+
+
                 sb.Append("&colour-depth=");
                 sb.Append(screen.BitsPerPixel);
                 output.Add(sb.ToString());
@@ -125,7 +189,7 @@ namespace UnicontaClient.Pages.CustomPage.GL.Vat.UK.HMRCConnection
             ManagementObjectSearcher mos = new ManagementObjectSearcher(queryString);
             foreach (ManagementObject mo in mos.Get())
             {
-                property += mo[propertyName].ToString();
+                property += mo[propertyName]?.ToString();
             }
             if (string.IsNullOrWhiteSpace(property))
                 return "";
@@ -137,22 +201,18 @@ namespace UnicontaClient.Pages.CustomPage.GL.Vat.UK.HMRCConnection
         {
             StringBuilder sb = new StringBuilder();
             sb.Append("width=");
-            sb.Append(600);
+            sb.Append(Math.Round(App.Current.MainWindow.Width, 0).ToString());
+
             sb.Append("&height=");
-            sb.Append(400);
+            sb.Append(Math.Round(App.Current.MainWindow.Height, 0).ToString());
+
             return sb.ToString();
         }
 
         static IEnumerable<byte> CreateGuidBytes(IEnumerable<string> seed)
         {
-            List<string> seedList = seed.ToList();
+            List<string> seedList = seed.Where(x => !String.IsNullOrEmpty(x)).ToList();
             List<byte> output = new List<byte>();
-            foreach (var item in seedList)
-            {
-                if (string.IsNullOrEmpty(item))
-                    seedList.Remove(item);
-
-            }
 
             int seedCount = seedList.Count;
             bool withinBounds = seedCount > 0 && seedCount < 17;
@@ -172,11 +232,26 @@ namespace UnicontaClient.Pages.CustomPage.GL.Vat.UK.HMRCConnection
             return output;
         }
 
+        static string GetOrGenerateAndSaveDeviceId()
+        {
+            if (System.IO.File.Exists("UKVATDeviceId"))
+                return System.IO.File.ReadAllText("UKVATDeviceId");
+
+            var deviceId = Guid.NewGuid().ToString();
+
+            System.IO.File.WriteAllText("UKVATDeviceId", deviceId);
+
+            return deviceId;
+        }
+
         static string GetUserAgent()
         {
             StringBuilder sb = new StringBuilder();
             //OS Family/OS Version+ (Device Manufacturer/Device Model+)
-            OperatingSystem os = Environment.OSVersion;
+            var os = Environment.OSVersion;
+
+
+
             string osFamily = string.Empty;
             string osVersion = string.Empty;
             string manufacturer = string.Empty;
@@ -200,6 +275,7 @@ namespace UnicontaClient.Pages.CustomPage.GL.Vat.UK.HMRCConnection
                     osFamily = "Macintosh";
                     break;
             }
+
             switch (os.Version.Major)
             {
                 case 5:
@@ -226,32 +302,92 @@ namespace UnicontaClient.Pages.CustomPage.GL.Vat.UK.HMRCConnection
                     break;
             }
 
-            sb.Append(osFamily);
-            sb.Append("/");
-            sb.Append(osVersion);
-            sb.Append("(");
-            sb.Append(manufacturer);
-            sb.Append("/");
-            sb.Append(model);
-            sb.Append(")");
+            try
+            {
+                manufacturer = GetWMIProperty("SELECT * FROM Win32_ComputerSystem", "Manufacturer");
+                model = GetWMIProperty("SELECT * FROM Win32_ComputerSystem", "Model");
+            }
+            catch { }
+
+            sb.Append("os-family=");
+            sb.Append(Uri.EscapeDataString(osFamily));
+
+            sb.Append("&os-version=");
+            sb.Append(Uri.EscapeDataString(osVersion));
+
+            sb.Append("&device-manufacturer=");
+            sb.Append(Uri.EscapeDataString(manufacturer));
+
+            sb.Append("&device-model=");
+            sb.Append(Uri.EscapeDataString(model));
 
             return sb.ToString();
         }
+
+        static string GetVendorName()
+        {
+            return "Uniconta";
+        }
+
         static string GetVendorVersion()
         {
             StringBuilder sb = new StringBuilder();
-            int versionNum = BasePage.session.ProgramVersion;
+            int versionNum = BasePage.session.ServerVersion;
             if (versionNum == 0)
                 return "";
+
             sb.Append("uniconta=");
             sb.Append(versionNum);
             return sb.ToString();
-
         }
+
         static string GetLicenseId()
         {
-            //TODO: Generate subscription Ids from user
-            return "";
+            return String.Empty;
         }
+
+
+        [DllImport("user32.dll")]
+        public static extern bool EnumDisplaySettings(string lpszDeviceName, int iModeNum, ref DEVMODE lpDevMode);
+    }
+
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct DEVMODE
+    {
+        private const int CCHDEVICENAME = 0x20;
+        private const int CCHFORMNAME = 0x20;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 0x20)]
+        public string dmDeviceName;
+        public short dmSpecVersion;
+        public short dmDriverVersion;
+        public short dmSize;
+        public short dmDriverExtra;
+        public int dmFields;
+        public int dmPositionX;
+        public int dmPositionY;
+        public ScreenOrientation dmDisplayOrientation;
+        public int dmDisplayFixedOutput;
+        public short dmColor;
+        public short dmDuplex;
+        public short dmYResolution;
+        public short dmTTOption;
+        public short dmCollate;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 0x20)]
+        public string dmFormName;
+        public short dmLogPixels;
+        public int dmBitsPerPel;
+        public int dmPelsWidth;
+        public int dmPelsHeight;
+        public int dmDisplayFlags;
+        public int dmDisplayFrequency;
+        public int dmICMMethod;
+        public int dmICMIntent;
+        public int dmMediaType;
+        public int dmDitherType;
+        public int dmReserved1;
+        public int dmReserved2;
+        public int dmPanningWidth;
+        public int dmPanningHeight;
     }
 }

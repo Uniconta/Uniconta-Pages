@@ -79,7 +79,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
     }
 
-    public partial class VatReportDenmark : BasePage
+    public partial class VatReportDenmark : ControlBasePage
     {
 
         public override string NameOfControl

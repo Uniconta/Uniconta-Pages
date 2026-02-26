@@ -540,13 +540,13 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (journals.DialogResult == true)
                 {
-                    PostJournal(journals.InvJournal, CwInvJournal.Date);
+                    PostJournal(journals.InvJournal, CwInvJournal.Date, journals.ClearCounted);
                 }
             };
             journals.Show();
         }
 
-        async void PostJournal(Uniconta.DataModel.InvJournal invJournal, DateTime date)
+        async void PostJournal(Uniconta.DataModel.InvJournal invJournal, DateTime date, bool clearCounted)
         {
             if (invJournal == null) return;
             var mainList = (IEnumerable<InvItemStorageCount>)dgInvStockStatus.GetVisibleRows();
@@ -571,13 +571,17 @@ namespace UnicontaClient.Pages.CustomPage
                     var itm = item.itemRec;
                     if (itm != null)
                         journalLine._CostPrice = itm._CostPrice;
-                    journalLine._Qty = dif;
+                    if (clearCounted)
+                        journalLine._Qty = 0d;
+                    else
+                        journalLine._Qty = dif;
                     journalLine.SetMaster(invJournal);
                     journalLine._Dim1 = invJournal._Dim1;
                     journalLine._Dim2 = invJournal._Dim2;
                     journalLine._Dim3 = invJournal._Dim3;
                     journalLine._Dim4 = invJournal._Dim4;
                     journalLine._Dim5 = invJournal._Dim5;
+
                     invJournalLineList.Add(journalLine);
                 }
             }

@@ -1,17 +1,14 @@
+using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Net.Http;
 using System.Net;
-using System.Text;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
+using Uniconta.ClientTools.Controls;
 using UnicontaClient.Pages.GL.Vat.UK.HMRCConnection.Model;
 using UnicontaClient.Pages.GL.Vat.UK.HMRCConnection.OAuth2;
-using Uniconta.ClientTools.Controls;
-using Newtonsoft.Json;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage.GL.Vat.UK.HMRCConnection
@@ -127,25 +124,96 @@ namespace UnicontaClient.Pages.CustomPage.GL.Vat.UK.HMRCConnection
                 if (string.IsNullOrWhiteSpace(deserialised.chargeRefNumber))
                     successString += "Charge Ref Number: " + deserialised.chargeRefNumber;
                 _client.Dispose();
-                UnicontaMessageBox.Show("VAT return sent to HMRC successfully" + successString , "Information");
+                UnicontaMessageBox.Show("VAT return sent to HMRC successfully" + successString, "Information");
             }
 
+        }
+
+        async Task<string> ViewVATReturn(string vatReturnNumber)
+        {
+            string uriString = "organisations/vat/" + _vrn + "/returns" + "/" + vatReturnNumber;
+            //add access token to header of http message
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Common.AccessToken);
+            SetFraudPreventionHeaders();
+            //get
+            HttpResponseMessage response = await _client.GetAsync(uriString);
+
+            if (!response.IsSuccessStatusCode)
+                throw new WebException(await ProcessAPIError(response));
+
+            UnicontaMessageBox.Show("Retrieved VAT returns from HMRC", "Success");
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        async Task<string> GetVATLiabilities(string from, string to)
+        {
+            var query = HttpUtility.ParseQueryString(string.Empty);
+            //example format = "?from=2017-01-01&to=2017-12-31
+            query["from"] = from;
+            query["to"] = to;
+
+            string uriString = "organisations/vat/" + _vrn + "/liabilities" + "?" + query.ToString();
+            //add access token to header of http message
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Common.AccessToken);
+            SetFraudPreventionHeaders();
+            //get
+            HttpResponseMessage response = await _client.GetAsync(uriString);
+
+            if (!response.IsSuccessStatusCode)
+                throw new WebException(await ProcessAPIError(response));
+
+            UnicontaMessageBox.Show("Retrieved VAT liabilities from HMRC", "Success");
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        async Task<string> GetVATPayments(string from, string to)
+        {
+            var query = HttpUtility.ParseQueryString(string.Empty);
+            //example format = "?from=2017-01-01&to=2017-12-31
+            query["from"] = from;
+            query["to"] = to;
+
+            string uriString = "organisations/vat/" + _vrn + "/payments" + "?" + query.ToString();
+            //add access token to header of http message
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Common.AccessToken);
+            SetFraudPreventionHeaders();
+            //get
+            HttpResponseMessage response = await _client.GetAsync(uriString);
+
+            if (!response.IsSuccessStatusCode)
+                throw new WebException(await ProcessAPIError(response));
+
+            UnicontaMessageBox.Show("Retrieved VAT payments from HMRC", "Success");
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        async Task<string> GetCustomerDetails()
+        {
+            string uriString = "organisations/vat/" + _vrn + "/information";
+            //add access token to header of http message
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Common.AccessToken);
+            SetFraudPreventionHeaders();
+            //get
+            HttpResponseMessage response = await _client.GetAsync(uriString);
+
+            if (!response.IsSuccessStatusCode)
+                throw new WebException(await ProcessAPIError(response));
+
+            UnicontaMessageBox.Show("Retrieved VAT customer information from HMRC", "Success");
+            return await response.Content.ReadAsStringAsync();
         }
 
         async Task<string> ProcessAPIError(HttpResponseMessage response)
         {
             APIErrorModel deserialised;
+            var strResponse = await response.Content.ReadAsStringAsync();
             try
             {
-                deserialised = JsonConvert.DeserializeObject<APIErrorModel>(await response.Content.ReadAsStringAsync());
-            }
-            catch (JsonException)
-            {
-                throw;
+                deserialised = JsonConvert.DeserializeObject<APIErrorModel>(strResponse);
             }
             catch (Exception)
             {
-                throw;
+                return strResponse;
             }
 
             return deserialised?.GetErrorsAsString();
@@ -188,18 +256,42 @@ namespace UnicontaClient.Pages.CustomPage.GL.Vat.UK.HMRCConnection
 
         void SetFraudPreventionHeaders()
         {
-            _client.DefaultRequestHeaders.Add("Gov-Client-Connection-Method", "DESKTOP_APP_DIRECT");
-            _client.DefaultRequestHeaders.Add("Gov-Client-Device-ID", FraudPreventionInfo.ClientDeviceId);
-            _client.DefaultRequestHeaders.Add("Gov-Client-User-IDs", FraudPreventionInfo.ClientUserIds);
-            _client.DefaultRequestHeaders.Add("Gov-Client-Timezone", FraudPreventionInfo.ClientTimezone);
-            _client.DefaultRequestHeaders.Add("Gov-Client-Local-IPs", FraudPreventionInfo.ClientLocalIps);
-            _client.DefaultRequestHeaders.Add("Gov-Client-Screens", FraudPreventionInfo.ClientScreens);
-            //_client.DefaultRequestHeaders.Add("Gov-Client-Window-Size", FraudPreventionInfo.WindowSize);
-            _client.DefaultRequestHeaders.Add("Gov-Client-User-Agent", FraudPreventionInfo.UserAgent);
-            _client.DefaultRequestHeaders.Add("Gov-Client-Vendor-Version", FraudPreventionInfo.VendorVersion);
-            //_client.DefaultRequestHeaders.Add("Gov-Client-Window-Size", FraudPreventionInfo.WindowSize);
-            _client.DefaultRequestHeaders.Add("Gov-Client-License-IDs", FraudPreventionInfo.LicenseId);
-            _client.DefaultRequestHeaders.Add("Gov-Client-Mac-Addresses", FraudPreventionInfo.MacAddresses);
+            SetFraudPreventionHeader("Gov-Client-Connection-Method", "DESKTOP_APP_DIRECT");
+            SetFraudPreventionHeader("Gov-Client-Device-ID", FraudPreventionInfo.ClientDeviceId);
+            SetFraudPreventionHeader("Gov-Client-User-IDs", FraudPreventionInfo.ClientUserIds);
+            SetFraudPreventionHeader("Gov-Client-Timezone", FraudPreventionInfo.ClientTimezone);
+            SetFraudPreventionHeader("Gov-Client-Local-IPs", FraudPreventionInfo.ClientLocalIps);
+            SetFraudPreventionHeader("Gov-Client-Local-IPs-Timestamp", FraudPreventionInfo.ClientLocalIpsTimestamp);
+            SetFraudPreventionHeader("Gov-Client-Screens", FraudPreventionInfo.ClientScreens);
+            SetFraudPreventionHeader("Gov-Client-User-Agent", FraudPreventionInfo.UserAgent);
+            SetFraudPreventionHeader("Gov-Vendor-Product-Name", FraudPreventionInfo.VendorName);
+            SetFraudPreventionHeader("Gov-Vendor-Version", FraudPreventionInfo.VendorVersion);
+            SetFraudPreventionHeader("Gov-Client-Window-Size", FraudPreventionInfo.WindowSize);
+            SetFraudPreventionHeader("Gov-Vendor-License-IDs", FraudPreventionInfo.LicenseId);
+            SetFraudPreventionHeader("Gov-Client-Mac-Addresses", FraudPreventionInfo.MacAddresses);
+        }
+
+        void SetFraudPreventionHeader(string name, string value)
+        {
+            if (!_client.DefaultRequestHeaders.Contains(name))
+                _client.DefaultRequestHeaders.Add(name, value);
+        }
+
+        async Task TestFraudPreventionHeadersAsync()
+        {
+            await ProcessAuth();
+
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Common.AccessToken);
+            SetFraudPreventionHeaders();
+
+            //HttpResponseMessage response = await _client.GetAsync("test/fraud-prevention-headers/validate");
+            HttpResponseMessage response = await _client.GetAsync("test/fraud-prevention-headers/vat-mtd/validation-feedback");//connectionMethod=DESKTOP_APP_DIRECT
+
+            if (!response.IsSuccessStatusCode)
+                throw new WebException(await ProcessAPIError(response));
+
+            var message = await response.Content.ReadAsStringAsync();
+            UnicontaMessageBox.Show(message, "Info");
         }
     }
 

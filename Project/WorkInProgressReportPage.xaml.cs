@@ -56,7 +56,8 @@ namespace UnicontaClient.Pages.CustomPage
         static bool showTask;
         static bool showWorkspace;
         static bool includeJournals;
-        static bool showWIPCostvalue;
+        bool showWIPCostvalue;
+        bool hasLayout;
 
         ItemBase iIncludeZeroBalance, iIncludeJournals, iShowTask, iShowWorkspace, iShowWIPCostvalue;
         bool hasWorkspace;
@@ -66,12 +67,16 @@ namespace UnicontaClient.Pages.CustomPage
         private const string FILTERVALUE_ZEROBALANCE = @"([OnAccount] <> 0.0 Or [ClosingBalance] <> 0.0)";
         private const string FILTERVALUE_ZEROBALANCE_COSTVALUE = @"([OnAccount] <> 0.0 Or [ClosingBalanceCostValue] <> 0.0)";
 
-        SQLTableCache<Uniconta.DataModel.Project> projCache;
+        SQLTableCache<Uniconta.DataModel.Project> projects;
+        SQLTableCache<Uniconta.DataModel.PrCategory> categories;
+        SQLTableCache<Uniconta.DataModel.PrJournal> prJournals;
+        SQLTableCache<Uniconta.DataModel.Employee> employees;
+
 
         public WorkInProgressReportPage(BaseAPI API) : base(API, string.Empty)
         {
-            this.DataContext = this;
             InitializeComponent();
+            this.DataContext = this;
             localMenu.dataGrid = dgWorkInProgressRpt;
             dgWorkInProgressRpt.RowDoubleClick += dgWorkInProgressRpt_RowDoubleClick;
             SetRibbonControl(localMenu, dgWorkInProgressRpt);
@@ -81,13 +86,17 @@ namespace UnicontaClient.Pages.CustomPage
             dgWorkInProgressRpt.ShowTotalSummary();
             dgWorkInProgressRpt.tableView.AllowFixedColumnMenu = true;
 
+            categories = api.GetCache<Uniconta.DataModel.PrCategory>();
+            projects = api.GetCache<Uniconta.DataModel.Project>();
+            prJournals = api.GetCache<Uniconta.DataModel.PrJournal>();
+            employees = api.GetCache<Uniconta.DataModel.Employee>();
+
             localMenu.OnChecked += LocalMenu_OnChecked;
             GetMenuItem();
 
             iIncludeZeroBalance.IsChecked = !excludeZeroBalance;
             iIncludeJournals.isEditLayout = false;
-            iShowWIPCostvalue.IsChecked = showWIPCostvalue;
-
+      
             showTask = api.CompanyEntity.ProjectTask && showTask;
             iShowTask.IsChecked = showTask;
             iShowTask.isEditLayout = api.CompanyEntity.ProjectTask;
@@ -136,22 +145,28 @@ namespace UnicontaClient.Pages.CustomPage
 
         async private void SetProjectSource()
         {
-            projCache = api.GetCache<Uniconta.DataModel.Project>() ?? await this.api.LoadCache<Uniconta.DataModel.Project>();
-            cmbProject.ItemsSource = projCache;
+            projects = api.GetCache<Uniconta.DataModel.Project>() ?? await this.api.LoadCache<Uniconta.DataModel.Project>();
+            cmbProject.ItemsSource = projects;
             StartLoadCache();
         }
 
         protected override void OnLayoutLoaded()
         {
             base.OnLayoutLoaded();
-            iShowWIPCostvalue.isEditLayout = !base.HasLayout();
+
+            hasLayout = base.HasLayout() || base.CurrentLayoutName != null;
+            if (hasLayout || api.CompanyEntity.HideCostPrice)
+            {
+                iShowWIPCostvalue.isEditLayout = false;
+                iShowWIPCostvalue.IsChecked = false;
+            }
 
             if (!api.CompanyEntity.ProjectTask)
                 this.Task.Visible = this.Task.ShowInColumnChooser = false;
             UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
             SetDimensionLocalMenu();
             SetLayoutSalesCostValue();
-            if (api.CompanyEntity.HideCostPrice && !showWIPCostvalue)
+            if (api.CompanyEntity.HideCostPrice)
             {
                 EmployeeFeeCostValue.Visible = EmployeeFeeCostValue.ShowInColumnChooser =
             EmployeeFeeJournalCostValue.Visible = EmployeeFeeJournalCostValue.ShowInColumnChooser =
@@ -217,30 +232,34 @@ namespace UnicontaClient.Pages.CustomPage
                     iShowWIPCostvalue.IsChecked = showWIPCostvalue;
                     SetLayoutSalesCostValue();
 
-                    if(showWIPCostvalue)
+
+                    if (!hasLayout)
                     {
-                        OpeningBalanceCostValue.Visible = true;
-                        EmployeeFeeCostValue.Visible = true;
-                        EmployeeFeeJournalCostValue.Visible = true;
-                        ExpensesCostValue.Visible = true;
-                        RevenueCostValue.Visible = true;
-                        InvoicedCostValue.Visible = true;
-                        TotalInvoicedCostValue.Visible = true;
-                        AdjustmentCostValue.Visible = true;
-                        ClosingBalanceCostValue.Visible = true;
-                    }
-                    else
-                    {
-                        OpeningBalance.Visible = true;
-                        EmployeeFee.Visible = true;
-                        EmployeeFeeJournal.Visible = true;
-                        Expenses.Visible = true;
-                        Revenue.Visible = true;
-                        OnAccount.Visible = true;
-                        Invoiced.Visible = true;
-                        TotalInvoiced.Visible = true;
-                        Adjustment.Visible = true;
-                        ClosingBalance.Visible = true;
+                        if (showWIPCostvalue)
+                        {
+                            OpeningBalanceCostValue.Visible = true;
+                            EmployeeFeeCostValue.Visible = true;
+                            EmployeeFeeJournalCostValue.Visible = true;
+                            ExpensesCostValue.Visible = true;
+                            RevenueCostValue.Visible = true;
+                            InvoicedCostValue.Visible = true;
+                            TotalInvoicedCostValue.Visible = true;
+                            AdjustmentCostValue.Visible = true;
+                            ClosingBalanceCostValue.Visible = true;
+                        }
+                        else
+                        {
+                            OpeningBalance.Visible = true;
+                            EmployeeFee.Visible = true;
+                            EmployeeFeeJournal.Visible = true;
+                            Expenses.Visible = true;
+                            Revenue.Visible = true;
+                            OnAccount.Visible = true;
+                            Invoiced.Visible = true;
+                            TotalInvoiced.Visible = true;
+                            Adjustment.Visible = true;
+                            ClosingBalance.Visible = true;
+                        }
                     }
                     SetIncludeFilter();
 
@@ -250,32 +269,35 @@ namespace UnicontaClient.Pages.CustomPage
 
         void SetLayoutSalesCostValue()
         {
-            if (showWIPCostvalue)
+            if (!hasLayout)
             {
-                isCostValue = true;
-                OpeningBalance.Visible = false;
-                EmployeeFee.Visible = false;
-                EmployeeFeeJournal.Visible = false;
-                Expenses.Visible = false;
-                Revenue.Visible = false;
-                OnAccount.Visible = false;
-                Invoiced.Visible = false;
-                TotalInvoiced.Visible = false;
-                Adjustment.Visible = false;
-                ClosingBalance.Visible = false;
-            }
-            else
-            {
-                isCostValue = false;
-                OpeningBalanceCostValue.Visible = false;
-                EmployeeFeeCostValue.Visible = false;
-                EmployeeFeeJournalCostValue.Visible = false;
-                ExpensesCostValue.Visible = false;
-                RevenueCostValue.Visible = false;
-                InvoicedCostValue.Visible = false;
-                TotalInvoicedCostValue.Visible = false;
-                AdjustmentCostValue.Visible = false;
-                ClosingBalanceCostValue.Visible = false;
+                if (showWIPCostvalue)
+                {
+                    isCostValue = true;
+                    OpeningBalance.Visible = false;
+                    EmployeeFee.Visible = false;
+                    EmployeeFeeJournal.Visible = false;
+                    Expenses.Visible = false;
+                    Revenue.Visible = false;
+                    OnAccount.Visible = false;
+                    Invoiced.Visible = false;
+                    TotalInvoiced.Visible = false;
+                    Adjustment.Visible = false;
+                    ClosingBalance.Visible = false;
+                }
+                else
+                {
+                    isCostValue = false;
+                    OpeningBalanceCostValue.Visible = false;
+                    EmployeeFeeCostValue.Visible = false;
+                    EmployeeFeeJournalCostValue.Visible = false;
+                    ExpensesCostValue.Visible = false;
+                    RevenueCostValue.Visible = false;
+                    InvoicedCostValue.Visible = false;
+                    TotalInvoicedCostValue.Visible = false;
+                    AdjustmentCostValue.Visible = false;
+                    ClosingBalanceCostValue.Visible = false;
+                }
             }
         }
 
@@ -382,7 +404,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (DefaultToDate != DateTime.MinValue)
                 pairTM.Add(PropValuePair.GenereteWhereElements(nameof(TMJournalLineClient.Date), DefaultToDate, CompareOperator.LessThanOrEqual));
 
-            var tmJourLines = await api.Query<TMJournalLineClient>(projCache.Get(cmbProject.Text), pairTM);
+            var tmJourLines = await api.Query<TMJournalLineClient>(projects.Get(cmbProject.Text), pairTM);
 
             var grouped = new Dictionary<(string emp, string proj, string cat, string ws, string task, DateTime date), TMJournalLineClient>();
             Uniconta.DataModel.Employee emp = null;
@@ -440,6 +462,7 @@ namespace UnicontaClient.Pages.CustomPage
             bool isApprovedSunday = true;
             DateTime approvedDateSunday = DateTime.MinValue;
             var approveDate = DateTime.MinValue;
+            emp = null;
             foreach (var row in grpEmpDate)
             {
                 if (emp == null || emp._Number != row.Employee)
@@ -688,17 +711,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "Transactions":
                     if (selectedItem != null)
-                    {
-                        var header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Transactions"), selectedItem.Project);
-                        if (selectedItem._Workspace != null)
-                            header += string.Format(" ({0}: {1})", Uniconta.ClientTools.Localization.lookup("Workspace"), selectedItem.Workspace);
-
-                        object[] param = new object[2];
-                        param[0] = (object)selectedItem.ProjectRef;
-                        param[1] = selectedItem._Workspace;
-
-                        AddDockItem(TabControls.ProjectTransactionPage,  param, header);
-                    }
+                        AddDockItem(TabControls.ProjectTransactionPage, dgWorkInProgressRpt.syncEntity);
                     break;
                 case "Search":
                     LoadGrid();
@@ -722,6 +735,10 @@ namespace UnicontaClient.Pages.CustomPage
                 case "ZeroInvoice":
                     if (selectedItem != null)
                         CreateZeroInvoice(selectedItem);
+                    break;
+                case "PostAdjustments":
+                    if (selectedItem != null)
+                        PostAdjustments();
                     break;
                 case "DebtorAccount":
                     if (selectedItem != null)
@@ -750,7 +767,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private async void CreateOrder(ProjectWIPTotalsClient selectedItem)
         {
-            var project = (ProjectClient)projCache.Get(selectedItem.Project);
+            var project = (ProjectClient)projects.Get(selectedItem.Project);
             ProjectTaskClient projTask = null;
             if (api.CompanyEntity.ProjectTask && selectedItem.Task != null)
             {
@@ -816,7 +833,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void CreateZeroInvoice(ProjectWIPTotalsClient selectedItem)
         {
-            var project = (ProjectClient)projCache.Get(selectedItem.Project);
+            var project = (ProjectClient)projects.Get(selectedItem.Project);
             var workSpaceCache = api.GetCache(typeof(Uniconta.DataModel.PrWorkSpace));
             var prWorkspace = (PrWorkSpaceClient)workSpaceCache.Get(selectedItem.Workspace);
             var cwCreateZeroInvoice = new UnicontaClient.Pages.CwCreateZeroInvoice(api, project, prWorkspace);
@@ -870,6 +887,113 @@ namespace UnicontaClient.Pages.CustomPage
                 ShowOrderLines(debtorOrderInstance);
         }
 
+        private void PostAdjustments()
+        {
+            var adjustmentDialog = new CwPostAdjustments(api);
+            adjustmentDialog.Closing += async delegate
+            {
+                if (adjustmentDialog.DialogResult == true)
+                {
+                    var prJournal = (Uniconta.DataModel.PrJournal)api.GetCache(typeof(Uniconta.DataModel.PrJournal)).Get(adjustmentDialog.Journal);
+                    if (prJournal == null)
+                    {
+                        UnicontaMessageBox.Show(string.Concat(Uniconta.ClientTools.Localization.lookup("Journal"), ": ", Uniconta.ClientTools.Localization.lookup("FieldCannotBeBlank").ToLower()), Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.OK);
+                        return;
+                    }
+
+                    if (adjustmentDialog.AdjustmentCategory == null)
+                    {
+                        UnicontaMessageBox.Show(string.Concat(Uniconta.ClientTools.Localization.lookup("AdjustmentCategory"), ": ", Uniconta.ClientTools.Localization.lookup("FieldCannotBeBlank").ToLower()), Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.OK);
+                        return;
+                    }
+
+                    var employee = (Uniconta.DataModel.Employee)api.GetCache(typeof(Uniconta.DataModel.Employee)).Get(adjustmentDialog?.Employee);
+                    busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
+                    busyIndicator.IsBusy = true;
+
+                    var prLines = new List<PrJournalLine>(12);
+                    var visibleRows = dgWorkInProgressRpt.GetVisibleRows();
+                    foreach (var row in visibleRows as IEnumerable<ProjectWIPTotalsClient>)
+                    {
+                        if (row.EnterAdjustmentAmount != 0)
+                        {
+                            var project = (ProjectClient)projects.Get(row.Project);
+                            var rec = new PrJournalLine()
+                            {
+                                _Approved = true,
+                                _Project = row.Project,
+                                _PrCategory = adjustmentDialog.AdjustmentCategory,
+                                _Task = row._Task,
+                                _WorkSpace = row.Workspace,
+                                _Invoiceable = true,
+                                _Employee = adjustmentDialog.Employee,
+                                _Text = adjustmentDialog.Comment,
+                                _Qty = row.EnterAdjustmentAmount < 0 ? -1 : 1,
+                                _SalesPrice = Math.Abs(row.EnterAdjustmentAmount),
+                                _Date = adjustmentDialog.AdjustmentDate != DateTime.MinValue ? adjustmentDialog.AdjustmentDate : Uniconta.ClientTools.Page.BasePage.GetSystemDefaultDate(),
+                            };
+
+                            if (api.CompanyEntity._DimFromProject)
+                            {
+                                rec._Dim1 = project._Dim1;
+                                rec._Dim2 = project._Dim2;
+                                rec._Dim3 = project._Dim3;
+                                rec._Dim4 = project._Dim4;
+                                rec._Dim5 = project._Dim5;
+                            }
+                            else if (employee != null)
+                            {
+                                rec._Dim1 = employee._Dim1;
+                                rec._Dim2 = employee._Dim2;
+                                rec._Dim3 = employee._Dim3;
+                                rec._Dim4 = employee._Dim4;
+                                rec._Dim5 = employee._Dim5;
+                            }
+
+                            prLines.Add(rec);
+                        }
+                    }
+
+                    Task<Uniconta.API.GeneralLedger.PostingResult> task;
+                    if (adjustmentDialog.IsSimulation)
+                        task = new UnicontaAPI.Project.API.PostingAPI(api).CheckJournal(prJournal, adjustmentDialog.AdjustmentDate, true, new GLTransClientTotal(), prLines);
+                    else
+                        task = new UnicontaAPI.Project.API.PostingAPI(api).PostDailyJournal(prJournal, adjustmentDialog.AdjustmentDate, adjustmentDialog.Comment, prLines);
+
+                    var postingResult = await task;
+
+                    busyIndicator.IsBusy = false;
+                    busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LoadingMsg");
+
+                    if (postingResult == null)
+                        return;
+
+                    if (postingResult.Err != ErrorCodes.Succes)
+                    {
+                        Utility.ShowJournalError(postingResult, dgWorkInProgressRpt);
+                    }
+                    else if (postingResult.SimulatedTrans != null && postingResult.SimulatedTrans.Length > 0)
+                    {
+                        AddDockItem(TabControls.SimulatedTransactions, new object[] { postingResult.AccountBalance, postingResult.SimulatedTrans }, Uniconta.ClientTools.Localization.lookup("SimulatedTransactions"), null, true);
+                    }
+                    else
+                    {
+                        var sb = StringBuilderReuse.Create();
+                        if (postingResult.JournalPostedlId != 0)
+                            sb.Append(string.Format("{0} {1}={2}", Uniconta.ClientTools.Localization.lookup("JournalHasBeenPosted"), Uniconta.ClientTools.Localization.lookup("JournalPostedId"), NumberConvert.ToString(postingResult.JournalPostedlId)));
+                        else
+                            sb.Append(Uniconta.ClientTools.Localization.lookup("JournalHasBeenPosted"));
+
+                        sb.AppendLine().AppendLine().Append(string.Format(Uniconta.ClientTools.Localization.lookup("PostedOBJ"), Uniconta.ClientTools.Localization.lookup("Adjustments").ToLower())).Append(": ").Append(prLines.Count);
+                        UnicontaMessageBox.Show(sb.ToStringAndRelease(), Uniconta.ClientTools.Localization.lookup("Message"));
+
+                        LoadGrid();
+                    }
+                }
+            };
+            adjustmentDialog.Show();
+        }
+
         private void ShowOrderLines(ProjectInvoiceProposalClient order)
         {
             var msg = string.Format(Uniconta.ClientTools.Localization.lookup("CreatedOBJ"), Uniconta.ClientTools.Localization.lookup("InvoiceProposal"));
@@ -901,9 +1025,14 @@ namespace UnicontaClient.Pages.CustomPage
                 AddDockItem(TabControls.UserNotesPage, local.ProjectRef, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Notes"), local.ProjectRef._Name));
         }
 
-        protected override void LoadCacheInBackGround()
+        protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
-            LoadType(new Type[] { typeof(Uniconta.DataModel.PrCategory), typeof(Uniconta.DataModel.PrWorkSpace), typeof(Uniconta.DataModel.Employee), typeof(Uniconta.DataModel.PrType) });
+            projects = projects ?? await api.LoadCache<Uniconta.DataModel.Project>().ConfigureAwait(false);
+            categories = categories ?? await api.LoadCache<Uniconta.DataModel.PrCategory>().ConfigureAwait(false);
+            prJournals = prJournals ?? await api.LoadCache<Uniconta.DataModel.PrJournal>().ConfigureAwait(false);
+            employees = employees ?? await api.LoadCache<Uniconta.DataModel.Employee>().ConfigureAwait(false);
+
+            LoadType(new Type[] { typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.ProjectTask) });
         }
         public override bool FilterOnLoadLayout => false;
     }
@@ -985,7 +1114,7 @@ namespace UnicontaClient.Pages.CustomPage
         public double EmployeeFeeJournalCostValue { get { return _EmployeeFeeJournalCostValue / 100d; } }
 
         [Display(Name = "EmployeeHoursPosted", ResourceType = typeof(ProjectTransClientText))]
-        public double EmployeeHoursPosted { get { return _EmployeeHoursPosted / 100d; } }
+        public double EmployeeHoursPosted { get { return _EmployeeHoursPosted; } }
 
         [Display(Name = "EmployeeHoursJournal", ResourceType = typeof(ProjectTransClientText))]
         public double EmployeeHoursJournal { get { return _EmployeeHoursJournal / 100d; } }
@@ -1037,6 +1166,10 @@ namespace UnicontaClient.Pages.CustomPage
 
         [Display(Name = "InvoiceProposal", ResourceType = typeof(ProjectTransClientText))]
         public bool OpenInvoiceProposal { get { return _HasInvoiceProposal; } }
+
+        private double _EnterAdjustmentAmount;
+        [Display(Name = "EnterAdjustmentAmount", ResourceType = typeof(ProjectTransClientText))]
+        public double EnterAdjustmentAmount { get { return _EnterAdjustmentAmount; } set { _EnterAdjustmentAmount = value; } }
 
         internal void NotifyClosingBalance()
         {

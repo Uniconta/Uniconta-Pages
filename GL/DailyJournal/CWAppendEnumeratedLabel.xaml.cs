@@ -30,11 +30,7 @@ namespace UnicontaClient.Pages.CustomPage
             api = crudApi;
             this.DataContext = this;
             InitializeComponent();
-#if !SILVERLIGHT
             this.Title = Uniconta.ClientTools.Localization.lookup("TransType");
-#else
-            Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             cmbAccType.ItemsSource = AppEnums.GLAccountType.Values;
             cmbOffSetAccType.ItemsSource = AppEnums.GLAccountType.Values;
             var Comp = api.CompanyEntity;

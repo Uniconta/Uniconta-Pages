@@ -175,12 +175,21 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         ShowInvoiceLines(selectedItem);
                     break;
+                case "RemoveExchangeRate":
+                    if (selectedItem != null)
+                        RemoveExchangeRate(selectedItem);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
-
+        async void RemoveExchangeRate(CreditorTransClient trans)
+        {
+            var transAPI = new Uniconta.API.DebtorCreditor.TransactionAPI(api);
+            var err = await transAPI.ExchangeTransRemove(trans);
+            UtilDisplay.ShowErrorCode(err);
+        }
         async void ShowInvoiceLines(CreditorTransClient creditorTrans)
         {
             var creditorInvoice = await api.Query<CreditorInvoiceClient>(new UnicontaBaseEntity[] { creditorTrans }, null);

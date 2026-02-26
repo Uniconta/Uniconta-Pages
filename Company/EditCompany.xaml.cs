@@ -170,11 +170,12 @@ namespace UnicontaClient.Pages.CustomPage
         void AcItem_ButtonClicked(object sender)
         {
             AccountantAccess actAccessDialog = new AccountantAccess(api, currentAccountant);
-            actAccessDialog.Closing += delegate
+            actAccessDialog.Closing += async delegate
              {
                  if (actAccessDialog.DialogResult == true)
                  {
-                     GetAccountant();
+                     await GetAccountant();
+                     SetAccountantOwnership(currentAccountant);
                  }
              };
             actAccessDialog.Show();
@@ -191,6 +192,7 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         editrow._Accountant2 = currentAccountant2.Id;
                         txtaccountant2.Text = currentAccountant2.Name;
+                        SetAccountantOwnership(currentAccountant2);
                     }
                     else
                     {
@@ -203,7 +205,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
         AccountantClient currentAccountant;
         AccountantClient currentAccountant2;
-        private async void GetAccountant()
+        private async Task GetAccountant()
         {
             var acc = await api.Query<AccountantClient>(new UnicontaBaseEntity[] { editrow }, null);
             if (acc != null && acc.Length > 0)
@@ -233,6 +235,27 @@ namespace UnicontaClient.Pages.CustomPage
                 txtaccountant2.Text = string.Empty;
                 currentAccountant2 = null;
             }
+        }
+
+        private async void SetAccountantOwnership(AccountantClient accountant)
+        {
+            if (accountant == null)
+                return;
+
+            int uid = 0;
+            if (accountant.OwnerUid == 0)
+            {
+                var subscriptions = await api.Query<SubscriptionClient>(accountant);
+                uid = subscriptions?.FirstOrDefault().OwnerUid ?? 0;
+            }
+            else
+                uid = accountant.OwnerUid;
+
+            if (uid == 0)
+                return;
+
+            var companyAPI = new CompanyAccessAPI(api);
+            await companyAPI.TransferOwnershipOfCompany(uid, editrow);
         }
 
         void EditCompany_SaveComplete(object args)
@@ -335,7 +358,7 @@ namespace UnicontaClient.Pages.CustomPage
         async void CreateBackup(string name, bool copyTrans, bool copyPhysicalVouchers, bool copyAttachments, bool copyUsers)
         {
             var compApi = new CompanyAPI(api);
-            var result = await compApi.CreateCopy(name, copyTrans,  copyPhysicalVouchers,  copyAttachments, copyUsers);
+            var result = await compApi.CreateCopy(name, copyTrans, copyPhysicalVouchers, copyAttachments, copyUsers);
             UtilDisplay.ShowErrorCode(result);
         }
 
@@ -487,6 +510,15 @@ namespace UnicontaClient.Pages.CustomPage
         {
             ErrorCodes res = await new CompanyAPI(session, api.CompanyEntity).RefreshCache();
             UtilDisplay.ShowErrorCode(res);
+        }
+
+        private void CheckEditor_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (!chkRunNetCore.IsChecked.GetValueOrDefault() &&
+        !chkRunNetFramework.IsChecked.GetValueOrDefault())
+            {
+                ((CheckEdit)sender).IsChecked = true;
+            }
         }
     }
 }

@@ -63,7 +63,7 @@ namespace UnicontaClient.Pages.CustomPage
             frmRibbon_BaseActions(ActionType);
         }
         bool isDocumentRefLookupSet;
-        private void liDocumentRef_LookupButtonClicked(object sender)
+        private async void liDocumentRef_LookupButtonClicked(object sender)
         {
             var lookupDocumentRefEditor = sender as LookupEditor;
             if (!isDocumentRefLookupSet)
@@ -72,7 +72,7 @@ namespace UnicontaClient.Pages.CustomPage
                 lookupDocumentRefEditor.ValueMember = "RowId";
                 lookupDocumentRefEditor.SelectedIndexChanged += LookupDocumentRefEditor_SelectedIndexChanged;
                 isDocumentRefLookupSet = true;
-                lookupDocumentRefEditor.ItemsSource = api.Query<VouchersClient>(editrow).GetAwaiter().GetResult();
+                lookupDocumentRefEditor.ItemsSource = await api.Query<VouchersClient>(editrow);
             }
         }
 

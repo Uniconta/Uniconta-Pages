@@ -72,6 +72,7 @@ x:Class="UnicontaClient.Pages.CustomPage.LedgerPostingPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Reconciled" Width="60" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="MultiLine" Width="60" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="HasVoucher" ReadOnly="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AutoPost" ReadOnly="True" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AccountName" ReadOnly="True" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension1" x:Name="coldim1"/>
                     <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension2" x:Name="coldim2"/>

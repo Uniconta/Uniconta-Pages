@@ -26,6 +26,12 @@
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="MenuLayout" LargeGlyph="Edit_32x32"/>
+    <RibbonItem Action="ChangeProfile" LocalizedNameKey="ChangeOBJ" Parameter="Profile" LargeGlyph="Add_32x32">
+      <RibbonItem Action="ProfileStandardUser" LocalizedNameKey="StandardUser" Glyph="Edit_16x16"/>
+      <RibbonItem Action="ProfileProjectTimeUser" LocalizedNameKey="TimeUser" Glyph="Edit_16x16"/>
+      <RibbonItem Action="ProfileInvoiceUser" LocalizedNameKey="InvoiceUser" Glyph="Edit_16x16" />
+      <RibbonItem Action="ProfileViewUser" LocalizedNameKey="ViewUser" Glyph="Edit_16x16" />
+    </RibbonItem>
     <RibbonItem Action="CreateEmployee" LocalizedNameKey="SetOBJ" Parameter="Employee" LargeGlyph="Invite_32x32"/>
     <RibbonItem Action="ChangeOwnership" LocalizedNameKey="ChangeOwnership" LargeGlyph="Change_Ownership_32x32"/>
     <RibbonItem Action="NotificationSubscriptions" LocalizedNameKey="NotificationSubscriptions" LargeGlyph="Notification_32x32"/>

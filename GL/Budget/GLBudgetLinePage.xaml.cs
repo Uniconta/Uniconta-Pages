@@ -95,12 +95,12 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (string.Compare(rec.Name, "Budget", StringComparison.CurrentCultureIgnoreCase) == 0)
                 {
-                    var cache = api.GetCache(typeof(Uniconta.DataModel.GLBudget)) ?? api.LoadCache(typeof(Uniconta.DataModel.GLBudget)).GetAwaiter().GetResult();
+                    var cache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.GLBudget), api);
                     master = (Uniconta.DataModel.GLBudget)cache.Get(rec.Value);
                 }
                 else if (string.Compare(rec.Name, "Account", StringComparison.CurrentCultureIgnoreCase) == 0)
                 {
-                    var cache = api.GetCache(typeof(Uniconta.DataModel.GLAccount)) ?? api.LoadCache(typeof(Uniconta.DataModel.GLAccount)).GetAwaiter().GetResult();
+                    var cache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.GLAccount), api);
                     master = (Uniconta.DataModel.GLAccount)cache.Get(rec.Value);
                 }
                 else

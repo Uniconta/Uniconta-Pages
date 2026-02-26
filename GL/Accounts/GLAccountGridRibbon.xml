@@ -17,8 +17,9 @@
      <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32">
       <!---If we want Inner menu-->
       <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16" ShortcutKey=""/>
-      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="OtherFields_16x16" ShortcutKey="" />
-      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="SaveLayout_16x16" ShortcutKey=""/>
+      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16" ShortcutKey="" />
+			<RibbonItem Action="AddExpressionColumn" LocalizedNameKey="AddOBJ" Parameter="CalculationExpression" Glyph="Accountant_16x16" ShortcutKey="" />
+      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" EnableSeperator="True" Glyph="SaveLayout_16x16" ShortcutKey=""/>
       <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16" ShortcutKey=""/>
       <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16" ShortcutKey="CTRL+U"/>
       <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="Export_16x16" ShortcutKey=""/>
@@ -39,6 +40,7 @@
     <RibbonItem Action="GLTran" LocalizedNameKey="AccountStatement" ControlName="TransactionReport" LargeGlyph="Account-statement_32x32" />
     <RibbonItem Action="Trans" LocalizedNameKey="Transactions" ControlName="AccountsTransaction" LargeGlyph="Posted_Transaction_32x32" ShortcutKey="CTRL+T" />
     <RibbonItem Action="GLTransSum" LocalizedNameKey="AccountTotals" ControlName="GLTransSumClientPage"  LargeGlyph="Validate_Add_32x32" />
+    <RibbonItem Action="SettleTran" LocalizedNameKey="SettleTran" LargeGlyph="Settled_Transaction_32x32"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="VatOnClient" LocalizedNameKey="VATprDC" ControlName="VatOnClientsReport" LargeGlyph="VAT_32x32"/>

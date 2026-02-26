@@ -1,0 +1,110 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
+        xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.TimeSheetApprovalReportOLD"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+        xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
+        xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
+    <UserControl.Resources>
+        <Util:StatusToColorConverter x:Key="StatusToColorConverter" />
+        <Util:FiedlValueToForegroundColor x:Key="FiedlValueToForegroundColor"/>
+    </UserControl.Resources>
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Project/TimeSheetApprovalReportGridRibbonOLD.xml" x:Name="localMenu"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <local:TimeSheetApprovalReportOLDGrid  x:Name="dgTimeSheetApprovalRptOLD" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
+                <local:TimeSheetApprovalReportOLDGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="EmployeeName" Width="120" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Date" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Period" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="EmployeeGroup" Visible="False" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="EmployeeGroupName" Visible="False" Width="90"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" Visible="False" FieldName="Dimension1" />
+                    <local:CorasauDataGridTemplateColumnClient  x:Name="cldim2" Width="70" Visible="False" FieldName="Dimension2"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="cldim3" Width="70" Visible="False" FieldName="Dimension3" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="cldim4" Width="70" Visible="False" FieldName="Dimension4" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="cldim5" Width="70" Visible="False" FieldName="Dimension5" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Total" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="NormHours" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="TotalHours" Width="100">
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <TextBlock Margin="2" HorizontalAlignment="Right"
+                                           Text="{Binding DataContext.RowData.Row.TotalHours,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}, StringFormat=N2 }"
+                                           Foreground="{Binding DataContext.RowData.Row.TotalHours,RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource FiedlValueToForegroundColor}}"></TextBlock>
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Mileage" Visible="False" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="MileageYTD" Visible="False" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Vacation" Visible="False" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="VacationYTD" Visible="False" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OtherVacation" Visible="False" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OtherVacationYTD" Visible="False" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OverTime" Visible="False" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OverTimeYTD" Visible="False" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="FlexTime" Visible="False" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="FlexTimeYTD" Visible="False" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Sickness" Visible="True" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="OtherAbsence" Visible="False" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="InvoiceableHours" Visible="True" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="NotInvoiceableHours" Visible="True" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Production" Visible="True" Width="100"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="EfficiencyPercentage" Visible="True" Width="80"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="TMClosedBy"  Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="TMApprovedBy" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ConfirmWarning" Visible="False" AllowEditing="True"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ErrorInfo" Visible="False" AllowEditing="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Status" Width="120">
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <StackPanel Orientation="Horizontal" >
+                                    <Rectangle Width="60" Fill="{Binding DataContext.RowData.Row.Status,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource StatusToColorConverter}, ConverterParameter=FirstBox}" />
+                                    <Rectangle Width="60" Fill="{Binding DataContext.RowData.Row.Status,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource StatusToColorConverter}, ConverterParameter=SecondBox}"/>
+                                </StackPanel>
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
+                </local:TimeSheetApprovalReportOLDGrid.Columns>
+                <local:TimeSheetApprovalReportOLDGrid.GroupSummary >
+                    <local:SumColumn FieldName="Total" SummaryType="Sum" ShowInGroupColumnFooter="Total"/>
+                    <local:SumColumn FieldName="NormHours" SummaryType="Sum" ShowInGroupColumnFooter="NormHours"/>
+                    <local:SumColumn FieldName="TotalHours" SummaryType="Sum" ShowInGroupColumnFooter="TotalHours"/>
+                    <local:SumColumn FieldName="Production" SummaryType="Sum" ShowInGroupColumnFooter="Production"/>
+                    <local:SumColumn FieldName="Mileage" SummaryType="Sum" ShowInGroupColumnFooter="Mileage"/>
+                    <local:SumColumn FieldName="Vacation" SummaryType="Sum" ShowInGroupColumnFooter="Vacation"/>
+                    <local:SumColumn FieldName="VacationOther" SummaryType="Sum" ShowInGroupColumnFooter="VacationOther"/>
+                    <local:SumColumn FieldName="OverTime" SummaryType="Sum" ShowInGroupColumnFooter="FlexTime"/>
+                    <local:SumColumn FieldName="FlexTime" SummaryType="Sum" ShowInGroupColumnFooter="FlexTime"/>
+                    <local:SumColumn FieldName="Sickness" SummaryType="Sum" ShowInGroupColumnFooter="Sickness"/>
+                    <local:SumColumn FieldName="Otherabsence" SummaryType="Sum" ShowInGroupColumnFooter="Otherabsence"/>
+                    <local:SumColumn FieldName="InvoiceableHours" SummaryType="Sum" ShowInGroupColumnFooter="InvoiceableHours"/>
+                    <local:SumColumn FieldName="NotInvoiceableHours" SummaryType="Sum" ShowInGroupColumnFooter="NotInvoiceableHours"/>
+                </local:TimeSheetApprovalReportOLDGrid.GroupSummary>
+                <local:TimeSheetApprovalReportOLDGrid.TotalSummary >
+                    <local:SumColumn FieldName="Total" SummaryType="Sum"/>
+                    <local:SumColumn FieldName="NormHours" SummaryType="Sum"/>
+                    <local:SumColumn FieldName="TotalHours" SummaryType="Sum"/>
+                    <local:SumColumn FieldName="Production" SummaryType="Sum"/>
+                    <local:SumColumn FieldName="Mileage" SummaryType="Sum"/>
+                    <local:SumColumn FieldName="Vacation" SummaryType="Sum"/>
+                    <local:SumColumn FieldName="VacationOther" SummaryType="Sum"/>
+                    <local:SumColumn FieldName="Overtime" SummaryType="Sum"/>
+                    <local:SumColumn FieldName="FlexTime" SummaryType="Sum"/>
+                    <local:SumColumn FieldName="Sickness" SummaryType="Sum"/>
+                    <local:SumColumn FieldName="Otherabsence" SummaryType="Sum"/>
+                    <local:SumColumn FieldName="InvoiceableHours" SummaryType="Sum"/>
+                    <local:SumColumn FieldName="NotInvoiceableHours" SummaryType="Sum"/>
+                </local:TimeSheetApprovalReportOLDGrid.TotalSummary>
+            </local:TimeSheetApprovalReportOLDGrid>  
+        </CorasauControls:BusyIndicator>
+    </Grid>
+</Pages:GridBasePage>

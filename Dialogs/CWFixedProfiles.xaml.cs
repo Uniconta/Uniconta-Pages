@@ -45,12 +45,7 @@ namespace UnicontaClient.Controls.Dialogs
             var Rights = userAccess._Rights;
             this.profile = AccessLevel.GetFixedProfile(Rights);
             InitializeComponent();
-#if !SILVERLIGHT
             this.Title = Uniconta.ClientTools.Localization.lookup("FixedProfiles");
-#endif
-#if SILVERLIGHT
-            Utilities.Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             this.Loaded += CW_Loaded;
         }
         void CW_Loaded(object sender, RoutedEventArgs e)

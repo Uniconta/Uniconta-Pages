@@ -1,17 +1,18 @@
+using DevExpress.Data;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using Uniconta.API.Project;
+using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
-using Uniconta.Common;
-using UnicontaClient.Models;
-using System.Collections.Generic;
-using DevExpress.Data;
-using Uniconta.DataModel;
 using Uniconta.ClientTools.Util;
-using Uniconta.ClientTools.Controls;
+using Uniconta.Common;
+using Uniconta.DataModel;
+using UnicontaClient.Models;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -28,10 +29,11 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class ProjectBudgetYearPage : GridBasePage
     {
         EmployeeClient _empMaster;
+        ProjectBudgetGroup budgetGrpMaster;
 
         ProjectBudgetLineClient[] _OrginalProjectBugetLines;
         List<ProjectBudgetYearClient> _ProjectBudgetYearClients;
-        SQLCache ProjBgtGroupCache, EmpCalendarCache;
+        SQLCache budgetGroups, payrolls, projects;
 
         double normHoursMonth1, normHoursMonth2, normHoursMonth3, normHoursMonth4, normHoursMonth5, normHoursMonth6, normHoursMonth7,
             normHoursMonth8, normHoursMonth9, normHoursMonth10, normHoursMonth11, normHoursMonth12, normHoursTotal;
@@ -39,19 +41,23 @@ namespace UnicontaClient.Pages.CustomPage
         double month1Sum, month2Sum, month3Sum, month4Sum, month5Sum, month6Sum, month7Sum, month8Sum, month9Sum,
             month10Sum, month11Sum, month12Sum, totalSum;
 
-        static int year;
-        static string budgetGroup;
+        static int defaultYear;
+        static string defaultBudgetGroup;
+        Uniconta.API.Project.FindPricesEmpl priceLookup;
 
         [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.ProjectBudgetGroup))]
         public string BudgetGroup { get; set; }
 
         public override string NameOfControl => TabControls.ProjectBudgetYearPage;
 
+        bool isDataChaged;
+        public override bool IsDataChaged { get { return isDataChaged || base.IsDataChaged; } }
+
         public ProjectBudgetYearPage(UnicontaBaseEntity master)
             : base(master)
         {
-            this.DataContext = this;
             InitializeComponent();
+            this.DataContext = this;
             InitPage(master);
         }
 
@@ -60,9 +66,9 @@ namespace UnicontaClient.Pages.CustomPage
             if (master is EmployeeClient emp)
                 _empMaster = emp;
 
-            if (year == 0)
-                year = (DateTime.Now.Year + 1);
-            txtYear.Text = year.ToString();
+            if (defaultYear == 0)
+                defaultYear = (DateTime.Now.Year + 1);
+            txtYear.Text = defaultYear.ToString();
 
             cmbProjectBudgetGroup.api = api;
             dgProjectBudgetYear.api = api;
@@ -71,8 +77,13 @@ namespace UnicontaClient.Pages.CustomPage
             dgProjectBudgetYear.View.ShowFixedTotalSummary = true;
             dgProjectBudgetYear.CustomSummary += DgProjectBudgetYear_CustomSummary;
             dgProjectBudgetYear.tableView.ShowingEditor += TableView_ShowingEditor; ;
+            dgProjectBudgetYear.SelectedItemChanged += DgProjectBudgetYear_SelectedItemChanged;
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
             SetRibbonControl(localMenu, dgProjectBudgetYear);
+
+            payrolls = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.EmpPayrollCategory));
+            projects = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.Project));
+            budgetGroups = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.ProjectBudgetGroup));
         }
 
         private void TableView_ShowingEditor(object sender, DevExpress.Xpf.Grid.ShowingEditorEventArgs e)
@@ -231,7 +242,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (dgProjectBudgetYear.SelectedItem != null)
                         DeleteRow();
                     break;
-                case "RefreshGrid":
+                case "Search":
                     LoadBudgetYear();
                     break;
                 case "Save":
@@ -249,12 +260,16 @@ namespace UnicontaClient.Pages.CustomPage
             if (_empMaster != null)
             {
                 await SetBudgetGroup();
-                LoadBudgetYear();
+                if (budgetGrpMaster != null)
+                    LoadBudgetYear();
             }
         }
 
         private void AddRow()
         {
+            if (budgetGrpMaster == null)
+                return;
+
             try
             {
                 var projectBudgetLine = api.CompanyEntity.CreateUserType<ProjectBudgetLineClient>();
@@ -277,6 +292,7 @@ namespace UnicontaClient.Pages.CustomPage
                     _ProjectBudgetYearClients = new List<ProjectBudgetYearClient> { newRow };
 
                 ResetSourceOnGrid();
+                isDataChaged = true;
             }
             catch (System.ArgumentException)
             {
@@ -292,8 +308,10 @@ namespace UnicontaClient.Pages.CustomPage
                 var selectedRow = dgProjectBudgetYear.SelectedItem as ProjectBudgetYearClient;
                 if (selectedRow != null)
                 {
-                    _ProjectBudgetYearClients.Remove(selectedRow);
+                    selectedRow.MonthQty1 = selectedRow.MonthQty2 = selectedRow.MonthQty3 = selectedRow.MonthQty4 = selectedRow.MonthQty5 = selectedRow.MonthQty6 =
+                    selectedRow.MonthQty7 = selectedRow.MonthQty8 = selectedRow.MonthQty9 = selectedRow.MonthQty10 = selectedRow.MonthQty11 = selectedRow.MonthQty12 = 0;
                     ResetSourceOnGrid();
+                    isDataChaged = true;
                 }
             }
         }
@@ -307,6 +325,21 @@ namespace UnicontaClient.Pages.CustomPage
             dgProjectBudgetYear.Visibility = Visibility.Visible;
         }
 
+        private void DgProjectBudgetYear_SelectedItemChanged(object sender, DevExpress.Xpf.Grid.SelectedItemChangedEventArgs e)
+        {
+            var oldselectedItem = e.OldItem as UnicontaClient.Pages.ProjectBudgetYearClient;
+            if (oldselectedItem != null)
+                oldselectedItem.PropertyChanged -= DgProjectBudgetYear_PropertyChanged;
+            var selectedItem = e.NewItem as UnicontaClient.Pages.ProjectBudgetYearClient;
+            if (selectedItem != null)
+                selectedItem.PropertyChanged += DgProjectBudgetYear_PropertyChanged;
+        }
+
+        private void DgProjectBudgetYear_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            isDataChaged = true;
+        }
+
         async void SaveBudgetYear()
         {
             if (_ProjectBudgetYearClients == null || _ProjectBudgetYearClients.Count == 0)
@@ -314,16 +347,17 @@ namespace UnicontaClient.Pages.CustomPage
 
             int prBudgetYearCount = _ProjectBudgetYearClients.Count;
 
-            List<ProjectBudgetLineClient> insertBudgetLine = new List<ProjectBudgetLineClient>(prBudgetYearCount);
-            List<ProjectBudgetLineClient> updateBudgetLine = new List<ProjectBudgetLineClient>(prBudgetYearCount);
-            List<ProjectBudgetLineClient> deleteBudgetLine = new List<ProjectBudgetLineClient>(prBudgetYearCount);
+            var insertBudgetLine = new List<ProjectBudgetLineClient>(prBudgetYearCount);
+            var updateBudgetLine = new List<ProjectBudgetLineClient>(prBudgetYearCount);
+            var deleteBudgetLine = new List<ProjectBudgetLineClient>(prBudgetYearCount);
 
-            // Group original lines by their key (project, employee, PrCategory, WorkSpace, Task)
+            // Group original lines by their key (project, employee, PayrollCategory, PrCategory, WorkSpace, Task)
             var groupedOriginal = _OrginalProjectBugetLines
                 .GroupBy(o => new
                 {
                     o.Project,
                     o.Employee,
+                    o.PayrollCategory,
                     o.PrCategory,
                     o.WorkSpace,
                     o.Task
@@ -332,13 +366,39 @@ namespace UnicontaClient.Pages.CustomPage
             // Iterate through each group
             foreach (var group in groupedOriginal)
             {
-                // Find the matching aggregate row for this key
-                var aggregated = _ProjectBudgetYearClients.FirstOrDefault(a =>
-                    a.Project == group.Key.Project &&
-                    a.Employee == group.Key.Employee &&
-                    a.PrCategory == group.Key.PrCategory &&
-                    a.WorkSpace == group.Key.WorkSpace &&
-                    a.Task == group.Key.Task);
+                var aList = _ProjectBudgetYearClients.Where(a =>
+                        a.Project == group.Key.Project &&
+                        a.Employee == group.Key.Employee &&
+                        a.PayrollCategory == group.Key.PayrollCategory &&
+                        a.PrCategory == group.Key.PrCategory &&
+                        a.WorkSpace == group.Key.WorkSpace &&
+                        a.Task == group.Key.Task).ToList();
+
+                if (aList.Count == 0)
+                    continue; 
+
+                var aggregated = new ProjectBudgetYearClient
+                {
+                    Project = group.Key.Project,
+                    Employee = group.Key.Employee,
+                    PayrollCategory = group.Key.PayrollCategory,
+                    PrCategory = group.Key.PrCategory,
+                    WorkSpace = group.Key.WorkSpace,
+                    Task = group.Key.Task,
+
+                    MonthQty1 = aList.Sum(x => x.MonthQty1),
+                    MonthQty2 = aList.Sum(x => x.MonthQty2),
+                    MonthQty3 = aList.Sum(x => x.MonthQty3),
+                    MonthQty4 = aList.Sum(x => x.MonthQty4),
+                    MonthQty5 = aList.Sum(x => x.MonthQty5),
+                    MonthQty6 = aList.Sum(x => x.MonthQty6),
+                    MonthQty7 = aList.Sum(x => x.MonthQty7),
+                    MonthQty8 = aList.Sum(x => x.MonthQty8),
+                    MonthQty9 = aList.Sum(x => x.MonthQty9),
+                    MonthQty10 = aList.Sum(x => x.MonthQty10),
+                    MonthQty11 = aList.Sum(x => x.MonthQty11),
+                    MonthQty12 = aList.Sum(x => x.MonthQty12),
+                };
 
                 for (int month = 1; month <= 12; month++)
                 {
@@ -359,6 +419,7 @@ namespace UnicontaClient.Pages.CustomPage
                             // No original line, but quantity is now set — insert new line
                             var newLine = CreateNewBudgetLineClient(aggregated);
                             UpdateNewBudgetLine(aggregated, newLine, month);
+                            await priceLookup.GetEmployeePrice(newLine);
                             insertBudgetLine.Add(newLine);
                         }
                         else
@@ -387,25 +448,68 @@ namespace UnicontaClient.Pages.CustomPage
             var unmatchedAggregates = _ProjectBudgetYearClients
                 .Where(agg => !_OrginalProjectBugetLines.Any(orig => IsProjectBudgetLineMatch(agg, orig)));
 
-            foreach (var newAgg in unmatchedAggregates)
+            if (unmatchedAggregates != null)
             {
-                for (int month = 1; month <= 12; month++)
+                var projBudgetArr = await api.Query<ProjectBudget>();
+                var projGrouped = unmatchedAggregates.GroupBy(s => s.Project);
+
+                var budgetsGrouped = projBudgetArr.GroupBy(b => Tuple.Create(b._Project, b._Group)).ToDictionary(g => g.Key, g => g.First());
+
+                foreach (var proj in projGrouped)
                 {
-                    if (!IsMonthQtySet(newAgg, month))
+                    var projectNo = proj.Key;
+
+                    var dictKey = Tuple.Create(projectNo, budgetGrpMaster.KeyStr);
+                    budgetsGrouped.TryGetValue(dictKey, out var projBudget);
+
+                    bool createHeader = projBudget == null;
+
+                    if (createHeader)
                     {
-                        var newLine = CreateNewBudgetLineClient(newAgg);
-                        UpdateNewBudgetLine(newAgg, newLine, month);
-                        insertBudgetLine.Add(newLine);
+                        var project = (Uniconta.DataModel.Project)projects.Get(projectNo);
+                        if (project == null)
+                            continue;
+
+                        projBudget = new ProjectBudget();
+                        projBudget.SetMaster(project);
+                        projBudget._Group = budgetGrpMaster.KeyStr;
+                        projBudget._Name = Uniconta.ClientTools.Localization.lookup("Budget");
+                        projBudget._Current = true;
                     }
+
+                    var insertNewBudgetLine = new List<ProjectBudgetLineClient>();
+                    foreach (var newAgg in proj)
+                    {
+                        for (int month = 1; month <= 12; month++)
+                        {
+                            if (IsMonthQtySet(newAgg, month))
+                                continue;
+                                                        
+                            var newLine = CreateNewBudgetLineClient(newAgg);
+                            UpdateNewBudgetLine(newAgg, newLine, month);
+                            await priceLookup.GetEmployeePrice(newLine);
+
+                            if (createHeader)
+                                insertNewBudgetLine.Add(newLine);
+                            else
+                                insertBudgetLine.Add(newLine);
+                        }
+                    }
+
+                    if (createHeader)
+                        await api.Insert(projBudget, insertNewBudgetLine);
                 }
             }
-
+            isDataChaged = false;
             var result = await api.MultiCrud(insertBudgetLine, updateBudgetLine, deleteBudgetLine);
             if (result != ErrorCodes.Succes)
                 UtilDisplay.ShowErrorCode(result);
             else
-                UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("SavedOBJ"), Uniconta.ClientTools.Localization.lookup("ProjectBudget")),
-                    Uniconta.ClientTools.Localization.lookup("Saved"));
+            {
+                LoadBudgetYear();
+                UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("SavedOBJ"), Uniconta.ClientTools.Localization.lookup("Budget")),
+                    Uniconta.ClientTools.Localization.lookup("Information"));
+            }
         }
 
         private ProjectBudgetLineClient CreateNewBudgetLineClient(ProjectBudgetYearClient item)
@@ -427,40 +531,40 @@ namespace UnicontaClient.Pages.CustomPage
             switch (mt)
             {
                 case 1:
-                    prjBudgetLine.Date = new DateTime(year, mt, DateTime.DaysInMonth(year, mt)); prjBudgetLine.Qty = item.MonthQty1;
+                    prjBudgetLine.Date = new DateTime(defaultYear, mt, DateTime.DaysInMonth(defaultYear, mt)); prjBudgetLine.Qty = item.MonthQty1;
                     break;
                 case 2:
-                    prjBudgetLine.Date = new DateTime(year, mt, DateTime.DaysInMonth(year, mt)); prjBudgetLine.Qty = item.MonthQty2;
+                    prjBudgetLine.Date = new DateTime(defaultYear, mt, DateTime.DaysInMonth(defaultYear, mt)); prjBudgetLine.Qty = item.MonthQty2;
                     break;
                 case 3:
-                    prjBudgetLine.Date = new DateTime(year, mt, DateTime.DaysInMonth(year, mt)); prjBudgetLine.Qty = item.MonthQty3;
+                    prjBudgetLine.Date = new DateTime(defaultYear, mt, DateTime.DaysInMonth(defaultYear, mt)); prjBudgetLine.Qty = item.MonthQty3;
                     break;
                 case 4:
-                    prjBudgetLine.Date = new DateTime(year, mt, DateTime.DaysInMonth(year, mt)); prjBudgetLine.Qty = item.MonthQty4;
+                    prjBudgetLine.Date = new DateTime(defaultYear, mt, DateTime.DaysInMonth(defaultYear, mt)); prjBudgetLine.Qty = item.MonthQty4;
                     break;
                 case 5:
-                    prjBudgetLine.Date = new DateTime(year, mt, DateTime.DaysInMonth(year, mt)); prjBudgetLine.Qty = item.MonthQty5;
+                    prjBudgetLine.Date = new DateTime(defaultYear, mt, DateTime.DaysInMonth(defaultYear, mt)); prjBudgetLine.Qty = item.MonthQty5;
                     break;
                 case 6:
-                    prjBudgetLine.Date = new DateTime(year, mt, DateTime.DaysInMonth(year, mt)); prjBudgetLine.Qty = item.MonthQty6;
+                    prjBudgetLine.Date = new DateTime(defaultYear, mt, DateTime.DaysInMonth(defaultYear, mt)); prjBudgetLine.Qty = item.MonthQty6;
                     break;
                 case 7:
-                    prjBudgetLine.Date = new DateTime(year, mt, DateTime.DaysInMonth(year, mt)); prjBudgetLine.Qty = item.MonthQty7;
+                    prjBudgetLine.Date = new DateTime(defaultYear, mt, DateTime.DaysInMonth(defaultYear, mt)); prjBudgetLine.Qty = item.MonthQty7;
                     break;
                 case 8:
-                    prjBudgetLine.Date = new DateTime(year, mt, DateTime.DaysInMonth(year, mt)); prjBudgetLine.Qty = item.MonthQty8;
+                    prjBudgetLine.Date = new DateTime(defaultYear, mt, DateTime.DaysInMonth(defaultYear, mt)); prjBudgetLine.Qty = item.MonthQty8;
                     break;
                 case 9:
-                    prjBudgetLine.Date = new DateTime(year, mt, DateTime.DaysInMonth(year, mt)); prjBudgetLine.Qty = item.MonthQty9;
+                    prjBudgetLine.Date = new DateTime(defaultYear, mt, DateTime.DaysInMonth(defaultYear, mt)); prjBudgetLine.Qty = item.MonthQty9;
                     break;
                 case 10:
-                    prjBudgetLine.Date = new DateTime(year, mt, DateTime.DaysInMonth(year, mt)); prjBudgetLine.Qty = item.MonthQty10;
+                    prjBudgetLine.Date = new DateTime(defaultYear, mt, DateTime.DaysInMonth(defaultYear, mt)); prjBudgetLine.Qty = item.MonthQty10;
                     break;
                 case 11:
-                    prjBudgetLine.Date = new DateTime(year, mt, DateTime.DaysInMonth(year, mt)); prjBudgetLine.Qty = item.MonthQty11;
+                    prjBudgetLine.Date = new DateTime(defaultYear, mt, DateTime.DaysInMonth(defaultYear, mt)); prjBudgetLine.Qty = item.MonthQty11;
                     break;
                 case 12:
-                    prjBudgetLine.Date = new DateTime(year, mt, DateTime.DaysInMonth(year, mt)); prjBudgetLine.Qty = item.MonthQty12;
+                    prjBudgetLine.Date = new DateTime(defaultYear, mt, DateTime.DaysInMonth(defaultYear, mt)); prjBudgetLine.Qty = item.MonthQty12;
                     break;
             }
         }
@@ -542,124 +646,78 @@ namespace UnicontaClient.Pages.CustomPage
 
         async private Task SetBudgetGroup()
         {
-            ProjBgtGroupCache = api?.CompanyEntity?.GetCache(typeof(Uniconta.DataModel.ProjectBudgetGroup)) ?? await api.LoadCache(typeof(Uniconta.DataModel.ProjectBudgetGroup));
+            budgetGroups = budgetGroups ?? await api.LoadCache(typeof(Uniconta.DataModel.ProjectBudgetGroup)).ConfigureAwait(false);
 
-            if (ProjBgtGroupCache != null && cmbProjectBudgetGroup.SelectedItem == null)
+            if (budgetGroups != null && cmbProjectBudgetGroup.SelectedItem == null)
             {
-                ProjectBudgetGroup prgBudgetGrp = null;
-                if (string.IsNullOrEmpty(budgetGroup))
-                    prgBudgetGrp = ((ProjectBudgetGroup[])ProjBgtGroupCache?.GetRecords)?.Where(x => x._Default == true)?.FirstOrDefault();
+                if (string.IsNullOrEmpty(defaultBudgetGroup))
+                    budgetGrpMaster = ((ProjectBudgetGroup[])budgetGroups?.GetRecords)?.Where(x => x._Default == true)?.FirstOrDefault();
                 else
-                    prgBudgetGrp = ((ProjectBudgetGroup[])ProjBgtGroupCache?.GetRecords)?.Where(x => x.KeyStr == budgetGroup)?.FirstOrDefault();
+                    budgetGrpMaster = (ProjectBudgetGroup)budgetGroups.Get(defaultBudgetGroup);
 
-                cmbProjectBudgetGroup.SelectedItem = prgBudgetGrp;
+                defaultBudgetGroup = budgetGrpMaster?.KeyStr;
+                cmbProjectBudgetGroup.SelectedItem = budgetGrpMaster;
             }
         }
 
         async private Task SetEmployeeNormHours(int currentYear)
         {
-            if (EmpCalendarCache == null)
-                EmpCalendarCache = api?.CompanyEntity?.GetCache(typeof(Uniconta.DataModel.TMEmpCalendar)) ?? await api.LoadCache(typeof(Uniconta.DataModel.TMEmpCalendar));
-
             DateTime startOfYear = new DateTime(currentYear, 1, 1);
             DateTime endOfYear = new DateTime(currentYear, 12, 31);
 
-            if (EmpCalendarCache != null)
+            var byMonth = await FindNormHours.GetByMonth(api, _empMaster.Number, startOfYear, endOfYear);
+
+            var months = new double[12];
+            foreach (var kv in byMonth)
             {
-                var calenderSetupEmpLst = await api.Query<TMEmpCalendarSetupClient>(_empMaster);
-                var calendarLineLst = new List<TMEmpCalendarLineClient>();
-                if (calenderSetupEmpLst != null)
-                {
-                    foreach (var calenderSetupEmp in calenderSetupEmpLst)
-                    {
-                        var empCalendar = EmpCalendarCache.Get(calenderSetupEmp.Calendar) as TMEmpCalendar;
-                        var empCalendarLines = empCalendar.CalendarLines ?? await empCalendar.LoadLines(api);
-
-                        foreach (var line in empCalendarLines)
-                        {
-                            if (line.Date >= startOfYear && line.Date <= endOfYear)
-                                calendarLineLst.Add(line);
-                        }
-                    }
-                }
-                var grpCalendrLst = calendarLineLst.GroupBy(x => new { x.Date.Month }).Select(x => new { Key = x.Key, Hours = x.Sum(y => y.Hours) }).ToList();
-
-                foreach (var grpCalender in grpCalendrLst)
-                {
-                    switch (grpCalender.Key.Month)
-                    {
-                        case 1:
-                            normHoursMonth1 = grpCalender.Hours;
-                            break;
-                        case 2:
-                            normHoursMonth2 = grpCalender.Hours;
-                            break;
-                        case 3:
-                            normHoursMonth3 = grpCalender.Hours;
-                            break;
-                        case 4:
-                            normHoursMonth4 = grpCalender.Hours;
-                            break;
-                        case 5:
-                            normHoursMonth5 = grpCalender.Hours;
-                            break;
-                        case 6:
-                            normHoursMonth6 = grpCalender.Hours;
-                            break;
-                        case 7:
-                            normHoursMonth7 = grpCalender.Hours;
-                            break;
-                        case 8:
-                            normHoursMonth8 = grpCalender.Hours;
-                            break;
-                        case 9:
-                            normHoursMonth9 = grpCalender.Hours;
-                            break;
-                        case 10:
-                            normHoursMonth10 = grpCalender.Hours;
-                            break;
-                        case 11:
-                            normHoursMonth11 = grpCalender.Hours;
-                            break;
-                        case 12:
-                            normHoursMonth12 = grpCalender.Hours;
-                            break;
-                    }
-                }
-
-                normHoursTotal = Math.Round(normHoursMonth1 + normHoursMonth2 + normHoursMonth3 + normHoursMonth4 + normHoursMonth5 + normHoursMonth6 + normHoursMonth7 +
-                    normHoursMonth8 + normHoursMonth9 + normHoursMonth10 + normHoursMonth11 + normHoursMonth12, 2);
-
-                dgProjectBudgetYear.UpdateTotalSummary();
-
+                int month = kv.Key.Item2;
+                if (month >= 1 && month <= 12)
+                    months[month - 1] = kv.Value;
             }
+
+            normHoursMonth1 = months[0];
+            normHoursMonth2 = months[1];
+            normHoursMonth3 = months[2];
+            normHoursMonth4 = months[3];
+            normHoursMonth5 = months[4];
+            normHoursMonth6 = months[5];
+            normHoursMonth7 = months[6];
+            normHoursMonth8 = months[7];
+            normHoursMonth9 = months[8];
+            normHoursMonth10 = months[9];
+            normHoursMonth11 = months[10];
+            normHoursMonth12 = months[11];
+
+            normHoursTotal = Math.Round(months.Sum(), 2);
+
+
+            dgProjectBudgetYear?.UpdateTotalSummary();
         }
 
         async void LoadBudgetYear()
         {
+            if (defaultBudgetGroup == null)
+            {
+                UnicontaMessageBox.Show(string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("FieldCannotBeEmpty"), Uniconta.ClientTools.Localization.lookup("BudgetGroup")), Uniconta.ClientTools.Localization.lookup("Information"));
+                return;
+            }
+
             try
             {
                 busyIndicator.IsBusy = true;
 
-                int currentYear = year;
+                int currentYear = defaultYear;
 
                 DateTime startOfYear = new DateTime(currentYear, 1, 1);
                 DateTime endOfYear = new DateTime(currentYear, 12, 31);
 
                 var propValuePair = new PropValuePair[]
                 {
-                PropValuePair.GenereteWhereElements("Date",typeof(DateTime),string.Format("{0}..{1}", startOfYear.ToString(),endOfYear.ToString())),
-                PropValuePair.GenereteWhereElements("Current", typeof(bool), "1")
+                    PropValuePair.GenereteWhereElements("Date",typeof(DateTime),string.Format("{0}..{1}", startOfYear.ToString(),endOfYear.ToString())),
+                    PropValuePair.GenereteWhereElements("Current", typeof(bool), "1")
                 };
 
-                if (cmbProjectBudgetGroup.SelectedItem is ProjectBudgetGroupClient prgBudgetGrp)
-                {
-                    budgetGroup = prgBudgetGrp.KeyStr;
-                    _OrginalProjectBugetLines = await api.Query<ProjectBudgetLineClient>(new List<UnicontaBaseEntity>(2) { _empMaster, prgBudgetGrp }, propValuePair);
-                }
-                else
-                    _OrginalProjectBugetLines = await api.Query<ProjectBudgetLineClient>(new List<UnicontaBaseEntity>(1) { _empMaster }, propValuePair);
-
+                _OrginalProjectBugetLines = await api.Query<ProjectBudgetLineClient>(new List<UnicontaBaseEntity>(2) { _empMaster, budgetGrpMaster }, propValuePair);
                 _ProjectBudgetYearClients = new List<ProjectBudgetYearClient>(_OrginalProjectBugetLines.Length);
 
                 foreach (var line in _OrginalProjectBugetLines)
@@ -730,6 +788,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             return prBugdetYear.Project == prBudgetLine.Project &&
                    prBugdetYear.Employee == prBudgetLine.Employee &&
+                   prBugdetYear.PayrollCategory == prBudgetLine.PayrollCategory &&
                    prBugdetYear.PrCategory == prBudgetLine.PrCategory &&
                    prBugdetYear.WorkSpace == prBudgetLine.WorkSpace &&
                    prBugdetYear.Task == prBudgetLine.Task;
@@ -737,19 +796,59 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void btnSubYear_Click(object sender, RoutedEventArgs e)
         {
-            year--;
-            txtYear.Text = year.ToString();
+            defaultYear--;
+            txtYear.Text = defaultYear.ToString();
         }
 
         private void btnAddYear_Click(object sender, RoutedEventArgs e)
         {
-            year++;
-            txtYear.Text = year.ToString();
+            defaultYear++;
+            txtYear.Text = defaultYear.ToString();
+        }
+
+        private void cmbProjectBudgetGroup_SelectedIndexChanged(object sender, RoutedEventArgs e)
+        {
+            defaultBudgetGroup = (string)cmbProjectBudgetGroup.EditValue;
+            budgetGrpMaster = (ProjectBudgetGroup)budgetGroups.Get(defaultBudgetGroup);
+        }
+
+        CorasauGridLookupEditorClient prevPayroll;
+        private void Payroll_GotFocus(object sender, RoutedEventArgs e)
+        {
+            var selectedItem = dgProjectBudgetYear.SelectedItem as ProjectBudgetYearClient;
+            if (selectedItem != null)
+            {
+                SetPayrollSource(selectedItem);
+                if (prevPayroll != null)
+                    prevPayroll.isValidate = false;
+                var editor = (CorasauGridLookupEditorClient)sender;
+                prevPayroll = editor;
+                editor.isValidate = true;
+            }
+        }
+
+        private void SetPayrollSource(ProjectBudgetYearClient rec)
+        {
+            ProjectClient project = (ProjectClient)projects?.Get(rec.Project);
+            if (project?.ProjectGroup != null)
+            {
+                payrolls = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.EmpPayrollCategory), api);
+
+                rec.PayrollSource = new BudgetYearPayrollFilter(payrolls, project.ProjectGroup._Invoiceable);
+                if (rec.PayrollSource != null)
+                    rec.NotifyPropertyChanged("PayrollSource");
+            }
         }
 
         protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             LoadType(new Type[] { typeof(Uniconta.DataModel.ProjectTask), typeof(Uniconta.DataModel.PrCategory), typeof(Uniconta.DataModel.PrWorkSpace), typeof(Uniconta.DataModel.TMEmpCalendar) });
+            projects = projects ?? await api.LoadCache(typeof(Uniconta.DataModel.Project)).ConfigureAwait(false);
+            payrolls = payrolls ?? await api.LoadCache(typeof(Uniconta.DataModel.EmpPayrollCategory)).ConfigureAwait(false);
+            budgetGroups = budgetGroups ?? await api.LoadCache(typeof(Uniconta.DataModel.ProjectBudgetGroup)).ConfigureAwait(false);
+
+            if (this.priceLookup == null)
+                priceLookup = new Uniconta.API.Project.FindPricesEmpl(api);
         }
     }
 }

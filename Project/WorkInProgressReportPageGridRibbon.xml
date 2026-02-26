@@ -22,7 +22,8 @@
       <!---If we want Inner menu-->
       <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
       <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16" ShortcutKey="" />
-      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
+			<RibbonItem Action="AddExpressionColumn" LocalizedNameKey="AddOBJ" Parameter="CalculationExpression" Glyph="Accountant_16x16" ShortcutKey="" />
+      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" EnableSeperator="True" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
       <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16" ShortcutKey=""/>
       <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16" ShortcutKey="Ctrl+U"/>
       <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16" LargeGlyph="ExportLayout_16x16" ShortcutKey=""/>
@@ -46,9 +47,12 @@
   <RibbonItem >
     <RibbonItem Action="ViewNotes" LocalizedNameKey="ProjectNotes" LargeGlyph="Note_32x32" ShortcutKey="CTRL+N"/>
   </RibbonItem>
-  <RibbonItem >
-    <RibbonItem Action="ProjectInvoiceProposal" LocalizedNameKey="InvoiceProposals" ControlName="ProjInvProposal" LargeGlyph="Orders_32x32"/>
-    <RibbonItem Action="CreateOrder" LocalizedNameKey="CreateOBJ" Parameter="InvoiceProposal" LargeGlyph="Invoice_32x32"/>
-    <RibbonItem Action="ZeroInvoice" LocalizedNameKey="CreateOBJ" Parameter="ZeroInvoice" Module="_ProjZeroInvoice" LargeGlyph="Blank_32x32"/>
-  </RibbonItem>
+	<RibbonItem >
+		<RibbonItem Action="ProjectInvoiceProposal" LocalizedNameKey="InvoiceProposals" ControlName="ProjInvProposal" LargeGlyph="Orders_32x32"/>
+		<RibbonItem Action="CreateOrder" LocalizedNameKey="CreateOBJ" Parameter="InvoiceProposal" LargeGlyph="Invoice_32x32"/>
+		<RibbonItem Action="ZeroInvoice" LocalizedNameKey="CreateOBJ" Parameter="ZeroInvoice" Module="_ProjZeroInvoice" LargeGlyph="Blank_32x32"/>
+	</RibbonItem>
+	  <RibbonItem>
+		  <RibbonItem Action="PostAdjustments" LocalizedNameKey="PostAdjustments" Glyph="Posted_Transaction_32x32" LargeGlyph="Posted_Transaction_32x32"/>
+	  </RibbonItem>
 </root>

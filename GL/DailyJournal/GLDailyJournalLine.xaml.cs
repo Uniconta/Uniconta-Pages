@@ -442,7 +442,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (string.Compare(rec.Name, "Journal", StringComparison.CurrentCultureIgnoreCase) == 0)
                 {
-                    var cache = api.GetCache(typeof(Uniconta.DataModel.GLDailyJournal)) ?? api.LoadCache(typeof(Uniconta.DataModel.GLDailyJournal)).GetAwaiter().GetResult();
+                    var cache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.GLDailyJournal), api);
                     SetJournal((Uniconta.DataModel.GLDailyJournal)cache.Get(rec.Value));
                 }
             }

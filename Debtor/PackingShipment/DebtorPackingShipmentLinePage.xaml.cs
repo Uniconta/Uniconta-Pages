@@ -22,6 +22,7 @@ using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using Uniconta.ClientTools;
+using UnicontaClient.Utilities;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -40,6 +41,28 @@ namespace UnicontaClient.Pages.CustomPage
             Init(master);
         }
 
+        public DebtorPackingShipmentLinePage(SynchronizeEntity syncEntity) : base(syncEntity, true)
+        {
+            InitializeComponent();
+            Init(syncEntity.Row);
+            SetHeader();
+        }
+
+        protected override void SyncEntityMasterRowChanged(UnicontaBaseEntity args)
+        {
+            dgDebtorPackingShipmentLineGrid.UpdateMaster(args);
+            SetHeader();
+            BindGrid();
+        }
+
+        private void SetHeader()
+        {
+            string key = Utility.GetHeaderString(dgDebtorPackingShipmentLineGrid.masterRecord);
+            if (string.IsNullOrEmpty(key)) return;
+            string header = string.Concat(Uniconta.ClientTools.Localization.lookup("Lines"), ": ", key);
+            SetHeader(header);
+        }
+
         void Init(UnicontaBaseEntity master)
         {
             InitializeComponent();
@@ -51,6 +74,12 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
             LoadCategories();
         }
+
+        Task BindGrid()
+        {
+            return dgDebtorPackingShipmentLineGrid.Filter(null);
+        }
+
         void LoadCategories()
         {
             var categorySource = new ArraySegment<string>(AppEnums.PackagingCategory.Values, 0, 17).ToList();
@@ -60,6 +89,9 @@ namespace UnicontaClient.Pages.CustomPage
         {
             switch (ActionType)
             {
+                case "SaveGrid":
+                    Save();
+                    break;
                 case "DeleteRow":
                     dgDebtorPackingShipmentLineGrid.DeleteRow();
                     break;
@@ -68,5 +100,14 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
             }
         }
+
+        async void Save()
+        {
+            var savetask = saveGrid();
+            if (savetask != null)
+                await savetask;
+            await dgDebtorPackingShipmentLineGrid.RefreshTask();
+        }
+
     }
 }

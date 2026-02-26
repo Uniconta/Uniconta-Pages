@@ -12,7 +12,8 @@
     <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32">
       <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16" />
       <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16" ShortcutKey="" />
-      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="save-16x16" />
+			<RibbonItem Action="AddExpressionColumn" LocalizedNameKey="AddOBJ" Parameter="CalculationExpression" Glyph="Accountant_16x16" ShortcutKey="" />
+      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" EnableSeperator="True" Glyph="save-16x16" />
       <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteOBJ" Parameter="Layout" Glyph="Delete_16x16" />
       <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16" />
       <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16" />

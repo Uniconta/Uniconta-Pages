@@ -332,8 +332,12 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var openFolderDialog = UtilDisplay.LoadFolderBrowserDialog;
             if (openFolderDialog.ShowDialog() == true)
-                txtImportFromDirectory.Text = openFolderDialog.SelectedPath;
-        }
+#if MAC
+                txtImportFromDirectory.Text = openFolderDialog.FolderName;
+#else
+               txtImportFromDirectory.Text = openFolderDialog.SelectedPath;
+#endif
+               }
         private void ExcelFileBrowse_ButtonClicked(object sender)
         {
 
@@ -886,8 +890,13 @@ namespace UnicontaClient.Pages.CustomPage
             var openFolderDialog = UtilDisplay.LoadFolderBrowserDialog;
             if (openFolderDialog.ShowDialog() == true)
             {
+#if MAC
+                txtPhysicalVoucherDir.Text = openFolderDialog.FolderName;
+                Dinero.PhysicalVoucherPath = openFolderDialog.FolderName;
+#else
                 txtPhysicalVoucherDir.Text = openFolderDialog.SelectedPath;
                 Dinero.PhysicalVoucherPath = openFolderDialog.SelectedPath;
+#endif
             }
         }
     }

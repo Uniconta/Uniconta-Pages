@@ -98,6 +98,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CompanyPreferencePage"
                         <CorasauControls:CorasauLayoutItem FieldName="UpdateCostOnPurchase">
                             <CorasauControls:CheckEditor IsChecked="{Binding UpdateCostOnPurchase,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="UpdateCostOnService">
+                            <CorasauControls:CheckEditor IsChecked="{Binding UpdateCostOnService,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="UpdatePurchasePrice">
                             <CorasauControls:CheckEditor IsChecked="{Binding UpdatePurchasePrice,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>

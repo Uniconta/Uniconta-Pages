@@ -165,6 +165,7 @@ namespace UnicontaClient.Pages.CustomPage
                         {
                             if (UnicontaMessageBox.Show(String.Format("Sollen die {0} markierten Belege hochgeladen werden? Bitte beachten Sie: nachdem Sie das Hochladen bestätigt haben, werden die Belege im Hintergrund hochgeladen. Bleiben Sie auf dieser Seite bis eine weitere Mitteilung erfolgt ist.", makR), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OKCancel) == MessageBoxResult.OK)
                             {
+                                // AC: Upload marked transaction by API Call here
                                 DatevEntity.SendDocToDatev(api, markedRows, glTransExported);
 
                                 foreach (var item in markedRows)
@@ -945,6 +946,8 @@ namespace UnicontaClient.Pages.CustomPage
 
             public static async void SendDocToDatev(CrudAPI crud, IEnumerable<GLTransClient> Trans, GLTransExportedClient glTransExported)
             {
+                // AC: Replace with API Call
+
                 int pd = 0;
                 int inv = 0;
                 int pdinverr = 0;
@@ -998,25 +1001,19 @@ namespace UnicontaClient.Pages.CustomPage
 
                     var HTTPConnMethod = "";
                     byte statussend = 0;
-                    int invbeleg = 0;
 
                     if (Tr.HasVoucher == true) // to get atach doc.
                     {
-                        List<PropValuePair> filter2 = new List<PropValuePair>();
-                        filter2.Add(PropValuePair.GenereteWhereElements("_RowId", typeof(int), Convert.ToString(Tr._DocumentRef)));
-
-                        var Doc = await crud.Query<VouchersClient>(filter2);
-                        if (Doc[0].Invoice != null)
-                            invbeleg = (int)NumberConvert.ToInt(Doc[0]._Invoice);
-                        else
-                            invbeleg = (Tr._Invoice > 0) ? Tr._Invoice : Tr._Voucher;
-
-
-                        var Res = await crud.Read(Doc[0]);
-                        name = Convert.ToString(GetInvoiceGuid(Tr.CompanyId, SmallDate.Pack(Tr.Date), Tr.DocumentRef, Convert.ToInt32(Tr.Account), invbeleg));
-                        if (Doc.Count() != 0 && Res == ErrorCodes.Succes && (Doc[0]._Data != null))
+                        var Doc = new VouchersClient()
                         {
-                            var bytec = new ByteArrayContent(Doc[0]._Data);
+                            RowId = Tr._DocumentRef
+                        };
+
+                        var Res = await crud.Read(Doc);
+                        name = Convert.ToString(GetInvoiceGuid(Tr.CompanyId, SmallDate.Pack(Tr.Date), Tr.DocumentRef, (int)NumberConvert.ToInt(Tr.Account), Tr.DocumentRef));
+                        if (Res == ErrorCodes.Succes && (Doc._Data != null))
+                        {
+                            var bytec = new ByteArrayContent(Doc._Data);
 
                             var metadata = new
                             {
@@ -1032,7 +1029,7 @@ namespace UnicontaClient.Pages.CustomPage
                             //var name = Convert.ToString(GetInvoiceGuid(Tr.CompanyId, SmallDate.Pack(Tr.Date), Tr.DocumentRef, Convert.ToInt32(Tr.Account), Tr.Invoice));
                             DocRef = Tr.DocumentRef;
 
-                            var content = new MultipartFormDataContent { { bytec, "file", name + "." + Doc[0].Fileextension } };
+                            var content = new MultipartFormDataContent { { bytec, "file", name + "." + Doc.Fileextension } };
                             content.Headers.Add("X-DATEV-Client-Id", clientId);
 
                             // Metadaten hinzufügen  
@@ -1111,7 +1108,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 folder = "Belege",
                                 register = glTransExported.FromDate.ToString("yyyy.MM")
                             };
-                            name = Convert.ToString(GetInvoiceGuid(Tr.CompanyId, SmallDate.Pack(Tr.Date), Tr.Invoice, Convert.ToInt32(Tr.Account), Tr.Invoice));  //Master                            
+                            name = Convert.ToString(GetInvoiceGuid(Tr.CompanyId, SmallDate.Pack(Tr.Date), Tr.Invoice, (int)NumberConvert.ToInt(Tr.Account), Tr.Invoice));  //Master                            
                             DocRef = Tr.Invoice;
 
                             var invoicePdf = await new Uniconta.API.DebtorCreditor.InvoiceAPI(crud).GetInvoicePdf(D);
@@ -1248,7 +1245,7 @@ namespace UnicontaClient.Pages.CustomPage
                 line[9] = InvoiceDate == DateTime.MinValue ? "" : InvoiceDate.ToString("ddMM");
                 line[10] = AddSingleQuotes((InvoiceField1)); //Per
                 line[11] = DueDate == DateTime.MinValue ? "\"\"" : AddSingleQuotes(DueDate.ToString("ddMMyy"));
-                Guid DatevGuid = GetInvoiceGuid(cID, SmallDate.Pack(Date), DocumentRef, Convert.ToInt32(Account), (int)NumberConvert.ToInt(InvoiceField1));
+                Guid DatevGuid = GetInvoiceGuid(cID, SmallDate.Pack(Date), DocumentRef, (int)NumberConvert.ToInt(Account), DocumentRef);
                 if (DatevGuid != Guid.Empty)
                     line[19] = AddSingleQuotes("BEDI " + AddDoubleQuotes(Convert.ToString(DatevGuid)));  //DT Per
                 else

@@ -7,11 +7,17 @@
     <RibbonItem Action="Remove" ShortcutKey="Shift+DELETE" LocalizedNameKey="Remove" LargeGlyph="Delete_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="SaveGrid" LocalizedNameKey="UpdateOBJ" Parameter="Address"  LargeGlyph="save-32x32" ShortcutKey="CTRL+N"/>
+    <RibbonItem Action="SaveGrid" LocalizedNameKey="UpdateOBJ" Parameter="Debtor"  LargeGlyph="save-32x32" ShortcutKey="CTRL+N"/>
   </RibbonItem>
   <RibbonItem>
       <RibbonItem LocalizedNameKey="New" StatusValue="" />
       <RibbonItem LocalizedNameKey="Total" StatusValue="" />
       <RibbonItem LocalizedNameKey="Available" StatusValue="" />
+  </RibbonItem>
+  <RibbonItem LocalizedNameKey="Update">
+	  <RibbonItem Action="UpdName" LocalizedNameKey="Name" IsCheckBox="True" />
+	  <RibbonItem Action="UpdAddress" LocalizedNameKey="Address" IsCheckBox="True" />
+	  <RibbonItem Action="UpdIndustryCode" LocalizedNameKey="IndustryCode" IsCheckBox="True" />
+	  <RibbonItem Action="UpdCompanyState" LocalizedNameKey="CompanyState" IsCheckBox="True" />
   </RibbonItem>
 </root>

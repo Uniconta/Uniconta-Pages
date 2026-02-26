@@ -81,10 +81,9 @@ namespace UnicontaClient.Pages.CustomPage
 
         private AccountPostingBalanceClient[] GetSource(AccountPostingBalance[] accountPostingBalance)
         {
-            int count = accountPostingBalance.Length;
-            AccountPostingBalanceClient[] accountPostingBalClientCollection = new AccountPostingBalanceClient[count];
-            var glAccounCache = api.GetCache(typeof(GLAccount)) ?? api.LoadCache(typeof(GLAccount)).GetAwaiter().GetResult();
-            for (int iCtr = 0; iCtr < count; iCtr++)
+            AccountPostingBalanceClient[] accountPostingBalClientCollection = new AccountPostingBalanceClient[accountPostingBalance.Length];
+            var glAccounCache = api.CompanyEntity.GetCache(typeof(GLAccount), api);
+            for (int iCtr = 0; iCtr < accountPostingBalance.Length; iCtr++)
             {
                 var accPostingBal = accountPostingBalance[iCtr];
                 var glAccount = glAccounCache.Get(accPostingBal.AccountRowId) as GLAccount;

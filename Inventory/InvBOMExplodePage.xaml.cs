@@ -186,7 +186,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (string.Compare(rec.Name, "Item", StringComparison.CurrentCultureIgnoreCase) == 0)
                 {
-                    var cache = api.GetCache(typeof(Uniconta.DataModel.InvItem)) ?? api.LoadCache(typeof(Uniconta.DataModel.InvItem)).GetAwaiter().GetResult();
+                    var cache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.InvItem), api);
                     invClient = (Uniconta.DataModel.InvItem)cache.Get(rec.Value);
                 }
                 else if (string.Compare(rec.Name, "Quantity", StringComparison.CurrentCultureIgnoreCase) == 0)

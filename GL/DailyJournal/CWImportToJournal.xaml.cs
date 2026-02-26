@@ -35,6 +35,9 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "Journal", ResourceType = typeof(InputFieldDataText))]
         static public string Journal { get; set; }
 
+        public int Kost1 { get; set; }
+        public int Kost2 { get; set; }
+
         CrudAPI api;
         public CWImportToJournal(CrudAPI crudApi, string title = null)
         {
@@ -50,6 +53,26 @@ namespace UnicontaClient.Pages.CustomPage
 
         async private void InitCaches(CrudAPI api)
         {
+            var datev = await UnicontaClient.Pages.GLTransPage.CreateDatevHeader(api).ConfigureAwait(true); // stay on UI-Thread
+            var company = api.CompanyEntity;
+            this.Kost1 = datev.Dim1 > company.NumberOfDimensions ? -1 : datev.Dim1;
+            this.Kost2 = datev.Dim2 > company.NumberOfDimensions ? -1 : datev.Dim2;
+            var dimensions = new List<string>();
+            dimensions.Add("(Leer)"); // value -1, index 0: keep empty on export
+            dimensions.Add($"Standard ({company._Dim1 ?? "leer"})"); // index 1, value 0
+            dimensions.Add(company._Dim1);
+            dimensions.Add(company._Dim2);
+            dimensions.Add(company._Dim3);
+            dimensions.Add(company._Dim4);
+            dimensions.Add(company._Dim5);
+            dimensions.RemoveRange(company.NumberOfDimensions + 2, 5 - company.NumberOfDimensions);
+            this.cmbKost1.ItemsSource = dimensions;
+            var dimensions2 = new List<string>(dimensions);
+            dimensions2[1] = $"Standard ({company._Dim2 ?? "leer"})";
+            this.cmbKost2.ItemsSource = dimensions2;
+            this.cmbKost1.SelectedIndex = this.Kost1 + 1; // default Dim1
+            this.cmbKost2.SelectedIndex = this.Kost2 + 1; // default Dim2
+
             if (api.GetCache(typeof(Uniconta.DataModel.GLVat)) == null)
                 await api.LoadCache(typeof(Uniconta.DataModel.GLVat)).ConfigureAwait(false);
             if (api.GetCache(typeof(Uniconta.DataModel.GLAccount)) == null)
@@ -72,7 +95,7 @@ namespace UnicontaClient.Pages.CustomPage
                     return;
                 }
 
-                var importDateV = new ImportDATEV(api, selectedJournal);
+                var importDateV = new ImportDATEV(api, selectedJournal, this.Kost1, this.Kost2);
 
                 stream = new System.IO.FileStream(browseFile.FilePath, System.IO.FileMode.Open, System.IO.FileAccess.Read);
                 var journalLines = await importDateV.CreateJournalLines(stream);
@@ -132,6 +155,23 @@ namespace UnicontaClient.Pages.CustomPage
                 else if (CancelButton.IsFocused)
                     SetDialogResult(false);
             }
+        }
+
+        private void CmbKost1_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (this.cmbKost1.SelectedItem != null)
+            {
+                this.Kost1 = this.cmbKost1.SelectedIndex - 1;
+            }
+        }
+
+        private void CmbKost2_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (this.cmbKost2.SelectedItem != null)
+            {
+                this.Kost2 = this.cmbKost2.SelectedIndex - 1;
+            }
+
         }
     }
 }

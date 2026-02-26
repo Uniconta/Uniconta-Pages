@@ -23,8 +23,8 @@ namespace UnicontaClient.Pages.CustomPage
             : base(API, string.Empty)
         {
             _logs = new ImportLogVoucher();
-            this.DataContext = this;
             InitializeComponent();
+            this.DataContext = this;
             company = api.CompanyEntity;
             leReading.Label = string.Format(Uniconta.ClientTools.Localization.lookup("LoadOBJ"), Uniconta.ClientTools.Localization.lookup("Status"));
             leWriting.Label = string.Format(Uniconta.ClientTools.Localization.lookup("SaveOBJ"), Uniconta.ClientTools.Localization.lookup("Status"));
@@ -169,7 +169,11 @@ namespace UnicontaClient.Pages.CustomPage
             var openFolderDialog = UtilDisplay.LoadFolderBrowserDialog;
             if (openFolderDialog.ShowDialog() == true)
             {
+#if MAC
+                txtImportFromDirectory.Text = openFolderDialog.FolderName;
+#else
                 txtImportFromDirectory.Text = openFolderDialog.SelectedPath;
+#endif
                 localMenu.EnableButtons(new string[] { "ImportData", "CopyData" });
             }
         }

@@ -328,6 +328,11 @@ x:Class="UnicontaClient.Pages.CustomPage.InventoryItemPage2"
                         <CorasauControls:LookupEditor x:Name="cmbPayrollCategory" Text="{Binding PayrollCategory,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="EPRGroup" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ProducerResponsibility}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutItem FieldName="PackagingModel" x:Name="liPackagingModel">
+                        <CorasauControls:LookupEditor x:Name="cmbPackagingModel" Text="{Binding PackagingModel,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="usedim"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Dimensions}"  Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem x:Name="lbldim1">
                         <CorasauControls:LookupEditor x:Name="cmbDim1" Text="{Binding Dimension1,Mode=TwoWay}"/>

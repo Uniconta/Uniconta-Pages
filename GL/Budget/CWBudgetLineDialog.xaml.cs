@@ -59,11 +59,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             InitializeComponent();
             this.DataContext = this;
-#if !SILVERLIGHT
             this.Title = Uniconta.ClientTools.Localization.lookup("DefaultValues");
-#else
-            Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             editrow = new GLBudgetLineClientWithFromToAct();
             editrow.Date = fromDate;
             editrow.ToDate = toDate;

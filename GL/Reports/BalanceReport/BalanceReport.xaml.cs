@@ -277,8 +277,8 @@ namespace UnicontaClient.Pages.CustomPage
         }
         void Init(UnicontaBaseEntity master = null)
         {
-            this.DataContext = this;
             InitializeComponent();
+            this.DataContext = this;
             busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LoadingMsg");
             this.Skip0Account = PassedCriteria.Skip0Account;
             this.ShowType = PassedCriteria.ShowType;
@@ -501,7 +501,7 @@ namespace UnicontaClient.Pages.CustomPage
         async void GenerateBalance()
         {
             busyIndicator.IsBusy = true;
-            var Cache = api.GetCache(typeof(GLAccount)) ?? api.LoadCache(typeof(GLAccount)).GetAwaiter().GetResult();
+            var Cache = api.GetCache(typeof(GLAccount)) ?? await api.LoadCache(typeof(GLAccount));
             if (balanceClient.Capacity == 0)
                 balanceClient.Capacity = Cache.Count;
 

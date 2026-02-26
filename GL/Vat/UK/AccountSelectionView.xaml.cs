@@ -17,7 +17,7 @@ using UnicontaClient.Pages.GL.Vat.UK.ViewModels;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
-    public partial class AccountSelectionView : BasePage
+    public partial class AccountSelectionView : ControlBasePage
     {
         public AccountSelectionView(string vatNo)
         {

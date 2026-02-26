@@ -9,244 +9,87 @@ using Uniconta.Common;
 using Uniconta.DataModel;
 using Uniconta.Reports.Utilities;
 using Uniconta.Common.Utility;
+using System.Collections.Generic;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
     /// <summary>
-    /// Class to Initialize before Printing the Invoices
+    /// Base Class to Initialize before Printing the for Debtor
     /// </summary>
-    public class DebtorInvoicePrintReport
+    public abstract class DebtorInvoicePrintReportBase<TOrderClient> : PrintReportBaseClient<DebtorInvoiceClient, DebtorInvoiceLines, TOrderClient>
+      where TOrderClient : UnicontaBaseEntity
     {
+        #region Properties
+
         public DebtorClient Debtor { get; private set; }
-        public CompanyClient Company { get; private set; }
-        public DebtorInvoiceClient DebtorInvoice { get; private set; }
-        public InvTransInvoice[] InvTransInvoiceLines { get; private set; }
-        public byte[] CompanyLogo { get; private set; }
+        public DebtorInvoiceClient DebtorInvoice { get { return PrintHeader; } }
+        public InvTransInvoice[] DebtorInvoiceLines { get { return PrintLines; } }
         public string ReportName { get; private set; }
         public bool IsCreditNote { get; private set; }
         public DebtorMessagesClient MessageClient { get; private set; }
-        public DCOrder DebtorOrder { get; private set; }
+        public TOrderClient OrderClient => BaseEntityClient;
         public DCPreviousAddressClient PreviousAddressClient { get; private set; }
 
-        private readonly CrudAPI crudApi;
-        private InvoicePostingResult invoicePostingResult;
-        private bool isRePrint;
-        private CompanyLayoutType layoutType;
-        private DebtorInvoiceClient debtorInvoice;
+        #endregion
+
+        #region Fields
+
         private DCPreviousAddressClient[] previousAddressLookup;
         private DebtorMessagesClient[] debtorMessageLookup;
         private bool isMultipleInvoicePrint;
 
+        #endregion
+
+        #region Abstract Methods
+
+        protected abstract Type OrderCacheDataModelType { get; }
+        protected abstract TOrderClient CreateOrderFromInvoice(Company Comp);
+        protected virtual string GetOrderCacheKey() => NumberConvert.ToStringNull(DebtorInvoice._OrderNumber);
+        #endregion
+
+        #region Constructor
+
         /// <summary>
-        /// Intitialization  for Post Invoice
+        /// Initializes a new instance of the DebtorInvoicePrintReportBase class with the specified posting result, API
+        /// context, and company layout type.
         /// </summary>
         /// <param name="postingResult">Result from Post Invoice</param>
         /// <param name="api">Current api instance</param>
         /// <param name="companyLayoutType">Layout type</param>
-        public DebtorInvoicePrintReport(InvoicePostingResult postingResult, CrudAPI api, CompanyLayoutType companyLayoutType)
+        protected DebtorInvoicePrintReportBase(InvoicePostingResult postingResult, CrudAPI api, CompanyLayoutType companyLayoutType)
+            : base(postingResult, api, companyLayoutType)
         {
-            invoicePostingResult = postingResult;
-            crudApi = api;
-            isRePrint = true;
-            layoutType = companyLayoutType;
         }
 
         /// <summary>
-        /// Initialization for Debtor Invoice Client
+        /// Initializes a new instance of the DebtorInvoicePrintReportBase class with the specified debtor invoice
+        /// client, API, and company layout type.
         /// </summary>
         /// <param name="debtorInvoiceClient">Invoice Client</param>
         /// <param name="api">Current api instance</param>
         /// <param name="companyLayoutType">Layout type</param>
-        public DebtorInvoicePrintReport(DebtorInvoiceClient debtorInvoiceClient, CrudAPI api, CompanyLayoutType companyLayoutType = CompanyLayoutType.Invoice)
+        protected DebtorInvoicePrintReportBase(DebtorInvoiceClient debtorInvoiceClient, CrudAPI api, CompanyLayoutType companyLayoutType = CompanyLayoutType.Invoice)
+            : base(debtorInvoiceClient, api, companyLayoutType)
         {
-            debtorInvoice = debtorInvoiceClient;
-            crudApi = api;
-            isRePrint = false;
-            layoutType = companyLayoutType;
         }
 
         /// <summary>
-        /// Initialization for Post Invoice and DebtorOrder Client
+        /// Initializes a new instance of the DebtorInvoicePrintReportBase class with the specified posting result, API
+        /// context, company layout type, and order client.
         /// </summary>
         /// <param name="postingResult">PostInvoice result</param>
         /// <param name="api">Current api instance</param>
         /// <param name="companyLayoutType">Layout type</param>
-        /// <param name="orderClient">DebtorOrder/DebtorOffer client</param>
-        public DebtorInvoicePrintReport(InvoicePostingResult postingResult, CrudAPI api, CompanyLayoutType companyLayoutType, DCOrder orderClient) : this(postingResult, api, companyLayoutType)
+        /// <param name="orderClient">DebtorOrder/DebtorOffer client/Proposal Client</param>
+        protected DebtorInvoicePrintReportBase(InvoicePostingResult postingResult, CrudAPI api, CompanyLayoutType companyLayoutType, TOrderClient orderClient)
+            : base(postingResult, api, companyLayoutType, orderClient)
         {
-            DebtorOrder = orderClient;
         }
 
-        /// <summary>
-        /// Method to Update Properties for Print Report
-        /// </summary>
-        /// <returns></returns>
-        async public Task<bool> InstantiateFields()
-        {
-            try
-            {
-                var Comp = crudApi.CompanyEntity;
-                var debtorInvoiceLineUserType = ReportUtil.GetUserType(typeof(DebtorInvoiceLines), Comp);
-                var debtorInvoiceClientUserType = ReportUtil.GetUserType(typeof(DebtorInvoiceClient), Comp);
-                DCInvoice dcInv;
+        #endregion
 
-                if (!isRePrint)
-                {
-                    var invApi = new InvoiceAPI(crudApi);
-                    var invoiceLIneInstance = Activator.CreateInstance(debtorInvoiceLineUserType) as DebtorInvoiceLines;
-                    dcInv = debtorInvoice;
-#if !UNIREPORT
-                    InvTransInvoiceLines = (DebtorInvoiceLines[])await invApi.GetInvoiceLines(dcInv, invoiceLIneInstance);
-#else
-                    InvTransInvoiceLines = (DebtorInvoiceLines[])await invApi.GetInvoiceLines(dcInv, invoiceLIneInstance).ConfigureAwait(false);
-#endif
-                    PreviousAddressClient = isMultipleInvoicePrint ? LayoutPrintReport.GetPreviousAddressClientForInvoice(previousAddressLookup, debtorInvoice) :
-                        await LayoutPrintReport.GetPreviousAddressClientForInvoice(dcInv, crudApi);
-                }
-                else
-                {
-                    dcInv = invoicePostingResult.Header;
-
-                    if (invoicePostingResult?.Lines != null && invoicePostingResult.Lines.Count() > 0)
-                    {
-                        var linesCount = invoicePostingResult.Lines.Count();
-                        var lines = invoicePostingResult.Lines;
-                        InvTransInvoiceLines = Array.CreateInstance(debtorInvoiceLineUserType, linesCount) as DebtorInvoiceLines[];
-                        int i = 0;
-                        foreach (var invtrans in invoicePostingResult.Lines)
-                        {
-                            DebtorInvoiceLines debtorInvoiceLines;
-                            if (invtrans.GetType() != debtorInvoiceLineUserType)
-                            {
-                                debtorInvoiceLines = Activator.CreateInstance(debtorInvoiceLineUserType) as DebtorInvoiceLines;
-                                StreamingManager.Copy(invtrans, debtorInvoiceLines);
-                            }
-                            else
-                                debtorInvoiceLines = invtrans as DebtorInvoiceLines;
-                            InvTransInvoiceLines[i++] = debtorInvoiceLines;
-                        }
-                    }
-                }
-
-                //For Getting User-Fields for DebtorInvoice
-                DebtorInvoiceClient debtorInvoiceClientUser;
-                if (dcInv.GetType() != debtorInvoiceClientUserType)
-                {
-                    debtorInvoiceClientUser = Activator.CreateInstance(debtorInvoiceClientUserType) as DebtorInvoiceClient;
-                    StreamingManager.Copy(dcInv, debtorInvoiceClientUser);
-                }
-                else
-                    debtorInvoiceClientUser = dcInv as DebtorInvoiceClient;
-                DebtorInvoice = debtorInvoiceClientUser;
-
-                //For Getting User fields for Debtor
-                DebtorClient debtor;
-                var debtorClietUserType = ReportUtil.GetUserType(typeof(DebtorClient), Comp);
-                var debtorClientUser = Activator.CreateInstance(debtorClietUserType) as DebtorClient;
-                if (DebtorInvoice._OneTimeDC == null)
-                {
-                    var dcCache = Comp.GetCache(typeof(Uniconta.DataModel.Debtor)) ?? await crudApi.LoadCache(typeof(Uniconta.DataModel.Debtor));
-                    debtor = dcCache.Get(DebtorInvoice._DCAccount) as DebtorClient;
-                }
-                else
-                    debtor = DebtorInvoice._OneTimeDC as DebtorClient;
-
-                if (debtor != null)
-                    StreamingManager.Copy(debtor, debtorClientUser);
-                else if (DebtorInvoice._Prospect != 0)
-                {
-                    //Check for Prospect. Create a Debtor for Prospect
-                    var prosCache = Comp.GetCache(typeof(Uniconta.DataModel.CrmProspect)) ?? await crudApi.LoadCache(typeof(Uniconta.DataModel.CrmProspect));
-                    var prospect = prosCache?.Get(DebtorInvoice._Prospect) as CrmProspect;
-                    if (prospect != null)
-                        debtorClientUser.CopyFrom(prospect);
-                }
-
-                if (PreviousAddressClient != null) //Setting the Previous Address if Exist for current invoice
-                {
-                    debtorClientUser._Name = PreviousAddressClient._Name;
-                    debtorClientUser._Address1 = PreviousAddressClient._Address1;
-                    debtorClientUser._Address2 = PreviousAddressClient._Address2;
-                    debtorClientUser._Address3 = PreviousAddressClient._Address3;
-                    debtorClientUser._City = PreviousAddressClient._City;
-                    debtorClientUser._ZipCode = PreviousAddressClient._ZipCode;
-                }
-
-                //to Contact listing for the current debtor
-                if (Comp.Contacts)
-                {
-                    var ContactsCache = Comp.GetCache(typeof(Uniconta.DataModel.Contact)) ?? await crudApi.LoadCache(typeof(Uniconta.DataModel.Contact)).ConfigureAwait(false);
-                    if (ContactsCache != null)
-                    {
-                        var contactCacheFilter = new ContactCacheFilter(ContactsCache, debtorClientUser.__DCType(), debtorClientUser._Account);
-                        if (contactCacheFilter.Any())
-                        {
-                            try
-                            {
-                                debtorClientUser.Contacts = contactCacheFilter.Cast<ContactClient>().ToArray();
-                            }
-                            catch { }
-                        }
-                    }
-                }
-                Debtor = debtorClientUser;
-
-                if (dcInv._Installation != null && Comp.GetCache(typeof(Uniconta.DataModel.WorkInstallation)) == null)
-                    await Comp.LoadCache(typeof(Uniconta.DataModel.WorkInstallation), crudApi);
-
-                UtilCommon.SetDeliveryAdress(debtorInvoiceClientUser, debtorClientUser, crudApi);
-                debtorInvoiceClientUser.SetInvoiceAddress(debtorClientUser);
-
-                /*In case debtor order is null, fill from DCInvoice*/
-                if (DebtorOrder == null)
-                {
-                    DebtorOrder = Comp.GetCache(typeof(Uniconta.DataModel.DebtorOrder))?.Get(NumberConvert.ToStringNull(debtorInvoiceClientUser._OrderNumber)) as DebtorOrderClient;
-                    if (DebtorOrder == null)
-                    {
-                        var debtorOrderUserType = ReportUtil.GetUserType(typeof(DebtorOrderClient), Comp);
-                        var debtorOrderUser = Activator.CreateInstance(debtorOrderUserType) as DebtorOrderClient;
-                        debtorOrderUser.CopyFrom(debtorInvoiceClientUser, debtorClientUser);
-                        DebtorOrder = debtorOrderUser;
-                    }
-                }
-
-                Company = UtilCommon.GetCompanyClientUserInstance(Comp);
-
-                var InvCache = Comp.GetCache(typeof(InvItem)) ?? await crudApi.LoadCache(typeof(InvItem));
-
-                CompanyLogo = await UtilCommon.GetLogo(crudApi);
-
-                Language lang = layoutType != CompanyLayoutType.PickingList? ReportGenUtil.GetLanguage(debtorClientUser, Comp): ReportGenUtil.GetLanguageFromCompany(Comp);
-                InvTransInvoiceLines = LayoutPrintReport.SetInvTransLines(DebtorInvoice, InvTransInvoiceLines, InvCache, crudApi, debtorInvoiceLineUserType, lang, false);
-
-                //Setting ReportName and Version
-                var invoiceNumber = DebtorInvoice._InvoiceNumber;
-                var lineTotal = DebtorInvoice._LineTotal;
-                IsCreditNote = (lineTotal < -0.0001d);
-
-                ReportName = layoutType != CompanyLayoutType.Invoice ? layoutType.ToString() : invoiceNumber == 0 ? IsCreditNote ? "ProformaCreditNote" : "ProformaInvoice"
-                    : IsCreditNote ? "Creditnote" : "Invoice";
-
-                MessageClient = isMultipleInvoicePrint ? LayoutPrintReport.GetDebtorMessageClient(debtorMessageLookup, lang, GetDebtorEmailType()) :
-                    await UtilCommon.GetDebtorMessageClient(crudApi, lang, GetDebtorEmailType());
-
-                var _LayoutGroup = DebtorInvoice._LayoutGroup ?? Debtor._LayoutGroup;
-                if (_LayoutGroup != null)
-                {
-                    var cache = crudApi.GetCache(typeof(DebtorLayoutGroup)) ?? await crudApi.LoadCache(typeof(DebtorLayoutGroup));
-                    var layClient = (DebtorLayoutGroup)cache.Get(_LayoutGroup);
-                    layClient?.SetCompanyBank(Company);
-                }
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                crudApi?.ReportException(ex, "Error Occured in DebtorInvoicePrintReport");
-                return false;
-            }
-        }
+        #region Methods
 
         /// <summary>
         /// Gets the debtor email type
@@ -267,7 +110,6 @@ namespace UnicontaClient.Pages.CustomPage
                     emailType = DebtorEmailType.Packnote;
                     break;
             }
-
             return emailType;
         }
 
@@ -292,5 +134,197 @@ namespace UnicontaClient.Pages.CustomPage
             if (previousAddressLookup == null)
                 previousAddressLookup = preivousAddressClients;
         }
+
+        /// <summary>
+        /// To get the languaeg for the print
+        /// </summary>
+        /// <returns>Language enum</returns>
+        protected override Language GetLanguage()
+        {
+            return layoutType != CompanyLayoutType.PickingList ? ReportGenUtil.GetLanguage(Debtor, base.Company) : base.GetLanguage();
+        }
+
+        /// <summary>
+        /// To set the entity
+        /// </summary>
+        /// <returns></returns>
+        protected override async Task SetEntityTask()
+        {
+            try
+            {
+                DebtorClient debtor;
+
+                var Comp = crudApi.CompanyEntity;
+                var debtorClientUser = Comp.CreateUserType<DebtorClient>();
+
+                if (DebtorInvoice._OneTimeDC == null)
+                {
+                    var dcCache = Comp.GetCache(typeof(Uniconta.DataModel.Debtor)) ?? await crudApi.LoadCache(typeof(Uniconta.DataModel.Debtor));
+                    debtor = dcCache.Get(DebtorInvoice._DCAccount) as DebtorClient;
+                }
+                else
+                    debtor = DebtorInvoice._OneTimeDC as DebtorClient;
+
+                StreamingManager.Copy(debtor, debtorClientUser);
+
+                Debtor = debtorClientUser;
+            }
+            catch (Exception ex)
+            {
+                crudApi?.ReportException(ex, $"Error Occured in SetEntityTask for {GetType().Name} - {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Method to finalize set action for print
+        /// </summary>
+        /// <returns></returns>
+        protected override async Task FinalizeTask()
+        {
+            try
+            {
+                var Comp = crudApi.CompanyEntity;
+
+                if (DebtorInvoice._Prospect != 0)
+                {
+                    //Check for Prospect. Create a Debtor for Prospect
+                    var prosCache = Comp.GetCache(typeof(Uniconta.DataModel.CrmProspect)) ?? await crudApi.LoadCache(typeof(Uniconta.DataModel.CrmProspect));
+                    var prospect = prosCache?.Get(DebtorInvoice._Prospect) as CrmProspect;
+                    if (prospect != null)
+                        Debtor.CopyFrom(prospect);
+                }
+
+                if (PreviousAddressClient == null)
+                    PreviousAddressClient = isMultipleInvoicePrint ? LayoutPrintReport.GetPreviousAddressClientForInvoice(previousAddressLookup, DebtorInvoice) :
+                        await LayoutPrintReport.GetPreviousAddressClientForInvoice(DebtorInvoice, crudApi);
+
+                //Setting the Previous Address if Exist for current invoice
+                if (PreviousAddressClient != null)
+                {
+                    Debtor._Name = PreviousAddressClient._Name;
+                    Debtor._Address1 = PreviousAddressClient._Address1;
+                    Debtor._Address2 = PreviousAddressClient._Address2;
+                    Debtor._Address3 = PreviousAddressClient._Address3;
+                    Debtor._City = PreviousAddressClient._City;
+                    Debtor._ZipCode = PreviousAddressClient._ZipCode;
+                }
+
+                //To Contact listing for the current debtor
+                if (Comp.Contacts)
+                {
+                    var ContactsCache = Comp.GetCache(typeof(Uniconta.DataModel.Contact)) ?? await crudApi.LoadCache(typeof(Uniconta.DataModel.Contact)).ConfigureAwait(false);
+                    if (ContactsCache != null)
+                    {
+                        var contactCacheFilter = new ContactCacheFilter(ContactsCache, Debtor.__DCType(), Debtor._Account);
+                        if (contactCacheFilter.Any())
+                        {
+                            try
+                            {
+                                Debtor.Contacts = contactCacheFilter.Cast<ContactClient>().ToArray();
+                            }
+                            catch { }
+                        }
+                    }
+                }
+
+                if (DebtorInvoice._Installation != null && Comp.GetCache(typeof(Uniconta.DataModel.WorkInstallation)) == null)
+                    await Comp.LoadCache(typeof(Uniconta.DataModel.WorkInstallation), crudApi);
+
+                UtilCommon.SetDeliveryAdress(DebtorInvoice, Debtor, crudApi);
+                DebtorInvoice.SetInvoiceAddress(Debtor);
+
+                /*In case order is null, fill from DCInvoice*/
+                if (BaseEntityClient == null)
+                {
+                    var key = GetOrderCacheKey();
+                    var cache = Comp.GetCache(OrderCacheDataModelType) ?? await crudApi.LoadCache(OrderCacheDataModelType);
+                    var order = (TOrderClient)cache?.Get(key);
+
+                    if (order != null)
+                        SetOrder(order);
+                    else
+                        SetOrder(CreateOrderFromInvoice(Comp));
+                }
+
+                var invoiceNumber = DebtorInvoice._InvoiceNumber;
+                var lineTotal = DebtorInvoice._LineTotal;
+                IsCreditNote = (lineTotal < -0.0001d);
+
+                ReportName = layoutType != CompanyLayoutType.Invoice ? layoutType.ToString() : invoiceNumber == 0 ? (IsCreditNote ? "ProformaCreditNote" : "ProformaInvoice")
+                        : (IsCreditNote ? "Creditnote" : "Invoice");
+
+                MessageClient = isMultipleInvoicePrint ? LayoutPrintReport.GetDebtorMessageClient(debtorMessageLookup, GetLanguage(), GetDebtorEmailType()) :
+                    await UtilCommon.GetDebtorMessageClient(crudApi, GetLanguage(), GetDebtorEmailType());
+
+                var _LayoutGroup = DebtorInvoice._LayoutGroup ?? Debtor._LayoutGroup;
+                if (_LayoutGroup != null)
+                {
+                    var cache = crudApi.GetCache(typeof(DebtorLayoutGroup)) ?? await crudApi.LoadCache(typeof(DebtorLayoutGroup));
+                    var layClient = (DebtorLayoutGroup)cache.Get(_LayoutGroup);
+                    layClient?.SetCompanyBank(base.Company);
+                }
+            }
+            catch (Exception ex)
+            {
+                crudApi?.ReportException(ex, $"Error Occured in FinalizeTask for {GetType().Name} - {ex.Message}");
+            }
+        }
+
+        #endregion
     }
+
+    /// <summary>
+    /// Client class to Initialize before Printing the for Debtor documnets like Invoice, Creditnote, Offer, Order Confirmation etc
+    /// </summary>
+    public class DebtorInvoicePrintReport : DebtorInvoicePrintReportBase<DebtorOrderClient>
+    {
+        public DebtorOrderClient DebtorOrder => BaseEntityClient; // keeps your old property name
+
+        public DebtorInvoicePrintReport(InvoicePostingResult postingResult, CrudAPI api, CompanyLayoutType companyLayoutType)
+            : base(postingResult, api, companyLayoutType) { }
+
+        public DebtorInvoicePrintReport(DebtorInvoiceClient debtorInvoiceClient, CrudAPI api, CompanyLayoutType companyLayoutType = CompanyLayoutType.Invoice)
+            : base(debtorInvoiceClient, api, companyLayoutType) { }
+
+        public DebtorInvoicePrintReport(InvoicePostingResult postingResult, CrudAPI api, CompanyLayoutType companyLayoutType, DebtorOrderClient orderClient)
+            : base(postingResult, api, companyLayoutType, orderClient) { }
+
+        protected override Type OrderCacheDataModelType => typeof(Uniconta.DataModel.DebtorOrder);
+
+        protected override DebtorOrderClient CreateOrderFromInvoice(Company Comp)
+        {
+            var debtorOrderUserType = ReportUtil.GetUserType(typeof(DebtorOrderClient), Comp);
+            var debtorOrderUser = Activator.CreateInstance(debtorOrderUserType) as DebtorOrderClient;
+            debtorOrderUser.CopyFrom(DebtorInvoice, Debtor);
+            return debtorOrderUser;
+        }
+    }
+
+    /// <summary>
+    /// Client class to Initialize before Printing the for Project documnets Project proposal or invoice
+    /// </summary>
+    public class ProjectInvoiceProposalPrintReport : DebtorInvoicePrintReportBase<ProjectInvoiceProposalClient>
+    {
+        public ProjectInvoiceProposalClient ProjectInvoiceProposal => BaseEntityClient; 
+
+        public ProjectInvoiceProposalPrintReport(InvoicePostingResult postingResult, CrudAPI api, CompanyLayoutType companyLayoutType)
+            : base(postingResult, api, companyLayoutType) { }
+
+        public ProjectInvoiceProposalPrintReport(DebtorInvoiceClient debtorInvoiceClient, CrudAPI api, CompanyLayoutType companyLayoutType = CompanyLayoutType.Invoice)
+            : base(debtorInvoiceClient, api, companyLayoutType) { }
+
+        public ProjectInvoiceProposalPrintReport(InvoicePostingResult postingResult, CrudAPI api, CompanyLayoutType companyLayoutType, ProjectInvoiceProposalClient orderClient)
+            : base(postingResult, api, companyLayoutType, orderClient) { }
+
+        protected override Type OrderCacheDataModelType => typeof(Uniconta.DataModel.ProjectInvoiceProposal);
+
+        protected override ProjectInvoiceProposalClient CreateOrderFromInvoice(Company Comp)
+        {
+            var proposalUserType = ReportUtil.GetUserType(typeof(ProjectInvoiceProposalClient), Comp);
+            var proposalUser = Activator.CreateInstance(proposalUserType) as ProjectInvoiceProposalClient;
+            proposalUser.CopyFrom(DebtorInvoice, Debtor);
+            return proposalUser;
+        }
+    }
+
 }

@@ -123,6 +123,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ContactPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Packnote"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Confirmation"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Offer"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PickingList"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="GetEmailIfContact"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ContactType"/>
                 </localPage:ContactGrid.Columns>

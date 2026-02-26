@@ -88,7 +88,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         bool RemoveMenu(UnicontaBaseEntity master)
         {
-            return !(master is GLTrans) && !(master is DCTrans) && !(master is DCTransOpen) && !(master is DCInvoice);
+            return !(master is GLTrans) && !(master is DCTrans) && !(master is DCTransOpen) && !(master is ProjectTrans) ;
         }
 
         public AccountsTransaction(object objAccount)
@@ -165,8 +165,8 @@ namespace UnicontaClient.Pages.CustomPage
         }
         private void InitializePage(List<UnicontaBaseEntity> masters = null)
         {
-            this.DataContext = this;
             InitializeComponent();
+            this.DataContext = this;
             var Comp = this.api.CompanyEntity;
             filterDate = BasePage.GetFilterDate(Comp, masters != null && masters.Count > 0);
             localMenu.dataGrid = dgAccountsTransGrid;
@@ -490,7 +490,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "CopyVoucherToJournal":
                     if (selectedItem != null)
-                        CopyToJOurnal();
+                        CopyToJournal();
                     break;
                 case "ExportVouchers":
                     var glTrans = ((IEnumerable<GLTransClient>)dgAccountsTransGrid.GetVisibleRows())?.Where(x => x._DocumentRef != 0);
@@ -543,8 +543,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (projdialog.DialogResult == true)
                 {
                     busyIndicator.IsBusy = true;
-                    var papi = new PostingAPI(api);
-                    var err = await papi.UpdateTransProject(trans, projdialog.Project, projdialog.AllLines);
+                    var err = await new PostingAPI(api).UpdateTransProject(trans, projdialog.Project, projdialog.AllLines, projdialog.PrCategory);
                     busyIndicator.IsBusy = false;
                     UtilDisplay.ShowErrorCode(err);
                     if (err == ErrorCodes.Succes)
@@ -653,7 +652,7 @@ namespace UnicontaClient.Pages.CustomPage
             return (num1 * num2) >= 0;
         }
 
-        void CopyToJOurnal()
+        void CopyToJournal()
         {
             var gltranslst = dgAccountsTransGrid.GetVisibleRows() as IEnumerable<GLTransClient>;
             var cwObj = new CWCopyVoucherToJrnl(api);
@@ -665,51 +664,47 @@ namespace UnicontaClient.Pages.CustomPage
                     var Accounts = api.GetCache(typeof(GLAccount));
                     var Vats = api.GetCache(typeof(GLVat));
 
-                    GLDailyJournalLineClient gljournaLine = null;
+                    GLDailyJournalLineClient prevVat = null;
                     double factor = CWCopyVoucherToJrnl.InvertSign ? -1d : 1d;
                     double vatAmount = 0;
-                    var glDailyJrnlLineLst = new List<GLDailyJournalLineClient>(gltranslst.Count());
+                    var lst = new List<GLDailyJournalLineClient>(gltranslst.Count());
                     foreach (var trans in gltranslst)
                     {
                         var vat = (GLVat)Vats.Get(trans._Vat);
                         if (vat != null && vat._Account != null && vat._OffsetAccount != null && (trans._Account == vat._Account || trans._Account == vat._OffsetAccount))
                             continue;
 
-                        if (gljournaLine != null && gljournaLine._AccountType == 0 && vatAmount != 0 && vatAmount == trans._Amount && gljournaLine._Vat == trans._Vat)
+                        if (prevVat != null && prevVat._AccountType == 0 && vatAmount != 0 && vatAmount == trans._Amount && prevVat._Vat == trans._Vat)
                         {
                             // We join vat with previous line
-                            gljournaLine.Amount += (factor * vatAmount);
-                            gljournaLine.AmountCur += factor * trans._AmountCur;
-                            gljournaLine = null;
+                            prevVat.Amount += (factor * vatAmount);
+                            prevVat.AmountCur += factor * trans._AmountCur;
+                            prevVat = null;
                             continue;
                         }
 
-                        if (vat != null && vat._Account != null && vat._OffsetAccount == null)
-                            vatAmount = trans._AmountVat;
-                        else
-                            vatAmount = 0;
+                        var gljournaLine = new GLDailyJournalLineClient
+                        {
+                            Date = CWCopyVoucherToJrnl.Date == DateTime.MinValue ? trans.Date : CWCopyVoucherToJrnl.Date,
+                            Text = string.IsNullOrEmpty(CWCopyVoucherToJrnl.Comment) ? trans.Text : CWCopyVoucherToJrnl.Comment,
+                            TransType = string.IsNullOrEmpty(CWCopyVoucherToJrnl.TransType) ? trans.TransType : CWCopyVoucherToJrnl.TransType,
 
-                        gljournaLine = new GLDailyJournalLineClient();
-
-                        gljournaLine.Date = CWCopyVoucherToJrnl.Date == DateTime.MinValue ? trans.Date : CWCopyVoucherToJrnl.Date;
-                        gljournaLine.Text = string.IsNullOrEmpty(CWCopyVoucherToJrnl.Comment) ? trans.Text : CWCopyVoucherToJrnl.Comment;
-                        gljournaLine.TransType = string.IsNullOrEmpty(CWCopyVoucherToJrnl.TransType) ? trans.TransType : CWCopyVoucherToJrnl.TransType;
-
-                        gljournaLine._Account = trans._Account;
-                        gljournaLine._Vat = trans._Vat;
-                        gljournaLine._VatOperation = trans._VatOperation;
-                        gljournaLine._Voucher = trans._Voucher;
-                        gljournaLine.Amount = factor * trans._Amount;
-                        gljournaLine._Currency = trans._Currency;
-                        gljournaLine.AmountCur = factor * trans._AmountCur;
-                        gljournaLine._Project = trans._Project;
-                        gljournaLine._DocumentRef = trans._DocumentRef;
-                        gljournaLine._Qty = trans._Qty;
-                        gljournaLine._Dim1 = trans._Dimension1;
-                        gljournaLine._Dim2 = trans._Dimension2;
-                        gljournaLine._Dim3 = trans._Dimension3;
-                        gljournaLine._Dim4 = trans._Dimension4;
-                        gljournaLine._Dim5 = trans._Dimension5;
+                            _Account = trans._Account,
+                            _Vat = trans._Vat,
+                            _VatOperation = trans._VatOperation,
+                            _Voucher = trans._Voucher,
+                            Amount = factor * trans._Amount,
+                            _Currency = trans._Currency,
+                            AmountCur = factor * trans._AmountCur,
+                            _Project = trans._Project,
+                            _DocumentRef = trans._DocumentRef,
+                            _Qty = trans._Qty,
+                            _Dim1 = trans._Dimension1,
+                            _Dim2 = trans._Dimension2,
+                            _Dim3 = trans._Dimension3,
+                            _Dim4 = trans._Dimension4,
+                            _Dim5 = trans._Dimension5
+                        };
 
                         if (trans._DCType > 0)
                         {
@@ -726,10 +721,19 @@ namespace UnicontaClient.Pages.CustomPage
                         }
 
                         gljournaLine.SetMaster(cwObj.GlDailyJournal);
-                        glDailyJrnlLineLst.Add(gljournaLine);
+                        lst.Add(gljournaLine);
+
+                        if (vat != null)
+                        {
+                            prevVat = gljournaLine;
+                            if (vat._Account != null && vat._OffsetAccount == null)
+                                vatAmount = trans._AmountVat;
+                            else
+                                vatAmount = 0;
+                        }
                     }
                     busyIndicator.IsBusy = true;
-                    var result = await api.Insert(glDailyJrnlLineLst);
+                    var result = await api.Insert(lst);
                     busyIndicator.IsBusy = false;
                     UtilDisplay.ShowErrorCode(result);
                 }
@@ -936,7 +940,6 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void SetNewDim(GLTransClient selectedItem, CWChangeDimension ChangeDimensionDialog)
         {
-            var postingApiInv = this.postingApiInv;
             var nDim = postingApiInv.CompanyEntity.NumberOfDimensions;
             var accs = postingApiInv.CompanyEntity.GetCache(typeof(Uniconta.DataModel.GLAccount));
             var acc = (Uniconta.DataModel.GLAccount)accs.Get(selectedItem._Account);
@@ -1027,8 +1030,6 @@ namespace UnicontaClient.Pages.CustomPage
         {
             return AccountsTransaction.HandleLookupOnLocalPage(dgAccountsTransGrid, lookup);
         }
-
-
 
         static public LookUpTable HandleLookupOnLocalPage(CorasauDataGrid grid, LookUpTable lookup)
         {

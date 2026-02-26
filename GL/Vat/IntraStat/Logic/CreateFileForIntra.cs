@@ -6,19 +6,17 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
-using Microsoft.Win32;
 using Uniconta.API.System;
+using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
-using Uniconta.Common.Utility;
-using UnicontaClient.Creditor.Payments;
-using Localization = Uniconta.ClientTools.Localization;
-using Uniconta.ClientTools.Controls;
 using Uniconta.Common.Enums;
+using Uniconta.Common.Utility;
+using Uniconta.DataModel;
+using Uniconta.WindowsAPI.ClientTools;
 using static UnicontaClient.Pages.CreateIntraStatFilePage;
-using Microsoft.IdentityModel.Tokens;
-using Uniconta.ClientTools;
+using Localization = Uniconta.ClientTools.Localization;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -38,9 +36,9 @@ namespace UnicontaClient.Pages.CustomPage
         private CrudAPI api;
         private string companyRegNo;
         private CountryCode companyCountryId;
-        private Dictionary<string, bool> dictVatNumber;
         public int exportGroup;
         public bool validateVIES;
+        private SQLCache debtors;
         #endregion
 
         public IntraHelper(CrudAPI api, int exportGroup, bool validateVIES)
@@ -48,8 +46,9 @@ namespace UnicontaClient.Pages.CustomPage
             companyRegNo = Regex.Replace(api.CompanyEntity._Id ?? string.Empty, "[^0-9]", "");
             companyCountryId = api.CompanyEntity._CountryId;
             this.exportGroup = exportGroup;
-            dictVatNumber = new Dictionary<string, bool>();
             this.validateVIES = validateVIES;
+            this.api = api;
+            debtors = api.GetCache(typeof(Uniconta.DataModel.Debtor));
         }
 
         public bool PreValidate()
@@ -69,13 +68,11 @@ namespace UnicontaClient.Pages.CustomPage
             return true;
         }
 
-        public void ClearVIESCache()
+        public async Task Validate(IEnumerable<IntrastatClient> intralst, bool compressed, bool onlyValidate)
         {
-            dictVatNumber.Clear(); 
-        }
-
-        public void Validate(IEnumerable<IntrastatClient> intralst, bool compressed, bool onlyValidate)
-        {
+            if (validateVIES)
+                await VIESValidate(intralst);
+            
             var countErr = 0;
 
             foreach (var intra in intralst)
@@ -172,16 +169,9 @@ namespace UnicontaClient.Pages.CustomPage
                         intra.SystemInfo += string.Format(Localization.lookup("MissingOBJ"), Localization.lookup("DebtorRegNo"));
                     }
 
-                    if (!hasErrors && validateVIES && intra.DebtorRegNoVIES != null && intra.DebtorRegNoVIES != UNKNOWN_CVRNO)
+                    if (!hasErrors && validateVIES)
                     {
-                        bool validVatNumber = false;
-                        if (!dictVatNumber.TryGetValue(intra.DebtorRegNoVIES, out validVatNumber))
-                        {
-                            validVatNumber = CheckEuropeanVatInformation(intra.DebtorRegNoVIES, intra.PartnerCountry);
-                            dictVatNumber.Add(intra.DebtorRegNoVIES, validVatNumber);
-                        }
-
-                        if (!validVatNumber)
+                        if (intra.Debtor._VIESStatus != VIESStatus.Valid)
                         {
                             hasErrors = true;
                             intra.SystemInfo += intra.SystemInfo != null ? Environment.NewLine : null;
@@ -196,18 +186,57 @@ namespace UnicontaClient.Pages.CustomPage
                     intra.SystemInfo = VALIDATE_OK;
             }
         }
-        private bool CheckEuropeanVatInformation(string cvr, string ctryCode)
-        {
-            if (string.IsNullOrEmpty(cvr))
-                return false;
 
-            if (ctryCode != null)
+        async Task VIESValidate(IEnumerable<IntrastatClient> intralst)
+        {
+            try
             {
-                var vatInfo = EuropeanVatInformation.Get(ctryCode, cvr);
-                if (vatInfo == null || vatInfo.VatNumber != null)
-                    return true;
+                const int Grouping = 20;
+                int cntTotal = intralst.Count();
+                int cnt = 0;
+                int cntAll = 0;
+                var lst2 = new List<DebtorClient>();
+                string oldAccount = null;
+                DebtorClient debtor;
+
+                debtors = debtors ?? await api.LoadCache(typeof(Uniconta.DataModel.Debtor));
+                foreach (var trans in intralst.OrderBy(s => s.DCAccount))
+                {
+                    bool rejected = false;
+                    cntAll++;
+                    if (trans.ImportOrExport == ImportOrExportIntrastat.Import || oldAccount == trans.DCAccount || trans.DebtorRegNoVIES == null || !Country2Language.IsEU(trans.Country))
+                        rejected = true;
+
+                    oldAccount = trans.DCAccount;
+                    debtor = debtors.Get(trans.DCAccount) as DebtorClient;
+                    if (debtor == null || debtor._VIESStatus != VIESStatus.None)
+                        rejected = true;
+
+                    if (!rejected)
+                    {
+                        cnt++;
+                        lst2.Add(debtor);
+                    }
+
+                    if (lst2.Count > 0 && ((cnt % Grouping) == 0 || cntAll == cntTotal))
+                    {
+                        var viesReportLst = await VIES.CheckVatApprox(lst2, api);
+                        lst2.Clear();
+
+                        if (viesReportLst.Count == 1 && viesReportLst[0].FaultCode == VIES.UC_FAULTCODE_GENERALERROR)
+                        {
+                            UnicontaMessageBox.Show(viesReportLst[0].FaultString, Uniconta.ClientTools.Localization.lookup("Error"), MessageBoxButton.OK);
+                            return;
+                        }
+                    }
+                }
+                if (cnt > 0)
+                    debtors = await api.LoadCache(typeof(Uniconta.DataModel.Debtor), true);
             }
-            return false;
+            catch (Exception ex)
+            {
+                return;
+            }
         }
 
         class CompressCompare : IEqualityComparer<IntrastatClient>

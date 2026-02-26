@@ -1,4 +1,4 @@
-<Pages:BasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
+<Pages:ControlBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
    xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
 x:Class="UnicontaClient.Pages.CustomPage.BalanceReportPrint"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -437,4 +437,4 @@ x:Class="UnicontaClient.Pages.CustomPage.BalanceReportPrint"
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <CorasauControls:UnicontaPreviewControl x:Name="custPrint" />
     </Grid>
-</Pages:BasePage>
+</Pages:ControlBasePage>

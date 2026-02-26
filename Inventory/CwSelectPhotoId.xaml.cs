@@ -63,8 +63,8 @@ namespace UnicontaClient.Pages.CustomPage
             SetDialogResult(false);
         }
 
-        bool lookupIsSet = false;
-        private void liPhoto_LookupButtonClicked(object sender)
+        bool lookupIsSet;
+        private async void liPhoto_LookupButtonClicked(object sender)
         {
             var lookupEditor = sender as LookupEditor;
             if (!lookupIsSet)
@@ -73,7 +73,7 @@ namespace UnicontaClient.Pages.CustomPage
                 lookupEditor.ValueMember = "RowId";
                 lookupEditor.SelectedIndexChanged += LookupEditor_SelectedIndexChanged;
                 lookupIsSet = true;
-                lookupEditor.ItemsSource = api.Query<UserDocsClient>(row).GetAwaiter().GetResult();
+                lookupEditor.ItemsSource = await api.Query<UserDocsClient>(row);
             }
         }
 

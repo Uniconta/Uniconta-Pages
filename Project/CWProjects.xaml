@@ -5,10 +5,13 @@ x:Class="UnicontaClient.Pages.CustomPage.CWProjects"
         xmlns:cw="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
         xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
         xmlns:ClientToolsControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
-        Height="150" Width="320">
+        Height="200" Width="320">
+    <cw:ChildWindow.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+    </cw:ChildWindow.Resources>
     <Grid x:Name="LayoutRoot" Margin="2">
         <Grid.RowDefinitions>
-            <RowDefinition />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
@@ -20,6 +23,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWProjects"
             <Grid.RowDefinitions>
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
             </Grid.RowDefinitions>
             <TextBlock Height="23" Grid.Row="0" x:Name="lblProject" Grid.Column="0" VerticalAlignment="Bottom"/>
             <StackPanel Orientation="Horizontal" Grid.Column="2">
@@ -28,6 +32,12 @@ x:Class="UnicontaClient.Pages.CustomPage.CWProjects"
             </StackPanel>
             <TextBlock x:Name="txtAllLines" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AllLines}" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0" />
             <ClientToolsControls:CheckEditor x:Name="chkAllLines" Grid.Row="1"  Grid.Column="2" HorizontalAlignment="Left"  VerticalAlignment="Center" IsChecked="{Binding Path=AllLines}" />
+
+            <TextBlock x:Name="txtPostOnProject" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PostOnProject}" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0" />
+            <StackPanel Orientation="Horizontal" Grid.Row="2"  Grid.Column="2">
+                <ClientToolsControls:CheckEditor x:Name="chkPostOnProject"  HorizontalAlignment="Left"  VerticalAlignment="Center"/>
+                <ClientToolsControls:LookupEditor x:Name="lePrCategory" Text="{Binding PrCategory, Mode=TwoWay}"  HorizontalAlignment="Stretch" Height="23" Margin="5 0 0 0"  Visibility="{Binding IsChecked,ElementName=chkPostOnProject,Converter={StaticResource BoolToVis}}"/>
+            </StackPanel> 
         </Grid>
         <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="1" Orientation="Horizontal" Margin="0 10 0 0" Grid.ColumnSpan="2">
             <Button x:Name="btnBuild" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OK}"  Click="OKButton_Click"  MinWidth="75" Height="23" HorizontalAlignment="Right" Margin="0 0 3 0" />

@@ -96,6 +96,8 @@ namespace UnicontaClient.Pages.CustomPage
             }
             if (!api.CompanyEntity.Project)
                 UtilDisplay.RemoveMenuCommand(rb, "AddProjectTimeUser");
+            if (api.session.User._Role != (byte)UserRoles.Accountant)
+                UtilDisplay.RemoveMenuCommand(rb, "ChangeProfile");
         }
 
         async void RemoveAccess(CompanyUserAccessClient selectedItem)
@@ -256,6 +258,22 @@ namespace UnicontaClient.Pages.CustomPage
                 case "UpdateExpireDate":
                     UpdateExpireDate(selectedItem);
                     break;
+                case "ProfileStandardUser":
+                    if (selectedItem != null)
+                        ChangeProfile(FixedProfiles.None, selectedItem);
+                    break;
+                case "ProfileProjectTimeUser":
+                    if(selectedItem!=null)
+                        ChangeProfile(FixedProfiles.ProjectTimeUser, selectedItem);
+                    break;
+                case "ProfileInvoiceUser":
+                    if (selectedItem != null)
+                        ChangeProfile(FixedProfiles.Invoice, selectedItem);
+                    break;
+                case "ProfileViewUser":
+                    if (selectedItem != null)
+                        ChangeProfile(FixedProfiles.View, selectedItem);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -316,6 +334,18 @@ namespace UnicontaClient.Pages.CustomPage
                         Uniconta.ClientTools.Localization.lookup("User"), "Add_16x16") as UsersPage2;
                     page.UserType = userType;
                     break;
+            }
+        }
+
+        async void ChangeProfile(FixedProfiles fixedProfile, CompanyUserAccessClient userAccess)
+        {
+            if (userAccess != null)
+            {
+                var rights = AccessLevel.SetFixedProfile(userAccess._Rights, fixedProfile);
+                userAccess._Rights = rights;
+                userAccess.NotifyPropertyChanged("FixedProfile");
+                var err = await companyAPI.GiveCompanyAccess(userAccess);
+                UtilDisplay.ShowErrorCode(err);
             }
         }
         private void CopyUsersFromCompanies()

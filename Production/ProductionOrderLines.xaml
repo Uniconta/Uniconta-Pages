@@ -120,6 +120,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProductionOrderLines"
                                 <local:CorasauDataGridTemplateColumnClient x:Name="ReportAsFinished" Width="70"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="ReportAsFinishedDeep" Width="70"/>
                                 <local:CorasauDataGridTemplateColumnClient x:Name="IgnoreBlocked" Width="50" Visible="False" />
+                                <local:CorasauDataGridTemplateColumnClient x:Name="Exclude" Width="50" Visible="False" />
                                 <local:ComboBoxColumnClient x:Name="Unit" Width="50" Visible="False" />
                                 <local:CorasauDataGridTemplateColumnClient x:Name="Week" Visible="False" />
                                 <local:CorasauDataGridTemplateColumnClient x:Name="Date" Visible="False" />

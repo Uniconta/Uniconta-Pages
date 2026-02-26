@@ -148,8 +148,11 @@ namespace UnicontaClient.Pages.CustomPage
             try
             {
                 int countFiles = 0;
+#if MAC
+                Microsoft.Win32.OpenFolderDialog folderBrowserDialog = null;
+#else
                 DevExpress.Xpf.Dialogs.DXFolderBrowserDialog folderBrowserDialog = null;
-
+#endif
                 var lstUpdate = new List<DebtorPaymentFileClient>();
 
                 var qrFiles = lstFiles.Cast<DebtorPaymentFileClient>();
@@ -168,8 +171,11 @@ namespace UnicontaClient.Pages.CustomPage
                     if (rec._Data == null)
                         await api.Read(rec);
 
+#if MAC
+                    var filepath = folderBrowserDialog.FolderName;
+#else
                     var filepath = folderBrowserDialog.SelectedPath;
-
+#endif
                     if (paymentFormatCache == null)
                         paymentFormatCache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.DebtorPaymentFormat)) ?? await api.CompanyEntity.LoadCache(typeof(Uniconta.DataModel.DebtorPaymentFormat), api);
 

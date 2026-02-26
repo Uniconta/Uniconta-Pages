@@ -190,6 +190,7 @@ x:Class="UnicontaClient.Pages.CustomPage.MatchVoucherBSLinesPage"
                                 <localPage:CorasauDataGridTemplateColumnClient FieldName="AmountCur" x:Name="colAmountCur" Visible="False" Width="90" />
                                 <localPage:ComboBoxColumnClient FieldName="Currency" x:Name="colCurrency" Visible="False" Width="100" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Info" Visible="False" Width="150" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="AutoPost" Visible="False" Width="70"/>
                                 <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension1" x:Name="coldim1" />
                                 <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension2" x:Name="coldim2" />
                                 <localPage:CorasauDataGridTemplateColumnClient Width="70" FieldName="Dimension3" x:Name="coldim3" />

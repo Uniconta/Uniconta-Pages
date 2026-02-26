@@ -8,7 +8,8 @@
     <RibbonItem Action="VatReportNorway" LocalizedNameKey="VatDeclaration" LargeGlyph="Add_Menu_32x32"/>
     <RibbonItem Action="VatReportDenmark" LocalizedNameKey="VatDeclaration" LargeGlyph="Show_Invoice_32x32" ShortcutKey="Ctrl+G"/>
     <RibbonItem Action="OLDVatReportDenmark" LocalizedNameKey="'Gammel' Momsopgørelse" LargeGlyph="Show_Invoice_32x32" ShortcutKey="Ctrl+G"/>
-    <RibbonItem Action="VatReportHolland" LocalizedNameKey="VatDeclaration" LargeGlyph="Show_Invoice_32x32" ShortcutKey="Ctrl+G"/>
+	  <RibbonItem Action="VatReportHolland" LocalizedNameKey="BTW Aangifte Huidige/vorige periode" LargeGlyph="Show_Invoice_32x32" ShortcutKey="Ctrl+G"/>
+	  <RibbonItem Action="VatReportHollandSum" LocalizedNameKey="BTW Aangifte totale periode" LargeGlyph="Show_Invoice_32x32" ShortcutKey="Ctrl+G"/>
     <RibbonItem Action="VatReportEstonia" LocalizedNameKey="VatDeclaration" LargeGlyph="Show_Invoice_32x32" ShortcutKey="Ctrl+G"/>
     <RibbonItem Action="VatReportIceland" LocalizedNameKey="VatDeclaration" LargeGlyph="Show_Invoice_32x32" ShortcutKey="Ctrl+G"/>
     <RibbonItem Action="UKVatReturn" LocalizedNameKey="VatDeclaration" LargeGlyph="VAT_32x32" />
@@ -25,7 +26,8 @@
       <!---If we want Inner menu-->
       <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
       <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16" ShortcutKey="" />
-      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
+			<RibbonItem Action="AddExpressionColumn" LocalizedNameKey="AddOBJ" Parameter="CalculationExpression" Glyph="Accountant_16x16" ShortcutKey="" />
+      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" EnableSeperator="True" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
       <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16" ShortcutKey=""/>
       <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16" ShortcutKey="Ctrl+U"/>
       <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16" LargeGlyph="ExportLayout_16x16" ShortcutKey=""/>

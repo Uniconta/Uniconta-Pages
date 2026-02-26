@@ -1,30 +1,30 @@
-using Uniconta.API.System;
-using UnicontaClient.Models;
-using UnicontaClient.Utilities;
-using Uniconta.ClientTools;
-using Uniconta.ClientTools.DataModel;
-using Uniconta.ClientTools.Page;
-using Uniconta.Common;
-using Uniconta.DataModel;
+using DevExpress.Xpf.Editors;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
-
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
-using System.Windows;
-using Uniconta.ClientTools.Util;
-using UnicontaClient.Controls.Dialogs;
+using Uniconta.API.System;
+using Uniconta.ClientTools;
 using Uniconta.ClientTools.Controls;
-using DevExpress.Xpf.Editors;
-using System.ComponentModel;
+using Uniconta.ClientTools.DataModel;
+using Uniconta.ClientTools.Page;
+using Uniconta.ClientTools.Util;
+using Uniconta.Common;
 using Uniconta.Common.Utility;
+using Uniconta.DataModel;
+using UnicontaClient.Controls.Dialogs;
+using UnicontaClient.Models;
+using UnicontaClient.Utilities;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -514,7 +514,7 @@ namespace UnicontaClient.Pages.CustomPage
                 var contact = cache.Get(contactRefId);
                 if (contact == null)
                 {
-                    cache = api.LoadCache(typeof(Uniconta.DataModel.Contact), true).GetAwaiter().GetResult();
+                    cache = await api.LoadCache(typeof(Uniconta.DataModel.Contact), true);
                     contact = cache.Get(contactRefId);
                     SetContactSource(cache, debtor);
                 }

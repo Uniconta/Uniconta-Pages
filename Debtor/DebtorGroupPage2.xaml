@@ -44,6 +44,11 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorGroupPage2"
                         <CorasauControls:CheckEditor  IsChecked="{Binding MandatoryItem,Mode=TwoWay}" />
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="EPRGroup" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ProducerResponsibility}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutItem FieldName="PackagingConsumer" x:Name="liPackagingConsumer">
+                        <CorasauControls:ComboBoxEditor SelectedItem="{Binding PackagingConsumer,Mode=TwoWay}" x:Name="cmbPackagingConsumer"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpInvoice" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Invoice}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem FieldName="PriceGroup" x:Name="liPriceGroup">
                         <CorasauControls:NumericUpDownEditor Text="{Binding PriceGroup,Mode=TwoWay}" MaxValue="3"/>

@@ -95,6 +95,9 @@ namespace UnicontaClient.Pages.CustomPage
             switch (e.Column.FieldName)
             {
                 case "PackagingType":
+                    if (row._Reporting != ReportingType.Packing && row._Reporting != ReportingType.Batteries)
+                        e.Cancel = true;
+                    break;
                 case "WasteSorting":
                 case "PackagingRateLevel":
                     if (row._Reporting != ReportingType.Packing)
@@ -131,7 +134,9 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 case "ReportingType":
                     rec.Category = null;
+                    rec.PackagingType = null;
                     SetCategorySource(rec);
+                    SetTypeSource(rec);
                     break;
             }
         }
@@ -151,7 +156,7 @@ namespace UnicontaClient.Pages.CustomPage
                     rec.CategorySource = validCat.ToList();
                     break;
                 case ReportingType.Electronic:
-                    validCat = new ArraySegment<string>(AppEnums.PackagingCategory.Values, 60, 7);//Temp to Photovoltic
+                    validCat = new ArraySegment<string>(AppEnums.PackagingCategory.Values, 60, 8);//Temp to MediumEquipment
                     rec.CategorySource = validCat.ToList();
                     break;
                 case ReportingType.OneTimeUsePlastic:
@@ -160,6 +165,26 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
             }
         }
+
+        private void SetTypeSource(InvPackagingProductClient rec)
+        {
+            if (rec?._Reporting == null)
+                return;
+            switch (rec._Reporting)
+            {
+                case ReportingType.Packing:
+                    var validType = new ArraySegment<string>(AppEnums.PackagingType.Values, 0, 21);//0 to BubbleWrap
+                    rec.TypeSource = validType.ToList();
+                    break;
+                case ReportingType.Batteries:
+                    validType = new ArraySegment<string>(AppEnums.PackagingType.Values, 40, 6);//Lithium to NonRechargeable
+                    rec.TypeSource = validType.ToList();
+                    break;
+               default:
+                    return;
+            }
+        }
+
         private void LocalMenu_OnItemClicked(string ActionType)
         {
             var selectedItem = dgInvPackagingProductGrid.SelectedItem as InvPackagingProductClient;
@@ -190,7 +215,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        void Save()
+        async void Save()
         {
             int i = 0;
             foreach (var item in dgInvPackagingProductGrid.GetVisibleRows() as IEnumerable<InvPackagingProductClient>)
@@ -203,7 +228,11 @@ namespace UnicontaClient.Pages.CustomPage
                     return;
                 }
             }
-            saveGrid();
+
+            var savetask = saveGrid(); 
+            if (savetask != null)
+                await savetask;
+            await dgInvPackagingProductGrid.RefreshTask();
         }
         void CopyFromItem()
         {
@@ -242,7 +271,7 @@ namespace UnicontaClient.Pages.CustomPage
                 dgInvPackagingProductGrid.PasteRows(lines);
             }
         }
-        private void PART_Editor_GotFocus(object sender, RoutedEventArgs e)
+        private void Category_GotFocus(object sender, RoutedEventArgs e)
         {
             var selectedItem = dgInvPackagingProductGrid.SelectedItem as InvPackagingProductClient;
             if (selectedItem?.CategorySource == null)
@@ -255,6 +284,22 @@ namespace UnicontaClient.Pages.CustomPage
                     editor.ItemsSource = selectedItem.CategorySource;
                 }));
                 
+            }
+        }
+
+        private void Type_GotFocus(object sender, RoutedEventArgs e)
+        {
+            var selectedItem = dgInvPackagingProductGrid.SelectedItem as InvPackagingProductClient;
+            if (selectedItem?.TypeSource == null)
+                SetTypeSource(selectedItem);
+            if (selectedItem != null)
+            {
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    var editor = (ComboBoxEditor)sender;
+                    editor.ItemsSource = selectedItem.TypeSource;
+                }));
+
             }
         }
     }

@@ -1,5 +1,3 @@
-using UnicontaClient.Models;
-using UnicontaClient.Pages;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -19,8 +17,11 @@ using Uniconta.API.Service;
 using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
+using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using Uniconta.DataModel;
+using UnicontaClient.Models;
+using UnicontaClient.Pages;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -102,7 +103,13 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
             }
         }
-
+        protected override void OnLayoutLoaded()
+        {
+            base.OnLayoutLoaded();
+            var Comp = api.CompanyEntity;
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            UtilDisplay.RemoveMenuCommand(rb, "InvoiceFee");
+        }
         async void SaveAndOpenPriceList(InvPriceList selectedItem)
         {
             if (dgCreditorPriceListGrid.HasUnsavedData)

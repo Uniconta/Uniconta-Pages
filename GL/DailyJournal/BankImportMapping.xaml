@@ -51,6 +51,7 @@ x:Class="UnicontaClient.Pages.CustomPage.BankImportMapping"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Contains" ShowCheckBoxInHeader="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="70" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Charge" Width="70" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="RequireVoucher" Width="70" ShowCheckBoxInHeader="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim2" Width="70" FieldName="Dimension2" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim3" Width="70" FieldName="Dimension3" />

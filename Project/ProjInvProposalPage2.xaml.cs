@@ -503,7 +503,7 @@ namespace UnicontaClient.Pages.CustomPage
                 var contact = cache.Get(contactRefId);
                 if (contact == null)
                 {
-                    cache = api.LoadCache(typeof(Uniconta.DataModel.Contact), true).GetAwaiter().GetResult();
+                    cache = await api.LoadCache(typeof(Uniconta.DataModel.Contact), true);
                     contact = cache.Get(contactRefId);
                     SetContactSource(cache, debtor);
                 }

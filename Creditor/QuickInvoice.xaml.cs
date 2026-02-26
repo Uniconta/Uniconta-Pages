@@ -447,6 +447,7 @@ namespace UnicontaClient.Pages.CustomPage
                             UtilDisplay.ShowErrorCode(ErrorCodes.ItemIsOnHold, null);
                     }
                     break;
+                case "Unit":
                 case "Qty":
                     if (this.PriceLookup != null && this.PriceLookup.UseCustomerPrices)
                         this.PriceLookup.GetCustomerPrice(rec, false);
@@ -741,7 +742,7 @@ namespace UnicontaClient.Pages.CustomPage
                     }
 
                     var invoicePostingResult = SetupInvoicePostingPrintGenerator(dbOrder, lines, GenrateInvoiceDialog.GenrateDate, GenrateInvoiceDialog.InvoiceNumber, isSimulated, GenrateInvoiceDialog.ShowInvoice,
-                        GenrateInvoiceDialog.PostOnlyDelivered, GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.NumberOfPages, GenrateInvoiceDialog.SendByEmail, !isSimulated && GenrateInvoiceDialog.SendByOutlook,
+                        GenrateInvoiceDialog.PostOnlyDelivered, GenrateInvoiceDialog.InvoiceQuickPrint, GenrateInvoiceDialog.NumberOfPages, GenrateInvoiceDialog.SendByEmail, GenrateInvoiceDialog.SendByOutlook,
                         GenrateInvoiceDialog.sendOnlyToThisEmail, GenrateInvoiceDialog.Emails, documents);
 
                     if (api.CompanyEntity.AllowSkipCreditMax)

@@ -56,8 +56,8 @@ namespace UnicontaClient.Pages.CustomPage
         }
         private void Initialize()
         {
-            this.DataContext = this;
             InitializeComponent();
+            this.DataContext = this;
             localMenu.dataGrid = dgAcStatsGrid;
             SetRibbonControl(localMenu, dgAcStatsGrid);
             dgAcStatsGrid.api = api;

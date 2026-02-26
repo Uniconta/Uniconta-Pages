@@ -66,10 +66,8 @@ namespace UnicontaClient.Pages.CustomPage
             dgPackNotesGrid.api = api;
             dgPackNotesGrid.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
-#if SILVERLIGHT
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
             UtilDisplay.RemoveMenuCommand(rb, "GenerateOioXml");
-#endif
             dgPackNotesGrid.ShowTotalSummary();
             var Comp = api.CompanyEntity;
             if (Comp.RoundTo100)
@@ -150,7 +148,11 @@ namespace UnicontaClient.Pages.CustomPage
                 case "ShowDeliveryNote":
                     if (selectedItem == null || dgPackNotesGrid.SelectedItems == null)
                         return;
+#if MAC
+                    var selectedItems = new List<DebtorDeliveryNoteClient>() { selectedItem };
+#else
                     var selectedItems = dgPackNotesGrid.SelectedItems.Cast<DebtorDeliveryNoteClient>();
+#endif
                     ShowDeliveryNote(selectedItems);
                     break;
                 case "SendDeliveryNote":
@@ -191,7 +193,11 @@ namespace UnicontaClient.Pages.CustomPage
                 var count = invoicesList.Count;
                 string dockName = null, reportName = null;
                 bool exportAsPdf = false;
+#if MAC
+                Microsoft.Win32.OpenFolderDialog folderDialogSaveInvoice = null;
+#else
                 DevExpress.Xpf.Dialogs.DXFolderBrowserDialog folderDialogSaveInvoice = null;
+#endif
                 hasLookups = false;
                 if (count > 1)
                 {
@@ -226,10 +232,18 @@ namespace UnicontaClient.Pages.CustomPage
                                     folderDialogSaveInvoice = UtilDisplay.LoadFolderBrowserDialog;
                                     var dialogResult = folderDialogSaveInvoice.ShowDialog();
                                     if (dialogResult == true)
+#if MAC
+                                        directoryPath = folderDialogSaveInvoice.FolderName;
+#else
                                         directoryPath = folderDialogSaveInvoice.SelectedPath;
+#endif
                                 }
                                 else
+#if MAC
+                                    directoryPath = folderDialogSaveInvoice.FolderName;
+#else
                                     directoryPath = folderDialogSaveInvoice.SelectedPath;
+#endif
 
                                 Utility.ExportReportAsPdf(printReport.Report, directoryPath, docName, docNumber.ToString());
                             }
@@ -244,10 +258,18 @@ namespace UnicontaClient.Pages.CustomPage
                         else
                         {
                             var pckNumber = debtInvoice.InvoiceNumber;
-                            reportName = await Utilities.Utility.GetLocalizedReportName(api, debtInvoice, CompanyLayoutType.Packnote);
                             dockName = string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("Preview"), string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("PackNote"), pckNumber));
 
+#if MAC
+                            var report = printReport.Report;
+                            var memoryStream = UnistreamReuse.Create();
+                            report.ExportToPdf(memoryStream);
+                            var control = UtilDisplay.LoadControl(memoryStream.ToArrayAndRelease(), FileextensionsTypes.PDF, false, false, null);
+                            AddDockItem(TabControls.ShowControlPage, new object[] { control }, dockName);
+#else
+                            reportName = await Utilities.Utility.GetLocalizedReportName(api, debtInvoice, CompanyLayoutType.Packnote);
                             AddDockItem(TabControls.StandardPrintReportPage, new object[] { new List<IPrintReport> { printReport }, reportName }, dockName);
+#endif
                         }
                     }
                     else
@@ -333,7 +355,7 @@ namespace UnicontaClient.Pages.CustomPage
             var isInitializedSuccess = await debtorQcpPrint.InstantiateFields();
             if (isInitializedSuccess)
             {
-                var standardDebtorPackNote = new DebtorQCPReportClient(debtorQcpPrint.Company, debtorQcpPrint.Debtor, debtorQcpPrint.DebtorInvoice, debtorQcpPrint.InvTransInvoiceLines, debtorQcpPrint.DebtorOrder,
+                var standardDebtorPackNote = new DebtorQCPReportClient(debtorQcpPrint.Company, debtorQcpPrint.Debtor, debtorQcpPrint.DebtorInvoice, debtorQcpPrint.DebtorInvoiceLines, debtorQcpPrint.DebtorOrder,
                     debtorQcpPrint.CompanyLogo, debtorQcpPrint.ReportName, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.PackNote, messageClient: debtorQcpPrint.MessageClient);
 
                 var standardReports = new[] { standardDebtorPackNote };

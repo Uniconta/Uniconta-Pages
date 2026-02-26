@@ -349,6 +349,7 @@ namespace UnicontaClient.Pages.CustomPage
                         setVariant(rec, false);
                         LoadInvItemStorageGrid(rec);
                         TableField.SetUserFieldsFromRecord(selectedItem, rec);
+                        rec.PurchaseAccount = selectedItem._PurchaseAccount;
                         if (selectedItem._Blocked)
                             UtilDisplay.ShowErrorCode(ErrorCodes.ItemIsOnHold, null);
 
@@ -356,6 +357,7 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     break;
                 case "Qty":
+                case "Unit":
                     if (this.PriceLookup != null && this.PriceLookup.UseCustomerPrices)
                         this.PriceLookup.GetCustomerPrice(rec, false);
                     break;

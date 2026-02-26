@@ -35,11 +35,7 @@ namespace UnicontaClient.Controls
             this.DataContext = this;
             InitializeComponent();
 
-#if !SILVERLIGHT
             this.Title = Uniconta.ClientTools.Localization.lookup("Company");
-#else
-            Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             if (loadedCompanies != null)
             {
                 cbCompany.ItemsSource = loadedCompanies;

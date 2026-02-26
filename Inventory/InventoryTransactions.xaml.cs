@@ -1,8 +1,5 @@
-using UnicontaClient.Models;
-using Uniconta.ClientTools.DataModel;
-using Uniconta.ClientTools.Page;
-using Uniconta.Common;
-using Uniconta.Common.Utility;
+using DevExpress.Data;
+using DevExpress.Xpf.Grid;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,23 +7,27 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Documents;
+using System.Windows.Input;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
-using Uniconta.DataModel;
-using Uniconta.ClientTools.Controls;
-using Uniconta.ClientTools;
-using System.Windows.Data;
-using DevExpress.Xpf.Grid;
-using UnicontaClient.Controls.Dialogs;
-using Uniconta.ClientTools.Util;
 using Uniconta.API.DebtorCreditor;
-using DevExpress.Data;
+using Uniconta.API.Inventory;
 using Uniconta.API.Service;
-using System.Windows.Input;
 using Uniconta.Client.Pages;
+using Uniconta.ClientTools;
+using Uniconta.ClientTools.Controls;
+using Uniconta.ClientTools.DataModel;
+using Uniconta.ClientTools.Page;
+using Uniconta.ClientTools.Util;
+using Uniconta.Common;
+using Uniconta.Common.Utility;
+using Uniconta.DataModel;
+using UnicontaClient.Controls.Dialogs;
+using UnicontaClient.Models;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -410,12 +411,24 @@ namespace UnicontaClient.Pages.CustomPage
                 case "ChangeCostValue":
                     DebtorInvoiceLinesPage.ChangeCostValue(selectedItem, dgInvTransGrid);
                     break;
+                case "ClearRestateCostflag":
+                    ClearRestateCostflag(selectedItem);
+                    break; 
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
 
+        async private void ClearRestateCostflag(InvTransClient selectedItem)
+        {
+            if (selectedItem != null)
+            {
+                var transAPI = new TransactionsAPI(api);
+                var res = await transAPI.ClearRestateCostflag(selectedItem);
+                UtilDisplay.ShowErrorCode(res);
+            }
+        }
         async private void JournalPosted(InvTransClient selectedItem)
         {
             var result = await api.Query(new GLDailyJournalPostedClient(), new UnicontaBaseEntity[] { selectedItem }, null);

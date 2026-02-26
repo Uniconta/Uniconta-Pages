@@ -45,6 +45,11 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "OnlyLineWithPhysicalVoucher", ResourceType = typeof(InputFieldDataText))]
         public bool HasPhysicalVoucher { get; set; }
 
+        [InputFieldData]
+        [Display(Name = "LineWithAutoPost", ResourceType = typeof(InputFieldDataText))]
+        public bool LineWithAutoPost { get; set; }
+
+        
         static int SelectedBankAccPosIndex = 0;
         static string lclJournal;
         static bool? lclIsMarkLine, lclAddVouNo, lclHasVoucher;

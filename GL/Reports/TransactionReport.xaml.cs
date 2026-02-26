@@ -73,8 +73,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         public TransactionReport(UnicontaBaseEntity master) : base(master)
         {
-            this.DataContext = this;
             InitializeComponent();
+            this.DataContext = this;
             InitMaster(master);
             Initialize();
         }

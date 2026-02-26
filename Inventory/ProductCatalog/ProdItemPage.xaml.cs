@@ -65,7 +65,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (string.Compare(rec.Name, "Catalog", StringComparison.CurrentCultureIgnoreCase) == 0)
                 {
-                    var cache = api.GetCache(typeof(Uniconta.DataModel.ProdCatalog)) ?? api.LoadCache(typeof(Uniconta.DataModel.ProdCatalog)).GetAwaiter().GetResult();
+                    var cache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.ProdCatalog), api);
                     master = (ProdCatalogClient)cache.Get(rec.Value);
                 }
             }

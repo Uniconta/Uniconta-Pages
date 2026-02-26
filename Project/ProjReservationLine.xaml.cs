@@ -445,10 +445,9 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     break;
                 case "Qty":
+                case "Unit":
                     if (this.PriceLookup != null && this.PriceLookup.UseCustomerPrices)
                         this.PriceLookup.GetCustomerPrice(rec, false);
-                    if (company._InvoiceUseQtyNow)
-                        rec.QtyNow = rec._Qty;
                     break;
                 case "Total":
                     Dispatcher.BeginInvoke(new Action(() => { RecalculateAmount(); }));

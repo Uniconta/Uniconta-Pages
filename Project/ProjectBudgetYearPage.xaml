@@ -41,8 +41,8 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectBudgetYearPage"
                 <CorasauControls:TextEditor x:Name="txtYear" IsReadOnly="True" />
                 <Button x:Name="btnAddYear" Content="+" Width="20" Padding="1" Click="btnAddYear_Click" Margin="2,0,0,0"/>
             </StackPanel>
-            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ProjectBudgetGroup}" Grid.Column="4" Margin="3,3,3,3" VerticalAlignment="Center" />
-            <CorasauControls:LookupEditor x:Name="cmbProjectBudgetGroup" Text="{Binding BudgetGroup,Mode=TwoWay}" Margin="0,3,3,3" Grid.Column="6" Height="23" />
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BudgetGroup}" Grid.Column="4" Margin="3,3,3,3" VerticalAlignment="Center" />
+            <CorasauControls:LookupEditor x:Name="cmbProjectBudgetGroup" Text="{Binding BudgetGroup,Mode=TwoWay}" Margin="0,3,3,3" Grid.Column="6" Height="23" SelectedIndexChanged="cmbProjectBudgetGroup_SelectedIndexChanged"/>
         </Grid>
         <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{StaticResource WindowHeaderGradient}" />
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="3" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
@@ -64,15 +64,20 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectBudgetYearPage"
                         </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="EmployeeName" AllowEditing="False" Fixed="Left" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PayrollCategory" Fixed="Left" FixedWidth="True" Width="75" Visible="True">
-                        <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    <localPage:CorasauDataGridForeignKeyColumnClient x:Name="PayrollCategory" Fixed="Left" FixedWidth="True" Width="75" Visible="True">
+                        <localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
                             <ControlTemplate>
-                                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.PayrollCategory,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" Margin="5,0,0,0" />
+                                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.PayrollCategory,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" />
                             </ControlTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
-                    </localPage:CorasauDataGridTemplateColumnClient>
+                        </localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
+                        <localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <localPage:CorasauGridLookupEditorClient  x:Name="PART_Editor" HasCustomLookUp="True" ItemsSource="{Binding DataContext.RowData.Row.PayrollSource,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"  GotFocus="Payroll_GotFocus" Margin="5,0,0,0"/>
+                            </DataTemplate>
+                        </localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
+                    </localPage:CorasauDataGridForeignKeyColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PayrollCategoryName" AllowEditing="False" Fixed="Left" Visible="True" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Fixed="Left" FixedWidth="True" Width="75">
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Fixed="Left" FixedWidth="True" Width="75" AllowEditing="false">
                         <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                             <ControlTemplate>
                                 <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.PrCategory,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" Margin="5,0,0,0" />

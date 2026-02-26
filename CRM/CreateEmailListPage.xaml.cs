@@ -105,8 +105,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         void InitPage()
         {
-            this.DataContext = this;
             InitializeComponent();
+            this.DataContext = this;
             setUserFields();
             dgCreateEmailList.UpdateMaster(master);
             localMenu.dataGrid = dgCreateEmailList;

@@ -262,6 +262,17 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccountPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="MicroEnterprise" x:Name="liMicroEnterprise">
                         <CorasauControls:CheckEditor x:Name="MicroEnterprise" IsChecked="{Binding MicroEnterprise,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="NoPackagingReporting" x:Name="liNoPackagingReporting">
+                        <CorasauControls:CheckEditor x:Name="NoPackagingReporting" IsChecked="{Binding NoPackagingReporting,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="VatNumberValidationService" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=VatNumberValidationService}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
+                    <CorasauControls:CorasauLayoutItem FieldName="VIESStatus" x:Name="liVIESStatus">
+                        <CorasauControls:TextEditor x:Name="leVIESStatus" IsReadOnly="True" Text="{Binding VIESStatus,Mode=OneWay}" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="VIESDate" x:Name="liVIESDate">
+                        <CorasauControls:TextEditor x:Name="dteVIESDate" IsReadOnly="True" Mask="d" MaskType="DateTimeAdvancingCaret" MaskUseAsDisplayFormat="True" Text="{Binding VIESDate,Mode=OneWay}" />
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="usedim" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Dimension}" Orientation="Vertical" Width="400" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                         <CorasauControls:CorasauLayoutItem x:Name="lbldim1">

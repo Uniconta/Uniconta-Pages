@@ -20,6 +20,7 @@ using Uniconta.ClientTools.Util;
 using Uniconta.API.Service;
 using Uniconta.ClientTools.Controls;
 using UnicontaClient.Controls.Dialogs;
+using Uniconta.Common.User;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -69,6 +70,9 @@ namespace UnicontaClient.Pages.CustomPage
             var Comp = api.CompanyEntity;
             if (!api.CompanyEntity._ProjectBudgetMonth)
                 UtilDisplay.RemoveMenuCommand(rb, "BudgetYear");
+
+            if (api.session.User._Role < (int)UserRoles.Admin)
+                UtilDisplay.RemoveMenuCommand(rb, new string[] { "TimeSheetOLD" });
         }
 
         private void localMenu_OnItemClicked(string ActionType)
@@ -129,6 +133,10 @@ namespace UnicontaClient.Pages.CustomPage
                 case "TimeSheet":
                     if (selectedItem != null)
                         AddDockItem(TabControls.TMJournalLinePage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("TimeRegistration"), selectedItem._Name));
+                    break;
+                case "TimeSheetOLD":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.TMJournalLinePageOLD, selectedItem, string.Format("{0}: {1}", "GAMMEL TIMEREGISTRERING", selectedItem._Name));
                     break;
                 case "EmpPayrollCategory":
                     if (selectedItem != null)

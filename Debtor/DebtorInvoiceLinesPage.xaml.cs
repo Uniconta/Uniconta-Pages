@@ -277,6 +277,10 @@ namespace UnicontaClient.Pages.CustomPage
                 case "ChangeCostValue":
                     ChangeCostValue(selectedItem, dgInvLines);
                     break;
+                case "ReturnReasonTransactions":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.InvTransReasonReport, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ReturnReason"), selectedItem.InvoiceNumber));
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;

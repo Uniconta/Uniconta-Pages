@@ -28,6 +28,9 @@ x:Class="UnicontaClient.Pages.CustomPage.BankStatementPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="StartBalance" x:Name="liStartBalance">
                         <CorasauControls:DoubleEditor FieldName="StartBalance"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="StartDate" x:Name="liStartDate">
+                        <CorasauControls:DateEditor x:Name="StartDate" EditValue="{Binding StartDate,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpOther" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Other}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem FieldName="DaysSlip" x:Name="liDaysSlip">
@@ -94,6 +97,17 @@ x:Class="UnicontaClient.Pages.CustomPage.BankStatementPage2"
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpBankConnect" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AutoBanking}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem FieldName="BankConnect2Journal" x:Name="liBankConnect2Journal">
                         <CorasauControls:CheckEditor x:Name="chkBankConnect2Journal" IsChecked="{Binding BankConnect2Journal,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="InternalCounterEntry" x:Name="liInternalCounterEntry">
+                        <CorasauControls:CheckEditor x:Name="chkInternalCounterEntry" IsChecked="{Binding InternalCounterEntry,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpAutopost" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AutoPosting}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutItem FieldName="AutoPostPayments" x:Name="liAutoPostPayments">
+                        <CorasauControls:CheckEditor x:Name="chkAutoPostPayments" IsChecked="{Binding AutoPostPayments,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="AutoPostJournal" x:Name="liAutoPostJournal">
+                        <CorasauControls:LookupEditor x:Name="lkAutoPostJournal" Text="{Binding AutoPostJournal,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutGroup>

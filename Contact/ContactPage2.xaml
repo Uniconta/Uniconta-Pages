@@ -90,6 +90,9 @@ x:Class="UnicontaClient.Pages.CustomPage.ContactPage2"
                         <CorasauControls:CorasauLayoutItem FieldName="Offer" x:Name="liOffer">
                             <CorasauControls:CheckEditor IsChecked="{Binding Offer,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="PickingList" x:Name="liPickingList">
+                            <CorasauControls:CheckEditor IsChecked="{Binding PickingList,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="GetEmailIfContact" x:Name="liOGetEmailIfContact">
                             <CorasauControls:CheckEditor IsChecked="{Binding GetEmailIfContact,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>

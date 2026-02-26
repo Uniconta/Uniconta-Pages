@@ -92,7 +92,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (masterValue != null)
             {
-                var cache = api.GetCache(typeof(Uniconta.DataModel.InvItemNameGroup)) ?? api.LoadCache(typeof(Uniconta.DataModel.InvItemNameGroup)).GetAwaiter().GetResult();
+                var cache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.InvItemNameGroup), api);
                 var master = cache.Get<InvItemNameGroup>(masterValue);
                 InitPage(master);
             }

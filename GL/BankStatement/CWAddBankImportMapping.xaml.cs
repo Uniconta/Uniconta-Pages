@@ -183,6 +183,7 @@ namespace UnicontaClient.Pages.CustomPage
             bankImportMap._Dim5 = leDim5.Text;
             bankImportMap._Charge = Charge;
             bankImportMap._Vat = Vat;
+            bankImportMap._RequireVoucher = chkRequireVoucher.IsChecked.GetValueOrDefault();
             var err = await api.Insert(bankImportMap);
             if (err != ErrorCodes.Succes)
                 UtilDisplay.ShowErrorCode(err);

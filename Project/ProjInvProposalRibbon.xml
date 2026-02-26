@@ -15,7 +15,8 @@
 			<!---If we want Inner menu-->
 			<RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
 			<RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16" ShortcutKey="" />
-			<RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="Edit_16x16"  ShortcutKey=""/>
+			<RibbonItem Action="AddExpressionColumn" LocalizedNameKey="AddOBJ" Parameter="CalculationExpression" Glyph="Accountant_16x16" ShortcutKey="" />
+			<RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" EnableSeperator="True" Glyph="Edit_16x16"  ShortcutKey=""/>
 			<RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16" ShortcutKey=""/>
 			<RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16" ShortcutKey="Ctrl+U"/>
 			<RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16"  ShortcutKey=""/>
@@ -27,7 +28,7 @@
 		<RibbonItem Action="ProjInvProposalLine" LocalizedNameKey="InvoiceProposalLine" ControlName="ProjInvoiceProposalLine" LargeGlyph="Order_Lines_Highlighted_32x32" ShortcutKey="ALT+L"/>
 		<RibbonItem Action="CreateInvoice" LocalizedNameKey="CreateOBJ" Parameter="Invoice" LargeGlyph="UserField_32x32" ShortcutKey="Ctrl+M"/>
 		<RibbonItem Action="CreatePacknote" LocalizedNameKey="CreateOBJ" Parameter="Packnote" LargeGlyph="Pack_Note_32x32" ShortcutKey="Ctrl+K"/>
-	</RibbonItem>
+  </RibbonItem>
 	<RibbonItem>
 		<RibbonItem Action="Invoices" LocalizedNameKey="PostedInvoices" ControlName="Invoices" LargeGlyph="Invoice_32x32"/>
 		<RibbonItem Action="Contacts" LocalizedNameKey="Contacts" ControlName="ContactPage" Module="Contacts" LargeGlyph="Contacts_32x32"/>
@@ -42,6 +43,7 @@
 	<RibbonItem LocalizedNameKey="Project" Module="Project">
 		<RibbonItem Action="ProjectTransaction" LocalizedNameKey="Adjustments" LargeGlyph="Transactions_32x32"/>
 		<RibbonItem Action="RegenerateOrderFromProject" LocalizedNameKey="TransactionOrigin" LargeGlyph="Add_Menu_32x32" ShortcutKey="CTRL+T"/>
+		<RibbonItem Action="RecalculateOrderPrices" LocalizedNameKey="RecalculatePrices" LargeGlyph="Calculator_32x32"/>
 	</RibbonItem>
 	<RibbonItem>
 		<RibbonItem Action="ApproveOrder" LocalizedNameKey="Approve" LargeGlyph="Allow_32x32"/>

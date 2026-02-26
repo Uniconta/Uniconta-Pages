@@ -47,8 +47,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void InitializePage()
         {
-            this.DataContext = this;
             InitializeComponent();
+            this.DataContext = this;
             ((TableView)dgInvTransNoBatchGrid.View).RowStyle = this.Resources["SubTotalRowStyle"] as Style;
             var Comp = api.CompanyEntity;
 

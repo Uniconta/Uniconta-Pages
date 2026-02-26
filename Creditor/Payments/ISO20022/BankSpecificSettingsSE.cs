@@ -333,14 +333,12 @@ namespace UnicontaISO20022CreditTransfer
             {
                 switch (paymentMethod)
                 {
+                    case PaymentTypes.IBAN:
                     case PaymentTypes.VendorBankAccount:
                         if (remittanceInfo.Length > 20)
                             remittanceInfo = remittanceInfo.Substring(0, 20);
                         break;
 
-                    case PaymentTypes.IBAN:
-                        remittanceInfo = string.Empty;
-                        break;
 
                     case PaymentTypes.PaymentMethod3: //FIK71
                         remittanceInfo = string.Empty;

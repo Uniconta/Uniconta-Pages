@@ -62,11 +62,9 @@ namespace UnicontaClient.Pages.CustomPage
         static DateTime postDte;
         string header { get; set; }
         public bool showCompanyName = false;
-#if !SILVERLIGHT
         protected override int DialogId { get { return DialogTableId; } }
         public int DialogTableId { get; set; }
         protected override bool ShowTableValueButton { get { return true; } }
-#endif
         public CWInvPosting(CrudAPI api, string headerName = null, bool showNumberSeries = false)
         {
             InitializeComponent();
@@ -76,9 +74,6 @@ namespace UnicontaClient.Pages.CustomPage
                 header = headerName;
             this.Title = Uniconta.ClientTools.Localization.lookup(header);
             OKButton.Content = Uniconta.ClientTools.Localization.lookup(header);
-#if SILVERLIGHT
-            UnicontaClient.Utilities.Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             lookupTransType.api = api;
             Simulation = true;
             Date = (postDte != DateTime.MinValue) ? postDte : BasePage.GetSystemDefaultDate();

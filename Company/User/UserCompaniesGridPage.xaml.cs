@@ -54,8 +54,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         void InitPage(UnicontaBaseEntity baseEntity)
         {
-            this.DataContext = this;
             InitializeComponent();
+            this.DataContext = this;
             queryLocal = true;
             selectedCompany = baseEntity;
             dgUserCompaniesGridClient.api = api;

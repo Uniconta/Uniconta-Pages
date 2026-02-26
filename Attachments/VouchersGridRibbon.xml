@@ -4,44 +4,45 @@
 		<!---When we create a new TabPage -->
 		<RibbonItem Action="AddRow" LocalizedNameKey="Add" LargeGlyph="Add_32x32"/>
 		<RibbonItem Action="CopyRecord" LocalizedNameKey="Copy"   LargeGlyph="Copy_32x32" ShortcutKey="Shift+F2"/>
-  </RibbonItem>
-  <RibbonItem>
-    <RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="Delete" Glyph="Delete_16x16" LargeGlyph="Delete_32x32"/>
+	</RibbonItem>
+	<RibbonItem>
+		<RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="Delete" Glyph="Delete_16x16" LargeGlyph="Delete_32x32"/>
 		<RibbonItem Action="RemoveFromInbox" LocalizedNameKey="RemoveFromInbox" LargeGlyph="close-32x32" />
-  </RibbonItem>
-  <RibbonItem>
-    <RibbonItem Action="Save" LocalizedNameKey="Save" LargeGlyph="save-32x32" ShortcutKey="Ctrl+S" />
+	</RibbonItem>
+	<RibbonItem>
+		<RibbonItem Action="Save" LocalizedNameKey="Save" LargeGlyph="save-32x32" ShortcutKey="Ctrl+S" />
 	</RibbonItem>
 	<RibbonItem>
 		<RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh" LargeGlyph="refresh"/>
-    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32">
-      <!---If we want Inner menu-->
-      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
-      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16" ShortcutKey="" />
-      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
-      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16" ShortcutKey=""/>
-      <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16" ShortcutKey="Ctrl+U"/>
-      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16" LargeGlyph="ExportLayout_16x16" ShortcutKey=""/>
-      <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16" LargeGlyph="Import_16x16" ShortcutKey=""/>
-      <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16" ShortcutKey=""/>
-      <RibbonItem Action="FieldSetting" LocalizedNameKey="FieldSetting" Glyph="Setup_16x16" ShortcutKey=""/>
-    </RibbonItem>
-  </RibbonItem>
+		<RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32">
+			<!---If we want Inner menu-->
+			<RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
+			<RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16" ShortcutKey="" />
+			<RibbonItem Action="AddExpressionColumn" LocalizedNameKey="AddOBJ" Parameter="CalculationExpression" Glyph="Accountant_16x16" ShortcutKey="" />
+			<RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" EnableSeperator="True" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
+			<RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16" ShortcutKey=""/>
+			<RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16" ShortcutKey="Ctrl+U"/>
+			<RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16" LargeGlyph="ExportLayout_16x16" ShortcutKey=""/>
+			<RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16" LargeGlyph="Import_16x16" ShortcutKey=""/>
+			<RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16" ShortcutKey=""/>
+			<RibbonItem Action="FieldSetting" LocalizedNameKey="FieldSetting" Glyph="Setup_16x16" ShortcutKey=""/>
+		</RibbonItem>
+	</RibbonItem>
 	<RibbonItem>
 		<RibbonItem Action="PageViewMode" ShortcutKey="" LocalizedNameKey="HideOBJ" Parameter="Folders"  LargeGlyph="Hide_Folder_32x32"/>
 	</RibbonItem>
 	<RibbonItem>
 		<RibbonItem Action="ViewDownloadRow" ShortcutKey="F7" LocalizedNameKey="View" LargeGlyph="View_Highlighted_32x32" />
-    <RibbonItem Action="CheckIfPosted" LocalizedNameKey="CheckIfPosted" LargeGlyph="Check_Journal_32x32"/>
-    <RibbonItem Action="Transactions" LocalizedNameKey="AccountsTransaction" LargeGlyph="Posted_Transaction_32x32"/>
-  </RibbonItem>
-  <RibbonItem>
-    <RibbonItem Action="GenerateJournalLines" LocalizedNameKey="GenerateJournalLines" ControlName="GL_DailyJournal" LargeGlyph="Move_32x32" ShortcutKey="Ctrl+J" />
+		<RibbonItem Action="CheckIfPosted" LocalizedNameKey="CheckIfPosted" LargeGlyph="Check_Journal_32x32"/>
+		<RibbonItem Action="Transactions" LocalizedNameKey="AccountsTransaction" LargeGlyph="Posted_Transaction_32x32"/>
+	</RibbonItem>
+	<RibbonItem>
+		<RibbonItem Action="GenerateJournalLines" LocalizedNameKey="GenerateJournalLines" ControlName="GL_DailyJournal" LargeGlyph="Move_32x32" ShortcutKey="Ctrl+J" />
 		<RibbonItem Action="ViewJournalLines" LocalizedNameKey="Journallines" ControlName="GL_DailyJournal" LargeGlyph="Journal_Lines_32x32" />
 		<RibbonItem Action="PostJournal" LocalizedNameKey="PostDirectly" ControlName="GL_DailyJournal" LargeGlyph="Posted_Journal_32x32"/>
 		<RibbonItem Action="GeneratePurchaseOrder" LocalizedNameKey="GeneratePurchaseOrder" ControlName="CreditorOrders" LargeGlyph="Move_32x32" ShortcutKey="Ctrl+G" />
-    <RibbonItem Action="Attach" LocalizedNameKey="Attach" LargeGlyph="Attachments_32x32"/>
-  </RibbonItem>
+		<RibbonItem Action="Attach" LocalizedNameKey="Attach" LargeGlyph="Attachments_32x32"/>
+	</RibbonItem>
 	<RibbonItem>
 		<RibbonItem Action="Bilagscan" LocalizedNameKey="Bilagscan" LargeGlyph="Transfer_32x32">
 			<RibbonItem Action="DocumentScanUpload" LocalizedNameKey="BilagscanSend" Glyph="Export_16x16" />
@@ -50,11 +51,12 @@
 		</RibbonItem>
 		<RibbonItem Action="UnicontaScan" LocalizedNameKey="UnicontaScan" LargeGlyph="Transfer_32x32">
 			<RibbonItem Action="DocumentScanUpload" LocalizedNameKey="Upload" Glyph="Export_16x16" />
+			<RibbonItem Action="CorrectScannedData" LocalizedNameKey="CorrectScannedData" Glyph="Edit_16x16" />
 		</RibbonItem>
 	</RibbonItem>
 	<RibbonItem>
-    <RibbonItem Action="EnvelopeWizard" LocalizedNameKey="CreateOBJ" Parameter="Envelope" Glyph="Envelope_32x32" LargeGlyph="Envelope_32x32"/>
-    <RibbonItem Action="PDFTools" LocalizedNameKey="PDFTools" LargeGlyph="PageTools_32x32">
+		<RibbonItem Action="EnvelopeWizard" LocalizedNameKey="CreateOBJ" Parameter="Envelope" Glyph="Envelope_32x32" LargeGlyph="Envelope_32x32"/>
+		<RibbonItem Action="PDFTools" LocalizedNameKey="PDFTools" LargeGlyph="PageTools_32x32">
 			<RibbonItem Action="SplitPDF" LocalizedNameKey="SplitPDF" Glyph="Match_Remove_16x16" />
 			<RibbonItem Action="JoinPDF" LocalizedNameKey="JoinTwoOBJ" Parameter="pdfs" ShortcutKey="Ctrl+O" Glyph="Match_Add_16x16" />
 			<RibbonItem Action="ConvertToPDF" LocalizedNameKey="ConvertToPDF" Glyph="Image_To_PDF_16x16" />

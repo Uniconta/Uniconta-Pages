@@ -1,18 +1,16 @@
-using Uniconta.API.DebtorCreditor;
-using Uniconta.API.Service;
-using UnicontaClient.Models;
-using UnicontaClient.Utilities;
-using Uniconta.ClientTools;
-using Uniconta.ClientTools.DataModel;
-using Uniconta.ClientTools.Page;
-using Uniconta.ClientTools.Util;
-using Uniconta.Common;
-using Uniconta.DataModel;
+using DevExpress.Data;
+using DevExpress.Xpf.Grid;
+using DevExpress.XtraReports.UI;
+using GermanyEInvoice.Create;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -22,18 +20,22 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using UnicontaClient.Controls.Dialogs;
-using Uniconta.ClientTools.Controls;
-using DevExpress.XtraReports.UI;
-using System.ComponentModel.DataAnnotations;
-using System.IO;
-using Uniconta.Client.Pages;
-using DevExpress.Xpf.Grid;
-using DevExpress.Data;
-using Uniconta.Common.Utility;
-using GermanyEInvoice.Create;
-using Uniconta.API.System;
 using System.Xml;
+using Uniconta.API.DebtorCreditor;
+using Uniconta.API.Service;
+using Uniconta.API.System;
+using Uniconta.Client.Pages;
+using Uniconta.ClientTools;
+using Uniconta.ClientTools.Controls;
+using Uniconta.ClientTools.DataModel;
+using Uniconta.ClientTools.Page;
+using Uniconta.ClientTools.Util;
+using Uniconta.Common;
+using Uniconta.Common.Utility;
+using Uniconta.DataModel;
+using UnicontaClient.Controls.Dialogs;
+using UnicontaClient.Models;
+using UnicontaClient.Utilities;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -153,6 +155,9 @@ namespace UnicontaClient.Pages.CustomPage
                 CostValue.HasDecimals = NetAmount.HasDecimals = TotalAmount.HasDecimals = Margin.HasDecimals = SalesValue.HasDecimals = false;
 
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
+#if MAC
+            UtilDisplay.RemoveMenuCommand(rb, new string[] { "ExportUBL", "SendAsOutlook" });
+#endif
             if (!Comp.Order && !Comp.Purchase)
                 UtilDisplay.RemoveMenuCommand(rb, "CreateOrder");
             if (Comp._CountryId == CountryCode.Germany)
@@ -280,7 +285,11 @@ namespace UnicontaClient.Pages.CustomPage
                 case "ShowPackNote":
                     if (dgInvoicesGrid.SelectedItem == null || dgInvoicesGrid.SelectedItems == null)
                         return;
+#if MAC
+                    var selectedItems = new List<DebtorInvoiceClient>() { selectedItem };
+#else
                     var selectedItems = dgInvoicesGrid.SelectedItems.Cast<DebtorInvoiceClient>();
+#endif
                     if (ActionType == "ShowInvoice")
                         ShowDocument(selectedItems, true);
                     else
@@ -365,6 +374,10 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         AddDockItem(TabControls.DebtorPackagingTransPage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ProducerResponsibility"), selectedItem.InvoiceNum));
                     break;
+                case "ReturnReasonTransactions":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.InvTransReasonReport, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ReturnReason"), selectedItem.InvoiceNum));
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -393,6 +406,24 @@ namespace UnicontaClient.Pages.CustomPage
 
             try
             {
+#if MAC
+                var invClient = dgInvoicesGrid.SelectedItem as DebtorInvoiceClient;
+                var iprintReport = isInvoice ? await PrintInvoice(invClient) : await PrintPackNote(invClient);
+
+                if (iprintReport != null)
+                {
+                    var report = iprintReport.Report;
+                    var memoryStream = UnistreamReuse.Create();
+                    report.ExportToPdf(memoryStream);
+                    var control = UtilDisplay.LoadControl(memoryStream.ToArrayAndRelease(), FileextensionsTypes.PDF, false, false, null);
+
+                    var docNumber = isInvoice ? invClient._InvoiceNumber : invClient._PackNote;
+                     var dockName = string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("Preview"), string.Format("{0}: {1}", isInvoice ? Uniconta.ClientTools.Localization.lookup("Invoice") :
+                                Uniconta.ClientTools.Localization.lookup("Packnote"), NumberConvert.ToString(docNumber)));
+
+                    AddDockItem(TabControls.ShowControlPage, new object[] { control }, dockName);
+                }
+#else
                 var docList = debtorInvoices.ToList();
                 var failedPrints = new List<long>();
                 var count = docList.Count;
@@ -464,7 +495,7 @@ namespace UnicontaClient.Pages.CustomPage
                             dockName = string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("Preview"), string.Format("{0}: {1}", isInvoice ? Uniconta.ClientTools.Localization.lookup("Invoice") :
                                 Uniconta.ClientTools.Localization.lookup("Packnote"), NumberConvert.ToString(docNumber)));
 
-                            AddDockItem(TabControls.StandardPrintReportPage, new object[] {  printReport , reportName }, dockName);
+                            AddDockItem(TabControls.StandardPrintReportPage, new object[] { printReport, reportName }, dockName);
                             break;
                         }
                     }
@@ -480,6 +511,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var failedList = string.Join(",", failedPrints);
                     UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("FailedPrintmsg") + failedList, Uniconta.ClientTools.Localization.lookup("Error"), MessageBoxButton.OK);
                 }
+#endif
             }
             catch (Exception ex)
             {
@@ -548,7 +580,7 @@ namespace UnicontaClient.Pages.CustomPage
             var isInitializedSuccess = await debtorInvoicePrint.InstantiateFields();
             if (isInitializedSuccess)
             {
-                var standardDebtorInvoice = new DebtorInvoiceReportClient(debtorInvoicePrint.Company, debtorInvoicePrint.Debtor, debtorInvoicePrint.DebtorInvoice, debtorInvoicePrint.InvTransInvoiceLines, debtorInvoicePrint.DebtorOrder,
+                var standardDebtorInvoice = new DebtorInvoiceReportClient(debtorInvoicePrint.Company, debtorInvoicePrint.Debtor, debtorInvoicePrint.DebtorInvoice, debtorInvoicePrint.DebtorInvoiceLines, debtorInvoicePrint.DebtorOrder,
                     debtorInvoicePrint.CompanyLogo, debtorInvoicePrint.ReportName, isCreditNote: debtorInvoicePrint.IsCreditNote, messageClient: debtorInvoicePrint.MessageClient);
 
 
@@ -591,7 +623,7 @@ namespace UnicontaClient.Pages.CustomPage
             var isInitializedSuccess = await debtorInvoicePrint.InstantiateFields();
             if (isInitializedSuccess)
             {
-                var standardDebtorInvoice = new DebtorQCPReportClient(debtorInvoicePrint.Company, debtorInvoicePrint.Debtor, debtorInvoicePrint.DebtorInvoice, debtorInvoicePrint.InvTransInvoiceLines, debtorInvoicePrint.DebtorOrder, debtorInvoicePrint.CompanyLogo, debtorInvoicePrint.ReportName,
+                var standardDebtorInvoice = new DebtorQCPReportClient(debtorInvoicePrint.Company, debtorInvoicePrint.Debtor, debtorInvoicePrint.DebtorInvoice, debtorInvoicePrint.DebtorInvoiceLines, debtorInvoicePrint.DebtorOrder, debtorInvoicePrint.CompanyLogo, debtorInvoicePrint.ReportName,
                   (int)packnote, messageClient: debtorInvoicePrint.MessageClient);
 
                 var standardReports = new[] { standardDebtorInvoice };
@@ -735,7 +767,11 @@ namespace UnicontaClient.Pages.CustomPage
             int countErr = 0;
             bool hasUserFolder = false;
             Microsoft.Win32.SaveFileDialog saveDialog = null;
+#if MAC
+            Microsoft.Win32.OpenFolderDialog folderBrowserDialog = null;
+#else
             DevExpress.Xpf.Dialogs.DXFolderBrowserDialog folderBrowserDialog = null;
+#endif
             InvoiceAPI Invapi = new InvoiceAPI(api);
 
             foreach (var invClient in invoiceUBL.ToList())
@@ -802,7 +838,11 @@ namespace UnicontaClient.Pages.CustomPage
                                 ? "E-Rechnung"
                                 : "E-Invoice";
                             var fileName = $"{invoiceLabel}_{invClient.InvoiceNum}.xml";
+#if MAC
+                            var filePath = System.IO.Path.Combine(folderBrowserDialog.FolderName, fileName);
+#else
                             var filePath = System.IO.Path.Combine(folderBrowserDialog.SelectedPath, fileName);
+#endif
                             try
                             {
                                 if (File.Exists(filePath))
@@ -832,7 +872,7 @@ namespace UnicontaClient.Pages.CustomPage
                             invClient._SystemInfo = invClient._SystemInfo + error.ToString() + "\n";
                         }
                     }
-                    else 
+                    else
                         xml = result.Document;
                 }
                 if (xml != null && createXmlFile)
@@ -876,7 +916,11 @@ namespace UnicontaClient.Pages.CustomPage
 
                         if (cnt > 1)
                         {
+#if MAC
+                            filename = folderBrowserDialog.FolderName;
+#else
                             filename = folderBrowserDialog.SelectedPath;
+#endif
                             filename = string.Format("{0}\\{1}_{2}.xml", filename, invoice, invClient.InvoiceNumber);
                         }
                         else

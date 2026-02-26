@@ -240,7 +240,7 @@ namespace UnicontaClient.Pages.CustomPage
                         for (int i = 0; i < fixedCompanies.Count; i++)
                         {
                             var comp = CWDefaultCompany.loadedCompanies.FirstOrDefault(x => x.CompanyId == fixedCompanies[i].CompanyId) as Company;
-                            var openComp = OpenFixedCompany(comp).GetAwaiter().GetResult();
+                            var openComp = Task.Run(() => OpenFixedCompany(comp)).GetAwaiter().GetResult();
                             if (openComp != null)
                                 LoadListOfTableTypes(openComp);
                             else
@@ -271,6 +271,10 @@ namespace UnicontaClient.Pages.CustomPage
                 //loading the localized labels from xml
                 dashboardLocalizationLabels = DashboardCommon.ConvertXmlForLocalization(data.Element(DashboardCommon.LOCALIZATION_LABELS));
 
+                if (dashboardLocalizationLabels != null)
+                    CriteriaOperator.RegisterCustomFunction(new GetConditionalLocalizeFunction(dashboardLocalizationLabels, (Language)session.User._Language));
+                else
+                    CriteriaOperator.RegisterCustomFunction(new GetConditionalLocalizeFunction());
                 #endregion
             }
             else
@@ -304,35 +308,12 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         if (col is GridDimensionColumn dimCol)
                         {
-                            var dimName = dimCol.Dimension.Name;
-                            var colName = col.Name;
-                            var savedName = col.CustomProperties.GetValue(dimCol.Dimension.UniqueId) ?? string.Empty;
-
-                            if (!string.IsNullOrEmpty(dimName) && (dimName.StartsWith("&") || dimName.StartsWith("@") || savedName.StartsWith("@") || savedName.StartsWith("&")))
-                            {
-                                if (col.CustomProperties.GetValue(dimCol.Dimension.UniqueId) == null)
-                                    col.CustomProperties.SetValue(dimCol.Dimension.UniqueId, dimName);
-                                else if ((dimCol.Dimension.Name.StartsWith("@") || dimCol.Dimension.Name.StartsWith("&")) && (savedName.StartsWith("@") || savedName.StartsWith("&")) && string.Compare(dimName, savedName) != 0)
-                                    col.CustomProperties.SetValue(dimCol.Dimension.UniqueId, dimName);
-                                else
-                                    dimName = savedName;
-                                dimCol.Dimension.Name = GetCustomLocalizedString(dimName.Substring(1));
-                            }
+                            LocalizeDimensionColumn(dimCol);
                             IsNestedField(dimCol.Dimension, dataSourceComponentName);
                         }
                         else if (col is GridMeasureColumn meaCol)
                         {
-                            var colName = meaCol.Measure.Name;
-                            var savedName = col.CustomProperties.GetValue(meaCol.Measure.UniqueId) ?? string.Empty;
-
-                            if (!string.IsNullOrEmpty(colName) && (colName.StartsWith("&") || colName.StartsWith("@")))
-                            {
-                                if (col.CustomProperties.GetValue(meaCol.Measure.UniqueId) == null)
-                                    col.CustomProperties.SetValue(meaCol.Measure.UniqueId, name);
-                                else
-                                    colName = savedName;
-                                meaCol.Measure.Name = GetCustomLocalizedString(colName.Substring(1));
-                            }
+                            LocalizeMeasureColumns(meaCol);
                             IsNestedField(meaCol.Measure, dataSourceComponentName);
                         }
                     }
@@ -550,7 +531,7 @@ namespace UnicontaClient.Pages.CustomPage
                                     if (type == typeof(CompanyClient))
                                         data = LoadCurrentUserCompanies(api);
                                     else
-                                        data = Query(type, api, masterRecords, filterValues).GetAwaiter().GetResult();
+                                        data = Task.Run(() => Query(type, api, masterRecords, filterValues)).GetAwaiter().GetResult();
 
                                     if (type == typeof(UserClient))
                                         data = LoadCurrentCompanyUser(api, data);
@@ -559,14 +540,17 @@ namespace UnicontaClient.Pages.CustomPage
                                 {
                                     var comp = CWDefaultCompany.loadedCompanies.FirstOrDefault(x => x.CompanyId == fixedComp.CompanyId);
                                     compApi = new CrudAPI(BasePage.session, comp);
-                                    data = Query(type, compApi, masterRecords, filterValues).GetAwaiter().GetResult();
+                                    if (type == typeof(CompanyClient))
+                                        data = LoadCurrentUserCompanies(compApi);
+                                    else
+                                        data = Task.Run(() => Query(type, compApi, masterRecords, filterValues)).GetAwaiter().GetResult();
                                 }
 
                                 if (lstOfDataSources != null && !lstOfDataSources.ContainsKey(DataSourceComponentName))
                                     lstOfDataSources.Add(DataSourceComponentName, data);
 
                                 if (typeofTable.Equals(typeof(CompanyDocumentClient)))
-                                    ReadData(data, compApi ?? api).GetAwaiter().GetResult(); // if there is image in property it will load again;
+                                    Task.Run(() => ReadData(data, compApi ?? api)).GetAwaiter().GetResult(); // if there is image in property it will load again;
 
                                 if (HasNestedField.TryGetValue(DataSourceComponentName, out bool nestField))
                                     e.Data = new DashBoardView.DisplayNameProviderTypedListWrapper<DataView>(UtilFunctions.BuildDataTable(data, type, (compApi ?? api).CompanyEntity).DefaultView, new DashBoardView.DisplayNameProviderStub());
@@ -779,17 +763,11 @@ namespace UnicontaClient.Pages.CustomPage
         /// </summary>
         void SetPivotLabelValues(PivotDashboardItem pivot, List<DataItem> targetLst, string dataSourceName)
         {
-            foreach (var col in targetLst)
+            foreach (var item in targetLst)
             {
-                var name = col.Name;
-                var savedName = pivot.CustomProperties.GetValue(col.UniqueId) ?? string.Empty;
-
-                if ((name != null || !string.IsNullOrEmpty(name)) && (col.Name.StartsWith("&") || col.Name.StartsWith("@") || savedName.StartsWith("@") || savedName.StartsWith("&")))
-                {
-                    name = savedName;
-                    col.Name = GetCustomLocalizedString(name.Substring(1));
-                }
-                IsNestedField(col, dataSourceName);
+                var key = item.UniqueId;
+                LocalizeName(getName: () => item.Name, setName: pvtItem => item.Name = pvtItem, getSaved: () => pivot.CustomProperties.GetValue(key), setSaved: pvtItem => pivot.CustomProperties.SetValue(key, pvtItem));
+                IsNestedField(item, dataSourceName);
             }
         }
 
@@ -798,16 +776,11 @@ namespace UnicontaClient.Pages.CustomPage
         /// </summary>
         void SetChartLabelValues(ChartDashboardItem chart, List<DataItem> targetLst, string dataSourceName)
         {
-            foreach (var col in targetLst)
+            foreach (var item in targetLst)
             {
-                var name = col.Name;
-                var savedName = chart.CustomProperties.GetValue(col.UniqueId) ?? string.Empty;
-
-                if ((name != null || !string.IsNullOrEmpty(name)) && (col.Name.StartsWith("&") || col.Name.StartsWith("@") || savedName.StartsWith("@") || savedName.StartsWith("&")))
-                {
-                    name = savedName;
-                    col.Name = GetCustomLocalizedString(name.Substring(1));
-                }
+                var key = item.UniqueId;
+                LocalizeName(getName: () => item.Name, setName: chtItem => item.Name = chtItem, getSaved: () => chart.CustomProperties.GetValue(key), setSaved: chtItem => chart.CustomProperties.SetValue(key, chtItem));
+                IsNestedField(item, dataSourceName);
             }
         }
 
@@ -827,17 +800,11 @@ namespace UnicontaClient.Pages.CustomPage
         /// </summary>
         void SetPieLabelValues(PieDashboardItem pie, List<DataItem> targetLst, string dataSourceName)
         {
-            foreach (var col in targetLst)
+            foreach (var item in targetLst)
             {
-                var name = col.Name;
-                var savedName = pie.CustomProperties.GetValue(col.UniqueId) ?? string.Empty;
-
-                if ((name != null || !string.IsNullOrEmpty(name)) && (col.Name.StartsWith("&") || col.Name.StartsWith("@") || savedName.StartsWith("@") || savedName.StartsWith("&")))
-                {
-                    name = savedName;
-                    col.Name = GetCustomLocalizedString(name.Substring(1));
-                }
-                IsNestedField(col, dataSourceName);
+                var key = item.UniqueId;
+                LocalizeName(getName: () => item.Name, setName: pieItem => item.Name = pieItem, getSaved: () => pie.CustomProperties.GetValue(key), setSaved: pieItem => pie.CustomProperties.SetValue(key, pieItem));
+                IsNestedField(item, dataSourceName);
             }
         }
 
@@ -846,17 +813,11 @@ namespace UnicontaClient.Pages.CustomPage
         /// </summary>
         void SetScatterChartLabelValues(ScatterChartDashboardItem sctChart, List<DataItem> targetLst, string dataSourceName)
         {
-            foreach (var col in targetLst)
+            foreach (var item in targetLst)
             {
-                var name = col.Name;
-                var savedName = sctChart.CustomProperties.GetValue(col.UniqueId) ?? string.Empty;
-
-                if ((name != null || !string.IsNullOrEmpty(name)) && (col.Name.StartsWith("&") || col.Name.StartsWith("@") || savedName.StartsWith("@") || savedName.StartsWith("&")))
-                {
-                    name = savedName;
-                    col.Name = GetCustomLocalizedString(name.Substring(1));
-                }
-                IsNestedField(col, dataSourceName);
+                var key = item.UniqueId;
+                LocalizeName(getName: () => item.Name, setName: scItem => item.Name = scItem, getSaved: () => sctChart.CustomProperties.GetValue(key), setSaved: scItem => sctChart.CustomProperties.SetValue(key, scItem));
+                IsNestedField(item, dataSourceName);
             }
         }
 
@@ -1304,6 +1265,99 @@ namespace UnicontaClient.Pages.CustomPage
             return Uniconta.ClientTools.Localization.lookup(keyString);
         }
 
+        /// <summary>
+        /// Localizes the names of the specified dimension column and its associated dimension.
+        /// </summary>
+        /// <param name="col">The dimension column whose name and associated dimension name will be localized. Cannot be null, and its
+        /// Dimension property must not be null.</param>
+        private void LocalizeDimensionColumn(GridDimensionColumn col)
+        {
+            if (col == null || col.Dimension == null)
+                return;
+
+            var key = col.Dimension.UniqueId;
+
+            //Dimension.Name
+            LocalizeName(getName: () => col.Dimension.Name, setName: dim => col.Dimension.Name = dim, getSaved: () => col.CustomProperties.GetValue(key), setSaved: dim => col.CustomProperties.SetValue(key, dim));
+
+            //Column.Name
+            LocalizeName(getName: () => col.Name, setName: c => col.Name = c, getSaved: () => col.CustomProperties.GetValue(key), setSaved: c => col.CustomProperties.SetValue(key, c));
+
+        }
+
+        /// <summary>
+        /// Localizes the names of the specified measure column and its associated measure, updating their display names
+        /// based on custom properties.
+        /// </summary>
+        /// <remarks>If the specified column or its associated measure is null, no action is taken. This
+        /// method updates both the column's name and the measure's name using values from the column's custom
+        /// properties, if available.</remarks>
+        /// <param name="col">The measure column whose name and associated measure name will be localized. Cannot be null, and must have a
+        /// non-null Measure property.</param>
+        private void LocalizeMeasureColumns(GridMeasureColumn col)
+        {
+            if (col == null || col.Measure == null)
+                return;
+
+            var key = col.Measure.UniqueId;
+
+            //Measure.Name
+            LocalizeName(getName: () => col.Measure.Name, setName: mea => col.Measure.Name = mea, getSaved: () => col.CustomProperties.GetValue(key), setSaved: mea => col.CustomProperties.SetValue(key, mea));
+
+            //Column.Name
+            LocalizeName(getName: () => col.Name, setName: c => col.Name = c, getSaved: () => col.CustomProperties.GetValue(key), setSaved: c => col.CustomProperties.SetValue(key, c));
+        }
+
+        /// <summary>
+        /// Updates a localized name property by retrieving, comparing, and setting its value based on localization key
+        /// conventions.
+        /// </summary>
+        /// <remarks>This method is intended for scenarios where name values are stored as localization
+        /// keys (typically prefixed) and need to be resolved to their localized equivalents. It ensures that the saved
+        /// value is updated only when necessary and that the name property reflects the correct localized string. The
+        /// method assumes that localization keys follow a specific format recognized by the Utility.IsLocalizationKey
+        /// method.</remarks>
+        /// <param name="getName">A function that returns the current name value to be localized. The returned string may be a localization
+        /// key or a plain value.</param>
+        /// <param name="setName">An action that sets the localized name value after processing. The provided string should be the final,
+        /// localized value.</param>
+        /// <param name="getSaved">A function that returns the previously saved name value, which may be used to determine if an update is
+        /// necessary. The returned object is converted to a string for comparison.</param>
+        /// <param name="setSaved">An action that sets the saved name value, typically to track the last processed localization key.</param>
+        private void LocalizeName(Func<string> getName, Action<string> setName, Func<object> getSaved, Action<string> setSaved)
+        {
+            var name = getName() ?? string.Empty;
+            var saved = (getSaved() ?? string.Empty).ToString();
+
+            if (string.IsNullOrEmpty(name))
+                return;
+
+            if (!(IsLocalizationKey(name) || IsLocalizationKey(saved)))
+                return;
+
+            if (getSaved() == null)
+                setSaved(name);
+            else if ((IsLocalizationKey(name)) && (IsLocalizationKey(saved)) && string.Compare(name, saved, StringComparison.OrdinalIgnoreCase) != 0)
+                setSaved(name);
+            else
+                name = saved;
+
+            if (IsLocalizationKey(name) && name.Length > 1)
+                setName(GetCustomLocalizedString(name.Substring(1)));
+
+        }
+
+        /// <summary>
+        /// Determines whether the specified string represents a localization key.
+        /// </summary>
+        /// <remarks>A localization key is identified by a leading '@' or '&' character. This method does
+        /// not validate the existence or format of the key beyond this prefix.</remarks>
+        /// <param name="s">The string to evaluate as a potential localization key. Can be null or empty.</param>
+        /// <returns>true if the string is not null or empty and begins with '@' or '&'; otherwise, false.</returns>
+        private bool IsLocalizationKey(string s)
+        {
+            return !string.IsNullOrEmpty(s) && (s.StartsWith("@", StringComparison.Ordinal) || s.StartsWith("&", StringComparison.Ordinal));
+        }
         #endregion
     }
 }

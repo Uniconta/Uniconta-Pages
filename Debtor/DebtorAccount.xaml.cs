@@ -1,21 +1,23 @@
-using Uniconta.API.Service;
-using UnicontaClient.Models;
-using UnicontaClient.Utilities;
-using Uniconta.ClientTools.DataModel;
-using Uniconta.ClientTools.Page;
-using Uniconta.ClientTools.Util;
-using Uniconta.Common;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Collections;
+using Uniconta.API.Service;
 using Uniconta.ClientTools.Controls;
+using Uniconta.ClientTools.DataModel;
+using Uniconta.ClientTools.Page;
+using Uniconta.ClientTools.Util;
+using Uniconta.Common;
+using Uniconta.Common.Enums;
 using Uniconta.Common.User;
 using Uniconta.Common.Utility;
+using Uniconta.WindowsAPI.ClientTools;
+using UnicontaClient.Models;
+using UnicontaClient.Utilities;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -331,6 +333,12 @@ namespace UnicontaClient.Pages.CustomPage
                 case "ValidateNemhandel":
                     ValidateFunctions(selectedItems, ActionType);
                     break;
+                case "VatNumberValidationService":
+                    ValidateFunctions(selectedItems, ActionType);
+                    break;
+                case "VatNumberValidationServiceLog":
+                    AddDockItem(TabControls.DebtorFieldLogPage, dgDebtorAccountGrid.syncEntity, true, "Log", null, new System.Windows.Point(100, 200));
+                    break;
 
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -357,14 +365,101 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 var selectedItemsArr = dgDebtorAccountGrid.SelectedItems.Cast<DebtorClient>().ToArray();
                 var msg = string.Format(Uniconta.ClientTools.Localization.lookup("MarkedControlFunction"), selectedItemsArr.Length);
-                var result = UnicontaMessageBox.Show(msg, Uniconta.ClientTools.Localization.lookup("Validate"), UnicontaMessageBox.YesNo, MessageBoxImage.Question);
+                var actionstr = actiontype == "ValidateNemhandel" ? "Nemhandel" : actiontype == "ValidateAddress" ? Uniconta.ClientTools.Localization.lookup("Address") : Uniconta.ClientTools.Localization.lookup("VatNumberValidationService");
+                var result = UnicontaMessageBox.Show(msg, string.Concat(Uniconta.ClientTools.Localization.lookup("Validate"), " (", actionstr, ")"), UnicontaMessageBox.YesNo, MessageBoxImage.Question);
                 if (result != UnicontaMessageBox.Yes)
                     return;
 
                 if (actiontype == "ValidateNemhandel")
                     AddDockItem(TabControls.DebtorNHRLookup, selectedItemsArr, null, null, true, null);
-                else
+                else if (actiontype == "ValidateAddress")
                     AddDockItem(TabControls.UpdateDebAddressViaCvr, selectedItemsArr, null, null, true, null, new[] { new BasePage.ValuePair(null, "Debtor") });
+                else if (actiontype == "VatNumberValidationService")
+                    VatNumberValidationService(selectedItemsArr);
+            }
+        }
+
+        async void VatNumberValidationService(IEnumerable<DebtorClient> debtors)
+        {
+            try
+            {
+                var previousContent = busyIndicator.BusyContent;
+
+                busyIndicator.IsBusy = true;
+                const int Grouping = 20;
+                int cntTotal = debtors.Count();
+                int cntPotential = 0;
+                int cntAll = 0; 
+                int cntRejected = 0;
+                int cntApproved = 0;
+                int cntNotApproved = 0;
+                int cntError = 0;
+                var lst2 = new List<DebtorClient>();
+                foreach (var debtor in debtors) 
+                {
+                    cntAll++;
+                    if ((debtor._Country == CountryCode.UnitedKingdom && debtor._EORI == null) || (debtor._Country != CountryCode.UnitedKingdom && 
+                        (debtor._LegalIdent == null || !Country2Language.IsEU(debtor._Country) || debtor._Country == api.CompanyEntity._CountryId)))
+                        cntRejected++;
+                    else
+                    {
+                        cntPotential++;
+                        lst2.Add(debtor);
+                    }
+                   
+                    if (lst2.Count > 0 && ((cntPotential % Grouping) == 0 || cntAll == cntTotal))
+                    {
+                        busyIndicator.BusyContent = string.Concat(Uniconta.ClientTools.Localization.lookup("Total"), ": ", cntTotal, Environment.NewLine,
+                                                                  Uniconta.ClientTools.Localization.lookup("Approved"), ": ", cntApproved, " ...", Environment.NewLine,
+                                                                  Uniconta.ClientTools.Localization.lookup("NotApproved"), ": ", cntNotApproved, " ...", Environment.NewLine,
+                                                                  Uniconta.ClientTools.Localization.lookup("Error"), ": ", cntError, " ...", Environment.NewLine,
+                                                                  Uniconta.ClientTools.Localization.lookup("Rejected"), ": ", cntRejected, " ...");
+
+                        var viesReportLst = await VIES.CheckVatApprox(lst2, api);
+                        if (viesReportLst == null || viesReportLst.Count == 1 && viesReportLst[0].FaultCode == VIES.UC_FAULTCODE_GENERALERROR)
+                        {
+                            busyIndicator.IsBusy = false;
+                            busyIndicator.BusyContent = previousContent;
+                            UnicontaMessageBox.Show(viesReportLst?[0].FaultString ?? Uniconta.ClientTools.Localization.lookup("NoSucces"), Uniconta.ClientTools.Localization.lookup("Error"), MessageBoxButton.OK);
+                            return;
+                        }
+
+                        foreach (var x in viesReportLst)
+                        {
+                            if (x.FaultString != null)
+                            {
+                                cntError++;
+                                continue;
+                            }
+
+                            if (x.IsValid)
+                                cntApproved++;
+                            else
+                                cntNotApproved++;
+                        }
+                        lst2.Clear();
+                    }
+                }
+                busyIndicator.IsBusy = false;
+                busyIndicator.BusyContent = previousContent;
+
+                var sb = StringBuilderReuse.Create(Uniconta.ClientTools.Localization.lookup("VatNumberValidationService")).AppendLine().AppendLine().
+
+                Append(string.Concat(Uniconta.ClientTools.Localization.lookup("Total"), ": ", cntTotal)).AppendLine().
+                Append(string.Concat(Uniconta.ClientTools.Localization.lookup("Approved"), ": ", cntApproved)).AppendLine().
+                Append(string.Concat(Uniconta.ClientTools.Localization.lookup("NotApproved"), ": ", cntNotApproved));
+                if (cntError > 0)
+                    sb.AppendLine().Append(string.Concat(Uniconta.ClientTools.Localization.lookup("Error"), ": ", cntError));
+                if (cntRejected > 0)
+                    sb.AppendLine().Append(string.Concat(Uniconta.ClientTools.Localization.lookup("Rejected"), ": ", cntRejected));
+
+                UnicontaMessageBox.Show(sb.ToStringAndRelease(), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OK);
+            }
+            catch (Exception ex)
+            {
+                busyIndicator.IsBusy = false;
+                UnicontaMessageBox.Show(ex.Message, Uniconta.ClientTools.Localization.lookup("Exception"), MessageBoxButton.OK);
+                return;
             }
         }
 

@@ -35,11 +35,7 @@ namespace UnicontaClient.Pages.CustomPage.Maintenance
 
 
             lookupNumberserie.api = api;
-#if !SILVERLIGHT
             this.Title = Uniconta.ClientTools.Localization.lookup("Primo");
-#else
-            Utility.SetThemeBehaviorOnChildWindow(this);
-#endif
             txtBalance.Text = financeYearClient.BalanceName;
             txtPL.Text = financeYearClient.PLText;
             txtVoucher.Text = Convert.ToString(financeYearClient.Voucher);

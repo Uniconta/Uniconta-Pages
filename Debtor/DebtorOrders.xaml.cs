@@ -432,6 +432,8 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     if (reload)
                         await api.UpdateCache(new[] { typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.Contact) });
+                    else
+                        await api.UpdateCache();
                 }
             }
             if (refresh)

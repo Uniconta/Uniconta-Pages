@@ -168,12 +168,21 @@ namespace UnicontaClient.Pages.CustomPage
                         AddDockItem(TabControls.DebtorTransCollectPage, dgDebtorTran.syncEntity, header);
                     }
                     break;
+                case "RemoveExchangeRate":
+                    if (selectedItem != null)
+                        RemoveExchangeRate(selectedItem);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
-
+        async void RemoveExchangeRate(DebtorTransClient trans)
+        {
+            var transAPI = new Uniconta.API.DebtorCreditor.TransactionAPI(api);
+            var err = await transAPI.ExchangeTransRemove(trans);
+            UtilDisplay.ShowErrorCode(err);
+        }
         async private void JournalPosted(DebtorTransClient selectedItem)
         {
             var result = await api.Query(new GLDailyJournalPostedClient(), new UnicontaBaseEntity[] { selectedItem }, null);
@@ -321,7 +330,7 @@ namespace UnicontaClient.Pages.CustomPage
             var isInitializedSuccess = await debtorInvoicePrint.InstantiateFields();
             if (isInitializedSuccess)
             {
-                var standardDebtorInvoice = new DebtorInvoiceReportClient(debtorInvoicePrint.Company, debtorInvoicePrint.Debtor, debtorInvoicePrint.DebtorInvoice, debtorInvoicePrint.InvTransInvoiceLines, debtorInvoicePrint.DebtorOrder,
+                var standardDebtorInvoice = new DebtorInvoiceReportClient(debtorInvoicePrint.Company, debtorInvoicePrint.Debtor, debtorInvoicePrint.DebtorInvoice, debtorInvoicePrint.DebtorInvoiceLines, debtorInvoicePrint.DebtorOrder,
                     debtorInvoicePrint.CompanyLogo, debtorInvoicePrint.ReportName, isCreditNote: debtorInvoicePrint.IsCreditNote, messageClient: debtorInvoicePrint.MessageClient);
 
                 iprintReport = new StandardPrintReport(crudapi, new[] { standardDebtorInvoice }, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.Invoice) { UseReportCache = true };
@@ -348,7 +357,7 @@ namespace UnicontaClient.Pages.CustomPage
             var isInitializedSuccess = await creditorInvoicePrint.InstantiateFields();
             if (isInitializedSuccess)
             {
-                var standardCreditorInvoice = new CreditorStandardReportClient(creditorInvoicePrint.Company, creditorInvoicePrint.Creditor, creditorInvoicePrint.CreditorInvoice, creditorInvoicePrint.InvTransInvoiceLines, creditorInvoicePrint.CreditorOrder,
+                var standardCreditorInvoice = new CreditorStandardReportClient(creditorInvoicePrint.Company, creditorInvoicePrint.Creditor, creditorInvoicePrint.CreditorInvoice, creditorInvoicePrint.CreditorInvoiceLines, creditorInvoicePrint.CreditorOrder,
                     creditorInvoicePrint.CompanyLogo, creditorInvoicePrint.ReportName, (int)Uniconta.ClientTools.Controls.Reporting.StandardReports.PurchaseInvoice, creditorInvoicePrint.CreditorMessage, creditorInvoicePrint.IsCreditNote);
 
                 iprintReport = new StandardPrintReport(crudApi, new[] { standardCreditorInvoice }, (byte)Uniconta.ClientTools.Controls.Reporting.StandardReports.PurchaseInvoice) { UseReportCache = true };

@@ -548,7 +548,8 @@ namespace UnicontaISO20022CreditTransfer
                         break;
 
                     case PaymentTypes.PaymentMethod4: //FIK73
-                        remittanceInfo = string.Empty;
+                        if (remittanceInfo.Length > 20)
+                            remittanceInfo = remittanceInfo.Substring(0, 20); //Nordea er det et krav
                         break;
 
                     case PaymentTypes.PaymentMethod6: //FIK04
@@ -595,10 +596,24 @@ namespace UnicontaISO20022CreditTransfer
             switch (companyBankEnum)
             {
                 case CompanyBankENUM.Nordea_DK:
-                    maxLines = 10;
-                    maxStrLen = 140;
                     if (trans._PaymentMethod == PaymentTypes.PaymentMethod6 || trans._PaymentMethod == PaymentTypes.PaymentMethod3) //Not allowed for FIK71 and Giro04 
                         return resultList;
+
+                    if (ISOPaymType == ISO20022PaymentTypes.DOMESTIC)
+                    {
+                        maxLines = 10;
+                        maxStrLen = 140;
+                    }
+                    else if (ISOPaymType == ISO20022PaymentTypes.SEPA)
+                    {
+                        maxLines = 1;
+                        maxStrLen = 140;
+                    }
+                    else
+                    {
+                        maxLines = 1;
+                        maxStrLen = 105;
+                    }
                     break;
 
                 case CompanyBankENUM.Handelsbanken:
@@ -616,8 +631,16 @@ namespace UnicontaISO20022CreditTransfer
                 case CompanyBankENUM.BankData:
                 case CompanyBankENUM.BEC:
                 case CompanyBankENUM.SDC:
-                    maxLines = 5;
-                    maxStrLen = 35;
+                    if (ISOPaymType == ISO20022PaymentTypes.DOMESTIC)
+                    {
+                        maxLines = 41;
+                        maxStrLen = 35;
+                    }
+                    else
+                    {
+                        maxLines = 4;
+                        maxStrLen = 35;
+                    }
                     break;
 
                 default:

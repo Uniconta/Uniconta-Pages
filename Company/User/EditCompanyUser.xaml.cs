@@ -1,3 +1,4 @@
+using DevExpress.Utils.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +20,7 @@ using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using Uniconta.Common.User;
 using Uniconta.DataModel;
+using Uniconta.DirectDebitPayment.NETS.LS;
 using UnicontaClient.Models;
 
 using UnicontaClient.Pages;
@@ -35,7 +37,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override Type TableType { get { return typeof(CompanyUserAccessClient); } }
         public override string NameOfControl { get { return TabControls.EditCompanyUser.ToString(); } }
         public override UnicontaBaseEntity ModifiedRow { get { return editrow; } set { editrow = (CompanyUserAccessClient)value; } }
-        public EditCompanyUser(UnicontaBaseEntity sourcedata, bool IsEdit) :  base(sourcedata, IsEdit)
+        public EditCompanyUser(UnicontaBaseEntity sourcedata, bool IsEdit) : base(sourcedata, IsEdit)
         {
             InitializeComponent();
             layoutControl = layoutItems;
@@ -50,6 +52,14 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void frmRibbon_OnItemClicked(string ActionType)
         {
+            if (ActionType == "Save")
+            {
+                if (api.session.User._Role == (byte)UserRoles.Accountant && cbProfile.SelectedIndex == 2)
+                {
+                    UtilDisplay.ShowErrorCode(ErrorCodes.NoRights);
+                    return;
+                }
+            }
             frmRibbon_BaseActions(ActionType);
         }
 
@@ -73,7 +83,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void cbProfile_SelectedIndexChanged(object sender, RoutedEventArgs e)
         {
             if (cbProfile.SelectedIndex == -1)
-            return;
+                return;
             var index = cbProfile.SelectedIndex;
             var profile = (FixedProfiles)index;
             editrow._Rights = AccessLevel.SetFixedProfile(editrow._Rights, profile);
