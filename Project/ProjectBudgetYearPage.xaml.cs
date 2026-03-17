@@ -367,12 +367,12 @@ namespace UnicontaClient.Pages.CustomPage
             foreach (var group in groupedOriginal)
             {
                 var aList = _ProjectBudgetYearClients.Where(a =>
-                        a.Project == group.Key.Project &&
-                        a.Employee == group.Key.Employee &&
-                        a.PayrollCategory == group.Key.PayrollCategory &&
-                        a.PrCategory == group.Key.PrCategory &&
-                        a.WorkSpace == group.Key.WorkSpace &&
-                        a.Task == group.Key.Task).ToList();
+                       a.Project == group.Key.Project &&
+                       a.Employee == group.Key.Employee &&
+                       a.PayrollCategory == group.Key.PayrollCategory &&
+                       a.PrCategory == group.Key.PrCategory &&
+                       a.WorkSpace == group.Key.WorkSpace &&
+                       a.Task == group.Key.Task).ToList();
 
                 if (aList.Count == 0)
                     continue; 
@@ -646,9 +646,9 @@ namespace UnicontaClient.Pages.CustomPage
 
         async private Task SetBudgetGroup()
         {
-            budgetGroups = budgetGroups ?? await api.LoadCache(typeof(Uniconta.DataModel.ProjectBudgetGroup)).ConfigureAwait(false);
-
-            if (budgetGroups != null && cmbProjectBudgetGroup.SelectedItem == null)
+            budgetGroups = budgetGroups ?? await api.LoadCache(typeof(Uniconta.DataModel.ProjectBudgetGroup));
+            cmbProjectBudgetGroup.ItemsSource = budgetGroups;
+            if (budgetGroups != null && cmbProjectBudgetGroup?.SelectedItem == null)
             {
                 if (string.IsNullOrEmpty(defaultBudgetGroup))
                     budgetGrpMaster = ((ProjectBudgetGroup[])budgetGroups?.GetRecords)?.Where(x => x._Default == true)?.FirstOrDefault();
@@ -849,6 +849,12 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (this.priceLookup == null)
                 priceLookup = new Uniconta.API.Project.FindPricesEmpl(api);
+        }
+        protected override Task<ErrorCodes> saveGrid()
+        {
+            var t = base.saveGrid();
+            SaveBudgetYear();
+            return t;
         }
     }
 }

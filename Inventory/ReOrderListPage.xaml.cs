@@ -363,13 +363,30 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "MoveFromWarehouse":
                     dgReOrderList.SelectedItem = null;
-                    CwMoveBtwWareHouse cwJournal = new CwMoveBtwWareHouse(api);
-                    cwJournal.Closed += delegate
                     {
-                        if (cwJournal.DialogResult == true)
-                            MoveBetweenWarehouse(cwJournal.InvJournal, cwJournal.Warehouse, cwJournal.Location);
-                    };
-                    cwJournal.Show();
+                        CwMoveBtwWareHouse cwJournal = new CwMoveBtwWareHouse(api);
+                        cwJournal.Closed += delegate
+                        {
+                            if (cwJournal.DialogResult == true)
+                                MoveBetweenWarehouse(cwJournal.InvJournal, cwJournal.Warehouse, cwJournal.Location);
+                        };
+                        cwJournal.Show();
+                    }
+                    break;
+                case "CreateTransferOrder":
+                    dgReOrderList.SelectedItem = null;
+                    {
+                        CwMoveBtwWareHouse cwJournal = new CwMoveBtwWareHouse(api)
+                        {
+                            ShowJournal = false
+                        };
+                        cwJournal.Closed += delegate
+                        {
+                            if (cwJournal.DialogResult == true)
+                                CreateTransferOrder(cwJournal.Warehouse, cwJournal.Location);
+                        };
+                        cwJournal.Show();
+                    }
                     break;
                 case "Storage":
                     AddDockItem(TabControls.InvItemStoragePage, dgReOrderList.syncEntity, true);
@@ -947,21 +964,23 @@ namespace UnicontaClient.Pages.CustomPage
                                     continue;
                             }
 
-                            var orderLine = new CreditorOrderLineClient();
-                            orderLine._LineNumber = ++line;
-                            orderLine._Item = item._Item;
-                            orderLine._Variant1 = item._Variant1;
-                            orderLine._Variant2 = item._Variant2;
-                            orderLine._Variant3 = item._Variant3;
-                            orderLine._Variant4 = item._Variant4;
-                            orderLine._Variant5 = item._Variant5;
-                            orderLine._Warehouse = item._Warehouse;
-                            orderLine._Location = item._Location;
-                            orderLine._Qty = item._Quantity;
+                            var orderLine = new CreditorOrderLineClient
+                            {
+                                _LineNumber = ++line,
+                                _Item = item._Item,
+                                _Variant1 = item._Variant1,
+                                _Variant2 = item._Variant2,
+                                _Variant3 = item._Variant3,
+                                _Variant4 = item._Variant4,
+                                _Variant5 = item._Variant5,
+                                _Warehouse = item._Warehouse,
+                                _Location = item._Location,
+                                _Qty = item._Quantity,
+                                _Storage = defaultStorage,
+                                _DiscountPct = creditor._LineDiscountPct
+                            };
                             if (_InvoiceUseQtyNowCre)
                                 orderLine._QtyNow = orderLine._Qty;
-                            orderLine._Storage = defaultStorage;
-                            orderLine._DiscountPct = creditor._LineDiscountPct;
                             if (item._Project != null)
                             {
                                 orderLine._Project = item._Project;
@@ -1034,6 +1053,11 @@ namespace UnicontaClient.Pages.CustomPage
 
                 var ord = this.CreateGridObject(typeof(ProductionOrderClient)) as ProductionOrderClient;
                 ord.SetMaster(rec);
+                ord._Variant1 = rec._Variant1;
+                ord._Variant2 = rec._Variant2;
+                ord._Variant3 = rec._Variant3;
+                ord._Variant4 = rec._Variant4;
+                ord._Variant5 = rec._Variant5;
                 ord._OurRef = dfltProductionOrder._OurRef;
                 ord._Remark = dfltProductionOrder._Remark;
                 ord._Group = dfltProductionOrder._Group;
@@ -1073,24 +1097,26 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (item._Quantity > 0 && item._ItemType == (byte)Uniconta.DataModel.ItemType.ProductionBOM)
                 {
-                    var journalLine = new InvJournalLine();
-                    journalLine._MovementType = Uniconta.DataModel.InvMovementType.ReportAsFinished;
-                    journalLine._Item = item._Item;
-                    journalLine._Variant1 = item._Variant1;
-                    journalLine._Variant2 = item._Variant2;
-                    journalLine._Variant3 = item._Variant3;
-                    journalLine._Variant4 = item._Variant4;
-                    journalLine._Variant5 = item._Variant5;
-                    journalLine._Warehouse = item._Warehouse;
-                    journalLine._Location = item._Location;
-                    journalLine._CostPrice = item._CostPrice;
-                    journalLine._Qty = item._Quantity;
+                    var journalLine = new InvJournalLine
+                    {
+                        _MovementType = Uniconta.DataModel.InvMovementType.ReportAsFinished,
+                        _Item = item._Item,
+                        _Variant1 = item._Variant1,
+                        _Variant2 = item._Variant2,
+                        _Variant3 = item._Variant3,
+                        _Variant4 = item._Variant4,
+                        _Variant5 = item._Variant5,
+                        _Warehouse = item._Warehouse,
+                        _Location = item._Location,
+                        _CostPrice = item._CostPrice,
+                        _Qty = item._Quantity,
+                        _Dim1 = invJournal._Dim1,
+                        _Dim2 = invJournal._Dim2,
+                        _Dim3 = invJournal._Dim3,
+                        _Dim4 = invJournal._Dim4,
+                        _Dim5 = invJournal._Dim5
+                    };
                     journalLine.SetMaster(invJournal);
-                    journalLine._Dim1 = invJournal._Dim1;
-                    journalLine._Dim2 = invJournal._Dim2;
-                    journalLine._Dim3 = invJournal._Dim3;
-                    journalLine._Dim4 = invJournal._Dim4;
-                    journalLine._Dim5 = invJournal._Dim5;
                     invJournalLineList.Add(journalLine);
                 }
             }
@@ -1115,14 +1141,24 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (item._Quantity > 0d)
                 {
-                    var journalLine = new InvJournalLine();
-                    journalLine._MovementType = Uniconta.DataModel.InvMovementType.Project; // this is a warehouse movement in journal
-                    journalLine._Item = item._Item;
-                    journalLine._Variant1 = item._Variant1;
-                    journalLine._Variant2 = item._Variant2;
-                    journalLine._Variant3 = item._Variant3;
-                    journalLine._Variant4 = item._Variant4;
-                    journalLine._Variant5 = item._Variant5;
+                    var journalLine = new InvJournalLine
+                    {
+                        _MovementType = Uniconta.DataModel.InvMovementType.Project, // this is a warehouse movement in journal
+                        _Item = item._Item,
+                        _Variant1 = item._Variant1,
+                        _Variant2 = item._Variant2,
+                        _Variant3 = item._Variant3,
+                        _Variant4 = item._Variant4,
+                        _Variant5 = item._Variant5,
+                        _Dim1 = invJournal._Dim1,
+                        _Dim2 = invJournal._Dim2,
+                        _Dim3 = invJournal._Dim3,
+                        _Dim4 = invJournal._Dim4,
+                        _Dim5 = invJournal._Dim5,
+                        _WarehouseTo = item._Warehouse,
+                        _LocationTo = item._Location,
+                        _Qty = item._Quantity  // move from and to is always positive.
+                    };
 
                     if (FromWarehouse != null)
                     {
@@ -1138,15 +1174,7 @@ namespace UnicontaClient.Pages.CustomPage
                             journalLine._Location = itm._Location;
                         }
                     }
-                    journalLine._WarehouseTo = item._Warehouse;
-                    journalLine._LocationTo = item._Location;
-                    journalLine._Qty = item._Quantity;  // move from and to is always positive.
                     journalLine.SetMaster(invJournal);
-                    journalLine._Dim1 = invJournal._Dim1;
-                    journalLine._Dim2 = invJournal._Dim2;
-                    journalLine._Dim3 = invJournal._Dim3;
-                    journalLine._Dim4 = invJournal._Dim4;
-                    journalLine._Dim5 = invJournal._Dim5;
                     invJournalLineList.Add(journalLine);
                 }
             }
@@ -1158,6 +1186,58 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 api.AllowBackgroundCrud = true;
                 result = await api.Insert(invJournalLineList);
+            }
+            UtilDisplay.ShowErrorCode(result);
+        }
+
+        async void CreateTransferOrder(string FromWarehouse, string FromLocation)
+        {
+            var mainList = dgReOrderList.GetVisibleRows() as IEnumerable<ReOrderListPageGridClient>;
+            var invJournalLineList = new List<InvTransferOrderLine>();
+            foreach (var item in mainList)
+            {
+                if (item._Quantity > 0d)
+                {
+                    var journalLine = new InvTransferOrderLine
+                    {
+                        _Item = item._Item,
+                        _Variant1 = item._Variant1,
+                        _Variant2 = item._Variant2,
+                        _Variant3 = item._Variant3,
+                        _Variant4 = item._Variant4,
+                        _Variant5 = item._Variant5,
+                        _Warehouse = item._Warehouse,
+                        _Location = item._Location,
+                        _Qty = item._Quantity  // move from and to is always positive.
+                    };
+
+                    if (FromWarehouse != null)
+                    {
+                        journalLine._WarehouseFrom = FromWarehouse;
+                        journalLine._LocationFrom = FromLocation;
+                    }
+                    else
+                    {
+                        var itm = (InvItem)this.items.Get(item._Item);
+                        if (itm != null)
+                        {
+                            journalLine._WarehouseFrom = itm._Warehouse;
+                            journalLine._LocationFrom = itm._Location;
+                        }
+                    }
+                    invJournalLineList.Add(journalLine);
+                }
+            }
+
+            ErrorCodes result;
+            if (invJournalLineList.Count == 0)
+                result = ErrorCodes.NoLinesFound;
+            else
+            {
+                var ord = this.CreateGridObject(typeof(InvTransferOrderClient)) as InvTransferOrderClient;
+                ord._WarehouseFrom = FromWarehouse;
+                api.AllowBackgroundCrud = true;
+                result = await api.Insert(ord, invJournalLineList);
             }
             UtilDisplay.ShowErrorCode(result);
         }

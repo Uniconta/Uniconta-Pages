@@ -53,11 +53,19 @@ namespace UnicontaClient.Pages.CustomPage
                 ribbonControl.DisableButtons("ShowLog");
 
             }
+#if MAC_APPSTORE
+            { 
+#else
             if (api.CompanyEntity._Country != (byte)CountryCode.Germany)
             {
+#endif
                 RibbonBase rb = (RibbonBase)localMenu.DataContext;
                 if (rb != null)
+#if MAC_APPSTORE
+                    UtilDisplay.RemoveMenuCommand(rb, new string[] { "Upload", "DatevVerbinden", "ConnectedApplications" });
+#else
                     UtilDisplay.RemoveMenuCommand(rb, new string[] { "Upload", "DatevVerbinden", "ConnectedApplications", "ShowLog" });
+#endif
             }
             if (DatevDetails.AccessToken != null && DatevDetails.Tokenvalidto > DateTime.Now)
             {
@@ -162,28 +170,6 @@ namespace UnicontaClient.Pages.CustomPage
                                 else
                                     break;
                             FilUpload(selectedItem, false);
-                            break;
-                        }
-                        else
-                            break;
-                    }
-                    else
-                        UnicontaMessageBox.Show("Der DATEV Zugangstoken ist ungültig oder abgelaufen", "Fehler", MessageBoxButton.OK);
-                    break;
-                case "UploadOld":
-                    if (!string.IsNullOrEmpty(DatevDetails.AccessToken) && DatevDetails.Tokenvalidto > DateTime.Now)
-                    {
-                        if (UnicontaMessageBox.Show(String.Format("Möchten Sie {0:d} - {1:d} Version {3} ({2}) zu DATEV hochladen?", selectedItem._FromDate, selectedItem._ToDate, selectedItem.Comment, selectedItem._SuppVersion), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.YesNoCancel) == MessageBoxResult.Yes)
-                        {
-                            if ((!string.IsNullOrEmpty(selectedItem._SendToDatevDOC)) || (!string.IsNullOrEmpty(selectedItem.SendToDatevEXTF)))
-                                if (UnicontaMessageBox.Show(String.Format("Sie haben {0:d} - {1:d} Version {3} ({2}) bereits zu DATEV hochgeladen. Möchten Sie noch einmal hochladen?", selectedItem._FromDate, selectedItem._ToDate, selectedItem.Comment, selectedItem._SuppVersion), Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-                                {
-                                    FilUpload(selectedItem, true);
-                                    break;
-                                }
-                                else
-                                    break;
-                            FilUpload(selectedItem, true);
                             break;
                         }
                         else

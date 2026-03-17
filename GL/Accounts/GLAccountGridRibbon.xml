@@ -27,10 +27,10 @@
       <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16" ShortcutKey=""/>
     </RibbonItem>
   </RibbonItem>
-  <RibbonItem>
-     <RibbonItem Action="AllocationAccounts" LocalizedNameKey="AllocAndAccruals" LargeGlyph="Setup-allocation-32x32">
-     </RibbonItem>
-    <RibbonItem Action="Budget" LocalizedNameKey="Budget" ControlName="GLBudgetLinePage" LargeGlyph="Budget_32x32"/>
+	<RibbonItem LocalizedNameKey="Relations">
+    <RibbonItem Action="AllocationAccounts" LocalizedNameKey="AllocAndAccruals" LargeGlyph="Setup-allocation-32x32"/>
+	<RibbonItem Action="SettleTran" LocalizedNameKey="SettleTran" LargeGlyph="Settled_Transaction_32x32"/>
+	<RibbonItem Action="Budget" LocalizedNameKey="Budget" ControlName="GLBudgetLinePage" LargeGlyph="Budget_32x32"/>
     <RibbonItem Module="Attachments" LocalizedNameKey="Attachments" LargeGlyph="Attachments_32x32">
       <RibbonItem Action="AddNote" ShortcutKey="Alt+N" ControlName="UserNotesPage" LocalizedNameKey="Note" Glyph="Note_16x16" />
       <RibbonItem Action="AddDoc" LocalizedNameKey="Document" ControlName="UserDocsPage" Glyph="Document_Attachment_16x16" />
@@ -40,14 +40,11 @@
     <RibbonItem Action="GLTran" LocalizedNameKey="AccountStatement" ControlName="TransactionReport" LargeGlyph="Account-statement_32x32" />
     <RibbonItem Action="Trans" LocalizedNameKey="Transactions" ControlName="AccountsTransaction" LargeGlyph="Posted_Transaction_32x32" ShortcutKey="CTRL+T" />
     <RibbonItem Action="GLTransSum" LocalizedNameKey="AccountTotals" ControlName="GLTransSumClientPage"  LargeGlyph="Validate_Add_32x32" />
-    <RibbonItem Action="SettleTran" LocalizedNameKey="SettleTran" LargeGlyph="Settled_Transaction_32x32"/>
-  </RibbonItem>
-  <RibbonItem>
-    <RibbonItem Action="VatOnClient" LocalizedNameKey="VATprDC" ControlName="VatOnClientsReport" LargeGlyph="VAT_32x32"/>
+	<RibbonItem Action="VatOnClient" LocalizedNameKey="VATprDC" ControlName="VatOnClientsReport" LargeGlyph="VAT_32x32"/>
   </RibbonItem>
   <RibbonItem TabId="1" TabHeader="EditAll" LocalizedNameKey="Add">
-    <RibbonItem Action="EditAll"  LocalizedNameKey="EditAll" Glyph="Edit_16x16" LargeGlyph="Edit_32x32"/>
-    <RibbonItem Action="AddRow"  LocalizedNameKey="AddOBJ" Parameter="LedgerAccount" Glyph="Add_16x16" LargeGlyph="Add_32x32"/>
+    <RibbonItem Action="EditAll" LocalizedNameKey="EditAll" Glyph="Edit_16x16" LargeGlyph="Edit_32x32"/>
+    <RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="LedgerAccount" Glyph="Add_16x16" LargeGlyph="Add_32x32"/>
     <RibbonItem Action="CopyRow" LocalizedNameKey="CopyOBJ" Parameter="LedgerAccount" LargeGlyph="Copy_32x32"/>
   </RibbonItem>
   <RibbonItem>

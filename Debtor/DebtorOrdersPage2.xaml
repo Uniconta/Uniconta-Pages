@@ -267,7 +267,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrdersPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="Split" x:Name="liSplit">
                         <CorasauControls:LookupEditor x:Name="leSplit" EditValue="{Binding Split,Mode=TwoWay}"  />
                     </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="SplitFromDate " x:Name="liSplitFromDate">
+                    <CorasauControls:CorasauLayoutItem FieldName="SplitFromDate" x:Name="liSplitFromDate">
                         <CorasauControls:DateEditor x:Name="leSplitFromDate" EditValue="{Binding SplitFromDate,Mode=TwoWay}"  />
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="UpdatingItems" x:Name="liUpdatingItems">

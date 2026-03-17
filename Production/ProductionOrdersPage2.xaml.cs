@@ -122,6 +122,8 @@ namespace UnicontaClient.Pages.CustomPage
             StartLoadCache();
         }
 
+        public override CorasauRibbonControl RibbonControl => frmRibbon;
+
         protected override void OnLayoutCtrlLoaded()
         {
             AdjustLayout();

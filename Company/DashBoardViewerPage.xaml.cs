@@ -271,10 +271,8 @@ namespace UnicontaClient.Pages.CustomPage
                 //loading the localized labels from xml
                 dashboardLocalizationLabels = DashboardCommon.ConvertXmlForLocalization(data.Element(DashboardCommon.LOCALIZATION_LABELS));
 
-                if (dashboardLocalizationLabels != null)
-                    CriteriaOperator.RegisterCustomFunction(new GetConditionalLocalizeFunction(dashboardLocalizationLabels, (Language)session.User._Language));
-                else
-                    CriteriaOperator.RegisterCustomFunction(new GetConditionalLocalizeFunction());
+                DashboardCommon.CurrentContext.GetCustomizedLabel = (key) => GetCustomLocalizedString(key);
+
                 #endregion
             }
             else
@@ -741,6 +739,7 @@ namespace UnicontaClient.Pages.CustomPage
             dState = new DashboardState();
             company = api.CompanyEntity;
             CriteriaOperator.RegisterCustomFunction(new DashBoardView.ExchangeRateFunction(new CrudAPI(api)));
+            CriteriaOperator.RegisterCustomFunction(new DashBoardView.GetConditionalLocalizeFunction());
             InitializeComponent();
             this.BusyIndicator = busyIndicator;
             dashboardViewerUniconta.ObjectDataSourceLoadingBehavior = DevExpress.DataAccess.DocumentLoadingBehavior.LoadAsIs;

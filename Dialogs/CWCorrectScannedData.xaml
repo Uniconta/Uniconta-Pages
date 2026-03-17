@@ -2,8 +2,8 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
-    MinHeight="520"
-    MinWidth="780"
+    Height="800"
+    Width="1100"
     ShowIcon="False">
     <CorasauControls:BusyIndicator x:Name="busyIndicator">
         <Grid Background="{StaticResource LayoutGridColor}">
@@ -12,6 +12,27 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
+
+            <!-- Toast notification overlay -->
+            <Border x:Name="ToastBorder"
+                Grid.Row="0"
+                Grid.RowSpan="3"
+                VerticalAlignment="Bottom"
+                HorizontalAlignment="Center"
+                Margin="0,0,0,70"
+                Padding="16,10"
+                CornerRadius="6"
+                Background="#CC1A1A1A"
+                Visibility="Collapsed"
+                Panel.ZIndex="100"
+                IsHitTestVisible="False">
+                    <TextBlock x:Name="ToastText"
+                        Foreground="White"
+                        FontSize="13"
+                        TextWrapping="Wrap"
+                        MaxWidth="420"
+                        TextAlignment="Center" />
+            </Border>
 
             <!--  ====== MAIN: Left extraction / Right document ======  -->
             <Grid Grid.Row="0" Margin="10">
@@ -88,7 +109,7 @@
                                             Focusable="False"
                                             BorderThickness="0"
                                             Background="Transparent"
-                                            Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}" />
+                                            Text="{Binding CorrectedValue, UpdateSourceTrigger=PropertyChanged}" />
                                     </Grid>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
@@ -116,32 +137,40 @@
                             </ToolTip>
                         </Grid.ToolTip>
 
-                        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-                            <ItemsControl x:Name="PdfPagesItems">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <StackPanel Orientation="Vertical" />
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
+                        <ScrollViewer x:Name="DocScroll"
+                            HorizontalScrollBarVisibility="Auto"
+                            VerticalScrollBarVisibility="Auto"
+                            PreviewMouseWheel="DocScroll_PreviewMouseWheel">
+                            <Grid x:Name="ZoomHost" RenderTransformOrigin="0,0">
+                                <Grid.LayoutTransform>
+                                    <ScaleTransform x:Name="ZoomTransform" ScaleX="1" ScaleY="1" />
+                                </Grid.LayoutTransform>
+                                <ItemsControl x:Name="PdfPagesItems">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Vertical" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
 
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border Margin="0,0,0,12">
-                                            <Grid>
-                                                <Image x:Name="PageImage"
-                                                    Source="{Binding Image}"
-                                                    Stretch="Uniform"
-                                                    SnapsToDevicePixels="True" />
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Margin="0,0,0,12">
+                                                <Grid>
+                                                    <Image x:Name="PageImage"
+                                                        Source="{Binding Image}"
+                                                        Stretch="Uniform"
+                                                        SnapsToDevicePixels="True" />
 
-                                                <Canvas x:Name="OverlayCanvas"
-                                                    Background="Transparent"
-                                                    IsHitTestVisible="True"
-                                                    MouseLeftButtonDown="OverlayCanvas_MouseLeftButtonDown" />
-                                            </Grid>
-                                        </Border>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
+                                                    <Canvas x:Name="OverlayCanvas"
+                                                        Background="Transparent"
+                                                        IsHitTestVisible="True"
+                                                        MouseLeftButtonDown="OverlayCanvas_MouseLeftButtonDown" />
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Grid>
                         </ScrollViewer>
                     </Grid>
                 </Border>
@@ -186,11 +215,13 @@
                         <Button x:Name="SaveButton"
                             Content="Save"
                             Width="90"
+                            IsDefault="True"
                             Click="SaveButton_Click" />
                         <Button x:Name="CancelButton"
                             Content="Cancel"
                             Width="90"
                             Margin="6,0,0,0"
+                            IsCancel="True"
                             Click="CancelButton_Click" />
                     </StackPanel>
                 </Grid>

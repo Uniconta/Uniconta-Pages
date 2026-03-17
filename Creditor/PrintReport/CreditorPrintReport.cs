@@ -23,7 +23,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         public CreditorClient Creditor { get; private set; }
         public CreditorInvoiceClient CreditorInvoice { get { return PrintHeader; } }
-        public InvTransInvoice[] CreditorInvoiceLines { get { return PrintLines; } } 
+        public InvTransInvoice[] CreditorInvoiceLines { get { return InvTransInvoiceLines; } } 
         public string ReportName { get; private set; }
         public CreditorOrderClient CreditorOrder { get; private set; }
         public bool IsCreditNote { get; private set; }

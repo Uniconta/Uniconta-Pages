@@ -16,7 +16,6 @@
     <RibbonItem Action="DatevHeader" LocalizedNameKey="DatevHeader" LargeGlyph="CreateExit_32x32"/>
     <RibbonItem Action="DatevVerbinden" LocalizedNameKey="HideOBJ"  Parameter="Green" LargeGlyph="datevconnectb"/>
     <RibbonItem Action="Upload" LocalizedNameKey="Upload" Parameter="SupplementaryTransactions3" LargeGlyph="datevupload"/>
-    <RibbonItem Action="UploadOld" LocalizedNameKey="Upload Old" LargeGlyph="datevupload"/>
     <RibbonItem Action="ConnectedApplications" LocalizedNameKey="Verbundene Anwendungen" Parameter="SupplementaryTransactions3" LargeGlyph="datevrework"/>
     <RibbonItem Action="ShowLog" LocalizedNameKey="Protokoll" Parameter="SupplementaryTransactions3" LargeGlyph="datevlog"/>
   </RibbonItem>

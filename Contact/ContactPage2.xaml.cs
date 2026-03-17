@@ -87,6 +87,9 @@ namespace UnicontaClient.Pages.CustomPage
                 GetInterestAndProduct();
             }
         }
+
+        public override CorasauRibbonControl RibbonControl => frmRibbon;
+
         async void GetInterestAndProduct()
         {
             var api = this.api;

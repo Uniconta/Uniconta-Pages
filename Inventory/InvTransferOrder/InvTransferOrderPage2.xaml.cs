@@ -331,7 +331,7 @@ namespace UnicontaClient.Pages.CustomPage
             closePageOnSave = true;
             if (res)
             {
-                header = string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("PurchaseLines"), editrow._OrderNumber, editrow._DCAccount);
+                header = string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("TransferOrderLines"), editrow._OrderNumber, editrow._DCAccount);
                 AddDockItem(Control, ModifiedRow, header);
                 dockCtrl?.JustClosePanel(this.ParentControl);
 

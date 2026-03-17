@@ -2892,7 +2892,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             LoadType(new Type[] { typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.ProjectTask) });
 
-            defaultWrkSpace = workspaceCache.FirstOrDefault(s => s._Default)?._Number;
+            defaultWrkSpace = workspaceCache?.FirstOrDefault(s => s._Default)?._Number;
             dgTMJournalLineGridOLD.WorkSpaceDefault = defaultWrkSpace;
             dgTMJournalLineTransRegGridOLD.WorkSpaceDefault = defaultWrkSpace;
         }

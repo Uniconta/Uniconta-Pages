@@ -37,6 +37,6 @@
 	  <RibbonItem Action="CollectionLetterLog" LocalizedNameKey="CollectionLetterLog" Module="_CollectionLetter" LargeGlyph="Note_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="RemoveExchangeRate" LocalizedNameKey="RemoveOBJ" Parameter="ExchangeRate" LargeGlyph="Delete_32x32"/>
+    <RibbonItem Action="RemoveExchangeRate" LocalizedNameKey="RemoveOBJ" Parameter="ExchangeRateDif" LargeGlyph="Delete_32x32"/>
   </RibbonItem>
 </root>

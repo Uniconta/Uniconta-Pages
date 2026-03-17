@@ -287,15 +287,16 @@ namespace UnicontaClient.Pages.CustomPage
                     var streetAddress = address.CompleteStreet;
 
                     string code = null;
+                    string ciIndustryCode = ci.industrycode?.code?.PadLeft(6, '0');
                     if (IndustryCodes != null)
-                        code = IndustryCodes.Get(ci.industrycode?.code)?.KeyStr;
+                        code = IndustryCodes.Get(ciIndustryCode)?.KeyStr;
 
                     var difName = ci.life.name != null && !Equal(ci.life.name, debtor._Name);
                     var difAddress = streetAddress != null && !Equal(streetAddress, debtor._Address1);  
                     var difAddress2 = address.street2 != null && !Equal(address.street2, debtor._Address2);  
                     var difZipCode = address.zipcode != null && !Equal(address.zipcode, debtor._ZipCode);
                     var difCity = address.cityname != null && !Equal(address.cityname, debtor._City);
-                    var difIndustryCode = code != null && !Equal(ci.industrycode?.code, debtor._IndustryCode);
+                    var difIndustryCode = code != null && !Equal(ciIndustryCode, debtor._IndustryCode);
                     var difCompanyState = ci.companystatus != null && ci.companystatus.StatusCode() != debtor._StateOfCompany;
 
                     if (!difName && !difAddress && !difZipCode && !difCity && !difIndustryCode && !difCompanyState)
@@ -321,7 +322,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (IndustryCodes != null)
                         newDebtor.NewIndustryCode = code;
                     else
-                        newDebtor.NewIndustryCode = ci.industrycode?.code;
+                        newDebtor.NewIndustryCode = ciIndustryCode;
                     var state = ci.companystatus;
                     if (state != null)
                     {

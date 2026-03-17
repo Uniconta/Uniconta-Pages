@@ -36,6 +36,7 @@ namespace UnicontaClient.Pages
         CrudAPI API;
 
         bool isPrjJournal = false;
+        public bool ShowJournal= true;
         public CwMoveBtwWareHouse(CrudAPI api)
         {
             this.DataContext = this;
@@ -59,7 +60,15 @@ namespace UnicontaClient.Pages
 
         void CW_Loaded(object sender, RoutedEventArgs e)
         {
-            Dispatcher.BeginInvoke(new Action(() => { lookupJournal.Focus(); }));
+            if (!ShowJournal)
+            {
+                tbInvJournal.Visibility = lookupJournal.Visibility = tbPrJournal.Visibility = lookupPrJournal.Visibility = Visibility.Collapsed;
+                rowInvJrnl.Height = new GridLength(0d);
+                Dispatcher.BeginInvoke(new Action(() => { leWarehouse.Focus(); }));
+                this.Title = string.Format(Uniconta.ClientTools.Localization.lookup("CreateOBJ"), Uniconta.ClientTools.Localization.lookup("TransferOrder"));
+            }
+            else
+                Dispatcher.BeginInvoke(new Action(() => { lookupJournal.Focus(); }));
         }
 
         private void ChildWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)

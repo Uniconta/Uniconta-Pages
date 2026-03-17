@@ -389,7 +389,7 @@ namespace UnicontaClient.Pages.CustomPage
             busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LoadingMsg");
             busyIndicator.IsBusy = true;
 
-            var empCache = api.GetCache<Uniconta.DataModel.Employee>() ?? await api.LoadCache<Uniconta.DataModel.Employee>();
+            var empCache = await api.LoadCache<Uniconta.DataModel.Employee>(true);
             var priceLookup = new Uniconta.API.Project.FindPricesEmpl(api);
 
             var pairTM = new List<PropValuePair>(4)
@@ -711,7 +711,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "Transactions":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.ProjectTransactionPage, dgWorkInProgressRpt.syncEntity);
+                        AddDockItem(TabControls.ProjectTransactionPage, dgWorkInProgressRpt.syncEntity, null, null, true, null, new[] { new BasePage.ValuePair("Workspace", showWorkspace.ToString()) });
                     break;
                 case "Search":
                     LoadGrid();

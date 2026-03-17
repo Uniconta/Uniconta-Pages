@@ -31,7 +31,7 @@
       <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16" ShortcutKey=""/>
      </RibbonItem>
   </RibbonItem>
-  <RibbonItem>
+  <RibbonItem LocalizedNameKey="Relations">
     <RibbonItem Action="Contacts" LocalizedNameKey="Contacts" ControlName="ContactPage" Module="Contacts" LargeGlyph="Contacts_32x32" ShortcutKey=""/>
     <RibbonItem Action="DeliveryAddresses" LocalizedNameKey="DeliveryAddresses" ControlName="WorkInstallationPage" Module="DeliveryAddress" LargeGlyph="Delivery_32x32" ShortcutKey=""/>
     <RibbonItem Action="ClientItemNumber" LocalizedNameKey="ClientItemNumber" Module="InvClientName" LargeGlyph="Item_Number_32x32" ShortcutKey=""/>

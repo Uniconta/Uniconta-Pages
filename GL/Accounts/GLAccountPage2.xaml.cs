@@ -24,6 +24,7 @@ using System.Xml;
 using System.Windows;
 using Uniconta.ClientTools.Util;
 using UnicontaClient.Pages;
+using System.ComponentModel;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -95,6 +96,8 @@ namespace UnicontaClient.Pages.CustomPage
             Utility.SetDimensions(crudapi, lblNewdim1, lblNewdim2, lblNewdim3, lblNewdim4, lblNewdim5, dim1lookupeditior, dim2lookupeditior, dim3lookupeditior, dim4lookupeditior, dim5lookupeditior, useNewdim);
 
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
+
+            editrow.PropertyChanged += GLAccountPropertyChanged;
         }
 
         void frmRibbon_OnItemClicked(string ActionType)
@@ -127,7 +130,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void cbAccountType_SelectedIndexChanged(object sender, RoutedEventArgs e)
         {
-            SetAccountTotals();           
+            SetAccountTotals();
         }
 
         void EnableScriptButton(bool enable)
@@ -211,5 +214,23 @@ namespace UnicontaClient.Pages.CustomPage
 
             OffsetAccountLookupEditor.ItemsSource = Cache;
         }
+
+        #region Dutch taxonomy
+        private void GLAccountPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (UtilDisplay.IsLocalizationEnabled_Netherlands(Api.CompanyEntity))
+            {
+                if (e?.PropertyName == nameof(GLAccountClient.StandardAccount)
+                && sender is GLAccountClient localAccountClient)
+                {
+                    if (localAccountClient.StandardAccountRef is GLStandardCharOfAccount stdAccount)
+                    {
+                        localAccountClient.ExternalNo = stdAccount.KeyStr;
+                        localAccountClient.ExternalName = stdAccount.KeyName;
+                    }
+                }
+            }
+        }
+        #endregion  
     }
 }

@@ -57,11 +57,11 @@ x:Class="UnicontaClient.Pages.CustomPage.InvTransferOrderPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="OrderNumber" x:Name="liOrderNumber">
                         <CorasauControls:IntegerEditor EditValue="{Binding OrderNumber,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SetMask="false" LostFocus="OrderNumber_LostFocus"/>
                     </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="Warehouse" x:Name="liWarehouse">
-                        <CorasauControls:LookupEditor x:Name="leWarehouse" EditValue="{Binding Warehouse,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="WarehouseFrom" x:Name="liWarehouseFrom">
                         <CorasauControls:LookupEditor x:Name="leWarehouseFrom" EditValue="{Binding WarehouseFrom,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Warehouse" x:Name="liWarehouse">
+                        <CorasauControls:LookupEditor x:Name="leWarehouse" EditValue="{Binding Warehouse,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="DeliveryDate" x:Name="liDeliveryDate">
                         <CorasauControls:DateEditor x:Name="deDeLiveryDate" EditValue="{Binding DeliveryDate,Mode=TwoWay}"/>

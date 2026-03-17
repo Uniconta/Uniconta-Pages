@@ -107,6 +107,7 @@ namespace UnicontaClient.Controls.Dialogs
     {
         private static string cmpName = "";
         private static string cmpAdr = "";
+        private static int cmpId;
         private static int Ko;
         private static int Ku;
         private static int Li;
@@ -158,6 +159,7 @@ namespace UnicontaClient.Controls.Dialogs
         static async Task InitConnection()
         {
             var cmp = crudApi.CompanyEntity;
+            cmpId = cmp.RowId;
             cmpName = cmp.Name;
             cmpAdr = cmp._Address1 + " " + cmp._Address2 + " " + cmp._Address3;
             if (cmp._Dim1 != null)
@@ -758,7 +760,7 @@ namespace UnicontaClient.Controls.Dialogs
                 }
 
                 FastZip zip = new FastZip();
-                string filename = cmpName + "-" + DateTime.Now.ToString("ddMMyyHHmmss") + ".zip";
+                string filename =  string.Concat("GDPdU", "_", cmpId, "_", DateTime.Now.ToString("ddMMyyHHmmss"), ".zip");
                 zip.CreateZip(folderPath + "\\" + filename, tempFolder, false, null);
             }
             catch (Exception ex)
@@ -772,7 +774,6 @@ namespace UnicontaClient.Controls.Dialogs
             {
                 return false;
             }
-
             return Directory.GetFiles(pfad).Length == 0 &&
                    Directory.GetDirectories(pfad).Length == 0;
         }

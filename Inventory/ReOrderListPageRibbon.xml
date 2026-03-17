@@ -40,6 +40,7 @@
     <RibbonItem Action="CreateProductionOrder" LocalizedNameKey="CreateOBJ" Parameter="ProductionOrder" Module="Production" LargeGlyph="Pack_Note_32x32" />
     <RibbonItem Action="ReportAsFinished" LocalizedNameKey="ReportAsFinished" Module="InvBOM" LargeGlyph="Order_Lines_Highlighted_32x32" />
     <RibbonItem Action="MoveFromWarehouse" LocalizedNameKey="MoveFromWarehouse" Module="Warehouse" LargeGlyph="Journal_Lines_Highlighted_32x32" />
+    <RibbonItem Action="CreateTransferOrder" LocalizedNameKey="CreateOBJ" Parameter="TransferOrder" Module="Warehouse" LargeGlyph="Orders_32x32" />
     <RibbonItem Action="Storage" LocalizedNameKey="OnHand" LargeGlyph="Storage_32x32"/>
   </RibbonItem>
 </root>

@@ -270,7 +270,7 @@ namespace UnicontaClient.Pages.CustomPage
                     continue;
 
                 var dt = empl._TMApproveDate != DateTime.MinValue ? empl._TMApproveDate : empl._Hired;
-                if (dt < queryTransStartDate)
+                if (dt != DateTime.MinValue && dt < queryTransStartDate)
                     queryTransStartDate = dt;
             }
 
@@ -309,8 +309,8 @@ namespace UnicontaClient.Pages.CustomPage
                 var startDateMonday = monday.AddDays(-1);
 
                 var endDate = empl._Terminated == DateTime.MinValue ? DateTime.Today : empl._Terminated;
-                endDate = rec._ValidTo < endDate ? rec._ValidTo : endDate;
-
+                var validTo = rec._ValidTo == DateTime.MinValue ? DateTime.MaxValue : rec._ValidTo;
+                endDate = validTo < endDate ? validTo : endDate;
 
                 #region Internal Registration
 

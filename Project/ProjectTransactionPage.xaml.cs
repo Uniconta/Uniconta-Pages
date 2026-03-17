@@ -106,6 +106,16 @@ namespace UnicontaClient.Pages.CustomPage
                 return master as ProjectBudgetLine;
         }
 
+        public override void SetParameter(IEnumerable<ValuePair> Parameters)
+        {
+            foreach (var parm in Parameters)
+            {
+                if (string.Compare(parm.Name, "Workspace", StringComparison.OrdinalIgnoreCase) == 0 && string.Compare(parm.Value, "True", StringComparison.OrdinalIgnoreCase) == 0)
+                    parmWorkspace = parmWorkspace ?? "null";
+            }
+            base.SetParameter(Parameters);
+        }
+
         public ProjectTransactionPage(SynchronizeEntity syncEntity) : base(syncEntity, true)
         {
             UnicontaBaseEntity argsProj = getMaster(syncEntity.Row);

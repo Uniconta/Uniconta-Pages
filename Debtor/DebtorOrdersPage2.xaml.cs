@@ -161,6 +161,8 @@ namespace UnicontaClient.Pages.CustomPage
             StartLoadCache();
         }
 
+        public override CorasauRibbonControl RibbonControl => frmRibbon;
+        
         private void LiContactName_ButtonClicked(object sender)
         {
             if (editrow.Debtor == null)

@@ -2029,7 +2029,25 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void ActionClose()
         {
-            var cwDate = new CwSetPeriodPerDate(TMJournalActionType.Close, JournalLineDate, employee, api);
+            double[] daySums = { day1Sum, day2Sum, day3Sum, day4Sum, day5Sum, day6Sum, day7Sum };
+            var closeDate = (int)employee._TMCloseDate.DayOfWeek;
+            int closeDay = 7;
+
+            double totalDaySums = daySums.Sum();
+            double totalNormHours = normHoursArr.Sum();
+
+            if (totalDaySums != totalNormHours)
+            {
+                for (int i = 6; i >= 0; i--)
+                {
+                    var rest = normHoursArr[i] - daySums[i];
+                    if (closeDate < i + 1 && rest > 0)
+                        closeDay = i;
+                }
+            }
+            var calcCloseDate = closeDay == 0 ? JournalLineDate : JournalLineDate.AddDays(closeDay - 1);
+
+            var cwDate = new CwSetPeriodPerDate(TMJournalActionType.Close, calcCloseDate, employee, api, true);
             cwDate.DialogTableId = 2000000055;
 
             cwDate.Closing += async delegate
@@ -2045,7 +2063,7 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     api.AllowBackgroundCrud = true;
 
-                    var postingRes = await postingApi.CloseTimeJournal(employee, cwDate.StartDate); //TODO:Kig på denne
+                    var postingRes = await postingApi.CloseTimeJournal(employee, cwDate.StartDate);
 
                     ShowJournalInfo(postingRes, postingRes.CreatedOvertime);
                     if (postingRes.Err == 0)
@@ -2205,7 +2223,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             LoadType(new Type[] { typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.ProjectTask) });
 
-            defaultWrkSpace = workspaceCache.FirstOrDefault(s => s._Default)?._Number;
+            defaultWrkSpace = workspaceCache?.FirstOrDefault(s => s._Default)?._Number;
             dgTMJournalLineGrid.WorkSpaceDefault = defaultWrkSpace;
             dgTMJournalLineTransRegGrid.WorkSpaceDefault = defaultWrkSpace;
         }

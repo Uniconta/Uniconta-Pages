@@ -991,6 +991,11 @@ namespace UnicontaClient.Pages.CustomPage
             var ord = this.CreateGridObject(typeof(ProductionOrderClient)) as ProductionOrderClient;
             ord.SetMaster(Proj);
             ord._ProdItem = rec._Item;
+            ord._Variant1 = rec._Variant1;
+            ord._Variant2 = rec._Variant2;
+            ord._Variant3 = rec._Variant3;
+            ord._Variant4 = rec._Variant4;
+            ord._Variant5 = rec._Variant5;
             ord._OurRef = dfltProductionOrder._OurRef;
             ord._Remark = dfltProductionOrder._Remark;
             ord._Group = dfltProductionOrder._Group;

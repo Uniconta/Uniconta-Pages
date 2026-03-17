@@ -478,13 +478,15 @@ namespace UnicontaClient.Pages.CustomPage
                 DateTime LastPostedDate = DateTime.MinValue;
                 int startGLSearch = 0;
                 long Total = 0;
-                int l = bankStmtLines.Length;
-                if (l > 0)
+                if (bankStmtLines.Length > 0)
                     bankStmtLines[0]._AmountCent += Uniconta.Common.Utility.NumberConvert.ToLong(100d * master._StartBalance);
 
-                for (int i = 0; (i < l); i++)
+                int i;
+                BankStatementLineGridClient p;
+                GLTransClientTotalBank t;
+                for (i = 0; (i < bankStmtLines.Length); i++)
                 {
-                    var p = bankStmtLines[i];
+                    p = bankStmtLines[i];
                     if (p._Primo)
                         p._Text = Localization.lookup("Primo");
                     //if (! p._Void)
@@ -505,7 +507,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                         for (int n = startGLSearch; (n < listtran.Length); n++)
                         {
-                            var t = listtran[n];
+                            t = listtran[n];
                             if (t._Date < PostedDate)
                                 startGLSearch = n;
                             else if (t._Date == PostedDate)
@@ -585,6 +587,16 @@ namespace UnicontaClient.Pages.CustomPage
                             else
                                 break;
                         }
+                    }
+                }
+                for (i = 0; (i < bankStmtLines.Length); i++)
+                {
+                    p = bankStmtLines[i];
+                    if (p._JournalPostedId != 0 && p._Trans != null && p._Trans.Count == 1)
+                    {
+                        t = p.Trans[0];
+                        if ((ShowCurrency ? t._AmountCur : t._Amount) != p.Amount)
+                            p._MisMatch = true;
                     }
                 }
             }
@@ -2053,10 +2065,10 @@ namespace UnicontaClient.Pages.CustomPage
         [Display(Name = "Void", ResourceType = typeof(GLDailyJournalLineText))]
         public bool VoidLine { get { return _Void; } set { _Void = value; NotifyPropertyChanged("VoidLine"); NotifyPropertyChanged("State"); } }
 
-        internal bool _IsMatched;
+        internal bool _IsMatched, _MisMatch;
         public bool IsMatched { get { return _IsMatched; } set { _IsMatched = value; NotifyPropertyChanged("IsMatched"); NotifyPropertyChanged("State"); NotifyPropertyChanged("AllowEditing"); } }
         public bool AllowEditing { get { return State == 1 || _Void; } }
-        public byte State { get { return _InJournal ? (byte)2 : (_Trans != null || _Primo || this._JournalPostedId != 0 ? (byte)3 : _Void ? (byte)4 : (byte)1); } }
+        public byte State { get { return _InJournal || _MisMatch ? (byte)2 : (_Trans != null || _Primo || this._JournalPostedId != 0 ? (byte)3 : _Void ? (byte)4 : (byte)1); } }
         internal bool _Mark;
         public bool Mark { get { return _Mark; } set { if (_Mark == value) return; _Mark = value; NotifyPropertyChanged("Mark"); } }
 

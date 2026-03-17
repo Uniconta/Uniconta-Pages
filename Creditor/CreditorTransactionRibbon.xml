@@ -36,6 +36,6 @@
     <RibbonItem Action="InvoiceLine" LocalizedNameKey="InvoiceLines" LargeGlyph="Order_Lines_Highlighted_32x32" ShortcutKey="ALT+L"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="RemoveExchangeRate" LocalizedNameKey="RemoveOBJ" Parameter="ExchangeRate" LargeGlyph="Delete_32x32"/>
+    <RibbonItem Action="RemoveExchangeRate" LocalizedNameKey="RemoveOBJ" Parameter="ExchangeRateDif" LargeGlyph="Delete_32x32"/>
   </RibbonItem>
 </root>

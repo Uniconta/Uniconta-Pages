@@ -417,6 +417,7 @@ namespace UnicontaClient.Pages.CustomPage
                         globalEvents.NotifyRefreshViewer(NameOfControl, rec);
                     }
                     break;
+                case "Qty":
                 case "Unit":
                     if (this.PriceLookup != null && this.PriceLookup.UseCustomerPrices)
                         this.PriceLookup.GetCustomerPrice(rec, false);

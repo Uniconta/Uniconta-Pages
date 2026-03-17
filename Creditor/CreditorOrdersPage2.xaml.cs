@@ -131,7 +131,10 @@ namespace UnicontaClient.Pages.CustomPage
             editrow.PropertyChanged += Editrow_PropertyChanged;
             if (crudapi.GetCache(typeof(Uniconta.DataModel.Creditor)) == null)
                 crudapi.LoadCache(typeof(Uniconta.DataModel.Creditor));
+            StartLoadCache();
         }
+
+        public override CorasauRibbonControl RibbonControl => frmRibbon;
 
         private void LiContactName_ButtonClicked(object sender)
         {

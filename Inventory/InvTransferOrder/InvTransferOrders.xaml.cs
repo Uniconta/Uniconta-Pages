@@ -297,16 +297,20 @@ namespace UnicontaClient.Pages.CustomPage
 
                     if (postingResult.Err != ErrorCodes.Succes)
                         UtilDisplay.ShowErrorCode(postingResult.Err);
-                    else if (postingDialog.IsSimulation)
-                    {
-                        if (postingResult.SimulatedTrans != null)
-                            AddDockItem(TabControls.SimulatedTransactions, postingResult.SimulatedTrans, Uniconta.ClientTools.Localization.lookup("SimulatedTransactions"), null, true);
-                    }
                     else
                     {
-                        this.PostedDate = DateTime.MinValue;
-                        this.Comment = null;
-                        UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("TransferOrderPosted"), Uniconta.ClientTools.Localization.lookup("Message"));
+                        if (postingDialog.IsSimulation)
+                        {
+                            if (postingResult.SimulatedTrans != null)
+                                AddDockItem(TabControls.SimulatedTransactions, postingResult.SimulatedTrans, Uniconta.ClientTools.Localization.lookup("SimulatedTransactions"), null, true);
+                        }
+                        else
+                        {
+                            this.PostedDate = DateTime.MinValue;
+                            this.Comment = null;
+                            UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("TransferOrderPosted"), Uniconta.ClientTools.Localization.lookup("Message"));
+                            dgInvTransferOrdersGrid.Refresh();
+                        }
                     }
                 }
             };

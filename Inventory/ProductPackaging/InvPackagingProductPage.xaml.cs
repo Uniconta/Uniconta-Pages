@@ -133,8 +133,11 @@ namespace UnicontaClient.Pages.CustomPage
             switch (e.PropertyName)
             {
                 case "ReportingType":
-                    rec.Category = null;
-                    rec.PackagingType = null;
+                    if (dgInvPackagingProductGrid.HasUnsavedData)
+                    {
+                        rec.Category = null;
+                        rec.PackagingType = null;
+                    }
                     SetCategorySource(rec);
                     SetTypeSource(rec);
                     break;

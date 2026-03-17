@@ -4,66 +4,96 @@ x:Class="UnicontaClient.Pages.CustomPage.EDeliveryMappingPage"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
-    xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" 
+    xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"
     xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools">
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="10"></RowDefinition>
-            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="10" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <CorasauControls:CorasauRibbonControl x:Name="localMenu" XMLSourcePath=";component/Pages/Debtor/EDeliveryMappingRibbon.xml"/>
+        <CorasauControls:CorasauRibbonControl x:Name="localMenu" XMLSourcePath=";component/Pages/Debtor/EDeliveryMappingRibbon.xml" />
         <Grid Grid.Row="1" Margin="5">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="15"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="50"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="15"/>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="15" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="50" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="15" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Group}" Grid.Column="0"/>
-            <CorasauControls:CorasauLayoutItem x:Name="liMappinggroup" Grid.Column="2" ButtonClicked="liMappinggroup_ButtonClicked" Style="{StaticResource LayoutItemsstyle}">
-                <CorasauControls:LookupEditor x:Name="leMappinggroup" SelectedIndexChanged="leMappinggroup_SelectedIndexChanged" HorizontalContentAlignment="Right"/>
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=Group}" Grid.Column="0" />
+            <CorasauControls:CorasauLayoutItem x:Name="liMappinggroup"
+                Grid.Column="2"
+                ButtonClicked="liMappinggroup_ButtonClicked"
+                Style="{StaticResource LayoutItemsstyle}">
+                <CorasauControls:LookupEditor x:Name="leMappinggroup"
+                    SelectedIndexChanged="leMappinggroup_SelectedIndexChanged"
+                    HorizontalContentAlignment="Right" />
                 <CorasauControls:CorasauLayoutItem.ButtonContent>
-                    <Image Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/Plus_8x8.svg, UsePalette=True}" Height="14" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}"/>
+                    <Image Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/Plus_8x8.svg,
+                                                   UsePalette=True}"
+                        Height="14"
+                        dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}" />
                 </CorasauControls:CorasauLayoutItem.ButtonContent>
             </CorasauControls:CorasauLayoutItem>
 
-            <TextBlock x:Name="tbDocumentNum" Grid.Column="4" Visibility="Collapsed"/>
-            <CorasauControls:LookupEditor x:Name="leDocumentNum" Grid.Column="6" Visibility="Collapsed" GotFocus="leDocumentNum_GotFocus"/>
+            <TextBlock x:Name="tbDocumentNum"
+                Grid.Column="4"
+                Visibility="Collapsed" />
+            <CorasauControls:LookupEditor x:Name="leDocumentNum"
+                Grid.Column="6"
+                Visibility="Collapsed"
+                GotFocus="leDocumentNum_GotFocus" />
         </Grid>
-        <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{StaticResource WindowHeaderGradient}" />
-        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="3" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+        <GridSplitter Grid.Row="2"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            Background="{StaticResource WindowHeaderGradient}" />
+        <CorasauControls:BusyIndicator x:Name="busyIndicator"
+            Grid.Row="3"
+            BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=LoadingMsg}">
             <localPage:EDeliveryMappingGrid x:Name="dgEdeliveryMappingGrid" AutoGenerateColumns="None">
                 <localPage:EDeliveryMappingGrid.Columns>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="TagId" Width="270">
                         <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
-                            <CorasauControls:ComboBoxEditSettingsCustom x:Name="cmbTagIds" DisplayMember="Name" ValueMember="RowId"/>
+                            <CorasauControls:ComboBoxEditSettingsCustom x:Name="cmbTagIds"
+                                DisplayMember="Name"
+                                ValueMember="RowId" />
                         </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="TableId" Width="270">
                         <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
-                            <CorasauControls:ComboBoxEditSettingsCustom x:Name="cmbTableIds" DisplayMember="DisplayName" ValueMember="Id"/>
+                            <CorasauControls:ComboBoxEditSettingsCustom x:Name="cmbTableIds"
+                                DisplayMember="DisplayName"
+                                ValueMember="Id" />
                         </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Property" Width="100">
                         <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                             <ControlTemplate>
-                                <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.Property,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                                <TextBlock Margin="2"
+                                    VerticalAlignment="Center"
+                                    Text="{Binding DataContext.RowData.Row.Property, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
                             </ControlTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                         <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                             <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" GotFocus="PART_Editor_GotFocus" DisplayMember="DisplayName" ValueMember="Id" ItemsSource="{Binding DataContext.RowData.Row.PropertySource,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" />
+                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor"
+                                    GotFocus="PART_Editor_GotFocus"
+                                    DisplayMember="DisplayName"
+                                    ValueMember="Id"
+                                    ItemsSource="{Binding DataContext.RowData.Row.PropertySource, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" />
                             </DataTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Value" Width="150" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="FallbackDefaultValue" Width="190"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Value"
+                        Width="150"
+                        Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="FallbackDefaultValue" Width="190" />
                 </localPage:EDeliveryMappingGrid.Columns>
             </localPage:EDeliveryMappingGrid>
         </CorasauControls:BusyIndicator>

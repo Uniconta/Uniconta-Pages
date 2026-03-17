@@ -781,6 +781,8 @@ namespace UnicontaClient.Pages.CustomPage
                 var xml = await GetEdeliveryMappingDoc(invClient, api, eDeliveryMappingGroups);
                 if (xml == null)
                 {
+                    if (Debcache == null)
+                        Debcache = await api.CompanyEntity.LoadCache(typeof(Debtor), api);
                     var debtor = (Debtor)Debcache.Get(invClient._DCAccount);
                     if (debtor == null)
                         continue;
@@ -967,16 +969,8 @@ namespace UnicontaClient.Pages.CustomPage
                 var nhrApi = new NHRAPI(api);
 
                 var mappings = await nhrApi.GetMappingsByInvoice(inv, eDeliveryMappingGroups);
-                var xmlTagsAndValues = mappings?
-                    .Select(x => Tuple.Create(
-                        x.eDeliveryTag.Name,
-                        x.GetTablePropertyValueFromEntity(inv, comp)
-                    ))?
-                    .Where(x => !string.IsNullOrEmpty(x.Item2))
-                    .ToDictionary(x => x.Item1, y => y.Item2);
-
-                var xml = xmlTagsAndValues == null || xmlTagsAndValues.Count == 0 ? null :
-                    await nhrApi.GetValidatedeDeliveryMappingDoc(inv, xmlTagsAndValues);
+                var xml = await nhrApi.GetValidatedeDeliveryMappingDoc(
+                    inv, mappings.Select(m => (eDeliveryMapping)m).ToList());
 
                 if (xml == null)
                     return null;

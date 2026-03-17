@@ -556,33 +556,34 @@ namespace UnicontaClient.Pages.CustomPage
                 var dif = item.Difference;
                 if (dif != 0d)
                 {
-                    var journalLine = new InvJournalLine();
-                    journalLine._Date = date;
-                    journalLine._MovementType = Uniconta.DataModel.InvMovementType.Counting;
-                    journalLine._Item = item._Item;
-                    journalLine._Variant1 = item._Variant1;
-                    journalLine._Variant2 = item._Variant2;
-                    journalLine._Variant3 = item._Variant3;
-                    journalLine._Variant4 = item._Variant4;
-                    journalLine._Variant5 = item._Variant5;
-                    journalLine._Warehouse = item._Warehouse;
-                    journalLine._Location = item._Location;
-                    journalLine._SerieBatch = item._SerieBatch;
+                    var journalLine = new InvJournalLine
+                    {
+                        _Date = date,
+                        _MovementType = Uniconta.DataModel.InvMovementType.Counting,
+                        _Item = item._Item,
+                        _Variant1 = item._Variant1,
+                        _Variant2 = item._Variant2,
+                        _Variant3 = item._Variant3,
+                        _Variant4 = item._Variant4,
+                        _Variant5 = item._Variant5,
+                        _Warehouse = item._Warehouse,
+                        _Location = item._Location,
+                        _SerieBatch = item._SerieBatch,
+                        _Qty = dif,
+                        _Dim1 = invJournal._Dim1,
+                        _Dim2 = invJournal._Dim2,
+                        _Dim3 = invJournal._Dim3,
+                        _Dim4 = invJournal._Dim4,
+                        _Dim5 = invJournal._Dim5
+                    };
+                    journalLine.SetMaster(invJournal);
                     var itm = item.itemRec;
                     if (itm != null)
                         journalLine._CostPrice = itm._CostPrice;
-                    if (clearCounted)
-                        journalLine._Qty = 0d;
-                    else
-                        journalLine._Qty = dif;
-                    journalLine.SetMaster(invJournal);
-                    journalLine._Dim1 = invJournal._Dim1;
-                    journalLine._Dim2 = invJournal._Dim2;
-                    journalLine._Dim3 = invJournal._Dim3;
-                    journalLine._Dim4 = invJournal._Dim4;
-                    journalLine._Dim5 = invJournal._Dim5;
-
                     invJournalLineList.Add(journalLine);
+
+                    if (clearCounted)
+                        item.Quantity = null;
                 }
             }
 

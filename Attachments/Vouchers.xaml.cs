@@ -248,6 +248,11 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
             }
             UtilDisplay.RemoveMenuCommand(rb, menuToRemove);
+
+#if MAC
+            var menuMacNoSupport = new string[2] { "SplitPDF", "JoinPDF" };
+            UtilDisplay.RemoveMenuCommand(rb, menuMacNoSupport);
+#endif
         }
 
         public async override Task InitQuery()
@@ -1034,6 +1039,9 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         CorrectScannedData(selectedItem);
                     break;
+                case "ViewCorrectScannedData":
+                    AddDockItem(TabControls.VoucherScanCorrectionPage, null, true, Localization.lookup("ViewCorrectScannedData"), "View_16x16");
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -1548,10 +1556,24 @@ namespace UnicontaClient.Pages.CustomPage
                                 voucher._Currency = 0;
                                 voucher._Amount = 0;
                                 voucher._CreditorAccount = null;
+                                voucher._Project = null;
                                 voucher._PaymentId = null;
                                 voucher._PaymentMethod = 0;
                                 voucher._PurchaseNumber = 0;
                                 voucher._Content = 0;
+                                voucher._Vat = null;
+                                voucher._VatOperation = null;
+                                voucher._Approver1 = null;
+                                voucher._Approver2 = null;
+                                voucher._Payment = null;
+                                voucher._TransType = null;
+                                voucher._Dim1 = null;
+                                voucher._Dim2 = null;
+                                voucher._Dim3 = null;
+                                voucher._Dim4 = null;
+                                voucher._Dim5 = null;
+                                voucher._CostAccount = null;
+                                voucher._PrCategory = null;
                                 voucher._SentToScanner = false;
                             }
 
