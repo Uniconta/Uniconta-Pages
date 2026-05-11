@@ -54,9 +54,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             InitializeComponent();
             InitPage(crudApi);
-#if !SILVERLIGHT
             FocusManager.SetFocusedElement(txtName, txtName);
-#endif
         }
 
         void InitPage(CrudAPI crudapi)
@@ -64,9 +62,9 @@ namespace UnicontaClient.Pages.CustomPage
             ribbonControl = frmRibbon;
             layoutControl = layoutItems;
             cbCountry.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.CountryCode));
-            cbCurrentERP.ItemsSource= Enum.GetValues(typeof(Uniconta.Common.ERPSystem));
-            cbCompanyType.ItemsSource= Enum.GetValues(typeof(Uniconta.Common.CompanyType));
-            cbCommingFrom.ItemsSource= Enum.GetValues(typeof(Uniconta.Common.ContactFrom));
+            cbCurrentERP.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.ERPSystem));
+            cbCompanyType.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.CompanyType));
+            cbComingFrom.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.ContactFrom));
             cbCloseReason.ItemsSource = Enum.GetValues(typeof(Uniconta.DataModel.CloseReasonType));
             var Comp = crudapi.CompanyEntity;
             if (LoadedRow == null)
@@ -82,7 +80,7 @@ namespace UnicontaClient.Pages.CustomPage
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
             editrow.PropertyChanged += Editrow_PropertyChanged;
             txtCompanyRegNo.EditValueChanged += TxtCVR_EditValueChanged;
-            lePid.api = api;
+            lePid.api = leOrigPid.api = api;
             if (BasePage.session.User._Role == (byte)Uniconta.Common.User.UserRoles.Reseller)
             {
                 this.liPid.Visibility = Visibility.Collapsed;
@@ -194,13 +192,17 @@ namespace UnicontaClient.Pages.CustomPage
                             editrow.Www = contact.www;
                         }
                     }
+                    if (ci.industry != null)
+                    {
+                        if (editrow.IndustryCode == null)
+                            editrow.IndustryCode = ci.industry?.primary?.code;
+                    }
                 }
                 else
                     onlyRunOnce = false;
             }
         }
 
-#if !SILVERLIGHT
         private void Email_ButtonClicked(object sender)
         {
             var txtEmail = ((CorasauLayoutItem)sender).Content as TextEditor;
@@ -222,6 +224,10 @@ namespace UnicontaClient.Pages.CustomPage
         {
             Utility.OpenWebSite(editrow._Www);
         }
-#endif
+
+        private void liCompanyRegNo_ButtonClicked(object sender)
+        {
+            Utility.OpenCVR(editrow._Country, editrow._LegalIdent);
+        }
     }
 }

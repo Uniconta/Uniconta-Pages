@@ -110,8 +110,10 @@ namespace UnicontaClient.Pages.CustomPage
         {
             foreach (var parm in Parameters)
             {
-                if (string.Compare(parm.Name, "Workspace", StringComparison.OrdinalIgnoreCase) == 0 && string.Compare(parm.Value, "True", StringComparison.OrdinalIgnoreCase) == 0)
+                if (string.Equals(parm.Name, "Workspace", StringComparison.OrdinalIgnoreCase) && string.Equals(parm.Value, "True", StringComparison.OrdinalIgnoreCase))
                     parmWorkspace = parmWorkspace ?? "null";
+                else if (string.Equals(parm.Name, "IncludeJournals", StringComparison.OrdinalIgnoreCase))
+                    InclTimeJournals = bool.TryParse(parm.Value, out var result) && result;
             }
             base.SetParameter(Parameters);
         }
@@ -139,7 +141,11 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var WIPreport = master as ProjectWIPTotalsClient;
             if (WIPreport != null)
+            {
                 parmWorkspace = WIPreport.Workspace;
+                viewOnlyOpen = true;
+                iViewOnlyOpenBase.IsChecked = viewOnlyOpen;
+            }
         }
         private void SetHeader()
         {
@@ -214,8 +220,14 @@ namespace UnicontaClient.Pages.CustomPage
             Employees = api.GetCache<Uniconta.DataModel.Employee>();
             Projects = api.GetCache<Uniconta.DataModel.Project>();
             Payrolls = api.GetCache(typeof(Uniconta.DataModel.EmpPayrollCategory));
+            if (api.CompanyEntity.HideInternalProjects)
+            {
+                if (GridFilter == null)
+                    GridFilter = new List<PropValuePair>();
+                GridFilter.Add(PropValuePair.GenereteParameter("HideInternalProjects", typeof(string), "1"));
+            }
         }
-
+        
         protected override void OnLayoutLoaded()
         {
             base.OnLayoutLoaded();
@@ -242,8 +254,8 @@ namespace UnicontaClient.Pages.CustomPage
         {
             timetransLst = null;
             timeTransFound = false;
-            InclTimeJournals = false;
-            iIncludeTimeJournalBase.IsChecked = InclTimeJournals;
+            if (api.CompanyEntity.TimeManagement)
+                iIncludeTimeJournalBase.IsChecked = InclTimeJournals;
         }
 
         private void SetIncludeFilter()
@@ -522,6 +534,21 @@ namespace UnicontaClient.Pages.CustomPage
 
                         if (s._Project == null || s._PayrollCategory == null || s._Employee == null)
                             continue;
+
+                        if (parmWorkspace == null)
+                        {
+                            //No filter
+                        }
+                        else if (parmWorkspace == "null")
+                        {
+                            if (s.WorkSpace != null)
+                                continue;
+                        }
+                        else
+                        {
+                            if (!string.Equals(parmWorkspace, s.WorkSpace, StringComparison.OrdinalIgnoreCase))
+                                continue;
+                        }
 
                         if (s.Total != 0)
                         {

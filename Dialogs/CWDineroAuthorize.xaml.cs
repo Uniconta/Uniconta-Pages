@@ -72,6 +72,7 @@ namespace UnicontaClient.Controls.Dialogs
                 $"{HttpUtility.UrlEncode($"redirect_uri={REDIRECT_URI}")}";
 
             webViewer.UriSource = new Uri(consentUrl);
+            webViewer.RefreshViewer();
             webViewer.Visibility = Visibility.Visible;
         }
 

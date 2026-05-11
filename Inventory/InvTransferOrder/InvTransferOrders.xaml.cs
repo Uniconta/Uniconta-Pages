@@ -170,7 +170,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "OrderLine":
                     if (selectedItem == null)
                         return;
-                    header = string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("TransferOrderLines"), selectedItem._OrderNumber, selectedItem._DCAccount);
+                    header = string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("TransferOrderLines"), selectedItem._OrderNumber, selectedItem._Warehouse);
                     AddDockItem(TabControls.InvTransferOrderLines, dgInvTransferOrdersGrid.syncEntity, header);
                     break;
                 case "AddNote":

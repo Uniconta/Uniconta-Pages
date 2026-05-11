@@ -789,8 +789,19 @@ namespace UnicontaClient.Pages.CustomPage
             if (employee._TMCloseDate >= JournalLineDate)
                 return;
 
-            var gridHours = dgTMJournalLineGrid.ItemsSource as ICollection;
-            if (gridHours.Count > 0)
+            bool HasContent(TMJournalLineClient line) =>
+                line.Project != null ||
+                line.PayrollCategory != null ||
+                line.Day1 != 0 ||
+                line.Day2 != 0 ||
+                line.Day3 != 0 ||
+                line.Day4 != 0 ||
+                line.Day5 != 0 ||
+                line.Day6 != 0 ||
+                line.Day7 != 0;
+
+            var gridHours = dgTMJournalLineGrid.ItemsSource as IEnumerable<TMJournalLineClient>;
+            if (gridHours?.Any(HasContent) == true)
                 return;
 
             var pairJournalTrans = new PropValuePair[]
@@ -856,12 +867,22 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        List<ProjectTransClient> internalTransLst;
-        List<TMJournalLineClient> journalLineNotApprovedLst;
+        ProjectTransClient[] internalTransLst;
+        TMJournalLineClient[] journalLineNotApprovedLst;
         DateTime approvedCutOffDate;
-        string mileageInternalProject;
+        DateTime lastEmpApproveDate = DateTime.MinValue;
         async void InitializeStatusText()
         {
+            if (employee == null)
+                return;
+
+            if (employee._TMApproveDate != lastEmpApproveDate)
+            {
+                internalTransLst = null;
+                journalLineNotApprovedLst = null;
+                lastEmpApproveDate = employee._TMApproveDate;
+            }
+
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
 
             if ((internalTransLst == null || journalLineNotApprovedLst == null) && payrollCache != null && payrollCache.Count > 0)
@@ -871,7 +892,7 @@ namespace UnicontaClient.Pages.CustomPage
                                      employee._TMApproveDate.DayOfWeek == DayOfWeek.Monday ? employee._TMApproveDate :
                                      FirstDayOfWeek(employee._TMApproveDate);
 
-                HashSet<string> lstCatPayProj = null, lstCatPay = null;
+                HashSet<string> lstCatPay = null;
 
                 foreach (var val in payrollCache)
                 {
@@ -886,278 +907,109 @@ namespace UnicontaClient.Pages.CustomPage
                         case Uniconta.DataModel.InternalType.OverTime: AddToList(ref lstCatOverTime, val._Number); break;
                         case Uniconta.DataModel.InternalType.Sickness: AddToList(ref lstCatSickness, val._Number); break;
                         case Uniconta.DataModel.InternalType.OtherAbsence: AddToList(ref lstCatOtherAbsence, val._Number); break;
-                        case Uniconta.DataModel.InternalType.Mileage:
-                            AddToList(ref lstCatMileage, val._Number);
-                            mileageInternalProject = val._InternalProject;
-                            break;
+                        case Uniconta.DataModel.InternalType.Mileage: AddToList(ref lstCatMileage, val._Number); break;
                     }
 
-                    if (val._InternalType != Uniconta.DataModel.InternalType.Mileage)
-                    {
-                        AddToList(ref lstCatPayProj, val._InternalProject);
-                        AddToList(ref lstCatPay, val._Number);
-                    }
+                    AddToList(ref lstCatPay, val._Number);
                 }
 
-                var catPayDist = lstCatPay != null ? string.Join(";", lstCatPay) : string.Empty;
-                var catPayProjDist = lstCatPayProj != null ? string.Join(";", lstCatPayProj) : string.Empty;
+                var catPayDist = string.Join(";", lstCatPay ?? Enumerable.Empty<string>());
 
                 if (internalTransLst == null)
                 {
                     var pairInternalTrans = new PropValuePair[]
                     {
                         PropValuePair.GenereteWhereElements(nameof(ProjectTransClient.Employee), typeof(string), employee.KeyStr),
-                        PropValuePair.GenereteWhereElements(nameof(ProjectTransClient.Project), typeof(string), catPayProjDist),
                         PropValuePair.GenereteWhereElements(nameof(ProjectTransClient.PayrollCategory), typeof(string), catPayDist),
                     };
-                    var internalProjTrans = await api.Query<ProjectTransClient>(pairInternalTrans);
-                    internalTransLst = internalProjTrans != null ? internalProjTrans.ToList() : new List<ProjectTransClient>();
-
-                    if (lstCatMileage != null)
-                    {
-                        var mileageCatDist = string.Join(";", lstCatMileage);
-
-                        var pairmileageTrans = new PropValuePair[]
-                        {
-                            PropValuePair.GenereteWhereElements(nameof(ProjectTransClient.Employee), typeof(string), employee.KeyStr),
-                            PropValuePair.GenereteWhereElements(nameof(ProjectTransClient.PayrollCategory), typeof(string), mileageCatDist),
-                        };
-                        var mileageTrans = await api.Query<ProjectTransClient>(pairmileageTrans);
-                        if (mileageTrans != null && mileageTrans.Length > 0)
-                            internalTransLst.AddRange(mileageTrans);
-                    }
+                    internalTransLst = await api.Query<ProjectTransClient>(pairInternalTrans);
                 }
 
                 if (journalLineNotApprovedLst == null)
                 {
                     var pairJournalTrans = new List<PropValuePair>
                     {
-                        PropValuePair.GenereteWhereElements(nameof(TMJournalLineClient.Project), typeof(string), catPayProjDist),
                         PropValuePair.GenereteWhereElements(nameof(TMJournalLineClient.Employee), typeof(string), employee.KeyStr),
                         PropValuePair.GenereteWhereElements(nameof(TMJournalLineClient.PayrollCategory), typeof(string), catPayDist),
-                        PropValuePair.GenereteWhereElements(nameof(TMJournalLineClient.Date), approvedCutOffDate, CompareOperator.GreaterThanOrEqual)
                     };
-
-                    var lineNotApprovedLst = await api.Query<TMJournalLineClient>(pairJournalTrans);
-                    journalLineNotApprovedLst = lineNotApprovedLst != null ? lineNotApprovedLst.ToList() : new List<TMJournalLineClient>();
-
-                    if (lstCatMileage != null)
-                    {
-                        var mileageCatDist = string.Join(";", lstCatMileage);
-
-                        var pairmileageTrans = new PropValuePair[]
-                        {
-                            PropValuePair.GenereteWhereElements(nameof(TMJournalLineClient.Employee), typeof(string), employee.KeyStr),
-                            PropValuePair.GenereteWhereElements(nameof(TMJournalLineClient.RegistrationType), typeof(int), "1"),
-                            PropValuePair.GenereteWhereElements(nameof(TMJournalLineClient.PayrollCategory), typeof(string), mileageCatDist),
-                            PropValuePair.GenereteWhereElements(nameof(TMJournalLineClient.Date), approvedCutOffDate, CompareOperator.GreaterThanOrEqual)
-                        };
-                        var mileageTrans = await api.Query<TMJournalLineClient>(pairmileageTrans);
-                        if (mileageTrans != null && mileageTrans.Length > 0)
-                            journalLineNotApprovedLst.AddRange(mileageTrans);
-                    }
+                    journalLineNotApprovedLst = await api.Query<TMJournalLineClient>(pairJournalTrans);
                 }
             }
 
-            #region Vacation
-            vacationYTD = 0;
-            vacationNotApproved = 0;
-
-            if (lstCatVacation == null)
-                UtilDisplay.RemoveMenuCommand(rb, "VacationBal");
-            else
-            {
-                if (internalTransLst != null || journalLineNotApprovedLst != null)
-                {
-                    var vacationStartDate = JournalLineDate < new DateTime(2023, 1, 1) ? new DateTime(JournalLineDate.Year, 1, 1) : new DateTime(2023, 1, 1);
-
-                    if (internalTransLst != null)
-                    {
-                        var projtransEndDate = JournalLineDate.AddDays(6);
-
-                        var transList = internalTransLst.Where(s => lstCatVacation.Any(n => n == s._PayrollCategory) && s.Date >= vacationStartDate && s.Date <= projtransEndDate).ToList();
-                        vacationYTD = -transList.Select(x => x.Qty).Sum();
-                    }
-
-                    if (journalLineNotApprovedLst != null)
-                    {
-                        var projtransEndDateAppr = approvedCutOffDate == DateTime.MinValue ? vacationStartDate :
-                                               approvedCutOffDate.AddDays(-1) < vacationStartDate ? vacationStartDate : approvedCutOffDate.AddDays(-1);
-
-                        if (projtransEndDateAppr > JournalLineDate.AddDays(6))
-                            projtransEndDateAppr = JournalLineDate.AddDays(6);
-
-                        var transList = journalLineNotApprovedLst.Where(s => s._RegistrationType == RegistrationType.Hours &&
-                                                                             s._InternalType == Uniconta.DataModel.InternalType.Vacation &&
-                                                                             s._Invoiceable == false && s.Date >= projtransEndDateAppr && s.Date < JournalLineDate);
-                        vacationNotApproved = transList.Select(x => x.Total).Sum();
-                    }
-                }
-            }
-            #endregion Vacation
-
-            #region Other vacation
-            otherVacationYTD = 0;
-            otherVacationNotApproved = 0;
-
-            if (lstCatOtherVacation == null)
-                UtilDisplay.RemoveMenuCommand(rb, "OtherVacationBal");
-            else
-            {
-                if (internalTransLst != null || journalLineNotApprovedLst != null)
-                {
-                    var vacationStartDate = JournalLineDate < new DateTime(2023, 1, 1) ? new DateTime(JournalLineDate.Year, 1, 1) : new DateTime(2023, 1, 1);
-
-                    if (internalTransLst != null)
-                    {
-                        var projtransEndDate = JournalLineDate.AddDays(6);
-
-                        var transList = internalTransLst.Where(s => lstCatOtherVacation.Any(n => n == s._PayrollCategory) && s.Date >= vacationStartDate && s.Date <= projtransEndDate).ToList();
-                        otherVacationYTD = -transList.Select(x => x.Qty).Sum();
-                    }
-
-                    if (journalLineNotApprovedLst != null)
-                    {
-                        var projtransEndDateAppr = approvedCutOffDate == DateTime.MinValue ? vacationStartDate :
-                                                   approvedCutOffDate.AddDays(-1) < vacationStartDate ? vacationStartDate : approvedCutOffDate.AddDays(-1);
-
-                        if (projtransEndDateAppr > JournalLineDate.AddDays(6))
-                            projtransEndDateAppr = JournalLineDate.AddDays(6);
-
-                        var transList = journalLineNotApprovedLst.Where(s => s._RegistrationType == RegistrationType.Hours &&
-                                                                             s._InternalType == Uniconta.DataModel.InternalType.OtherVacation &&
-                                                                             s._Invoiceable == false && s.Date >= projtransEndDateAppr && s.Date < JournalLineDate);
-                        otherVacationNotApproved = transList.Select(x => x.Total).Sum();
-                    }
-                }
-            }
-            #endregion Other vacation
-
-            #region Overtime
-            overTimeYTD = 0;
-            overTimeNotApproved = 0;
-
-            if (lstCatOverTime == null)
-                UtilDisplay.RemoveMenuCommand(rb, "OvertimeBal");
-            else
-            {
-                if (internalTransLst != null)
-                {
-                    var projtransEndDateOvertime = approvedCutOffDate == DateTime.MinValue ? DateTime.MaxValue : approvedCutOffDate.AddDays(-1);
-                    if (projtransEndDateOvertime > JournalLineDate.AddDays(6))
-                        projtransEndDateOvertime = JournalLineDate.AddDays(6);
-
-                    var transList = internalTransLst.Where(s => lstCatOverTime.Any(n => n == s._PayrollCategory) && s.Date <= projtransEndDateOvertime).ToList();
-                    overTimeYTD = -transList.Select(x => x.Qty).Sum();
-                }
-
-                if (journalLineNotApprovedLst != null)
-                {
-                    var projtransEndDateOvertimeNotAppr = approvedCutOffDate == DateTime.MinValue ? DateTime.MinValue : approvedCutOffDate.AddDays(-1);
-
-                    var transList = journalLineNotApprovedLst
-                                    .Where(s => s._RegistrationType == RegistrationType.Hours &&
-                                                s._InternalType == Uniconta.DataModel.InternalType.OverTime &&
-                                                s._Invoiceable == false && s.Date >= projtransEndDateOvertimeNotAppr && s.Date < JournalLineDate)
-                                    .GroupBy(s => s.PayrollCategory)
-                                    .Select(t => new { Payroll = t.Key, Value = t.Sum(u => u.Total) }).ToList();
-
-                    foreach (var rec in transList)
-                    {
-                        var factor = (double)payrollCache.Get(rec?.Payroll)?._Factor;
-                        overTimeNotApproved += factor != 0 ? factor * rec.Value : rec.Value;
-                    }
-                }
-            }
-            #endregion Overtime
-
-            #region FlexTime
-            flexTimeYTD = 0;
-            flexTimeNotApproved = 0;
-
-            if (lstCatFlexTime == null)
-                UtilDisplay.RemoveMenuCommand(rb, "FlexTimeBal");
-            else
-            {
-                if (internalTransLst != null)
-                {
-                    var projtransEndDateFlex = approvedCutOffDate == DateTime.MinValue ? DateTime.MaxValue : approvedCutOffDate.AddDays(-1);
-                    if (projtransEndDateFlex > JournalLineDate.AddDays(6))
-                        projtransEndDateFlex = JournalLineDate.AddDays(6);
-
-                    var transList = internalTransLst.Where(s => lstCatFlexTime.Any(n => n == s._PayrollCategory) && s.Date <= projtransEndDateFlex).ToList();
-                    flexTimeYTD = -transList.Select(x => x.Qty).Sum();
-                }
-
-                if (journalLineNotApprovedLst != null)
-                {
-                    var projtransEndDateFlexNotAppr = approvedCutOffDate == DateTime.MinValue ? DateTime.MinValue : approvedCutOffDate.AddDays(-1);
-
-                    var transList = journalLineNotApprovedLst
-                                 .Where(s => s._RegistrationType == RegistrationType.Hours &&
-                                             s._InternalType == Uniconta.DataModel.InternalType.FlexTime &&
-                                             s._Invoiceable == false && s.Date >= projtransEndDateFlexNotAppr && s.Date < JournalLineDate)
-                                 .GroupBy(s => s.PayrollCategory)
-                                 .Select(t => new { Payroll = t.Key, Value = t.Sum(u => u.Total) }).ToList();
-
-                    foreach (var rec in transList)
-                    {
-                        var factor = (double)payrollCache.Get(rec?.Payroll)?._Factor;
-                        flexTimeNotApproved += factor != 0 ? factor * rec.Value : rec.Value;
-                    }
-                }
-            }
-            #endregion FlexTime
-
-            #region Mileage
-            DateTime calendarStartDate = DateTime.MinValue;
-            mileageYTD = 0;
-            mileageNotApproved = 0;
-
-            if (lstCatMileage == null)
-                UtilDisplay.RemoveMenuCommand(rb, "MileageBal");
-            else
-            {
-                if (internalTransLst != null || journalLineNotApprovedLst != null)
-                {
-                    var mileageStartDate = new DateTime(JournalLineDate.Year, 1, 1);
-
-                    if (internalTransLst != null)
-                    {
-                        var projtransMileageEndDate = JournalLineDate.AddDays(6);
-                        var startDateNorm = employee._Hired < calendarStartDate ? calendarStartDate : employee._Hired;
-
-                        if (projtransMileageEndDate < startDateNorm)
-                            projtransMileageEndDate = startDateNorm;
-
-                        var transList = internalTransLst.Where(s => lstCatMileage.Any(n => n == s._PayrollCategory) && s.Date >= mileageStartDate && s.Date <= projtransMileageEndDate).ToList();
-                        mileageYTD = transList.Select(x => x.Qty).Sum();
-                    }
-
-                    if (journalLineNotApprovedLst != null)
-                    {
-                        if (mileageStartDate.DayOfWeek != DayOfWeek.Monday)
-                        {
-                            int diff = (7 + (mileageStartDate.DayOfWeek - DayOfWeek.Monday)) % 7;
-                            mileageStartDate = mileageStartDate.AddDays(-1 * diff);
-                        }
-
-                        var transMileageEndDate = approvedCutOffDate == DateTime.MinValue ? mileageStartDate :
-                                                  approvedCutOffDate.AddDays(-1) < mileageStartDate ? mileageStartDate : approvedCutOffDate.AddDays(-1);
-
-                        var transList = journalLineNotApprovedLst.Where(s => s._RegistrationType == RegistrationType.Mileage &&
-                                                                             s._InternalType == Uniconta.DataModel.InternalType.Mileage &&
-                                                                             s.Date >= transMileageEndDate && s.Date < JournalLineDate);
-                        mileageNotApproved = transList.Select(x => x.Total).Sum();
-                    }
-                }
-            }
-            #endregion Mileage
+            (vacationYTD, vacationNotApproved) = CalculateBalances(rb, "VacationBal", lstCatVacation, Uniconta.DataModel.InternalType.Vacation);
+            (otherVacationYTD, otherVacationNotApproved) = CalculateBalances(rb, "OtherVacationBal", lstCatOtherVacation, Uniconta.DataModel.InternalType.OtherVacation);
+            (overTimeYTD, overTimeNotApproved) = CalculateBalances(rb, "OvertimeBal", lstCatOverTime, Uniconta.DataModel.InternalType.OverTime);
+            (flexTimeYTD, flexTimeNotApproved) = CalculateBalances(rb, "FlexTimeBal", lstCatFlexTime, Uniconta.DataModel.InternalType.FlexTime);
+            (mileageYTD, mileageNotApproved) = CalculateBalances(rb, "MileageBal", lstCatMileage, Uniconta.DataModel.InternalType.Mileage);
 
             RecalculateWeekInternalHour();
             RecalculateWeekInternalMileage();
             RecalculateEfficiencyPercentage();
         }
+
+
+        (double ytd, double notApproved) CalculateBalances(RibbonBase rb, string menuCommand, HashSet<string> catList, Uniconta.DataModel.InternalType internalType)
+        {
+            if (catList == null)
+            {
+                UtilDisplay.RemoveMenuCommand(rb, menuCommand);
+                return (0, 0);
+            }
+
+            if (internalTransLst == null && journalLineNotApprovedLst == null)
+                return (0, 0);
+
+            double ytd = 0, notApproved = 0;
+
+            DateTime startDate = DateTime.MinValue;
+            var registrationType = RegistrationType.Hours;
+            var isMileage = internalType == Uniconta.DataModel.InternalType.Mileage;
+            var isOverTimeFlex = internalType == Uniconta.DataModel.InternalType.OverTime || internalType == Uniconta.DataModel.InternalType.FlexTime;
+
+            if (isMileage)
+            {
+                startDate = new DateTime(JournalLineDate.Year, 1, 1);
+                registrationType = RegistrationType.Mileage;
+            }
+            else if (isOverTimeFlex)
+                startDate = DateTime.MinValue;
+            else
+                startDate = JournalLineDate < new DateTime(2023, 1, 1) ? new DateTime(JournalLineDate.Year, 1, 1) : new DateTime(2023, 1, 1);
+
+            if (internalTransLst != null)
+            {
+                var endDate = JournalLineDate.AddDays(6);
+                ytd = internalTransLst
+                    .Where(s => catList.Contains(s._PayrollCategory) && s.Date >= startDate && s.Date <= endDate)
+                    .Sum(x => isMileage ? x.Qty : -x.Qty);
+            }
+
+            if (journalLineNotApprovedLst != null)
+            {
+                var cutoff = JournalLineDate.AddDays(-1);
+                var approved = FirstDayOfWeek(employee._TMApproveDate);
+                foreach (var line in journalLineNotApprovedLst.Where(s => s._RegistrationType == registrationType &&
+                                                                           s._InternalType == internalType &&
+                                                                           (isMileage || !s._Invoiceable) &&
+                                                                           s.Date >= approved && s.Date <= cutoff))
+                {
+                    var calcQty = CalcNotApprovedHoursMileage(line);
+                    if (calcQty == 0)
+                        continue;
+
+                    if (isOverTimeFlex)
+                    {
+                        var factor = payrollCache.Get(line?.PayrollCategory)?._Factor ?? 0;
+                        if (factor != 0)
+                            calcQty = factor * calcQty;
+                    }
+                    notApproved += calcQty;
+                }
+            }
+
+            return (ytd, notApproved);
+        }
+
 
         void RecalculateWeekInternalHour()
         {
@@ -1174,26 +1026,52 @@ namespace UnicontaClient.Pages.CustomPage
                     foreach (var x in gridHours)
                     {
                         if (x._InternalType == Uniconta.DataModel.InternalType.Vacation)
-                            vacationTotal += x.Total;
+                            vacationTotal += CalcNotApprovedHoursMileage(x); 
                         else if (x._InternalType == Uniconta.DataModel.InternalType.OtherVacation)
-                            otherVacationTotal += x.Total;
-                        else if (x._InternalType == Uniconta.DataModel.InternalType.OverTime)
+                            otherVacationTotal += CalcNotApprovedHoursMileage(x);
+                        else if (x._InternalType == Uniconta.DataModel.InternalType.OverTime || x._InternalType == Uniconta.DataModel.InternalType.FlexTime)
                         {
-                            var payroll = (Uniconta.DataModel.EmpPayrollCategory)payrollCache.Get(x.PayrollCategory);
-                            var factor = payroll != null ? (payroll._Factor == 0 ? 1 : payroll._Factor) : 1;
-                            overTimeTotal += x.Total * factor;
-                        }
-                        else if (x._InternalType == Uniconta.DataModel.InternalType.FlexTime)
-                        {
-                            var payroll = (Uniconta.DataModel.EmpPayrollCategory)payrollCache.Get(x.PayrollCategory);
-                            var factor = payroll != null ? (payroll._Factor == 0 ? 1 : payroll._Factor) : 1;
-                            flexTimeTotal += x.Total * factor;
+                            var calc = CalcNotApprovedHoursMileage(x);
+                            if (calc == 0)
+                                continue;
+
+                            var factor = payrollCache.Get(x?.PayrollCategory)?._Factor ?? 0; 
+                            if (factor != 0)
+                                calc = factor * calc;
+
+                            if (x._InternalType == Uniconta.DataModel.InternalType.OverTime)
+                                overTimeTotal += calc;
+                            else
+                                flexTimeTotal += calc;
                         }
                     }
                 }
             }
 
             SetStatusTextHour(vacationTotal, otherVacationTotal, overTimeTotal, flexTimeTotal);
+        }
+
+        private double CalcNotApprovedHoursMileage(TMJournalLineClient line)
+        {
+            double total = 0;
+            for (int i = 0; i < 7; i++)
+            {
+                var dt = line.Date.AddDays(i);
+                if (dt <= employee._TMApproveDate)
+                    continue;
+
+                switch (dt.DayOfWeek)
+                {
+                    case DayOfWeek.Monday: total += line._Day1; break;
+                    case DayOfWeek.Tuesday: total += line._Day2; break;
+                    case DayOfWeek.Wednesday: total += line._Day3; break;
+                    case DayOfWeek.Thursday: total += line._Day4; break;
+                    case DayOfWeek.Friday: total += line._Day5; break;
+                    case DayOfWeek.Saturday: total += line._Day6; break;
+                    case DayOfWeek.Sunday: total += line._Day7; break;
+                }
+            }
+            return total;
         }
 
         void RecalculateEfficiencyPercentage()
@@ -1233,7 +1111,7 @@ namespace UnicontaClient.Pages.CustomPage
                     foreach (var x in gridMileage)
                     {
                         if (x._InternalType == Uniconta.DataModel.InternalType.Mileage)
-                            mileageTotal += x.Total;
+                           mileageTotal += CalcNotApprovedHoursMileage(x);//x.Total;
                     }
                 }
             }
@@ -1924,7 +1802,8 @@ namespace UnicontaClient.Pages.CustomPage
             busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LoadingMsg");
 
             ShowJournalInfo(postingRes);
-            if (postingRes.Err == 0 && postingRes.CreatedOvertime)
+
+            if (postingRes.Err == 0)
                 RefreshGrid();
         }
 
@@ -2035,14 +1914,22 @@ namespace UnicontaClient.Pages.CustomPage
 
             double totalDaySums = daySums.Sum();
             double totalNormHours = normHoursArr.Sum();
-
-            if (totalDaySums != totalNormHours)
+            var zeroCalendar = totalNormHours == 0;
+            if (totalDaySums < totalNormHours || zeroCalendar)
             {
                 for (int i = 6; i >= 0; i--)
                 {
-                    var rest = normHoursArr[i] - daySums[i];
-                    if (closeDate < i + 1 && rest > 0)
-                        closeDay = i;
+                    if (zeroCalendar && daySums[i] != 0)
+                    {
+                        closeDay = i >= 4 ? 7 : i + 1;
+                        break;
+                    }
+                    else
+                    {
+                        var remaining = normHoursArr[i] - daySums[i];
+                        if (closeDate < i + 1 && remaining > 0)
+                            closeDay = i;
+                    }
                 }
             }
             var calcCloseDate = closeDay == 0 ? JournalLineDate : JournalLineDate.AddDays(closeDay - 1);
@@ -2080,7 +1967,11 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void ActionOpen()
         {
-            var openDate = employee._TMApproveDate < JournalLineDate.AddDays(6) ? employee._TMApproveDate.AddDays(1) : JournalLineDate.AddDays(6);
+            var maxDate = JournalLineDate.AddDays(6);
+            var openDate = employee._TMApproveDate < JournalLineDate ? JournalLineDate :
+                employee._TMApproveDate < maxDate ? employee._TMApproveDate.AddDays(1) :
+                maxDate;
+
             var cwDate = new CwSetPeriodPerDate(TMJournalActionType.Open, openDate, employee, api);
             cwDate.DialogTableId = 2000000055;
 
@@ -2115,7 +2006,6 @@ namespace UnicontaClient.Pages.CustomPage
                     ShowJournalInfo(postingRes, postingRes.CreatedOvertime);
                     if (postingRes.Err == 0)
                     {
-                        //TODO:Spørg Erik mht. Streaming benytter pt. #if MICROSOFT - korrekt?
                         if (postingDialog.IsSimulation)
                         {
                             AddDockItem(TabControls.SimulatedPrJournalLinePage, postingRes.SimulatedLines, Uniconta.ClientTools.Localization.lookup("SimulatedTransactions"), null, true);

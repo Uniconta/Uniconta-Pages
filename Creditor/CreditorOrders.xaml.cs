@@ -584,7 +584,7 @@ namespace UnicontaClient.Pages.CustomPage
                     ctrl = TabControls.DebtorOrderLines;
                     break;
             }
-            var confrimationText = string.Format(" {0}. {1}:{2},{3}:{4}\r\n{5}", Uniconta.ClientTools.Localization.lookup(orderMsg), Uniconta.ClientTools.Localization.lookup("OrderNumber"), order._OrderNumber,
+            var confrimationText = string.Format("{0}. {1}:{2},{3}:{4}\r\n{5}", Uniconta.ClientTools.Localization.lookup(orderMsg), Uniconta.ClientTools.Localization.lookup("OrderNumber"), order._OrderNumber,
                 Uniconta.ClientTools.Localization.lookup("Account"), order._DCAccount, string.Concat(string.Format(Uniconta.ClientTools.Localization.lookup("GoTo"), Uniconta.ClientTools.Localization.lookup(lineMsg)), " ?"));
 
             var confirmationBox = new CWConfirmationBox(confrimationText, string.Empty, false);

@@ -2,7 +2,6 @@
 using DevExpress.Xpf.Core.FilteringUI;
 using Scanner;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
@@ -22,7 +21,6 @@ using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
-using Uniconta.Common.Utility;
 using Uniconta.DataModel;
 using Localization = Uniconta.ClientTools.Localization;
 
@@ -41,7 +39,7 @@ namespace UnicontaClient.Controls.Dialogs
                 return true;
 
             var word = wordLine.word;
-            if (word == null) 
+            if (word == null)
                 return true;
 
             bool isFirstWord = !isAppend || WordLine == null || WordLine.Count == 0;
@@ -62,7 +60,7 @@ namespace UnicontaClient.Controls.Dialogs
             {
                 case ScanFieldType.Date:
                     if (AzureScanUtil.TryParseScanValue<DateTime>(temp, out var date, CultureInfo.CurrentCulture))
-                        newValue = date.ToString("g", CultureInfo.CurrentCulture);
+                        newValue = date.ToString("d", CultureInfo.CurrentCulture);
                     break;
                 case ScanFieldType.Double:
                     if (AzureScanUtil.TryParseScanValue<double>(temp, out var d, CultureInfo.CurrentCulture))
@@ -77,7 +75,23 @@ namespace UnicontaClient.Controls.Dialogs
                         newValue = b.ToString();
                     break;
                 default:
-                    newValue = temp;
+                    if (_Property == AzureCorrectionPropertiesAllowed.Currency)
+                    {
+                        if (AzureScanUtil.TryResolveCurrency(CultureInfo.CurrentCulture, temp, out var curr) &&
+                            Enum.TryParse<Currencies>(curr, out var currencyEnum))
+                            newValue = AppEnums.Currencies.ToString((byte)currencyEnum);
+                    }
+                    else if (_Property == AzureCorrectionPropertiesAllowed.ContactEmail)
+                    {
+                        if (temp != null && temp.Contains("@") && temp.Contains("."))
+                            newValue = temp;
+                    }
+                    else if (_Property == AzureCorrectionPropertiesAllowed.CompanyRegNo)
+                        newValue = new string((temp ?? "")
+                            .Where(c => char.IsLetterOrDigit(c) || '-' == c || '.' == c)
+                            .ToArray());
+                    else
+                        newValue = temp;
                     break;
             }
 
@@ -133,135 +147,128 @@ namespace UnicontaClient.Controls.Dialogs
             };
         }
 
-        public static AzureScanCorrectionWithWords[] GetAzureScanExtractions(
-            AzureScannerResult result, ContentTypes contentType)
+        // Bypasses field-type validation — for auto-highlight only (e.g. split email tokens).
+        // CorrectedValue is NOT changed; the caller restores it from the stored value.
+        public void SetHighlightWords(IList<AzureScanWordOnLine> words)
         {
-            var dict = new Dictionary<string, AzureScanCorrectionWithWords>(StringComparer.Ordinal);
-
-            var bankClassId = new CreditorPaymentAccountClient().ClassId();
-            var creditorClassId = CreditorClient.CLASSID;
-            var documnetClassId = VouchersClient.CLASSID;
-
-            // Creditor
-            AddIfMissing(dict, AzureCorrectionPropertiesAllowed.CompanyRegNo, creditorClassId, contentType,
-                ScanFieldType.String, result.GetCreditorCVRExtended());
-            AddIfMissing(dict, AzureCorrectionPropertiesAllowed.Name, creditorClassId, contentType,
-                ScanFieldType.String, result.GetNameExtended());
-            AddIfMissing(dict, AzureCorrectionPropertiesAllowed.Address1, creditorClassId, contentType,
-                ScanFieldType.String, result.GetAddress1Extended());
-            AddIfMissing(dict, AzureCorrectionPropertiesAllowed.City, creditorClassId, contentType,
-                ScanFieldType.String, result.GetCityExtended());
-            AddIfMissing(dict, AzureCorrectionPropertiesAllowed.ZipCode, creditorClassId, contentType,
-                ScanFieldType.String, result.GetPostalCodeExtended());
-            AddIfMissing(dict, AzureCorrectionPropertiesAllowed.ContactEmail, creditorClassId, contentType,
-                ScanFieldType.String, result.GetEmailExtended());
-            AddIfMissing(dict, AzureCorrectionPropertiesAllowed.Phone, creditorClassId, contentType,
-                ScanFieldType.String, result.GetPhoneExtended());
-
-            // Bank
-            AddIfMissing(dict, AzureCorrectionPropertiesAllowed.BankAccount, bankClassId, contentType,
-                ScanFieldType.String, result.GetBbanExtended());
-            AddIfMissing(dict, AzureCorrectionPropertiesAllowed.IBAN, bankClassId, contentType,
-                ScanFieldType.String, result.GetIbanExtended());
-            AddIfMissing(dict, AzureCorrectionPropertiesAllowed.SWIFT, bankClassId, contentType,
-                ScanFieldType.String, result.GetSwiftNoExtended());
-
-            var fik = result.GetFikExtended();
-            var fikEntity = !string.IsNullOrWhiteSpace(fik?.Item3) ? Tuple.Create(fik.Item1, fik.Item3) : null;
-            AddIfMissing(dict, AzureCorrectionPropertiesAllowed.FIKCode, bankClassId, contentType,
-                ScanFieldType.String, fikEntity);
-
-            // Voucher
-            AddIfMissing(dict, AzureCorrectionPropertiesAllowed.Invoice, documnetClassId, contentType,
-                ScanFieldType.String, result.GetInvoiceNumberExtended());
-            AddIfMissing(dict, AzureCorrectionPropertiesAllowed.PostingDate, documnetClassId, contentType,
-                ScanFieldType.Date, Format(result.GetInvoiceDateExtended()));
-            AddIfMissing(dict, AzureCorrectionPropertiesAllowed.DueDate, documnetClassId, contentType,
-                ScanFieldType.Date, Format(result.GetDueDateExtended()));
-            AddIfMissing(dict, AzureCorrectionPropertiesAllowed.PurchaseNumber, documnetClassId, contentType,
-                ScanFieldType.String, Format(result.GetPurchaseNumberExtended()));
-            AddIfMissing(dict, AzureCorrectionPropertiesAllowed.Project, documnetClassId, contentType,
-                ScanFieldType.String, result.GetProjectNumberExtended());
-            AddIfMissing(dict, AzureCorrectionPropertiesAllowed.Currency, creditorClassId, contentType,
-                ScanFieldType.String, Format(result.GetCurrencyExtended()));
-            AddIfMissing(dict, AzureCorrectionPropertiesAllowed.Amount, documnetClassId, contentType,
-                ScanFieldType.Double, Format(result.GetAmountExtended()));
-
-            return dict
-                .Select(k => k.Value)
-                .ToArray();
+            if (words == null || words.Count == 0) return;
+            WordLine = new List<AzureScanWordOnLine>(words);
+            NormalizedBounds = MergeNormalizedBounds();
+            _PageNumber = PageNumberResolved;
         }
 
-        private static void AddIfMissing(Dictionary<string, AzureScanCorrectionWithWords> dict,
-            string key, int classId, ContentTypes contentType, ScanFieldType fieldType,
-            Tuple<RootAzureScanElement, string> value)
+        public bool AddWordsMulti(IList<AzureScanWordOnLine> words, bool isAppend)
         {
-            if (dict.TryGetValue(key, out var existing))
+            if (words == null || words.Count == 0) return false;
+            if (words.Count == 1) return AddWords(words[0], isAppend);
+            if (_PropertyType != ScanFieldType.Date) return false;
+
+            bool isFirstGroup = !isAppend || WordLine == null || WordLine.Count == 0;
+
+            var prefix = isFirstGroup
+                ? Enumerable.Empty<string>()
+                : WordLine.Select(w => w.word?.Text ?? "");
+
+            // Try the full word list first, then progressively skip leading non-date words
+            // (e.g. "Onsdag d. 22. apr. 2026" → skip "Onsdag", "d." → "22. apr. 2026" ✓).
+            for (int skip = 0; skip < words.Count - 1; skip++)
             {
-                if (string.IsNullOrWhiteSpace(existing.CorrectedValue) && !string.IsNullOrWhiteSpace(value?.Item2))
-                    existing.CorrectedValue = value?.Item2;
-                return;
+                var subset = words.Skip(skip).ToList();
+                var temp = string.Join(" ", prefix.Concat(subset.Select(w => w.word?.Text ?? "")));
+
+                if (!AzureScanUtil.TryParseScanValue<DateTime>(temp, out var date, CultureInfo.CurrentCulture))
+                    continue;
+
+                var newValue = date.ToString("d", CultureInfo.CurrentCulture);
+
+                if (isFirstGroup)
+                {
+                    _PageNumber = subset[0].word.PageNumber;
+                    WordLine = new List<AzureScanWordOnLine>(subset);
+                    NormalizedBounds = MergeNormalizedBounds();
+                }
+                else
+                {
+                    foreach (var w in subset) WordLine.Add(w);
+                    NormalizedBounds = MergeNormalizedBounds();
+                    _PageNumber = PageNumberResolved;
+                }
+
+                CorrectedValue = newValue;
+                return true;
             }
 
-            var element = value?.Item1;
-
-            var nBox = element?.GetNormalizedBox()
-                ?? new NBox { MinX = 0, MinY = 0, MaxX = 0, MaxY = 0 };
-
-            var extract = new AzureScanCorrectionWithWords
-            {
-                Property = key,
-                CorrectedValue = value?.Item2,
-                _ContentType = contentType,
-                _PropertyType = fieldType,
-                _TableId = classId,
-                _PageNumber = element?.PageNumber ?? 0,
-                NormalizedBounds = nBox,
-            };
-
-            dict[key] = extract;
+            return false;
         }
 
-        private static Tuple<RootAzureScanElement, string> Format<T>(Tuple<RootAzureScanElement, T> element)
+        public static List<AzureScanCorrectionWithWords> GetAzureScanExtractions(AzureScan scan)
         {
-            if (element == null)
-                return null;
+            var list = new List<AzureScanCorrectionWithWords>();
+            if (scan?._Corrections == null)
+                return list;
 
-            T val = element.Item2;
-            if (val == null)
-                return null;
-            else if (val is double d)
-                return Tuple.Create(element.Item1, d.ToString("N2", CultureInfo.CurrentCulture));
-            else if (val is short date)
+            foreach (var ext in scan._Corrections)
             {
-                var dt = SmallDate.Unpack(date);
-                var dtStr = dt.TimeOfDay == TimeSpan.Zero
-                    ? dt.ToString("d", CultureInfo.CurrentCulture)
-                    : dt.ToString("g", CultureInfo.CurrentCulture);
-                return Tuple.Create(element.Item1, dtStr);
+                if (string.IsNullOrWhiteSpace(ext?._Property))
+                    continue;
+
+                var fieldType = ScanFieldType.String;
+                switch (ext._Property)
+                {
+                    case AzureCorrectionPropertiesAllowed.PostingDate:
+                    case AzureCorrectionPropertiesAllowed.DueDate:
+                        fieldType = ScanFieldType.Date;
+                        break;
+                    case AzureCorrectionPropertiesAllowed.Amount:
+                        fieldType = ScanFieldType.Double;
+                        break;
+                }
+
+                var extract = new AzureScanCorrectionWithWords
+                {
+                    RowId = ext._RowId,
+                    CompanyId = ext.CompanyId,
+                    _Uid = ext._Uid,
+                    _UserLogidId = ext._UserLogidId,
+                    _DocumentRef = ext._DocumentRef,
+                    _Flags = ext._Flags,
+                    _CreditorLegalIdent = ext._CreditorLegalIdent,
+                    _HeaderNormalized = ext._HeaderNormalized,
+                    _LineTextNormalized = ext._LineTextNormalized,
+                    CorrectedValue = ext._CorrectedValue,
+                    Property = ext._Property,
+                    _WordIndexInLine = ext._WordIndexInLine,
+                    _PageNumber = ext._PageNumber,
+                    _TableId = ext._TableId,
+                    _X1N = ext._X1N,
+                    _Y1N = ext._Y1N,
+                    _X2N = ext._X2N,
+                    _Y2N = ext._Y2N,
+                    _PropertyType = fieldType
+                };
+
+                list.Add(extract);
             }
-            else if (val is Currencies curr)
-            {
-                var currStr = AppEnums.Currencies.ToString((int)curr);
-                return Tuple.Create(element.Item1, currStr);
-            }
-            else
-                return Tuple.Create(element.Item1, val.ToString());
+
+            return list?
+                .OrderBy(x =>
+                {
+                    int index = Array.IndexOf(x.OutputOrder, x._Property);
+                    return index == -1 ? int.MaxValue : index;
+                })?
+                .ToList();
         }
     }
 
     public partial class CWCorrectScannedData : UnicontaBaseWindow
     {
-        private static readonly ConcurrentDictionary<int, AzureScannerResult> _ScanResultCache
-            = new ConcurrentDictionary<int, AzureScannerResult>();
-
         private const string UnipediaScanUrl =
             "https://www.uniconta.com/da/unipedia/uniconta-scan/";
 
         private readonly CrudAPI api;
         private readonly VouchersClient voucher;
 
-        private AzureScannerResult scan;
+        private AzureScan scan;
 
         // DevExpress PDF rendering state
         private PdfDocumentProcessor _pdfProcessor;
@@ -329,7 +336,7 @@ namespace UnicontaClient.Controls.Dialogs
                 else
                     RenderImageDocument(data);
 
-                FieldsList.ItemsSource = AzureScanCorrectionWithWords.GetAzureScanExtractions(scan, voucher._Content);
+                FieldsList.ItemsSource = AzureScanCorrectionWithWords.GetAzureScanExtractions(scan);
                 FieldsList.SelectionChanged += FieldsList_SelectionChanged;
                 if (scan.Any)
                     FieldsList.SelectedIndex = 0;
@@ -362,18 +369,16 @@ namespace UnicontaClient.Controls.Dialogs
             return data;
         }
 
-        private async Task<AzureScannerResult> GetScanResult()
+        private async Task<AzureScan> GetScanResult()
         {
-            _ScanResultCache.TryGetValue(voucher.RowId, out scan);
-
             var docApi = new DocumentAPI(api);
-            if (scan == null || !scan.Any)
-                scan = await docApi.GetAzureScanResult(voucher);
-
+            scan = await docApi.GetAzureScanResult(voucher);
             if (scan == null || !scan.Any)
                 UtilDisplay.ShowErrorCode(docApi.LastError);
+            else if (string.IsNullOrWhiteSpace(scan._CreditorLegalIdent) ||
+                string.IsNullOrWhiteSpace(scan._NormalizedHeader))
+                UnicontaMessageBox.Show(Localization.lookup("MissingInfoToTrainScanner"), Localization.lookup("Warning"));
 
-            _ScanResultCache[voucher.RowId] = scan;
             return scan;
         }
 
@@ -580,24 +585,81 @@ namespace UnicontaClient.Controls.Dialogs
                 var bounds = selectedExtraction.NormalizedBounds;
                 var page = selectedExtraction.PageNumberResolved;
 
-                // 1) Anchor word: bounds first, value fallback
-                var anchor = scan.GetWordAndLine(
-                    pageNumber: page,
-                    bounds: AzureScanUtil.IsMeaningful(bounds) ? bounds : (NBox?)null,
-                    nx: null,
-                    ny: null,
-                    value: selectedExtraction.CorrectedValue,
-                    allowNeighborPages: true);
-
                 List<AzureScanWordOnLine> toadd;
-                if (anchor != null)
-                    toadd = scan.ResolveWordLineForExtraction(anchor,
-                        bounds: AzureScanUtil.IsMeaningful(bounds) ? bounds : (NBox?)null,
-                        value: selectedExtraction.CorrectedValue);
-                else
-                    toadd = scan.FindWordsByExtractedValue(selectedExtraction.CorrectedValue);
 
-                toadd.ForEach(ta => selectedExtraction.AddWords(ta, true));
+                // Currency: stored bounds often point to the amount, not the symbol/alias.
+                // Prefer an explicit alias search ("DKK" → "kr.", "EUR" → "€") over bounds.
+                if (selectedExtraction._Property == AzureCorrectionPropertiesAllowed.Currency)
+                {
+                    var aliasWord = scan.FindCurrencyAliasWord(selectedExtraction.CorrectedValue);
+                    toadd = aliasWord != null
+                        ? new List<AzureScanWordOnLine> { aliasWord }
+                        : new List<AzureScanWordOnLine>();
+                }
+                else
+                {
+                    // 1) Anchor word: bounds first, value fallback
+                    var anchor = scan.GetWordAndLine(
+                        pageNumber: page,
+                        bounds: AzureScanUtil.IsMeaningful(bounds) ? bounds : (NBox?)null,
+                        nx: null,
+                        ny: null,
+                        value: selectedExtraction.CorrectedValue,
+                        allowNeighborPages: true);
+
+                    if (anchor != null)
+                        toadd = scan.ResolveWordLineForExtraction(anchor,
+                            bounds: AzureScanUtil.IsMeaningful(bounds) ? bounds : (NBox?)null,
+                            value: selectedExtraction.CorrectedValue);
+                    else
+                        toadd = scan.FindWordsByExtractedValue(selectedExtraction.CorrectedValue);
+                }
+
+                // For date fields: if nothing resolved (no bounds, no direct text match because the
+                // document uses a text-month format), search by individual date components.
+                if (toadd.Count == 0 && selectedExtraction._PropertyType == ScanFieldType.Date)
+                    toadd = scan.FindDateComponentWords(selectedExtraction.CorrectedValue, CultureInfo.CurrentCulture);
+
+                // For string fields (phone, email, etc.): search line text/digit sequences.
+                // Handles phone split into tokens ("70337233" → "70","33","72","33") and
+                // email split at "@" ("kontakt@nemlig.com" → "kontakt@","nemlig.com").
+                // Track whether toadd came from this trusted search — guards SetHighlightWords below.
+                List<AzureScanWordOnLine> lineTextWords = null;
+                if (toadd.Count == 0 && selectedExtraction._PropertyType == ScanFieldType.String)
+                {
+                    lineTextWords = scan.FindWordsByLineText(selectedExtraction.CorrectedValue);
+                    toadd = lineTextWords;
+                }
+
+                bool allAdded = selectedExtraction._PropertyType == ScanFieldType.Date && toadd.Count > 1
+                    && selectedExtraction.AddWordsMulti(toadd, false);
+
+                if (!allAdded)
+                    toadd.ForEach(ta => selectedExtraction.AddWords(ta, true));
+
+                // For date fields: if AddWords still failed (e.g. bounds returned just "20." which
+                // can't parse alone), try a full component search as a second-level fallback.
+                if ((selectedExtraction.WordLine == null || selectedExtraction.WordLine.Count == 0)
+                    && selectedExtraction._PropertyType == ScanFieldType.Date)
+                {
+                    var componentWords = scan.FindDateComponentWords(selectedExtraction.CorrectedValue, CultureInfo.CurrentCulture);
+                    if (componentWords.Count > 1)
+                    {
+                        allAdded = selectedExtraction.AddWordsMulti(componentWords, false);
+                        if (!allAdded)
+                            componentWords.ForEach(ta => selectedExtraction.AddWords(ta, true));
+                    }
+                }
+
+                // SetHighlightWords bypasses field-type validation and is ONLY safe when we know
+                // the words are correct (i.e. they came from FindWordsByLineText which matched the
+                // value's content). Do NOT call it for bounds-based paths — those can return
+                // unrelated words (e.g. a price number for a currency field) and would cause
+                // incorrect highlighting.
+                if ((selectedExtraction.WordLine == null || selectedExtraction.WordLine.Count == 0)
+                    && lineTextWords != null && lineTextWords.Count > 0)
+                    selectedExtraction.SetHighlightWords(lineTextWords);
+
                 selectedExtraction.CorrectedValue = value;
             }
 
@@ -650,6 +712,9 @@ namespace UnicontaClient.Controls.Dialogs
             bool isAppend = (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control;
 
             var isAdded = selectedExtraction.AddWords(word, isAppend);
+            if (!isAdded && selectedExtraction._PropertyType == ScanFieldType.Date && !isAppend)
+                isAdded = TryAddDateLookahead(selectedExtraction, word);
+
             if (!isAdded)
             {
                 ShowToast(string.Format(Localization.lookup("OBJNotValidFormat"), "'" + (word?.word?.Text ?? "") + "'"));
@@ -661,6 +726,80 @@ namespace UnicontaClient.Controls.Dialogs
 
             HighlightAzureWords(selectedExtraction);
             e.Handled = true;
+        }
+
+        private bool TryAddDateLookahead(AzureScanCorrectionWithWords extraction, AzureScanWordOnLine wordLine)
+        {
+            if (scan == null || wordLine?.word == null) return false;
+
+            var pageWords = scan.GetWordsOnPage(wordLine.word.PageNumber);
+            if (pageWords == null || pageWords.Length == 0) return false;
+
+            var clickedBox = wordLine.word.GetNormalizedBox();
+            var line = wordLine.line;
+
+            List<AzureScanElement> candidates;
+            if (line != null)
+            {
+                var lineBox = line.GetNormalizedBox();
+                var lineH = Math.Max(1e-9, lineBox.MaxY - lineBox.MinY);
+
+                // Words to the right on the same line
+                var sameLineNext = pageWords
+                    .Where(w =>
+                    {
+                        if (w == wordLine.word) return false;
+                        var wb = w.GetNormalizedBox();
+                        if (wb.MinX <= clickedBox.MinX) return false;
+                        var overlapY = Math.Max(0, Math.Min(wb.MaxY, lineBox.MaxY) - Math.Max(wb.MinY, lineBox.MinY));
+                        return overlapY / Math.Max(1e-9, wb.MaxY - wb.MinY) >= 0.35;
+                    })
+                    .OrderBy(w => w.GetNormalizedBox().MinX)
+                    .Take(4)
+                    .ToList();
+
+                // Words on the next line down — handles wrapped dates like "22. apr. / 2026"
+                var nextLineWords = pageWords
+                    .Where(w =>
+                    {
+                        var wb = w.GetNormalizedBox();
+                        return wb.MinY > lineBox.MaxY - 0.001 && wb.MinY <= lineBox.MaxY + lineH * 2;
+                    })
+                    .OrderBy(w => w.GetNormalizedBox().MinX)
+                    .Take(3)
+                    .ToList();
+
+                candidates = sameLineNext.Concat(nextLineWords).ToList();
+            }
+            else
+            {
+                candidates = pageWords
+                    .Where(w => w != wordLine.word
+                             && wordLine.word.IsAppendAllowed(w)
+                             && w.GetNormalizedBox().MinX > clickedBox.MinX)
+                    .OrderBy(w => w.GetNormalizedBox().MinX)
+                    .Take(4)
+                    .ToList();
+            }
+
+            if (candidates.Count == 0) return false;
+
+            for (int count = 1; count <= candidates.Count; count++)
+            {
+                var combined = string.Join(" ",
+                    new[] { wordLine.word.Text }.Concat(candidates.Take(count).Select(w => w.Text)));
+
+                if (AzureScanUtil.TryParseScanValue<DateTime>(combined, out _, CultureInfo.CurrentCulture))
+                {
+                    var wordsToAdd = new List<AzureScanWordOnLine> { wordLine };
+                    for (int i = 0; i < count; i++)
+                        wordsToAdd.Add(new AzureScanWordOnLine { word = candidates[i], line = line });
+
+                    return extraction.AddWordsMulti(wordsToAdd, false);
+                }
+            }
+
+            return false;
         }
 
         private System.Windows.Threading.DispatcherTimer _toastTimer;
@@ -796,7 +935,7 @@ namespace UnicontaClient.Controls.Dialogs
             bool bankAccSetOnCreditor = false;
             bool fikSetOnVoucher = false;
 
-            var headerNormalized = scan.NormalizedHeader;
+            var headerNormalized = scan._NormalizedHeader;
             var scanCreditorId = scan._CreditorLegalIdent;
 
             var paymentClassId = new CreditorPaymentAccountClient().ClassId();
@@ -811,17 +950,45 @@ namespace UnicontaClient.Controls.Dialogs
                 {
                     if (moded == null || string.IsNullOrWhiteSpace(moded.Property) || string.IsNullOrEmpty(moded.CorrectedValue))
                         continue;
-                    if (!moded.IsModified || !moded.OutputOrder.Any(p => p == moded.Property))
+                    if (!moded.OutputOrder.Any(p => p == moded.Property))
                         continue;
 
                     var target = moded._TableId == paymentClassId ? bank
                         : moded._TableId == creditorClassId ? (UnicontaBaseEntity)creditor
                         : voucher;
 
+                    // Creditor / bank records are protected: never silently overwritten
+                    // with raw scan output unless the user explicitly edited the value.
+                    if (target != voucher && !moded.IsModified)
+                        continue;
+
+                    // For voucher fields: when the user didn't edit, only auto-fill fields
+                    // that are currently empty. Fixes the "dialog shows e.g. 199 but inbox
+                    // is empty" report — the initial SetValuesOnDocument left voucher.* null
+                    // (Azure missed the field on first scan, dialog re-scan now finds it),
+                    // and the original `!IsModified` short-circuit threw away that recovery.
+                    // The empty-only guard prevents a flaky dialog re-scan from silently
+                    // overwriting a value the original scan already wrote correctly.
+                    if (target == voucher && !moded.IsModified)
+                    {
+                        var voucherProp = target.GetType().GetProperty(moded.Property);
+                        var voucherCurrent = voucherProp?.GetValue(target);
+                        bool isVoucherFieldEmpty = voucherCurrent == null
+                            || (voucherCurrent is string vs && string.IsNullOrEmpty(vs))
+                            || (voucherCurrent is double vd && vd == 0)
+                            || (voucherCurrent is float vf && vf == 0)
+                            || (voucherCurrent is long vl && vl == 0)
+                            || (voucherCurrent is int vi && vi == 0)
+                            || (voucherCurrent is short vsh && vsh == 0)
+                            || (voucherCurrent is byte vb && vb == 0);
+                        if (!isVoucherFieldEmpty)
+                            continue;
+                    }
+
                     var newText = moded.CorrectedValue;
                     if (bank != null && moded.Property == "FIKCode")
                     {
-                        var fik = scan.ExtractAndSetFIKWithRegex(newText, voucher.Invoice);
+                        var fik = AzureScanUtil.ExtractAndSetFIKWithRegex(newText, voucher.Invoice);
                         bank.FICreditorNumber = fik?.Item1;
                         bank.FIKMask = fik?.Item2;
                         newText = bank.FIKMask + bank.FICreditorNumber;
@@ -853,7 +1020,7 @@ namespace UnicontaClient.Controls.Dialogs
                         fikSetOnVoucher = moded.Property == "FIKCode";
                         bankAccSetOnCreditor = moded.Property == "BankAccount";
                     }
-                    else
+                    else if (moded.Property != AzureCorrectionPropertiesAllowed.CompanyRegNo)
                     {
                         if (creditor == null && CreditorClient.CLASSID == moded._TableId)
                             continue;
@@ -867,7 +1034,7 @@ namespace UnicontaClient.Controls.Dialogs
                             continue;
                         }
 
-                        if (!AzureScanUtil.TryParseScanValue(prop.PropertyType, newText, out var converted, scan.GetCultureInfo()))
+                        if (!AzureScanUtil.TryParseScanValue(prop.PropertyType, newText, out var converted, CultureInfo.CurrentCulture))
                             continue;
 
                         prop.SetValue(target, converted);
@@ -881,10 +1048,10 @@ namespace UnicontaClient.Controls.Dialogs
                         moded._CreditorLegalIdent = existingCorrection?._CreditorLegalIdent ?? scanCreditorId;
                     else
                         moded._CreditorLegalIdent = existingCorrection._CreditorLegalIdent.Length > scanCreditorId.Length
-                                ? existingCorrection._CreditorLegalIdent : scanCreditorId;
+                            ? existingCorrection._CreditorLegalIdent : scanCreditorId;
 
                     moded._HeaderNormalized = headerNormalized;
-                    moded._CorrectedValue = newText;
+                    moded.CorrectedValue = newText;
                     moded._UseCorrectedValueAlways = !(target is VouchersClient);
 
                     var lineSigs = AzureScanUtil.NormalizedLineTextsAndWordIndicesFromWordLine(
@@ -898,7 +1065,13 @@ namespace UnicontaClient.Controls.Dialogs
                     moded._UserLogidId = api.session.LoginId;
 
                     moded._DocumentRef = voucher.RowId;
-                    modified.Add(moded);
+
+                    // Only persist user-edited corrections to the cache — otherwise we'd
+                    // train the corrections cache on the scanner's own output.
+                    if (moded.IsModified &&
+                        !string.IsNullOrWhiteSpace(moded._HeaderNormalized) &&
+                        !string.IsNullOrWhiteSpace(moded._CreditorLegalIdent))
+                        modified.Add(moded);
                 }
                 catch
                 {
@@ -915,15 +1088,19 @@ namespace UnicontaClient.Controls.Dialogs
             }
 
             var err = ErrorCodes.Succes;
-            if (creditor?.Account != null || creditor?.CompanyRegNo != null)
+            if (api.CompanyEntity._PaperFlowSaveCreditors)
             {
-                creditor.Account = creditor.Account ?? creditor.CompanyRegNo;
-                err = await (creditor.RowId != 0 ? api.Update(creditor) : api.Insert(creditor));
-            }
-            if (err == 0 && bank != null && creditor?.Account != null)
-            {
-                bank.SetMaster(creditor);
-                err = await (bank.RowId != 0 ? api.Update(bank) : api.Insert(bank));
+                if (creditor?.Account != null || creditor?.CompanyRegNo != null)
+                {
+                    creditor.Account = creditor.Account ?? creditor.CompanyRegNo;
+                    err = await (creditor.RowId != 0 ? api.Update(creditor) : api.Insert(creditor));
+                }
+                if (err == 0 && bank != null && creditor?.Account != null &&
+                    api.CompanyEntity.CreditorBankApprovement)
+                {
+                    bank.SetMaster(creditor);
+                    err = await (bank.RowId != 0 ? api.Update(bank) : api.Insert(bank));
+                }
             }
             if (err == 0)
             {
@@ -937,17 +1114,9 @@ namespace UnicontaClient.Controls.Dialogs
                 var inserts = modified.Where(c => c.RowId == 0).ToList();
                 var updates = modified.Where(c => c.RowId != 0).ToList();
                 err = await api.MultiCrud(inserts, updates, null);
-                if (err == 0)
-                {
-                    inserts.AddRange(updates);
-                    scan._Corrections = inserts.ToArray();
-                }
             }
             if (err != 0)
-            {
-                _ScanResultCache.TryRemove(voucher.RowId, out _);
                 UtilDisplay.ShowErrorCode(err);
-            }
             else
                 SaveSucceeded = true;
 
@@ -980,35 +1149,54 @@ namespace UnicontaClient.Controls.Dialogs
         private async Task<CreditorClient> GetCreditor(
             List<AzureScanCorrectionWithWords> corrections)
         {
+            var creditor = voucher?.Creditor;
+
             var correction = corrections?.FirstOrDefault(c =>
                 c._TableId == CreditorClient.CLASSID &&
                 c._Property == AzureCorrectionPropertiesAllowed.CompanyRegNo &&
                 !string.IsNullOrWhiteSpace(c?._CorrectedValue));
 
-            var creditor = api.CompanyEntity._PaperFlowSaveCreditors ? voucher?.Creditor : null;
+            if (string.IsNullOrWhiteSpace(correction?._CorrectedValue))
+                return creditor;
 
             var correctedValue = Regex.Replace(correction._CorrectedValue, "[^0-9]", "");
             if (string.IsNullOrWhiteSpace(correctedValue) ||
                 correctedValue == Regex.Replace(creditor?.CompanyRegNo ?? "", "[^0-9]", ""))
                 return creditor;
 
-            var Comp = api.CompanyEntity;
-            var Cache = Comp.GetCache(typeof(CreditorClient));
-            if (Cache == null)
-                Cache = await Comp.LoadCache(typeof(CreditorClient), api);
-            if (Cache == null)
+            // Load creditor cache
+            var comp = api.CompanyEntity;
+
+            var creditorCache = comp.GetCache(typeof(CreditorClient))
+                ?? await comp.LoadCache(typeof(CreditorClient), api);
+
+            if (creditorCache != null && creditorCache.Count > 0)
+            {
+                var newCreditor = (CreditorClient)creditorCache.Get(correction._CorrectedValue);
+                newCreditor = newCreditor ?? (CreditorClient)creditorCache.Get(correctedValue);
+                if (newCreditor == null)
+                {
+                    // Search by company registration number
+                    var arr = (CreditorClient[])creditorCache?.GetNotNullArray;
+                    var creditors = arr?.Where(s => s?.CompanyRegNo != null && Regex.Replace(s.CompanyRegNo, "[^0-9]", "") == correctedValue)?.ToList();
+                    if (creditors.Count > 0)
+                        newCreditor = creditors.FirstOrDefault(c => c.PaymentId != null) ?? creditors[0];
+                }
+                if (newCreditor != null)
+                    return newCreditor;
+            }
+            
+            if (api.CompanyEntity._PaperFlowSaveCreditors)
+            {
+                creditor = creditor ?? new CreditorClient();
+                creditor.RowId = 0;
+                creditor.CompanyId = api.CompanyId;
+                creditor.Account = correction._CorrectedValue;
+                creditor.CompanyRegNo = correction._CorrectedValue;
                 return creditor;
+            }
 
-            var arr = (CreditorClient[])Cache?.GetNotNullArray;
-            var creditors = arr?.Where(s => s?.CompanyRegNo != null && Regex.Replace(s.CompanyRegNo, "[^0-9]", "") == correctedValue)?.ToList();
-            if (creditors.Count > 0)
-                creditor = creditors.FirstOrDefault(c => c.PaymentId != null) ?? creditors[0];
-            if (creditor == null)
-                creditor = (CreditorClient)Cache.Get(correction._CorrectedValue);
-            if (creditor == null)
-                creditor = (CreditorClient)Cache.Get(correctedValue);
-
-            return creditor;
+            return null;
         }
 
         private const double ZoomStep = 0.10;     // 10% per notch

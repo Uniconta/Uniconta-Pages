@@ -884,7 +884,7 @@ namespace UnicontaClient.Pages.CustomPage
             return err;
         }
 
-        void UpdatePrices()
+        async void UpdatePrices()
         {
             var source = dgProjectJournalLinePageGrid.GetVisibleRows() as IEnumerable<ProjectJournalLineClient>;
             foreach (var rec in source)
@@ -911,7 +911,7 @@ namespace UnicontaClient.Pages.CustomPage
                 getCostAndSales(rec);
                 if (rec._Employee != null)
                 {
-                    TimePriceLookup?.GetEmployeePrice(rec);
+                    await TimePriceLookup?.GetEmployeePrice(rec);
                     var emp = (Uniconta.DataModel.Employee)EmployeeCache?.Get(rec._Employee);
                     if (emp?._PayrollCategory != null)
                     {

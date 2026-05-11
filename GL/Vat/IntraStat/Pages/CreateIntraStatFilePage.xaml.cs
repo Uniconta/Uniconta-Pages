@@ -19,7 +19,9 @@ using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using Uniconta.Common.Enums;
+using Uniconta.Common.Utility;
 using Uniconta.DataModel;
+using Uniconta.WindowsAPI.ClientTools;
 using UnicontaClient.Models;
 using static UnicontaClient.Pages.CreateIntraStatFilePage;
 using Localization = Uniconta.ClientTools.Localization;
@@ -41,7 +43,7 @@ namespace UnicontaClient.Pages.CustomPage
         static bool DefaultImp, DefaultExp;
         static bool DefaultVIES;
         static int DefaultExpGrp;
-        SQLTableCache<Debtor> debtorCache;
+        SQLCache debtors;
         SQLTableCache<WorkInstallation> installationCache;
 
         public override string NameOfControl
@@ -80,7 +82,7 @@ namespace UnicontaClient.Pages.CustomPage
             };
             cmbExportGroup.SelectedIndex = DefaultExpGrp;
 
-            debtorCache = api.GetCache<Uniconta.DataModel.Debtor>();
+            debtors = api.GetCache(typeof(Uniconta.DataModel.Debtor));
             if (api.CompanyEntity.DeliveryAddress)
                 installationCache = api.GetCache<Uniconta.DataModel.WorkInstallation>(); ;
 
@@ -94,8 +96,8 @@ namespace UnicontaClient.Pages.CustomPage
 
         protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
-            if (debtorCache == null)
-                debtorCache = await api.LoadCache<Uniconta.DataModel.Debtor>().ConfigureAwait(false);
+            debtors = await api.LoadCache(typeof(Uniconta.DataModel.Debtor), true).ConfigureAwait(false);
+
             if (installationCache == null)
                 installationCache = await api.LoadCache<Uniconta.DataModel.WorkInstallation>().ConfigureAwait(false);
 
@@ -139,7 +141,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        private void Compress()
+        private async Task Compress()
         {
             try
             {
@@ -175,7 +177,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                     compressed = true;
 
-                    CallValidate(true);
+                    await CallValidate(true);
                 }
             }
             catch (Exception e)
@@ -252,7 +254,7 @@ namespace UnicontaClient.Pages.CustomPage
             return dictionaryColumnIndices;
         }
       
-        private async void CreateFile()
+        private async Task CreateFile()
         {
             if (compressed == false)
             {
@@ -349,6 +351,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var prop = PropValuePair.GenereteWhereElements("Item", typeof(string), "!null");
             List<PropValuePair> propValPair = new List<PropValuePair>() { prop };
+            debtors = debtors ?? await api.LoadCache(typeof(Uniconta.DataModel.Debtor));
 
             if (fromDate != DateTime.MinValue || toDate != DateTime.MinValue)
             {
@@ -431,7 +434,7 @@ namespace UnicontaClient.Pages.CustomPage
                         {
                             if (debtorinv._DeliveryAccount != null)
                             {
-                                var deliveryAccount = debtorCache.Get(debtorinv._DeliveryAccount);
+                                var deliveryAccount = (Uniconta.DataModel.Debtor)debtors.Get(debtorinv._DeliveryAccount);
                                 if (deliveryAccount != null && deliveryAccount._Country != CountryCode.Unknown && deliveryAccount._Country != deb.Country)
                                 {
                                     fdebtorCVRExport = deliveryAccount._LegalIdent ?? IntraHelper.UNKNOWN_CVRNO;
@@ -545,7 +548,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     if (Char.IsLetter(cvr.FirstOrDefault()))
                     {
-                        var cCode = cvr.Substring(0, 2);
+                        var cCode = cvr.Substring(0, 2).ToUpper();
                         cvr = cvr.Substring(2, cvr.Length - 2);
 
                         if (cCode == IntraHelper.CTRYCODE_EXTENDED_UK ||
@@ -583,12 +586,20 @@ namespace UnicontaClient.Pages.CustomPage
 
             dgIntraStatGrid.Columns.GetColumnByName("SystemInfo").Visible = true;
 
-
             busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("BusyMessage");
             busyIndicator.IsBusy = true;
 
             var intralst = (IEnumerable<IntrastatClient>)dgIntraStatGrid.GetVisibleRows();
-            await intraHelper.Validate(intralst, compressed, onlyValidate);
+
+            var ret = await VIESValidate(intralst);
+            if (!ret)
+            {
+                checkVIES.IsChecked = false;
+                busyIndicator.IsBusy = false;
+                return null;
+            }
+
+            intraHelper.Validate(intralst, compressed, onlyValidate);
             busyIndicator.IsBusy = false;
 
             if (onlyValidate)
@@ -597,10 +608,77 @@ namespace UnicontaClient.Pages.CustomPage
                 if (countErr == 0)
                     UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("ValidateNoError"), Uniconta.ClientTools.Localization.lookup("Validate"), MessageBoxButton.OK, MessageBoxImage.Information);
                 else
-                      UnicontaMessageBox.Show(string.Format("{0} {1}", countErr, Localization.lookup("JournalFailedValidation")), Localization.lookup("Validate"), MessageBoxButton.OK, MessageBoxImage.Warning);
+                    UnicontaMessageBox.Show(string.Format("{0} {1}", countErr, Localization.lookup("JournalFailedValidation")), Localization.lookup("Validate"), MessageBoxButton.OK, MessageBoxImage.Warning);
             }
 
             return intralst;
+        }
+
+        async Task <bool> VIESValidate(IEnumerable<IntrastatClient> intralst)
+        {
+            if (!DefaultVIES)
+                return true;
+
+            const int Grouping = 5;
+            int cnt = 0;
+            int cntAll = 0;
+            var lst2 = new List<DebtorClient>();
+            DebtorClient debtor;
+
+            debtors = debtors ?? await api.LoadCache(typeof(Uniconta.DataModel.Debtor));
+
+            var intradebtors = intralst.Where(t => t.ImportOrExport == ImportOrExportIntrastat.Export && t.DebtorRegNoVIES != null && Country2Language.IsEU(t.Country)).GroupBy(s => s.Debtor);
+            var cntTotal = intradebtors.Count();
+            foreach (var deb in intradebtors)
+            {
+                busyIndicator.IsBusy = true;
+                bool rejected = false;
+                cntAll++;
+
+                var debtornew = deb.Key;
+
+                if (debtornew == null || debtornew._VIESStatus != VIESStatus.None)
+                    continue;
+
+                cnt++;
+                lst2.Add(debtornew);
+
+                if (lst2.Count > 0 && ((cnt % Grouping) == 0 || cntAll == cntTotal))
+                {
+                    busyIndicator.BusyContent = string.Concat(Uniconta.ClientTools.Localization.lookup("VatNumberValidationService") + " " + NumberConvert.ToString(cntAll), " af ", cntTotal);
+
+                    var viesReportLst = await VIES.CheckVatApprox(lst2, api);
+
+                    if (api.session.LastError != 0)
+                        return ShowErrorAndExit(api.session.LastError.ToString());
+
+                    if (viesReportLst?.Count == 1 && viesReportLst[0].FaultCode == VIES.UC_FAULTCODE_GENERALERROR)
+                        return ShowErrorAndExit(viesReportLst[0].FaultString);
+
+                    lst2.Clear();
+                }
+            }
+
+            if (cnt > 0)
+            {
+                await api.LoadCache(typeof(Uniconta.DataModel.Debtor), true);
+                dgIntraStatGrid.RefreshData();
+            }
+
+            return true;
+        }
+
+        private bool ShowErrorAndExit(string message)
+        {
+            busyIndicator.IsBusy = false;
+
+            UnicontaMessageBox.Show(
+                Uniconta.ClientTools.Localization.lookup(message),
+                Uniconta.ClientTools.Localization.lookup("VatNumberValidationService"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+
+            return false;
         }
 
         private void btnSearch()
@@ -794,7 +872,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         [Display(Name = "VIESDate", ResourceType = typeof(DCAccountText))]
-        public DateTime? VIESDate { get { return Debtor?.VIESDate; } }
+        public DateTime? DebtorVIESDate { get { return Debtor?.VIESDate; } }
 
 
         [Display(Name = "VIESStatus", ResourceType = typeof(DCAccountText))]

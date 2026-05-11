@@ -1,13 +1,15 @@
-using UnicontaClient.Models;
-using UnicontaClient.Pages;
 using DevExpress.Xpf.Grid;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Linq;
+using System.Resources;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,22 +19,21 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Uniconta.API.GeneralLedger;
+using Uniconta.API.Project;
 using Uniconta.API.Service;
+using Uniconta.ClientTools;
 using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
+using Uniconta.Common.Utility;
 using Uniconta.DataModel;
-using Uniconta.ClientTools;
-using System.Resources;
+using UnicontaClient.Models;
+using UnicontaClient.Pages;
 using UnicontaClient.Pages.Project.TimeManagement;
 using static UnicontaClient.Pages.Project.TimeManagement.TMJournalLineHelper;
-using System.Text.RegularExpressions;
-using Uniconta.API.GeneralLedger;
-using Uniconta.API.Project;
-using Uniconta.Common.Utility;
-using System.Collections;
 
 
 //TOOD: I MainPage.xaml.cs kigges der ikke på dato mht. Godkender Lone har alle selvom hun ikke længere skulle være aktiv
@@ -308,7 +309,7 @@ namespace UnicontaClient.Pages.CustomPage
                 var monday = startDate.AddDays(-(int)(startDate.DayOfWeek - DayOfWeek.Monday));
                 var startDateMonday = monday.AddDays(-1);
 
-                var endDate = empl._Terminated == DateTime.MinValue ? DateTime.Today : empl._Terminated;
+                var endDate = empl._Terminated == DateTime.MinValue || empl._Terminated >= DateTime.Today ? DateTime.Today : empl._Terminated;
                 var validTo = rec._ValidTo == DateTime.MinValue ? DateTime.MaxValue : rec._ValidTo;
                 endDate = validTo < endDate ? validTo : endDate;
 
@@ -392,7 +393,7 @@ namespace UnicontaClient.Pages.CustomPage
                             {
                                 if (lstCatOtherVacation.Contains(s._PayrollCategory))
                                 {
-                                    if (s._Date >= otherVacationStartDate && s._Date < startDate)
+                                    if (s._Date >= otherVacationStartDate && s._Date <= startDate)
                                         sum += s._Qty;
                                     else if (s._Date == otherVacationStartDateNext)
                                         otherVacationPrimoNextPeriod += s._Qty;
@@ -563,6 +564,10 @@ namespace UnicontaClient.Pages.CustomPage
                             {
                                 for (int d = 1; d <= 7; d++)
                                 {
+                                    var dt = trans.Date.AddDays(d);
+                                    if (dt <= empl._TMApproveDate)
+                                        continue;
+
                                     var qty = trans.GetHoursDayN(d);
                                     if (qty == 0) continue;
 
@@ -579,11 +584,12 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                         else
                         {
-                            foreach (var g in vacationLines.GroupBy(x => x._InternalType))
+                            foreach (var line in vacationLines)
                             {
-                                var sum = g.Sum(y => y.Total);
-                                if (g.Key == InternalType.Vacation) vacationWeek = sum;
-                                else otherVacationWeek = sum;
+                                if (line._InternalType == InternalType.Vacation)
+                                    vacationWeek += CalcNotApprovedHours(empl, line);
+                                else 
+                                    otherVacationWeek += CalcNotApprovedHours(empl, line);
                             }
                         }
 
@@ -726,6 +732,31 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             return lines;
+        }
+
+        private double CalcNotApprovedHours(Uniconta.DataModel.Employee emp, TMJournalLineClient line)
+        {
+            double total = 0;
+            for (int i = 0; i < 7; i++)
+            {
+                var dt = line.Date.AddDays(i);
+
+                if (dt <= emp._TMApproveDate)
+                    continue;
+
+                switch (dt.DayOfWeek)
+                {
+                    case DayOfWeek.Monday: total += line._Day1; break;
+                    case DayOfWeek.Tuesday: total += line._Day2; break;
+                    case DayOfWeek.Wednesday: total += line._Day3; break;
+                    case DayOfWeek.Thursday: total += line._Day4; break;
+                    case DayOfWeek.Friday: total += line._Day5; break;
+                    case DayOfWeek.Saturday: total += line._Day6; break;
+                    case DayOfWeek.Sunday: total += line._Day7; break;
+                }
+
+            }
+            return total;
         }
 
         string GetStatus(Uniconta.DataModel.Employee employee, DateTime startDate, double totalHours)

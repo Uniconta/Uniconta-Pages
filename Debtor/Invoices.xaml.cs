@@ -832,6 +832,8 @@ namespace UnicontaClient.Pages.CustomPage
                         var obj = new ProcessInvoice(debtor, invClient, InvTransInvoiceLines, api.CompanyEntity);
                         if (obj.CanProcess())
                         {
+                            obj.SetDebtorLayoutGroups(await api.Query<DebtorLayoutGroup>());
+
                             // generate xml contents
                             var xmlContent = obj.GenerateZugferdXml();
 

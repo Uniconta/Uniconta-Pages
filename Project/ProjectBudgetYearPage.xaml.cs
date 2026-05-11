@@ -1,4 +1,6 @@
 using DevExpress.Data;
+using DevExpress.Xpf.Core.Serialization;
+using DevExpress.Xpf.Grid;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -75,6 +77,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgProjectBudgetYear.BusyIndicator = busyIndicator;
             dgProjectBudgetYear.ShowTotalSummary();
             dgProjectBudgetYear.View.ShowFixedTotalSummary = true;
+            DXSerializer.AddCreateCollectionItemEventHandler(dgProjectBudgetYear, CreateCollectionItemEventHandler);
             dgProjectBudgetYear.CustomSummary += DgProjectBudgetYear_CustomSummary;
             dgProjectBudgetYear.tableView.ShowingEditor += TableView_ShowingEditor; ;
             dgProjectBudgetYear.SelectedItemChanged += DgProjectBudgetYear_SelectedItemChanged;
@@ -85,7 +88,18 @@ namespace UnicontaClient.Pages.CustomPage
             projects = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.Project));
             budgetGroups = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.ProjectBudgetGroup));
         }
-
+        private void CreateCollectionItemEventHandler(object sender, XtraCreateCollectionItemEventArgs e)
+        {
+            if (e.CollectionName == "TotalSummary")
+            {
+                var col = e.Collection as DevExpress.Xpf.Grid.GridSummaryItemCollection;
+                var summary = e.CollectionItem as DevExpress.Xpf.Grid.GridSummaryItem;
+                col.Remove(summary);
+                var newItem = new SumColumn();
+                col.Add(newItem);
+                e.CollectionItem = newItem;
+            }
+        }
         private void TableView_ShowingEditor(object sender, DevExpress.Xpf.Grid.ShowingEditorEventArgs e)
         {
             if (e.Column.FieldName == "MonthQty1" || e.Column.FieldName == "MonthQty2" || e.Column.FieldName == "MonthQty3" ||
@@ -200,7 +214,11 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
         }
-
+        protected override void OnLayoutLoaded()
+        {
+            base.OnLayoutLoaded();
+            dgProjectBudgetYear.tableView.TotalSummaryElementStyle = (Style)FindResource("SummaryTotalStyle");
+        }
         void GetGridColumnsSum()
         {
             var lst = dgProjectBudgetYear.ItemsSource as IEnumerable<ProjectBudgetYearClient>;

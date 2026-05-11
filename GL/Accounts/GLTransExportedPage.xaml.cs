@@ -179,7 +179,7 @@ namespace UnicontaClient.Pages.CustomPage
                         UnicontaMessageBox.Show("Der DATEV Zugangstoken ist ungültig oder abgelaufen", "Fehler", MessageBoxButton.OK);
                     break;
                 case "ConnectedApplications":
-                    Process.Start("https://apps.datev.de/tokrevui");
+                    UtilDisplay.OpenExternalLink("https://apps.datev.de/tokrevui");
                     break;
                 case "ShowLog":
                     AddDockItem(TabControls.DatevLogPage, selectedItem, Uniconta.ClientTools.Localization.lookup("DatevLog"));
@@ -247,7 +247,7 @@ namespace UnicontaClient.Pages.CustomPage
                 DatevDetails.User = User.name;
                 status = 1;
                 SetStatusText();
-                InsDatevLog(selectedItem, DateTime.Now, "https://api.datev.de/userinfo HttpMethod.Get", "X-DATEV-Client-Id" + clientId, "", status, Output);
+                InsDatevLog(selectedItem, DateTime.Now, "userinfo HttpMethod.Get", "X-DATEV-Client-Id" + clientId, "", status, Output);
             }
 
         }
@@ -330,7 +330,7 @@ namespace UnicontaClient.Pages.CustomPage
                     TestUpload(selectedItem);
             }
 
-            InsDatevLog(selectedItem, DateTime.Now, "Anmeldung an https://login.datev.de/openid", "", "", status, "");
+            InsDatevLog(selectedItem, DateTime.Now, "Anmeldung", "", "", status, "");
 
         }
 
@@ -476,7 +476,14 @@ namespace UnicontaClient.Pages.CustomPage
             CWBrowserDialog dialog = null;
             try
             {
-                short timeoutInSeconds = 100; // after this timeout, login will be canceled
+                // after this timeout, login will be canceled
+                short timeoutInSeconds =
+#if DEBUG
+                    600
+#else
+                    100
+#endif
+                    ; 
                 tokenSource.CancelAfter(TimeSpan.FromSeconds(timeoutInSeconds));
                 var client = new OidcClient(options);
                 var nonce = GenerateNonce();
@@ -502,16 +509,14 @@ namespace UnicontaClient.Pages.CustomPage
 
                     http.Prefixes.Add(client.Options.RedirectUri);
                     http.Start();
-                    Console.WriteLine("Listening for Browser Redirect...");
+                    System.Diagnostics.Debug.WriteLine("Listening for Browser Redirect...");
                     string startUrlWithSuffix = state.StartUrl
                         // replace reponse_type, because otherwise it gets appended and we have two times this parameter
                         .Replace($"{OidcConstants.AuthorizeRequest.ResponseType}=code", $"{OidcConstants.AuthorizeRequest.ResponseType}=code%20id_token")
                         // Parameter enableWindowsSso for login.datev.de:
                         // if you have DATEV-software with Kommunikationsserver installed, you can login with DATEV-Benutzer (DID).
                         + "&enableWindowsSso=true";
-                    //var startInfo = new ProcessStartInfo(startUrlWithSuffix);
-                    //startInfo.UseShellExecute = true;
-                    Console.WriteLine($"Start browser with URL '{startUrlWithSuffix}'");
+                    System.Diagnostics.Debug.WriteLine($"Start browser with URL '{startUrlWithSuffix}'");
                     dialog = new CWBrowserDialog(startUrlWithSuffix, "DATEV Login");
                     dialog.EnableCertificateSelection(); ;
                     Dispatcher.BeginInvoke((Action)(() => dialog.Show()));
@@ -520,13 +525,12 @@ namespace UnicontaClient.Pages.CustomPage
                         if (http?.IsListening == true)
                             http.Stop();
                     };
-                    //Process.Start(startInfo);
 
                     var context = await http.GetContextAsync();
                     // handle OPTIONS request (PNA / CORS preflight request)
                     if (context.Request.HttpMethod == "OPTIONS")
                     {
-                        //Console.WriteLine($"Request with {context.Request.HttpMethod} instead of expected GET");
+                        System.Diagnostics.Debug.WriteLine($"Request with {context.Request.HttpMethod} instead of expected GET");
                         var optionsResponse = context.Response;
                         var requestHeaders = context.Request.Headers;
                         var origin = requestHeaders["Origin"];
@@ -559,7 +563,7 @@ namespace UnicontaClient.Pages.CustomPage
                     await responseOutput.WriteAsync(buffer, 0, buffer.Length, tokenSource.Token);
                     responseOutput.Close();
                     var query = context.Request.Url?.Query;
-                    Console.WriteLine($"Query: {query}");
+                    System.Diagnostics.Debug.WriteLine($"Query: {query}");
                     var result = await client.ProcessResponseAsync(query, state, cancellationToken: tokenSource.Token);
                     if (result.IsError)
                     {
@@ -574,17 +578,17 @@ namespace UnicontaClient.Pages.CustomPage
                         throw new ApplicationException("Nonce is wrong, could not login");
                     }
 
-                    Console.WriteLine($"Access token:\n{result.AccessToken}, expires {result.AccessTokenExpiration}");
+                    System.Diagnostics.Debug.WriteLine($"Access token:\n{result.AccessToken}, expires {result.AccessTokenExpiration}");
                     if (!string.IsNullOrWhiteSpace(result.RefreshToken))
                     {
-                        Console.WriteLine($"Refresh token:\n{result.RefreshToken}");
+                        System.Diagnostics.Debug.WriteLine($"Refresh token:\n{result.RefreshToken}");
                     }
 
                     // we are finished, so we can stop our http listener
                     http.Stop();
 
                     // Close the browser dialog automatically after 5 seconds (only on success)
-                    Task.Delay(TimeSpan.FromSeconds(5)).ContinueWith(_ =>
+                    Task.Delay(TimeSpan.FromSeconds(2)).ContinueWith(_ =>
                         Dispatcher.BeginInvoke((Action)(() => dialog?.Close()))
                     );
 
@@ -763,7 +767,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 if (DatevDetails.UCService > 0)
                 {
-                    var cwComboBox = new CWComboBoxSelector(Uniconta.ClientTools.Localization.lookup("Upload"), services.ToArray());
+                    var cwComboBox = new CWComboBoxSelector(Uniconta.ClientTools.Localization.lookup("Upload"), services.ToArray(), false);
                     cwComboBox.Closed += async delegate
                     {
                         if (cwComboBox.DialogResult == true && DatevDetails.UCService == 3)

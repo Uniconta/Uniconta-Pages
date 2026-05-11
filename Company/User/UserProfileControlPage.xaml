@@ -22,8 +22,7 @@ x:Class="UnicontaClient.Pages.CustomPage.UserProfileControlPage"
                             <local:ControlComboboxEditSettings></local:ControlComboboxEditSettings>
                         </local:CorasauDataGridTemplateColumnClient.EditSettings>
                         </local:CorasauDataGridTemplateColumnClient>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="ControlHeader"/>
-                    <!--<local:CorasauDataGridTemplateColumnClient x:Name="Rights"/>-->
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ControlHeader" Width="200"/>
                 </local:UserProfileControlPageGrid.Columns>
             </local:UserProfileControlPageGrid>
         </CorasauControls:BusyIndicator>

@@ -966,10 +966,13 @@ namespace UnicontaClient.Pages.CustomPage
             var savetask = saveGrid();
             if (savetask != null)
                 await savetask;
-
+            
             CWValidatePayment cwwin = new CWValidatePayment(api);
-
+#if MAC
+            cwwin.Closed += delegate
+#else
             cwwin.Closing += delegate
+#endif
             {
                 if (cwwin.DialogResult == true)
                     ValidatePayments(dgCreditorTranOpenGrid.GetVisibleRows() as IList<CreditorTransPayment>, cwwin.PaymentFormat, true);

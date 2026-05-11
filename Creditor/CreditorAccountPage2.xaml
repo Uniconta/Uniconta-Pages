@@ -125,7 +125,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorAccountPage2"
                             <CorasauControls:LookupEditor x:Name="prCategoryLookUpeditor" Text="{Binding PrCategory,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="D2CAccount" x:Name="liD2CAccount">
-                            <CorasauControls:LookupEditor  x:Name="leD2CAccount" Text="{Binding D2CAccount,Mode=TwoWay}" />
+                            <CorasauControls:LookupEditor  x:Name="leD2CAccount" Text="{Binding D2CAccount,Mode=TwoWay}" IsReadOnly="True"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="EEIsNotVatDeclOrg" x:Name="liEEIsNotVatDeclOrg">
                             <CorasauControls:CheckEditor IsChecked="{Binding EEIsNotVatDeclOrg,Mode=TwoWay}" />

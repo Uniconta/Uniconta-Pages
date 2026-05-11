@@ -60,10 +60,10 @@ x:Class="UnicontaClient.Pages.CustomPage.Profile"
                         <CorasauControls:PasswordBoxEditor x:Name="txtOldPassword" />
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem x:Name="liPassowrd" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Password}">
-                        <CorasauControls:PasswordBoxEditor x:Name="txtPassword"/>
+                        <CorasauControls:PasswordBoxEditor x:Name="txtPassword" MaxLength="60"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem x:Name="liConfirmPassword" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ConfirmPassword}">
-                        <CorasauControls:PasswordBoxEditor x:Name="txtConfirmPassword"/>
+                        <CorasauControls:PasswordBoxEditor x:Name="txtConfirmPassword" MaxLength="60"/>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
 

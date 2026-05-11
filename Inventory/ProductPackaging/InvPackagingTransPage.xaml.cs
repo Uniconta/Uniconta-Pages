@@ -199,6 +199,7 @@ namespace UnicontaClient.Pages.CustomPage
                         return;
                     }
                     var linesByJournal = allLines.GroupBy(l => l.JournalPostedId).ToDictionary(g => g.Key, g => g.ToArray());
+                    var linesByInvoice = allLines.GroupBy(l => l.InvoiceNumber).ToDictionary(g => g.Key, g => g.ToArray());
 
                     var packagingProducts = (await api.Query<InvPackagingProductClient>()).Where(p => p.ReportingType == reporting).ToArray();
                     var packagingProductsByItem = new Dictionary<string, List<InvPackagingProductClient>>();
@@ -269,8 +270,21 @@ namespace UnicontaClient.Pages.CustomPage
                         if (delCountry != country)
                             continue;
 
-                        if (!linesByJournal.TryGetValue(rec._JournalPostedId, out var lines))
-                            continue;
+                        string convertAccount = null;
+                        int? convertInvoicenumber = null;
+                        DebtorInvoiceLines[] lines;
+                        if (rec._JournalPostedId != 0)
+                        {
+                            if (!linesByJournal.TryGetValue(rec._JournalPostedId, out lines))
+                                continue;
+                        }
+                        else
+                        {
+                            if (!linesByInvoice.TryGetValue((int)rec._InvoiceNumber, out lines))
+                                continue;
+                            convertAccount = rec.Account;
+                            convertInvoicenumber = (int)rec.InvoiceNumber;
+                        }
 
                         var consumer = debtor.GetConsumer();
 
@@ -311,6 +325,8 @@ namespace UnicontaClient.Pages.CustomPage
                                     _Weight = -line.Qty * pack._Weight,
                                     _Price = consumer ? pack.PriceHousehold : pack.PriceBusiness,
                                     IsCreated = true,
+                                    _ConvertAccount = convertAccount,
+                                    _ConvertInvoiceNumber = convertInvoicenumber
                                 });
                             }
                         }

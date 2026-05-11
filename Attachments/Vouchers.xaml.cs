@@ -949,7 +949,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "BilagscanProfile":
                     if (api.CompanyEntity.DocumentScanner == PayableDocumentScanners.Paperflow)
-                        Process.Start("https://my.paperflow.com/");
+                        UtilDisplay.OpenExternalLink("https://my.paperflow.com/");
                     break;
                 case "BilagscanCreateUser":
                     if (api.CompanyEntity.DocumentScanner == PayableDocumentScanners.Paperflow)
@@ -1050,19 +1050,20 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void CreditorCacheReload(bool Refresh)
         {
+            if (Refresh)
+            {
+                if (dgVoucherGrid.HasUnsavedData)
+                    Utility.ShowConfirmationOnRefreshGrid(dgVoucherGrid);
+                else
+                    await dgVoucherGrid.RefreshTask();
+            }
+
             var lst = dgVoucherGrid.ItemsSource as IEnumerable<VouchersClient>;
             if (lst != null && lst.Count() > 0)
             {
                 var cache = this.CreditorCache;
                 if (cache != null && lst.Any(r => r._CreditorAccount != null && cache.Get(r._CreditorAccount) == null))
                     await api.UpdateCache(); // no need to specify Creditor, since this takes Debtor, Creditor, InvItem, etc
-            }
-            if (Refresh)
-            {
-                if (dgVoucherGrid.HasUnsavedData)
-                    Utility.ShowConfirmationOnRefreshGrid(dgVoucherGrid);
-                else
-                    gridRibbon_BaseActions("RefreshGrid");
             }
         }
 
@@ -1862,7 +1863,7 @@ namespace UnicontaClient.Pages.CustomPage
             cwwin.Show();
 
             if (cwwin.DialogResult == true)
-                Process.Start("https://my.paperflow.com/");
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("https://my.paperflow.com/") { UseShellExecute = true });
         }
 
         private async Task<string> GetOrganisationNumber()
@@ -1926,7 +1927,11 @@ namespace UnicontaClient.Pages.CustomPage
             cw.Closed += delegate
             {
                 if (cw.SaveSucceeded == true)
-                    CreditorCacheReload(true);
+                {
+                    CreditorCacheReload(false);
+                    gridRibbon_BaseActions("RefreshGrid");
+                    voucher.NotifyPropertyChanged(null);
+                }
             };
 
             cw.Show();

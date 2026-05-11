@@ -595,8 +595,11 @@ namespace UnicontaClient.Pages.CustomPage
                     if (p._JournalPostedId != 0 && p._Trans != null && p._Trans.Count == 1)
                     {
                         t = p.Trans[0];
-                        if ((ShowCurrency ? t._AmountCur : t._Amount) != p.Amount)
-                            p._MisMatch = true;
+                        if (t._StatementLines != null && t._StatementLines.Count == 1)
+                        {
+                            if ((ShowCurrency ? t._AmountCur : t._Amount) != p.Amount)
+                                p._MisMatch = true;
+                        }
                     }
                 }
             }

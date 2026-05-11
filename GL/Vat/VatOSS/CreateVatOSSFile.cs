@@ -156,6 +156,22 @@ namespace UnicontaClient.Pages.CustomPage
                 if (errText.Length == 0 && rec.MOSSType == null)
                     errText.Append(fieldCannotBeEmpty("VATMOSSType"));
 
+                var useVatCountry = rec.MOSSType == MOSSTYPE_001 ||
+                    rec.MOSSType == MOSSTYPE_002 ||
+                    rec.MOSSType == MOSSTYPE_003 ||
+                    rec.MOSSType == MOSSTYPE_004 ||
+                    rec.MOSSType == MOSSTYPE_005 ||
+                    rec.MOSSType == MOSSTYPE_006 ||
+                    rec.MOSSType == MOSSTYPE_020 ||
+                    rec.MOSSType == MOSSTYPE_030;
+                    
+                
+                if (useVatCountry)
+                {
+                    if (errText.Length == 0 && rec.VatCountry == null)
+                        errText.Append(fieldCannotBeEmpty("VatCountry"));
+                }
+
                 if (rec.MOSSType == MOSSTYPE_007)
                 {
                     if (errText.Length == 0)
@@ -171,9 +187,6 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     if (errText.Length == 0 && debtor?.Country == null)
                         errText.Append(Localization.lookup("CountryNotSet"));
-
-                    if (errText.Length == 0 && rec.Country == null)
-                        errText.Append(fieldCannotBeEmpty("VatCountry"));
                 }
 
                 if (errText.Length == 0 && rec.BusinessCountry != null && rec.ShipmentCountry != null)
@@ -194,6 +207,12 @@ namespace UnicontaClient.Pages.CustomPage
                         errText.Append(fieldCannotBeEmpty("ShipmentCountry"));
                     if (errText.Length == 0 && rec.Id == null)
                         errText.Append(fieldCannotBeEmpty("Id"));
+                }
+
+                if (errText.Length == 0 && rec.MOSSType == MOSSTYPE_006)
+                {
+                    if (rec.ShipmentCountry == null)
+                        errText.Append(fieldCannotBeEmpty("ShipmentCountry"));
                 }
 
                 if (errText.Length > 0)
@@ -217,7 +236,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 if (rec.MOSSType == MOSSTYPE_001 || rec.MOSSType == MOSSTYPE_002 || rec.MOSSType == MOSSTYPE_020 || rec.MOSSType == MOSSTYPE_030)
                 {
-                    sw.Write(rec.fCountry); sw.Write(';');
+                    sw.Write(rec.fVatCountry); sw.Write(';');
                     sw.Write(rec.RateType); sw.Write(';');
                 }
 
@@ -236,14 +255,14 @@ namespace UnicontaClient.Pages.CustomPage
                     sw.Write(';');
 
                     sw.Write(rec.Id); sw.Write(';');
-                    sw.Write(rec.fCountry); sw.Write(';');
+                    sw.Write(rec.fVatCountry); sw.Write(';');
                     sw.Write(rec.RateType); sw.Write(';');
                 }
 
                 if (rec.MOSSType == MOSSTYPE_006)
                 {
+                    sw.Write(rec.fShipmentCountry);
                     sw.Write(rec.fVatCountry); sw.Write(';');
-                    sw.Write(rec.fCountry); sw.Write(';');
                     sw.Write(rec.RateType); sw.Write(';');
                 }
 
@@ -293,7 +312,7 @@ namespace UnicontaClient.Pages.CustomPage
             c = string.Compare(x.Vat, y.Vat);
             if (c != 0)
                 return false;
-            c = (int)x.Country.GetValueOrDefault() - (int)y.Country.GetValueOrDefault();
+            c = (int)x._VatCountry - (int)y._VatCountry;
             if (c != 0)
                 return false;
             c = (int)x._BusinessCountry - (int)y._BusinessCountry;
@@ -307,7 +326,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         public int GetHashCode(VatOSSTable obj)
         {
-            return Util.GetHashCode(obj.MOSSType) * Util.GetHashCode(obj.Vat) * Util.GetHashCode((int)obj.Country) * Util.GetHashCode((int)obj._BusinessCountry) * Util.GetHashCode((int)obj._BusinessCountry);
+            return Util.GetHashCode(obj.MOSSType) * Util.GetHashCode(obj.Vat) * Util.GetHashCode((int)obj._VatCountry) * Util.GetHashCode((int)obj._BusinessCountry) * Util.GetHashCode((int)obj._BusinessCountry);
         }
     }
 
@@ -327,7 +346,7 @@ namespace UnicontaClient.Pages.CustomPage
             int c = _x._MOSSType - _y._MOSSType;
             if (c != 0)
                 return c;
-            c = _x.Country == null || _y.Country == null ? 0 : (int)_x.Country - (int)_y.Country;
+            c = _x._VatCountry == null || _y._VatCountry == null ? 0 : (int)_x._VatCountry - (int)_y._VatCountry;
             if (c != 0)
                 return c;
             var v = _x.Rate - _y.Rate;

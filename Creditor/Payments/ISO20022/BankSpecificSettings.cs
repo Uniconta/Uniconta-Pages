@@ -318,7 +318,7 @@ namespace UnicontaISO20022CreditTransfer
 
 
         /// <summary>
-        /// Germany will in a transition phase - use two formats pain.001.001.03 and pain.001.001.09
+        /// Germany and Holland will in a transition phase - use two formats pain.001.001.03 and pain.001.001.09
         /// </summary>
         public virtual bool NewPaymentFormat()
         {

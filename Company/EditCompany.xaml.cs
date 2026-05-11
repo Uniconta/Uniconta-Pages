@@ -237,8 +237,9 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        private async void SetAccountantOwnership(AccountantClient accountant)
+        private void SetAccountantOwnership(AccountantClient accountant)
         {
+            /*
             if (accountant == null)
                 return;
 
@@ -256,6 +257,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             var companyAPI = new CompanyAccessAPI(api);
             await companyAPI.TransferOwnershipOfCompany(uid, editrow);
+            */
         }
 
         void EditCompany_SaveComplete(object args)

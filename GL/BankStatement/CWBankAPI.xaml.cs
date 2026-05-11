@@ -172,7 +172,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (ToDate > DateTime.Now.Date)
                     errText = string.Format(Uniconta.ClientTools.Localization.lookup("ValueMayNoBeGreater"), Uniconta.ClientTools.Localization.lookup("ToDate"), Uniconta.ClientTools.Localization.lookup("TodaysDate").ToLower());
                 if (FromDate < DateTime.Now.Date.AddYears(-2))
-                    errText = string.Format(Uniconta.ClientTools.Localization.lookup("PleaseNotOBJ"), string.Concat(Uniconta.ClientTools.Localization.lookup("ToDate"), " >= ", DateTime.Now.Date.AddYears(-2).ToString("dd.MM.yyyy")));
+                    errText = string.Format(Uniconta.ClientTools.Localization.lookup("PleaseNotOBJ"), string.Concat(Uniconta.ClientTools.Localization.lookup("FromDate"), " >= ", DateTime.Now.Date.AddYears(-2).ToString("dd.MM.yyyy")));
             }
             else if (Type == 0)
             {

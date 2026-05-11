@@ -105,6 +105,8 @@ namespace UnicontaClient.Pages.CustomPage
             string key = Utility.GetHeaderString(dgInvPriceListLineClientGrid.masterRecord);
             if (string.IsNullOrEmpty(key)) return;
             string header = string.Concat(Uniconta.ClientTools.Localization.lookup("SalesPricesAndDiscounts"), ": ", key);
+            if (dgInvPriceListLineClientGrid.masterRecord.GetType() == typeof(CreditorPriceListClient))
+                header = string.Concat(Uniconta.ClientTools.Localization.lookup("PurchasePricesAndDiscounts"), ": ", key);
             SetHeader(header);
         }
 

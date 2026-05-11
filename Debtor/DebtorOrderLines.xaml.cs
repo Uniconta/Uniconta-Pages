@@ -153,6 +153,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             Init(syncEntity.Row);
         }
+        protected override bool FocusOnSecondGrid => false;
         public void Init(UnicontaBaseEntity master)
         {
             InitializeComponent();
@@ -181,7 +182,15 @@ namespace UnicontaClient.Pages.CustomPage
             dgDebtorOrderLineGrid.CustomSummary += dgDebtorOrderLineGrid_CustomSummary;
             this.PreviewKeyDown += RootVisual_KeyDown;
             this.BeforeClose += DebtorOrderLines_BeforeClose;
+            dgDebtorOrderLineGrid.Loaded += DgDebtorOrderLineGrid_Loaded;
         }
+        bool gridLoaded;
+        private void DgDebtorOrderLineGrid_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (!gridLoaded)
+                FocusOnGrid(dgDebtorOrderLineGrid);
+        }
+
         bool isloaded = false;
         private void DebtorOrderLines_Loaded(object sender, RoutedEventArgs e)
         {
@@ -325,6 +334,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             if (!company.UnitConversion)
                 UnitGroup.Visible = UnitGroup.ShowInColumnChooser = false;
+            dgDebtorOrderLineGrid.Readonly = false;
         }
 
         void SetVariantColumns()
@@ -428,6 +438,8 @@ namespace UnicontaClient.Pages.CustomPage
             }
             if (screenName == TabControls.RegenerateOrderFromProjectPage)
                 InitQuery();
+            else if (screenName == TabControls.InventoryItems)
+                gridLoaded = false;
         }
 
         public bool DataChaged;
@@ -1014,7 +1026,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (dialog.ConfirmationResult == CWConfirmationBox.ConfirmationResultEnum.Yes)
                 {
                     busyIndicator.IsBusy = true;
-                    var err = await new OrderAPI(this.api).RecalcOrderPrices(new [] { Order });
+                    var err = await new OrderAPI(this.api).RecalcOrderPrices(new[] { Order });
                     busyIndicator.IsBusy = false;
                     UtilDisplay.ShowErrorCode(err);
                     if (err == ErrorCodes.Succes)
@@ -1497,7 +1509,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void SerialBatch_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
         {
-            SetSeriBatch(sender as ComboBoxEditor, dgDebtorOrderLineGrid , api);
+            SetSeriBatch(sender as ComboBoxEditor, dgDebtorOrderLineGrid, api);
         }
         public static void SetSeriBatch(ComboBoxEditor editor, CorasauDataGrid grid, CrudAPI api)
         {

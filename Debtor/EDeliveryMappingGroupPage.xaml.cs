@@ -3,11 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Uniconta.API.Service;
 using Uniconta.ClientTools;
 using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
+using Uniconta.Common;
 using UnicontaClient.Models;
 
 using UnicontaClient.Pages;
@@ -74,7 +76,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "EDeliveryMapping":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.EDeliveryMappingPage, selectedItem);
+                        _ = OpenChildPageWithSavedGroupAsync(selectedItem);
                     break;
                 case "SaveGrid":
                     var rows = dgEdeliveryMappingGroupGrid.ItemsSource as List<eDeliveryMappingGroupClient>;
@@ -98,6 +100,34 @@ namespace UnicontaClient.Pages.CustomPage
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
+        }
+
+        private async Task OpenChildPageWithSavedGroupAsync(eDeliveryMappingGroupClient group)
+        {
+           if (group.RowId == 0 || dgEdeliveryMappingGroupGrid.HasUnsavedData)
+            {
+                var msg = UnicontaMessageBox.Show(
+                    string.Format(Localization.lookup("SaveChangesFor"), Localization.lookup("eDeliveryMappingGroup")),
+                    Localization.lookup("eDeliveryMappingGroup"),
+                    System.Windows.MessageBoxButton.YesNo);
+
+                if (msg != System.Windows.MessageBoxResult.Yes)
+                    return;
+
+                var rows = dgEdeliveryMappingGroupGrid.ItemsSource as List<eDeliveryMappingGroupClient>;
+                if (rows != null && rows.GroupBy(x => x.IsDefault.ToString() + x.DocType + x.DocVersion).Any(g => g.Count() > 1))
+                {
+                    UnicontaMessageBox.Show(Localization.lookup("eDeliveryMappingMultipleDefaultGroup"),
+                        Localization.lookup("Error"));
+                    return;
+                }
+
+                var saveResult = await saveGrid();
+                if (saveResult != ErrorCodes.Succes)
+                    return;
+            }
+
+            AddDockItem(TabControls.EDeliveryMappingPage, group);
         }
 
         private void DataControl_CurrentItemChanged(object sender, DevExpress.Xpf.Grid.CurrentItemChangedEventArgs e)

@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
+using Uniconta.API.DebtorCreditor;
 using Uniconta.API.System;
 using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
@@ -15,6 +16,7 @@ using Uniconta.Common.Enums;
 using Uniconta.Common.Utility;
 using Uniconta.DataModel;
 using Uniconta.WindowsAPI.ClientTools;
+//using static System.IdentityModel.Tokens.SecurityTokenHandlerCollectionManager;
 using static UnicontaClient.Pages.CreateIntraStatFilePage;
 using Localization = Uniconta.ClientTools.Localization;
 
@@ -33,12 +35,10 @@ namespace UnicontaClient.Pages.CustomPage
         #endregion
 
         #region Variables
-        private CrudAPI api;
         private string companyRegNo;
         private CountryCode companyCountryId;
         public int exportGroup;
         public bool validateVIES;
-        private SQLCache debtors;
         #endregion
 
         public IntraHelper(CrudAPI api, int exportGroup, bool validateVIES)
@@ -47,8 +47,6 @@ namespace UnicontaClient.Pages.CustomPage
             companyCountryId = api.CompanyEntity._CountryId;
             this.exportGroup = exportGroup;
             this.validateVIES = validateVIES;
-            this.api = api;
-            debtors = api.GetCache(typeof(Uniconta.DataModel.Debtor));
         }
 
         public bool PreValidate()
@@ -68,11 +66,8 @@ namespace UnicontaClient.Pages.CustomPage
             return true;
         }
 
-        public async Task Validate(IEnumerable<IntrastatClient> intralst, bool compressed, bool onlyValidate)
+        public void Validate(IEnumerable<IntrastatClient> intralst, bool compressed, bool onlyValidate)
         {
-            if (validateVIES)
-                await VIESValidate(intralst);
-            
             var countErr = 0;
 
             foreach (var intra in intralst)
@@ -171,71 +166,33 @@ namespace UnicontaClient.Pages.CustomPage
 
                     if (!hasErrors && validateVIES)
                     {
-                        if (intra.Debtor._VIESStatus != VIESStatus.Valid)
+                        string message = null;
+
+                        if (intra.Debtor._VIESStatus == VIESStatus.Invalid)
+                        {
+                            message = Uniconta.ClientTools.Localization.lookup("NotValidVatNo");
+                        }
+                        else if (intra.Debtor._VIESStatus == VIESStatus.Error)
+                        {
+                            message = string.Format(
+                                Uniconta.ClientTools.Localization.lookup("OBJNotValidFormat"),
+                                Uniconta.ClientTools.Localization.lookup("CompanyRegNo"));
+                        }
+
+                        if (message != null)
                         {
                             hasErrors = true;
                             intra.SystemInfo += intra.SystemInfo != null ? Environment.NewLine : null;
-                            intra.SystemInfo += Uniconta.ClientTools.Localization.lookup("NotValidVatNo");
+                            intra.SystemInfo += message;
                         }
                     }
+
                 }
 
                 if (hasErrors)
                     countErr++;
                 else
                     intra.SystemInfo = VALIDATE_OK;
-            }
-        }
-
-        async Task VIESValidate(IEnumerable<IntrastatClient> intralst)
-        {
-            try
-            {
-                const int Grouping = 20;
-                int cntTotal = intralst.Count();
-                int cnt = 0;
-                int cntAll = 0;
-                var lst2 = new List<DebtorClient>();
-                string oldAccount = null;
-                DebtorClient debtor;
-
-                debtors = debtors ?? await api.LoadCache(typeof(Uniconta.DataModel.Debtor));
-                foreach (var trans in intralst.OrderBy(s => s.DCAccount))
-                {
-                    bool rejected = false;
-                    cntAll++;
-                    if (trans.ImportOrExport == ImportOrExportIntrastat.Import || oldAccount == trans.DCAccount || trans.DebtorRegNoVIES == null || !Country2Language.IsEU(trans.Country))
-                        rejected = true;
-
-                    oldAccount = trans.DCAccount;
-                    debtor = debtors.Get(trans.DCAccount) as DebtorClient;
-                    if (debtor == null || debtor._VIESStatus != VIESStatus.None)
-                        rejected = true;
-
-                    if (!rejected)
-                    {
-                        cnt++;
-                        lst2.Add(debtor);
-                    }
-
-                    if (lst2.Count > 0 && ((cnt % Grouping) == 0 || cntAll == cntTotal))
-                    {
-                        var viesReportLst = await VIES.CheckVatApprox(lst2, api);
-                        lst2.Clear();
-
-                        if (viesReportLst.Count == 1 && viesReportLst[0].FaultCode == VIES.UC_FAULTCODE_GENERALERROR)
-                        {
-                            UnicontaMessageBox.Show(viesReportLst[0].FaultString, Uniconta.ClientTools.Localization.lookup("Error"), MessageBoxButton.OK);
-                            return;
-                        }
-                    }
-                }
-                if (cnt > 0)
-                    debtors = await api.LoadCache(typeof(Uniconta.DataModel.Debtor), true);
-            }
-            catch (Exception ex)
-            {
-                return;
             }
         }
 

@@ -118,23 +118,13 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 case "Approve":
                     if (selectedItem != null)
-                    {
-                        if (!selectedItem._OnHold)
                             ApproveDoc(selectedItem);
-                        else
-                            UtilDisplay.ShowErrorCode(ErrorCodes.DocumentIsOnHold);
-                    }
                     break;
                 case "ApproveWithComments":
                 case "Reject":
                 case "Await":
                     if (selectedItem != null)
-                    {
-                        if (!selectedItem._OnHold)
                             ApproveComment(selectedItem, ActionType);
-                        else
-                            UtilDisplay.ShowErrorCode(ErrorCodes.DocumentIsOnHold);
-                    }
                     break;
                 case "ViewVoucher":
                     if (selectedItem != null)

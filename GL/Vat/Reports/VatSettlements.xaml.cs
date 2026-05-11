@@ -133,7 +133,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 if (cwConfirmationBox.DialogResult == true)
                                 {
                                     if (cwConfirmationBox.ConfirmationResult == CWConfirmationBox.ConfirmationResultEnum.Yes)
-                                        System.Diagnostics.Process.Start("https://pdcs.skat.dk/dcs-atn-gateway/nemlogin?targetUrl=aHR0cHM6Ly9udHNlLnNrYXQuZGsvbnRzZS1mcm9udC9jb250ZW50P2lkPWZyYW1lOjJGQUF1dG9yaXNlcnJldmlzb3JtZmw=");
+                                        UtilDisplay.OpenExternalLink("https://pdcs.skat.dk/dcs-atn-gateway/nemlogin?targetUrl=aHR0cHM6Ly9udHNlLnNrYXQuZGsvbnRzZS1mcm9udC9jb250ZW50P2lkPWZyYW1lOjJGQUF1dG9yaXNlcnJldmlzb3JtZmw=");
                                     else if (cwConfirmationBox.ConfirmationResult == CWConfirmationBox.ConfirmationResultEnum.No)
                                         UploadSettlements(selectedItem, null);
                                 }
@@ -153,7 +153,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem?.UploadedAt > DateTime.MinValue)
                     {
                         var deeplink = string.Format("https://ntse.skat.dk/ntse-front/dk/skat/RSU-Moms?periodStartDate={0}&periodSlutDate={1}", selectedItem._FromDate.ToString("yyyy-MM-dd"), selectedItem._ToDate.ToString("yyyy-MM-dd"));
-                        System.Diagnostics.Process.Start(deeplink);
+                        UtilDisplay.OpenExternalLink(deeplink);
                     }
                     break;
                 default:
@@ -519,7 +519,7 @@ namespace UnicontaClient.Pages.CustomPage
             textBlock.Inlines.Add(new System.Windows.Documents.Run() { Text = contents[0] });
             var hyperlink = new System.Windows.Documents.Hyperlink() { NavigateUri = new Uri(link) };
             hyperlink.Inlines.Add(contents[1]);
-            hyperlink.RequestNavigate += (s, e) => { System.Diagnostics.Process.Start(e.Uri.AbsoluteUri); };
+            hyperlink.RequestNavigate += (s, e) => { UtilDisplay.OpenExternalLink(e.Uri.AbsoluteUri); };
             textBlock.Inlines.Add(hyperlink);
             textBlock.Inlines.Add(new System.Windows.Documents.Run() { Text = contents[2] });
             return textBlock;

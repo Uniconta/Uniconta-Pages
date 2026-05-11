@@ -96,7 +96,8 @@ namespace UnicontaClient.Pages.CustomPage
 
             iIncludeZeroBalance.IsChecked = !excludeZeroBalance;
             iIncludeJournals.isEditLayout = false;
-      
+            iIncludeJournals.IsChecked = includeJournals;
+
             showTask = api.CompanyEntity.ProjectTask && showTask;
             iShowTask.IsChecked = showTask;
             iShowTask.isEditLayout = api.CompanyEntity.ProjectTask;
@@ -110,10 +111,9 @@ namespace UnicontaClient.Pages.CustomPage
             iShowWorkspace.isEditLayout = hasWorkspace && !showTask;
             iShowWorkspace.IsChecked = hasWorkspace && (showWorkspace || showTask);
 
+            var now = BasePage.GetSystemDefaultDate();
             if (WorkInProgressReportPage.DefaultFromDate == DateTime.MinValue)
             {
-                var now = BasePage.GetSystemDefaultDate();
-
                 var fromDate = new DateTime(now.Year, now.Month, 1);
                 fromDate = fromDate.AddMonths(-2);
 
@@ -121,7 +121,7 @@ namespace UnicontaClient.Pages.CustomPage
                 WorkInProgressReportPage.DefaultFromDate = fromDate;
             }
 
-            txtDateTo.DateTime = WorkInProgressReportPage.DefaultToDate;
+            txtDateTo.DateTime = WorkInProgressReportPage.DefaultToDate >= now.AddDays(-3) ? BasePage.GetSystemDefaultDate() : WorkInProgressReportPage.DefaultToDate;
             txtDateFrm.DateTime = WorkInProgressReportPage.DefaultFromDate;
             WorkInProgressReportPage.SetDateTime(txtDateFrm, txtDateTo);
 
@@ -711,7 +711,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "Transactions":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.ProjectTransactionPage, dgWorkInProgressRpt.syncEntity, null, null, true, null, new[] { new BasePage.ValuePair("Workspace", showWorkspace.ToString()) });
+                        AddDockItem(TabControls.ProjectTransactionPage, dgWorkInProgressRpt.syncEntity, null, null, true, null, new[] { new BasePage.ValuePair("Workspace", showWorkspace.ToString()), new BasePage.ValuePair("IncludeJournals", includeJournals.ToString()) });
                     break;
                 case "Search":
                     LoadGrid();

@@ -2,6 +2,7 @@ using DevExpress.Xpf.WindowsUI;
 using System.Diagnostics;
 using System.Windows;
 using Uniconta.ClientTools.Controls;
+using Uniconta.ClientTools.Util;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -36,7 +37,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
         private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
         {
-            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
+            UtilDisplay.OpenExternalLink(e.Uri.AbsoluteUri);
             e.Handled = true;
         }
     }

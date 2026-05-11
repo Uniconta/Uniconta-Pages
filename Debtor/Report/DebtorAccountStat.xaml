@@ -36,7 +36,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccountStat"
                 <localPage:InvStatisticsGrid.Columns>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Item" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ItemName" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Account"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Account" IsEditSettingSet="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AccountName"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Qty" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CostValue" Mask="N0"/>

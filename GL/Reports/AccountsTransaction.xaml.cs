@@ -88,7 +88,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         bool RemoveMenu(UnicontaBaseEntity master)
         {
-            return !(master is GLTrans) && !(master is DCTrans) && !(master is DCTransOpen) && !(master is ProjectTrans) ;
+            return !(master is GLTrans) && !(master is DCTrans) && !(master is DCTransOpen) && !(master is DCInvoice) && !(master is ProjectTrans) ;
         }
 
         public AccountsTransaction(object objAccount)

@@ -1192,54 +1192,85 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void CreateTransferOrder(string FromWarehouse, string FromLocation)
         {
+            var set = new HashSet<string>();
             var mainList = dgReOrderList.GetVisibleRows() as IEnumerable<ReOrderListPageGridClient>;
-            var invJournalLineList = new List<InvTransferOrderLine>();
             foreach (var item in mainList)
-            {
-                if (item._Quantity > 0d)
-                {
-                    var journalLine = new InvTransferOrderLine
-                    {
-                        _Item = item._Item,
-                        _Variant1 = item._Variant1,
-                        _Variant2 = item._Variant2,
-                        _Variant3 = item._Variant3,
-                        _Variant4 = item._Variant4,
-                        _Variant5 = item._Variant5,
-                        _Warehouse = item._Warehouse,
-                        _Location = item._Location,
-                        _Qty = item._Quantity  // move from and to is always positive.
-                    };
+                if (item._Quantity > 0d && item._Warehouse != null)
+                    set.Add(item._Warehouse);
 
-                    if (FromWarehouse != null)
+            var lst = new List<InvTransferOrderLine>();
+            InvTransferOrderClient ord = null;
+            int cnt = 0;
+            ErrorCodes result = ErrorCodes.NoLinesFound;
+            foreach (var wh in set)
+            {
+                lst.Clear();
+                foreach (var item in mainList)
+                {
+                    if (item._Quantity > 0d && item._Warehouse == wh)
                     {
-                        journalLine._WarehouseFrom = FromWarehouse;
-                        journalLine._LocationFrom = FromLocation;
-                    }
-                    else
-                    {
-                        var itm = (InvItem)this.items.Get(item._Item);
-                        if (itm != null)
+                        var journalLine = new InvTransferOrderLine
                         {
-                            journalLine._WarehouseFrom = itm._Warehouse;
-                            journalLine._LocationFrom = itm._Location;
+                            _Item = item._Item,
+                            _Variant1 = item._Variant1,
+                            _Variant2 = item._Variant2,
+                            _Variant3 = item._Variant3,
+                            _Variant4 = item._Variant4,
+                            _Variant5 = item._Variant5,
+                            _Warehouse = item._Warehouse,
+                            _Location = item._Location,
+                            _Qty = item._Quantity  // move from and to is always positive.
+                        };
+
+                        if (FromWarehouse != null)
+                        {
+                            journalLine._WarehouseFrom = FromWarehouse;
+                            journalLine._LocationFrom = FromLocation;
                         }
+                        else
+                        {
+                            var itm = (InvItem)this.items.Get(item._Item);
+                            if (itm != null)
+                            {
+                                journalLine._WarehouseFrom = itm._Warehouse;
+                                journalLine._LocationFrom = itm._Location;
+                            }
+                        }
+                        lst.Add(journalLine);
                     }
-                    invJournalLineList.Add(journalLine);
+                }
+
+                if (lst.Count == 0)
+                    result = ErrorCodes.NoLinesFound;
+                else
+                {
+                    ord = this.CreateGridObject(typeof(InvTransferOrderClient)) as InvTransferOrderClient;
+                    ord._WarehouseFrom = FromWarehouse;
+                    ord._Warehouse = wh;
+                    api.AllowBackgroundCrud = true;
+                    result = await api.Insert(ord, lst);
+                    if (result == 0)
+                        cnt++;
                 }
             }
 
-            ErrorCodes result;
-            if (invJournalLineList.Count == 0)
-                result = ErrorCodes.NoLinesFound;
-            else
+            if (cnt == 1)
             {
-                var ord = this.CreateGridObject(typeof(InvTransferOrderClient)) as InvTransferOrderClient;
-                ord._WarehouseFrom = FromWarehouse;
-                api.AllowBackgroundCrud = true;
-                result = await api.Insert(ord, invJournalLineList);
+                var confrimationText = string.Format("{0}. {1}:{2}\r\n{3}", Uniconta.ClientTools.Localization.lookup("TransferOrderCreated"), Uniconta.ClientTools.Localization.lookup("OrderNumber"), ord._OrderNumber,
+                    string.Concat(string.Format(Uniconta.ClientTools.Localization.lookup("GoTo"), Uniconta.ClientTools.Localization.lookup("TransferOrderLines")), " ?"));
+
+                var confirmationBox = new CWConfirmationBox(confrimationText, string.Empty, false);
+                confirmationBox.Closing += delegate
+                {
+                    if (confirmationBox.DialogResult == null)
+                        return;
+                    if (confirmationBox.ConfirmationResult == CWConfirmationBox.ConfirmationResultEnum.Yes)
+                        this.AddDockItem(TabControls.InvTransferOrderLines, ord, string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("TransferOrderLines"), ord._OrderNumber, ord._Warehouse));
+                };
+                confirmationBox.Show();
             }
-            UtilDisplay.ShowErrorCode(result);
+            else
+                UtilDisplay.ShowErrorCode(result);
         }
 
         CorasauGridLookupEditorClient prevInvPurAcc;

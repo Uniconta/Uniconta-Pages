@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
+using Uniconta.API.DebtorCreditor;
 using Uniconta.API.System;
 using Uniconta.ClientTools;
 using Uniconta.ClientTools.Controls;
@@ -37,7 +38,6 @@ namespace UnicontaClient.Pages.CustomPage
         private CountryCode companyCountryId;
         public bool validateVIES;
         public DateTime viesDate;
-        private SQLCache debtors;
         #endregion
 
         public CreateEUSaleWithoutVATFile(CrudAPI api, string companyRegNo, CountryCode companyCountryId, bool validateVIES)
@@ -46,7 +46,6 @@ namespace UnicontaClient.Pages.CustomPage
             this.companyRegNo = companyRegNo;
             this.companyCountryId = companyCountryId;
             this.validateVIES = validateVIES;
-            debtors = api.GetCache(typeof(Uniconta.DataModel.Debtor));
         }
 
         public bool CreateFile(IEnumerable<EUSaleWithoutVAT> listOfEUSaleWithoutVAT)
@@ -176,10 +175,8 @@ namespace UnicontaClient.Pages.CustomPage
             return true;
         }
 
-        public async Task Validate(IEnumerable<EUSaleWithoutVAT> listOfEU, bool compressed, bool onlyValidate)
+        public void Validate(IEnumerable<EUSaleWithoutVAT> listOfEU, bool compressed, bool onlyValidate)
         {
-            if (validateVIES)
-                await VIESValidate(listOfEU);
 
             var countErr = 0;
             foreach (var euSale in listOfEU)
@@ -250,13 +247,26 @@ namespace UnicontaClient.Pages.CustomPage
 
                 if (!hasErrors && validateVIES)
                 {
-                    if (debtor._VIESStatus != VIESStatus.Valid)
+                    string message = null;
+
+                    if (debtor._VIESStatus == VIESStatus.Invalid)
+                    {
+                        message = Uniconta.ClientTools.Localization.lookup("NotValidVatNo");
+                    }
+                    else if (debtor._VIESStatus == VIESStatus.Error)
+                    {
+                        message = string.Format(
+                            Uniconta.ClientTools.Localization.lookup("OBJNotValidFormat"),
+                            Uniconta.ClientTools.Localization.lookup("CompanyRegNo"));
+                    }
+
+                    if (message != null)
                     {
                         hasErrors = true;
                         if (euSale.SystemInfo == VALIDATE_OK)
-                            euSale.SystemInfo = Uniconta.ClientTools.Localization.lookup("NotValidVatNo");
+                            euSale.SystemInfo = message;
                         else
-                            euSale.SystemInfo += Environment.NewLine + Uniconta.ClientTools.Localization.lookup("NotValidVatNo");
+                            euSale.SystemInfo += Environment.NewLine + message;
                     }
                 }
 
@@ -277,57 +287,6 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
 
-        async Task VIESValidate(IEnumerable<EUSaleWithoutVAT> listOfEU)
-        {
-            try
-            {
-                const int Grouping = 20;
-                int cntTotal = listOfEU.Count();
-                int cnt = 0;
-                int cntAll = 0;
-                var lst2 = new List<DebtorClient>();
-                string oldAccount = null;
-                DebtorClient debtor;
-
-                debtors = debtors ?? await api.LoadCache(typeof(Uniconta.DataModel.Debtor));
-                foreach (var trans in listOfEU.OrderBy(s => s.Account))
-                {
-                    bool rejected = false;
-                    cntAll++;
-                    if (oldAccount == trans.Account || trans._DebtorRegNoFile == null || !Country2Language.IsEU(trans.Country))
-                        rejected = true;
-
-                    oldAccount = trans.Account;
-                    debtor = debtors.Get(trans.Account) as DebtorClient;
-                    if (debtor._VIESStatus != VIESStatus.None)
-                        rejected = true;
-
-                    if (!rejected)
-                    {
-                        cnt++;
-                        lst2.Add(debtor);
-                    }
-
-                    if (lst2.Count > 0 && ((cnt % Grouping) == 0 || cntAll == cntTotal))
-                    {
-                        var viesReportLst = await VIES.CheckVatApprox(lst2, api);
-                        lst2.Clear();
-
-                        if (viesReportLst.Count == 1 && viesReportLst[0].FaultCode == VIES.UC_FAULTCODE_GENERALERROR)
-                        {
-                            UnicontaMessageBox.Show(viesReportLst[0].FaultString, Uniconta.ClientTools.Localization.lookup("Error"), System.Windows.MessageBoxButton.OK);
-                            return;
-                        }
-                    }
-                }
-                if (cnt > 0)
-                    debtors = await api.LoadCache(typeof(Uniconta.DataModel.Debtor), true);
-            }
-            catch (Exception ex)
-            {
-                return;
-            }
-        }
 
         private long StreamToFile(List<EUSaleWithoutVAT> listOfImportExport, StreamWriter sw)
         {

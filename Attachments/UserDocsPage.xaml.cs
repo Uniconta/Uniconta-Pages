@@ -420,7 +420,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var url = string.Concat("https://web.uniconta.com/document/ViewAttachment?", selectedItem._DocumentGuid);
                     if (BasePage.session.Connection.Target == APITarget.Demo || BasePage.session.Connection.Target == APITarget.Testing)
                         url = string.Concat("https://test.uniconta.com:8080/document/ViewAttachment?", selectedItem._DocumentGuid);
-                    System.Diagnostics.Process.Start(url);
+                    UtilDisplay.OpenExternalLink(url);
                     break;
                 case "AttachInOutlook":
                     if (dgDocsGrid.SelectedItems == null || selectedItem == null)

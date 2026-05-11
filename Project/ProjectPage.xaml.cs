@@ -784,6 +784,68 @@ namespace UnicontaClient.Pages.CustomPage
                 AddDockItem(TabControls.UserNotesPage, dgProjectGrid.syncEntity);
         }
 
+
+        private void ContactNameEditor_GotFocus(object sender, RoutedEventArgs e)
+        {
+            var cmbContactName = sender as ComboBoxEditor;
+            var project = dgProjectGrid.SelectedItem as ProjectClient;
+            if (project != null && cmbContactName != null)
+                BindContact(project, cmbContactName);
+        }
+       
+        private void ContactNameEditor_SelectionChanged(object sender, RoutedEventArgs e)
+        {
+            var cmbContactName = sender as ComboBoxEditor;
+            var contact = cmbContactName.SelectedItem as Uniconta.DataModel.Contact;
+            var selectedItem = dgProjectGrid.SelectedItem as ProjectClient;
+            if (selectedItem != null)
+            {
+                dgProjectGrid.SetLoadedRow(selectedItem);
+                if (contact != null)
+                {
+                    selectedItem._ContactRef = contact.RowId;
+                    selectedItem.ContactName = contact._Name;
+                }
+                else
+                {
+                    selectedItem._ContactRef = 0;
+                    selectedItem.ContactName = null;
+                }
+                dgProjectGrid.SetModifiedRow(selectedItem);
+            }
+        }
+        async void BindContact(ProjectClient project, ComboBoxEditor cmbContactName)
+        {
+            var debtor = project.Debtor;
+            if (debtor == null) return;
+
+            var cache = api.GetCache(typeof(Uniconta.DataModel.Contact)) ?? await api.LoadCache(typeof(Uniconta.DataModel.Contact));
+            SetContactSource(cache, debtor, cmbContactName);
+
+            var contactRefId = project._ContactRef;
+            if (contactRefId != 0)
+            {
+                var contact = cache.Get(contactRefId);
+                if (contact == null)
+                {
+                    cache = await api.LoadCache(typeof(Uniconta.DataModel.Contact), true);
+                    contact = cache.Get(contactRefId);
+                    SetContactSource(cache, debtor, cmbContactName);
+                }
+                cmbContactName.SelectedItem = contact;
+                if (contact == null)
+                {
+                    project._ContactRef = 0;
+                    project.ContactName = null;
+                }
+            }
+        }
+
+        void SetContactSource(SQLCache cache, Debtor debtor, ComboBoxEditor cmbContactName)
+        {
+            cmbContactName.ItemsSource = cache != null ? new ContactCacheFilter(cache, 1, debtor._Account) : null;
+        }
+
         private void HasEmailImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             var projectClient = (sender as TextBlock).Tag as ProjectClient;

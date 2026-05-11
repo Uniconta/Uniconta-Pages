@@ -47,7 +47,13 @@ x:Class="UnicontaClient.Pages.CustomPage.AttachVoucherGridPage"
                         <local:CorasauDataGridTemplateColumnClient x:Name="Content" />
                         <local:CorasauDataGridTemplateColumnClient x:Name="Amount" Width="80" />
                         <local:CorasauDataGridTemplateColumnClient x:Name="Invoice" Width="60" />
-                        <local:CorasauDataGridTemplateColumnClient x:Name="Text" MinWidth="300" />
+                        <local:CorasauDataGridTemplateColumnClient x:Name="Text" Width="300" PrintCellStyle="{StaticResource DefaultTextPrintStyle}">
+                            <local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                                <DataTemplate>
+                                    <CorasauControls:TextEditor x:Name="PART_Editor" NullText="{Binding DataContext.RowData.Row.DefaultText,RelativeSource={RelativeSource TemplatedParent}}" />
+                                </DataTemplate>
+                            </local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                        </local:CorasauDataGridTemplateColumnClient>
                         <local:CorasauDataGridTemplateColumnClient x:Name="InJournal" ShowCheckBoxInHeader="False" HideHeaderCheck="True" ReadOnly="True" Width="60" Visible="False"/>
                         <local:CorasauDataGridTemplateColumnClient x:Name="PostingDate" Width="85"/>
                         <local:CorasauDataGridTemplateColumnClient x:Name="Voucher" Width="60" Visible="False" />

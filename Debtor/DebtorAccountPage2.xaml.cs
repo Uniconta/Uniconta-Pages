@@ -370,7 +370,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (!string.IsNullOrWhiteSpace(ci?.life?.name))
                     {
                         cvrFound = true;
-                        editrow.IndustryCode = ci.industrycode?.code?.PadLeft(6, '0');
+                        editrow.IndustryCode = ci.industrycode?.code;
                         var address = ci.address;
                         if (address != null)
                         {

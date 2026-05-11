@@ -86,7 +86,7 @@ namespace UnicontaClient.Pages.CustomPage
                 seriesIndex = GetSeriesId();
             }
             if (api.CompanyEntity.HideCostPrice)
-                fieldCostValue.Visible = false;
+                fieldCostValue.Visible = fieldCostValue.ShowInCustomizationForm = fieldMargin.Visible = fieldMargin.ShowInCustomizationForm = false;
         }
 
         int seriesIndex = 0;

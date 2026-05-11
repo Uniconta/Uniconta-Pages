@@ -399,9 +399,6 @@ namespace UnicontaClient.Pages.CustomPage
                         this.PriceLookup = _priceLookup;
                         _priceLookup?.SetPriceFromItem(rec, selectedItem);
 
-                        if (company._InvoiceUseQtyNow)
-                            rec.QtyNow = rec._Qty;
-
                         if (selectedItem._StandardVariant != rec.standardVariant)
                         {
                             rec.Variant1 = null;

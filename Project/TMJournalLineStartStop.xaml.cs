@@ -197,12 +197,12 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (selectedItem == null)
                 return;
-            Stop(selectedItem);
             var projectJournalLine = Activator.CreateInstance(selectedItem.GetType()) as ProjectJournalLineClient;
             CorasauDataGrid.CopyAndClearRowId(selectedItem, projectJournalLine, api);
             projectJournalLine.TimeFrom = DateTime.MinValue;
             projectJournalLine.TimeTo = DateTime.MinValue;
             projectJournalLine.Date = DateTime.MinValue;
+            Stop(selectedItem);
             var err = await api.Insert(projectJournalLine);
             if (err == ErrorCodes.Succes)
                 LoadGrid();
@@ -217,7 +217,10 @@ namespace UnicontaClient.Pages.CustomPage
                 selectedItem.Date = BasePage.GetSystemDefaultDate();
                 var err = await api.Update(selectedItem);
                 if (err == ErrorCodes.Succes)
+                {
+                    dgJournalLineStartStopPageGrid.SelectedItem = null;
                     LoadGrid();
+                }
                 else
                     UtilDisplay.ShowErrorCode(err);
             }

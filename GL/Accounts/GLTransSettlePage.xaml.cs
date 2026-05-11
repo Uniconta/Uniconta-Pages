@@ -591,15 +591,7 @@ namespace UnicontaClient.Pages.CustomPage
             busyIndicator.IsBusy = false;
         }
 
-        private void IsSettle_Checked(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void IsSettle_Unchecked(object sender, RoutedEventArgs e)
-        {
-
-        }
+        
         GLTransClientLocal settleMaster;
         List<GLTransClientLocal> settleChilds;
         private void Settle_Checked(object sender, RoutedEventArgs e)

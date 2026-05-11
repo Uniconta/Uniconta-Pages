@@ -78,6 +78,7 @@ namespace UnicontaClient.Pages.CustomPage
         private bool _fallbackChanged;
         private bool _nonFallbackChanged;
         private bool HasUnsavedChanges => _fallbackChanged || _nonFallbackChanged;
+        private bool _ignoreMappingGroupSelectionChanged;
 
         public EDeliveryMappingPage(BaseAPI api) : base(api, string.Empty) => Init(null);
         public EDeliveryMappingPage(eDeliveryMappingGroupClient master) : base(null) => Init(master);
@@ -91,23 +92,28 @@ namespace UnicontaClient.Pages.CustomPage
             dgEdeliveryMappingGrid.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
             dgEdeliveryMappingGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
-            dgEdeliveryMappingGrid.UpdateMaster(master);
             xmlCache = api.GetCache(typeof(eDeliveryTagTypeClient));
             mapppingGrpCache = api.GetCache(typeof(eDeliveryMappingGroupClient));
             nhrApi = new NHRAPI(api);
-            Loaded += async (s, e) => await InitAsync();
+            Loaded += async (s, e) => await InitAsync(master);
         }
 
-        private async Task InitAsync()
+        private async Task InitAsync(eDeliveryMappingGroupClient master)
         {
             if (xmlCache == null)
                 xmlCache = await api.LoadCache(typeof(eDeliveryTagTypeClient));
             if (mapppingGrpCache == null)
                 mapppingGrpCache = await api.LoadCache(typeof(eDeliveryMappingGroupClient));
 
-            var master = dgEdeliveryMappingGrid.masterRecord as eDeliveryMappingGroupClient;
             SetMappingGroups(master);
             SyncEntityMasterRowChanged(master);
+        }
+
+        public override Task InitQuery()
+        {
+            if (dgEdeliveryMappingGrid?.masterRecord == null)
+                return Task.CompletedTask;
+            return base.InitQuery();
         }
 
         protected override void SyncEntityMasterRowChanged(UnicontaBaseEntity args)
@@ -121,6 +127,10 @@ namespace UnicontaClient.Pages.CustomPage
                 SetXmlTags(master);
                 cmbTableIds.ItemsSource = master?.GetTableAndProperties(api.CompanyEntity)?.OrderBy(x => x.DisplayName)?.ToList();
                 ClearGridCache();
+
+                _ignoreMappingGroupSelectionChanged = true;
+                try { leMappinggroup.SelectedItem = master; }
+                finally { _ignoreMappingGroupSelectionChanged = false; }
             }
         }
 
@@ -238,10 +248,10 @@ namespace UnicontaClient.Pages.CustomPage
                 if (msg != MessageBoxResult.Yes)
                     return;
 
-                await ValidateAndSaveAsync();
+                var saved = await ValidateAndSaveAsync();
 
                 // If save failed (changes are still pending), don't proceed
-                if (HasUnsavedChanges)
+                if (!saved)
                     return;
             }
 
@@ -251,7 +261,7 @@ namespace UnicontaClient.Pages.CustomPage
                 Invoices.ExportUBL(new DebtorInvoiceClient[1] { invoice }, api, null, null, null, mapppingGrpCache, false);
         }
 
-        private async Task ValidateAndSaveAsync()
+        private async Task<bool> ValidateAndSaveAsync()
         {
             // Only skip validation if fallback is the ONLY thing changed
             if (_nonFallbackChanged || (!_fallbackChanged && !_nonFallbackChanged))
@@ -260,14 +270,18 @@ namespace UnicontaClient.Pages.CustomPage
                 if (result != null)
                 {
                     UnicontaMessageBox.Show(result, Localization.lookup("Error"));
-                    return;
+                    return false;
                 }
             }
 
-            await saveGrid();
+            var saveResult = await saveGrid();
+            if (saveResult != ErrorCodes.Succes)
+                return false;
+
             _fallbackChanged = false;
             _nonFallbackChanged = false;
             _shouldRefreshViewer = xmlDocument == null;
+            return true;
         }
 
         private async Task<string> ValidateReturnErrMsg()
@@ -397,9 +411,19 @@ namespace UnicontaClient.Pages.CustomPage
 
         private async void leMappinggroup_SelectedIndexChanged(object sender, RoutedEventArgs e)
         {
-            var newMappingGroup = (sender as LookupEditor).SelectedItem as eDeliveryMappingGroupClient;
-            if (newMappingGroup == null || dgEdeliveryMappingGrid.masterRecord == newMappingGroup)
+            if (_ignoreMappingGroupSelectionChanged)
                 return;
+
+            var newMappingGroup = (sender as LookupEditor).SelectedItem as eDeliveryMappingGroupClient;
+            var currentMappingGroup = dgEdeliveryMappingGrid.masterRecord as eDeliveryMappingGroupClient;
+            if (newMappingGroup == null || currentMappingGroup?.RowId == newMappingGroup.RowId)
+                return;
+
+            if (!await HandleUnsavedChangesBeforeGroupChangeAsync())
+            {
+                RestoreMappingGroupSelection(currentMappingGroup);
+                return;
+            }
 
             var docType = newMappingGroup._DocType;
 
@@ -442,12 +466,96 @@ namespace UnicontaClient.Pages.CustomPage
                 tbDocumentNum.Text = newMappingGroup.DocType;
                 tbDocumentNum.Visibility = Visibility.Visible;
 
+                ConfigureDocumentLookupEditor();
                 leDocumentNum.ItemsSource = result;
                 leDocumentNum.SelectedItem = selected;
                 leDocumentNum.Visibility = Visibility.Visible;
             }
 
             SyncEntityMasterRowChanged(newMappingGroup);
+        }
+
+        private async Task<bool> HandleUnsavedChangesBeforeGroupChangeAsync()
+        {
+            dgEdeliveryMappingGrid.View.PostEditor();
+            RemoveEmptyAddedMappingRows();
+            ClearLocalChangeTrackingIfGridIsClean();
+
+            if (!HasUnsavedChanges && !dgEdeliveryMappingGrid.HasUnsavedData)
+                return true;
+
+            var msg = UnicontaMessageBox.Show(
+                string.Format(Localization.lookup("SaveChangesFor"), Localization.lookup("EDeliveryMapping")),
+                Localization.lookup("EDeliveryMapping"),
+                MessageBoxButton.YesNoCancel);
+
+            if (msg == MessageBoxResult.Cancel)
+                return false;
+
+            if (msg == MessageBoxResult.No)
+            {
+                dgEdeliveryMappingGrid.CancelChanges();
+                ClearGridCache();
+                return true;
+            }
+
+            var saved = await ValidateAndSaveAsync();
+            return saved && !HasUnsavedChanges && !dgEdeliveryMappingGrid.HasUnsavedData;
+        }
+
+        private void RestoreMappingGroupSelection(eDeliveryMappingGroupClient mappingGroup)
+        {
+            _ignoreMappingGroupSelectionChanged = true;
+            try
+            {
+                leMappinggroup.SelectedItem = mappingGroup;
+            }
+            finally
+            {
+                _ignoreMappingGroupSelectionChanged = false;
+            }
+        }
+
+        private void RemoveEmptyAddedMappingRows()
+        {
+            var emptyRows = dgEdeliveryMappingGrid.AddedRows?
+                .Select(r => r.DataItem as EDeliveryMappingClientExtended)
+                .Where(IsEmptyMappingRow)
+                .ToList();
+
+            if (emptyRows == null || emptyRows.Count == 0)
+                return;
+
+            var source = dgEdeliveryMappingGrid.ItemsSource as IList;
+            if (source == null)
+                return;
+
+            foreach (var row in emptyRows)
+            {
+                var rowIndex = source.IndexOf(row);
+                if (rowIndex < 0)
+                    continue;
+
+                row.PropertyChanged -= eDeliveryMappingClient_PropertyChanged;
+                dgEdeliveryMappingGrid.SelectedItem = row;
+                dgEdeliveryMappingGrid.View.FocusedRowHandle = dgEdeliveryMappingGrid.GetRowHandleByListIndex(rowIndex);
+                dgEdeliveryMappingGrid.DeleteRow(false);
+            }
+        }
+
+        private static bool IsEmptyMappingRow(EDeliveryMappingClientExtended row) =>
+            row != null &&
+            row.TagId == 0 &&
+            row.TableId == 0 &&
+            string.IsNullOrWhiteSpace(row.Property);
+
+        private void ClearLocalChangeTrackingIfGridIsClean()
+        {
+            if (dgEdeliveryMappingGrid.HasUnsavedData)
+                return;
+
+            _fallbackChanged = false;
+            _nonFallbackChanged = false;
         }
 
         private void SetProperty(EDeliveryMappingClientExtended rec, bool resetProperty)
@@ -482,18 +590,23 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         private bool _documentlookupEditorAlreadyFocused;
-        private void leDocumentNum_GotFocus(object sender, RoutedEventArgs e)
+        private void ConfigureDocumentLookupEditor()
         {
-            var lookup = sender as LookupEditor;
+            var lookup = leDocumentNum;
             lookup.api = api;
             lookup.PopupContentTemplate = System.Windows.Application.Current.Resources["LookUpUrlInvoiceClientPopupContent"] as ControlTemplate;
             lookup.ValueMember = "InvoiceNumber";
             lookup.DisplayMember = "InvoiceNum";
+        }
+
+        private void leDocumentNum_GotFocus(object sender, RoutedEventArgs e)
+        {
+            ConfigureDocumentLookupEditor();
 
             if (_documentlookupEditorAlreadyFocused)
                 return;
 
-            lookup.SelectedIndexChanged += leDocumentNum_SelectedIndexChanged;
+            leDocumentNum.SelectedIndexChanged += leDocumentNum_SelectedIndexChanged;
             _documentlookupEditorAlreadyFocused = true;
         }
 

@@ -248,7 +248,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         public ProjectBudgetSumColumnWrapper(double monthVal, double normVal)
         {
-            AbsoluteValue = Math.Abs(monthVal - normVal);
+            AbsoluteValue = monthVal - normVal;
             IsNegative = monthVal - normVal < 0;
         }
         public override string ToString() => AbsoluteValue.ToString("N2");

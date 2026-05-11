@@ -1,4 +1,3 @@
-using UnicontaClient.Models;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -23,7 +22,10 @@ using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using Uniconta.Common.Enums;
+using Uniconta.Common.Utility;
 using Uniconta.DataModel;
+using Uniconta.WindowsAPI.ClientTools;
+using UnicontaClient.Models;
 using static UnicontaClient.Pages.CreateIntraStatFilePage;
 
 using UnicontaClient.Pages;
@@ -38,6 +40,8 @@ namespace UnicontaClient.Pages.CustomPage
     {
         SQLTableCache<GLVat> glVatCache;
         SQLTableCache<GLVatType> glVatTypeCache;
+        SQLCache debtors;
+
 
         public override string NameOfControl
         {
@@ -86,6 +90,8 @@ namespace UnicontaClient.Pages.CustomPage
                 DefaultToDate = fromDate.AddMonths(1).AddDays(-1);
             }
 
+            debtors = api.GetCache(typeof(Uniconta.DataModel.Debtor));
+
             txtDateTo.DateTime = DefaultToDate;
             txtDateFrm.DateTime = DefaultFromDate;
             SetDateTime(txtDateFrm, txtDateTo);
@@ -128,8 +134,9 @@ namespace UnicontaClient.Pages.CustomPage
             if (glVatTypeCache == null)
                 glVatTypeCache = await api.LoadCache<Uniconta.DataModel.GLVatType>().ConfigureAwait(false);
 
+            debtors = await api.LoadCache(typeof(Uniconta.DataModel.Debtor), true).ConfigureAwait(false);
 
-            LoadType(new Type[] { typeof(Uniconta.DataModel.Debtor), typeof(Uniconta.DataModel.InvGroup) });
+            LoadType(new Type[] { typeof(Uniconta.DataModel.InvGroup) });
         }
 
         private void localMenu_OnItemClicked(string ActionType)
@@ -188,11 +195,9 @@ namespace UnicontaClient.Pages.CustomPage
                 propValPair.Add(prop);
             }
 
-            if (glVatCache == null)
-                glVatCache = await api.LoadCache<Uniconta.DataModel.GLVat>();
-
-            if (glVatTypeCache == null)
-                glVatTypeCache = await api.LoadCache<Uniconta.DataModel.GLVatType>();
+            debtors = debtors ?? await api.LoadCache(typeof(Uniconta.DataModel.Debtor));
+            glVatCache = glVatCache ?? await api.LoadCache<Uniconta.DataModel.GLVat>();
+            glVatTypeCache = glVatTypeCache ?? await api.LoadCache<Uniconta.DataModel.GLVatType>();
 
             var lstEUSales = glVatTypeCache.Where(s => s._EUSaleWithoutVAT).Select(x => x._Code).Distinct();
             if (lstEUSales != null && lstEUSales.Count() > 0)
@@ -239,6 +244,8 @@ namespace UnicontaClient.Pages.CustomPage
             bool triangularTrade = false;
             ItemOrServiceType itemOrService = ItemOrServiceType.None;
             string lastVat = null;
+            string vatTypeSales = null;
+            GLVatType vatType = null;
             DebtorClient debtor = null;
             string debtorFileCVR = null;
 
@@ -269,19 +276,20 @@ namespace UnicontaClient.Pages.CustomPage
                 if (lastVat != invLine._Vat)
                 {
                     lastVat = invLine._Vat;
-                    var type = glVatCache.Get(lastVat)?._TypeSales;
-                    var vatType = glVatTypeCache.Get(type);
-
-                    triangularTrade = false;
-                    if (companyCountryId == CountryCode.Denmark && type == "s7")
-                        triangularTrade = true;
-                    else if (vatType != null)
-                    {
-                        if (vatType._EUSalesService)
-                            itemOrService = ItemOrServiceType.Service;
-                        else
-                            itemOrService = ItemOrServiceType.Item;
-                    }
+                    vatTypeSales = glVatCache.Get(lastVat)?._TypeSales;
+                    vatType = glVatTypeCache.Get(vatTypeSales);
+                }
+                
+                triangularTrade = false;
+                if (companyCountryId == CountryCode.Denmark && vatTypeSales == "s7")
+                    triangularTrade = true;
+                    
+                if (vatType != null)
+                {
+                    if (vatType._EUSalesService)
+                        itemOrService = ItemOrServiceType.Service;
+                    else
+                        itemOrService = ItemOrServiceType.Item;
                 }
 
                 var invoice = new EUSaleWithoutVAT();
@@ -320,7 +328,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     if (Char.IsLetter(cvr.FirstOrDefault()))
                     {
-                        var cCode = cvr.Substring(0, 2);
+                        var cCode = cvr.Substring(0, 2).ToUpper();
                         cvr = cvr.Substring(2, cvr.Length - 2);
 
                         if (cCode == IntraHelper.CTRYCODE_EXTENDED_UK ||
@@ -361,8 +369,18 @@ namespace UnicontaClient.Pages.CustomPage
             busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("BusyMessage");
             busyIndicator.IsBusy = true;
             var listOfEU = (IEnumerable<EUSaleWithoutVAT>)dgEUSalesWithoutVATGrid.GetVisibleRows();
-            await euSalesHelper.Validate(listOfEU, compressed, onlyValidate);
+
+            var ret = await VIESValidate(listOfEU);
+            if (!ret)
+            {
+                checkVIES.IsChecked = false;
+                busyIndicator.IsBusy = false;
+                return null;
+            }
+
+            euSalesHelper.Validate(listOfEU, compressed, onlyValidate);
             busyIndicator.IsBusy = false;
+            dgEUSalesWithoutVATGrid.RefreshData();
 
             if (onlyValidate)
             {
@@ -376,8 +394,74 @@ namespace UnicontaClient.Pages.CustomPage
             return listOfEU;
         }
 
+        async Task<bool> VIESValidate(IEnumerable<EUSaleWithoutVAT> listOfEU)
+        {
+            if (!DefaultVIES)
+                return true;
 
-        private void Compress()
+            const int Grouping = 5;
+            int cnt = 0;
+            int cntAll = 0;
+            var lst2 = new List<DebtorClient>();
+            DebtorClient debtor;
+
+            debtors = debtors ?? await api.LoadCache(typeof(Uniconta.DataModel.Debtor));
+
+            var euSalesdebtors = listOfEU.Where(t => t.DebtorRegNo != null && Country2Language.IsEU(t.Country)).GroupBy(s => s.DebtorRef); //TODO:Test om DebtorRef virker!!
+            var cntTotal = euSalesdebtors.Count();
+            foreach (var deb in euSalesdebtors)
+            {
+                busyIndicator.IsBusy = true;
+                bool rejected = false;
+                cntAll++;
+
+                var debtornew = deb.Key;
+
+                if (debtornew == null || debtornew._VIESStatus != Uniconta.DataModel.VIESStatus.None)
+                    continue;
+
+                cnt++;
+                lst2.Add(debtornew);
+
+                if (lst2.Count > 0 && ((cnt % Grouping) == 0 || cntAll == cntTotal))
+                {
+                    busyIndicator.BusyContent = string.Concat(Uniconta.ClientTools.Localization.lookup("VatNumberValidationService") + " " + NumberConvert.ToString(cntAll), " af ", cntTotal);
+
+                    var viesReportLst = await VIES.CheckVatApprox(lst2, api);
+
+                    if (api.session.LastError != 0)
+                        return ShowErrorAndExit(api.session.LastError.ToString());
+
+                    if (viesReportLst?.Count == 1 && viesReportLst[0].FaultCode == VIES.UC_FAULTCODE_GENERALERROR)
+                        return ShowErrorAndExit(viesReportLst[0].FaultString);
+
+                    lst2.Clear();
+                }
+            }
+
+            if (cnt > 0)
+            {
+                await api.LoadCache(typeof(Uniconta.DataModel.Debtor), true);
+                dgEUSalesWithoutVATGrid.RefreshData();
+            }
+
+            return true;
+        }
+
+        private bool ShowErrorAndExit(string message)
+        {
+            busyIndicator.IsBusy = false;
+
+            UnicontaMessageBox.Show(
+                Uniconta.ClientTools.Localization.lookup(message),
+                Uniconta.ClientTools.Localization.lookup("VatNumberValidationService"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+
+            return false;
+        }
+
+        private async Task Compress()
         {
             try
             {
@@ -405,7 +489,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                     compressed = true;
 
-                    CallValidate(true);
+                    await CallValidate(true);
 
                     ribbonControl.DisableButtons("Compress");
                 }

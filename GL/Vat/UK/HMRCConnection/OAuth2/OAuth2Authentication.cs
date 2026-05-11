@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Uniconta.ClientTools.Util;
+
 //using UnicontaClient.HMRCConnection.OAuth2.Views;
 using UnicontaClient.Pages.GL.Vat.UK.HMRCConnection.Model;
 using UnicontaClient.Pages.GL.Vat.UK.HMRCConnection.OAuth2.Model;
@@ -30,7 +32,7 @@ namespace UnicontaClient.Pages.CustomPage.GL.Vat.UK.HMRCConnection.OAuth2
         {
             //opens browser to HMRC page where user will authenticate themselves
             Uri authSiteUri = new Uri(_client.BaseAddress + Common.AuthAddress + "?response_type=code" + "&client_id=" + Common.ClientId + "&scope=" + scope + "&redirect_uri=" + Common.RedirectUri);
-            Process browser = Process.Start(authSiteUri.AbsoluteUri);
+            UtilDisplay.OpenExternalLink(authSiteUri.AbsoluteUri);
             //opens form for pasting in OAuth2.0 Authorisation Code 
             var authCode = string.Empty;
             AuthCodeView cwForm = new AuthCodeView("Green");

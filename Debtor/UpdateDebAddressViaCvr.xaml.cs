@@ -287,7 +287,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var streetAddress = address.CompleteStreet;
 
                     string code = null;
-                    string ciIndustryCode = ci.industrycode?.code?.PadLeft(6, '0');
+                    string ciIndustryCode = ci.industrycode?.code;
                     if (IndustryCodes != null)
                         code = IndustryCodes.Get(ciIndustryCode)?.KeyStr;
 

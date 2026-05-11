@@ -193,9 +193,6 @@ x:Class="UnicontaClient.Pages.CustomPage.ConfigureFunctionalityPage"
                     <CorasauControls:CorasauLayoutItem x:Name="cbBilagscan" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DocumentScannersPay}">
                         <CorasauControls:ComboBoxEditor x:Name="cmbDocumentScanner" SelectedIndexChanged="cmbDocumentScanner_SelectedIndexChanged"/>
                     </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="cbBusinessRules" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusinessRule}">
-                        <CorasauControls:CheckEditor IsChecked="{Binding BusinessRules, Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup x:Name="grpBoxAddins" View="GroupBox" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem  Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Attachments}">
@@ -203,6 +200,9 @@ x:Class="UnicontaClient.Pages.CustomPage.ConfigureFunctionalityPage"
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem x:Name="cbProfiles" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Profiles}">
                         <CorasauControls:CheckEditor IsChecked="{Binding Profiles ,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="cbBusinessRules" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BusinessRule}">
+                        <CorasauControls:CheckEditor IsChecked="{Binding BusinessRules, Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutControl>

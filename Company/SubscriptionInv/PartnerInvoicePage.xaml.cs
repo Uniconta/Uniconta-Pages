@@ -1,6 +1,4 @@
 using Corasau.Admin.API;
-using UnicontaClient.Models;
-using UnicontaClient.Pages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,9 +19,11 @@ using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
+using Uniconta.Common.Utility;
 using Uniconta.DataModel;
-using UnicontaClient.Utilities;
 using UnicontaClient.Controls;
+using UnicontaClient.Models;
+using UnicontaClient.Utilities;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -180,12 +180,8 @@ namespace UnicontaClient.Pages.CustomPage
         async private void ShowInvoice(PartnerInvoiceClient selectedItem)
         {
             var partnerDetails = await GetInvData(selectedItem);
-            if (partnerDetails == null) return;
-
-            object[] obj = new object[1];
-            obj[0] = partnerDetails;
-
-            AddDockItem(TabControls.InvoiceSubscriptionPage, obj, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("InvoiceNumber"), selectedItem._Invoice));
+            if (partnerDetails != null)
+                AddDockItem(TabControls.InvoiceSubscriptionPage, new object[] { partnerDetails }, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("InvoiceNumber"), selectedItem._Invoice));
         }
 
         async Task<PartnerInvDetails> GetInvData(PartnerInvoiceClient selecteditem)
@@ -198,7 +194,17 @@ namespace UnicontaClient.Pages.CustomPage
 
             var reseller = selecteditem.Reseller;
             var rSellerClient = await api.Query<ResellerClient>();
-            var partner = rSellerClient.Where(p => p.Pid == reseller).SingleOrDefault();
+            var partner = rSellerClient.SingleOrDefault(p => p.Pid == reseller);
+
+            var Comp = api.CompanyEntity;
+            var Cache = Comp.GetCache(typeof(Debtor)) ?? await Comp.LoadCache(typeof(Debtor), api);
+            if (Cache != null)
+            {
+                var debtor = Cache.Get(partner._Account ?? NumberConvert.ToString(selecteditem._Pid + 60000)) as DebtorClient;
+                partner.DebtorPaymentMandateId = debtor?.MandateRef?.MandateId;
+                partner.DebtorBankAccount = debtor?.BankAccount;
+                partner.VATZone = debtor?.VatZone;
+            }
 
             partnerInvDetails.Reseller = partner;
             partnerInvDetails.CompanyLogo = await UtilCommon.GetLogo(api);

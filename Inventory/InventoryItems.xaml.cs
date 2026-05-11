@@ -72,6 +72,11 @@ namespace UnicontaClient.Pages.CustomPage
                 ribbonControl.PerformRibbonAction("InvTrans");
         }
 
+        public override void PageClosing()
+        {
+            globalEvents.OnRefresh(NameOfControl, null);
+            base.PageClosing();
+        }
         private void DebtorAccount_BeforeClose()
         {
             this.PreviewKeyDown -= RootVisual_KeyDown;

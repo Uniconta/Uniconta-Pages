@@ -100,7 +100,18 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="PrType" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Installation" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="FixedPrice" Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="ContactName" ReadOnly="True" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ContactName">
+                        <local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <TextBlock Margin="2" VerticalAlignment="Center" Text="{Binding DataContext.RowData.Row.ContactName,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"></TextBlock>
+                            </ControlTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                        <local:CorasauDataGridTemplateColumnClient.CellEditTemplate>
+                            <DataTemplate>
+                                <CorasauControls:ComboBoxEditor GotFocus="ContactNameEditor_GotFocus" DisplayMember="KeyName" ItemsSource="{Binding DataContext.RowData.Row.ContactSource,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" SelectedIndexChanged="ContactNameEditor_SelectionChanged" />
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.CellEditTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
                     <local:ComboBoxColumnClient x:Name="Phase"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Created"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" />

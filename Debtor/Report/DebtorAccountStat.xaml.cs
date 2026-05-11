@@ -68,9 +68,7 @@ namespace UnicontaClient.Pages.CustomPage
             txtDateFrm.DateTime = Now.AddDays(1 - Now.Day).AddMonths(-2);
             dgAcStatsGrid.ShowTotalSummary();
             if (api.CompanyEntity.HideCostPrice)
-            {
-                MarginRatio.Visible = MarginRatio.ShowInColumnChooser = CostValue.Visible = CostValue.ShowInColumnChooser = false;
-            }
+                MarginRatio.Visible = MarginRatio.ShowInColumnChooser = CostValue.Visible = CostValue.ShowInColumnChooser = DB.Visible = DB.ShowInColumnChooser = false;
         }
 
         void localMenu_OnItemClicked(string ActionType)

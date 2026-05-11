@@ -116,7 +116,12 @@ namespace UnicontaClient.Pages.CustomPage
         {
             string buildText = AssemblyBuildDate(this.GetType());
             txtXapBuildDate.Text = buildText;
+#if MAC
+            var version = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
+            txtClientVersion.Text = version.Substring(0, version.LastIndexOf('.'));
+#else
             txtClientVersion.Text = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
+#endif
             txtAPIVersion.Text = APIVersion.CurrentVersion.ToString();
         }
         private async void savePassword()

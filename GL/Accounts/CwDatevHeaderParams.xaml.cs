@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using Uniconta.API.System;
 using Uniconta.ClientTools;
+using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -83,7 +84,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
         private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
         {
-            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
+            UtilDisplay.OpenExternalLink(e.Uri.AbsoluteUri);
             e.Handled = true;
         }
 
