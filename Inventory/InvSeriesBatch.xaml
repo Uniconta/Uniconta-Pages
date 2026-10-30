@@ -71,6 +71,14 @@ x:Class="UnicontaClient.Pages.CustomPage.InvSeriesBatch"
                             </DataTemplate>
                         </local:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="QtyMarked" MinWidth="80" Visible="False">
+                        <local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <UnicontaControls:TextEditor x:Name="PART_Editor" HorizontalContentAlignment="Right" Mask="{Binding Path=DataContext.RowData.Row.Decimals,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource MaskConverter},ConverterParameter=Decimals}" MaskUseAsDisplayFormat="True" MaskType="Numeric" 
+                                                                        EditValue="{Binding Path=DataContext.RowData.Row.QtyMarked,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}"/>
+                            </DataTemplate>
+                        </local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </local:CorasauDataGridTemplateColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="CostPrice" MinWidth="80" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Date" MinWidth="90"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Expire" MinWidth="90"/>

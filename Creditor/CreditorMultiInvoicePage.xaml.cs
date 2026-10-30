@@ -154,6 +154,7 @@ namespace UnicontaClient.Pages.CustomPage
                     voucher._PurchaseNumber = selectedItem._OrderNumber;
                     voucher._CreditorAccount = selectedItem._InvoiceAccount ?? selectedItem._DCAccount;
                     CWAddVouchers addVouvhersDialog = new CWAddVouchers(api, false, voucher);
+                    addVouvhersDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     addVouvhersDialog.Closed += delegate
                     {
                         if (addVouvhersDialog.DialogResult == true)
@@ -258,6 +259,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             bool showUpdateInv = api.CompanyEntity.Storage;
             var generateDoc = new CWGenerateInvoice(false, documentType.ToString(), false, true, true, false, isQuickPrintVisible: false, isShowUpdateInv: showUpdateInv);
+            generateDoc.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             generateDoc.DialogTableId = 2000000000;
             generateDoc.HideOutlookOption(true);
             generateDoc.ShowAllowCredMax(api.CompanyEntity.AllowSkipCreditMax);

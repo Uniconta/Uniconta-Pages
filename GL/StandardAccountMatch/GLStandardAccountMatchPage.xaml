@@ -1,0 +1,83 @@
+<Pages:GridBasePage xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.GL.StandardAccountMatch.GLStandardAccountMatchPage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:corasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+        xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"
+        xmlns:localCtrl="clr-namespace:UnicontaClient.Pages.CustomPage.GL.StandardAccountMatch"
+        xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+        KeyDown="ChildWindow_KeyDown">
+    <Grid x:Name="LayoutRoot" MinHeight="480" MinWidth="640" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <corasauControls:CorasauRibbonControl x:Name="frmRibbon"
+                                              Grid.Row="0"
+                                              XMLSourcePath=";component/Pages/GL/StandardAccountMatch/GLStandardAccountMatchPageRibbon.xml" />
+            <corasauControls:BusyIndicator x:Name="busyIndicator"
+                                Grid.Row="1"
+                                BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <localCtrl:GLAccountStandardAccountMatchGrid x:Name="dgGLAccountStandardAccountMatches"
+                                                  AutoGenerateColumns="None"
+                                                  VerticalAlignment="Stretch"
+                                                  HorizontalAlignment="Stretch">
+                <localCtrl:GLAccountStandardAccountMatchGrid.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Account" Width="100" AllowEditing="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Width="180" AllowEditing="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="StandardAccount" Width="120" AllowEditing="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="StandardAccountName" Width="120" AllowEditing="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ProposedStandardAccountCode" Width="120" AllowEditing="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ProposedStandardAccountName" Width="180" AllowEditing="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ProbabilityPercentage" Width="90" AllowEditing="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NeedsHumanReview" Width="90" AllowEditing="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Reasoning" Width="300" AllowEditing="False" />
+                </localCtrl:GLAccountStandardAccountMatchGrid.Columns>
+                <!--
+                <localCtrl:GLAccountStandardAccountMatchGrid.View>
+                    <dxg:TableView x:Name="tableView">
+                        <dxg:TableView.FormatConditions>
+                            <dxg:FormatCondition FieldName="ProposedStandardAccountCode"
+                         Expression="([StandardAccount] == null Or [StandardAccount] == '') 
+                                     And [ProposedStandardAccountCode] != null 
+                                     And [ProposedStandardAccountCode] != ''"
+                         ApplyToRow="False">
+                                <dxg:FormatCondition.Format>
+                                    <dx:Format Background="PowderBlue" />
+                                </dxg:FormatCondition.Format>
+                            </dxg:FormatCondition>
+                            <dxg:FormatCondition FieldName="ProposedStandardAccountCode"
+                         Expression="[StandardAccount] != null 
+                                     And [StandardAccount] != '' 
+                                     And [ProposedStandardAccountCode] != null 
+                                     And [ProposedStandardAccountCode] != '' 
+                                     And [ProposedStandardAccountCode] != [StandardAccount]"
+                         ApplyToRow="False">
+                                <dxg:FormatCondition.Format>
+                                    <dx:Format Background="Orange" />
+                                </dxg:FormatCondition.Format>
+                            </dxg:FormatCondition>
+                        </dxg:TableView.FormatConditions>
+                    </dxg:TableView>
+                </localCtrl:GLAccountStandardAccountMatchGrid.View>
+                -->
+            </localCtrl:GLAccountStandardAccountMatchGrid>
+        </corasauControls:BusyIndicator>
+        <StatusBar Grid.Row="2" MinHeight="24">
+            <StatusBarItem>
+                <TextBlock x:Name="StatusText" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=GLMatchStdReady}" />
+            </StatusBarItem>
+            <Separator />
+            <StatusBarItem HorizontalAlignment="Right">
+                <ProgressBar x:Name="AIProgressBar"
+                             Width="160"
+                             Height="18"
+                             Minimum="0"
+                             Maximum="100"
+                             Value="0"
+                             Visibility="Collapsed" />
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
+</Pages:GridBasePage>

@@ -37,5 +37,6 @@
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="PasswordOnEmail" LocalizedNameKey="PasswordOnEmail" LargeGlyph="User_Rights_32x32"/>
+    <RibbonItem Action="UserAssociate" LocalizedNameKey="UserAssociate" LargeGlyph="User_Rights_32x32"/>
   </RibbonItem>
 </root>

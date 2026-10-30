@@ -722,6 +722,9 @@ namespace UnicontaClient.Pages.CustomPage
 
             try
             {
+                if (CheckDataChanged())
+                    return;
+
                 busyIndicator.IsBusy = true;
 
                 int currentYear = defaultYear;
@@ -814,12 +817,18 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void btnSubYear_Click(object sender, RoutedEventArgs e)
         {
+            if (CheckDataChanged())
+                return;
+
             defaultYear--;
             txtYear.Text = defaultYear.ToString();
         }
 
         private void btnAddYear_Click(object sender, RoutedEventArgs e)
         {
+            if (CheckDataChanged())
+                return;
+
             defaultYear++;
             txtYear.Text = defaultYear.ToString();
         }
@@ -828,6 +837,16 @@ namespace UnicontaClient.Pages.CustomPage
         {
             defaultBudgetGroup = (string)cmbProjectBudgetGroup.EditValue;
             budgetGrpMaster = (ProjectBudgetGroup)budgetGroups.Get(defaultBudgetGroup);
+        }
+
+        private bool CheckDataChanged()
+        {
+            if (isDataChaged)
+            {
+                UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("Der er foretaget ændringer i indholdet af skærmbilledet. Gem først ændringerne"), Uniconta.ClientTools.Localization.lookup("Warning"));
+                return true;
+            }
+            return false;
         }
 
         CorasauGridLookupEditorClient prevPayroll;

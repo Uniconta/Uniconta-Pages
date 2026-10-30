@@ -490,10 +490,9 @@ namespace UnicontaClient.Pages.CustomPage
             var contact = (sender as TextBlock).Tag as ContactClient;
             if (contact != null)
             {
-                var mail = string.Concat("mailto:", contact._Email);
-                System.Diagnostics.Process proc = new System.Diagnostics.Process();
-                proc.StartInfo.FileName = mail;
-                proc.Start();
+                if (string.IsNullOrWhiteSpace(contact._Email))
+                    return;
+                OfficeComponentUtil.SendEmailToOutlook(contact._Email);
             }
         }
 

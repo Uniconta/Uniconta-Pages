@@ -308,9 +308,9 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (sender is CorasauLayoutItem layoutItem && layoutItem.Content is TextEditor txtEmail)
             {
-                var mail = $"mailto:{txtEmail.Text}";
-                var proc = new System.Diagnostics.Process { StartInfo = { FileName = mail } };
-                proc.Start();
+                if (string.IsNullOrWhiteSpace(txtEmail?.Text))
+                    return;
+                OfficeComponentUtil.SendEmailToOutlook(txtEmail.Text);
             }
         }
 

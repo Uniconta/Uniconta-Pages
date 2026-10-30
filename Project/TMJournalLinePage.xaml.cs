@@ -161,9 +161,9 @@ namespace UnicontaClient.Pages.CustomPage
             string employee = null;
             foreach (var rec in Parameters)
             {
-                if (string.Compare(rec.Name, "Employee", StringComparison.CurrentCultureIgnoreCase) == 0)
+                if (string.Equals(rec.Name, "Employee", StringComparison.CurrentCultureIgnoreCase))
                     employee = rec.Value;
-                if (string.Compare(rec.Name, "Date", StringComparison.CurrentCultureIgnoreCase) == 0)
+                if (string.Equals(rec.Name, "Date", StringComparison.CurrentCultureIgnoreCase))
                     employeeCalenderStartDate = StringSplit.DateParse(rec.Value, DateFormat.dmy);
             }
             if (employee != null)
@@ -1740,6 +1740,7 @@ namespace UnicontaClient.Pages.CustomPage
         void TimeRegistration(TMJournalLineClient selectedItem)
         {
             var cw = new CwTransportRegistration(selectedItem, api);
+            cw.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             cw.Closed += delegate
             {
                 if (cw.DialogResult == true)
@@ -1912,8 +1913,8 @@ namespace UnicontaClient.Pages.CustomPage
             var closeDate = (int)employee._TMCloseDate.DayOfWeek;
             int closeDay = 7;
 
-            double totalDaySums = daySums.Sum();
-            double totalNormHours = normHoursArr.Sum();
+            double totalDaySums = Math.Round(daySums.Sum(), 2);
+            double totalNormHours = Math.Round(normHoursArr.Sum(), 2);
             var zeroCalendar = totalNormHours == 0;
             if (totalDaySums < totalNormHours || zeroCalendar)
             {
@@ -1997,6 +1998,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var approveDate = employee._TMCloseDate >= JournalLineDate && employee._TMCloseDate <= JournalLineDate.AddDays(6) ? employee._TMCloseDate : JournalLineDate.AddDays(6);
             CWTimePosting postingDialog = new CWTimePosting(approveDate, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Period"), GetPeriod(JournalLineDate)), api.CompanyEntity.Name);
+            postingDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             postingDialog.DialogTableId = 2000000065;
             postingDialog.Closed += async delegate
             {

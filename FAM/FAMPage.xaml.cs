@@ -171,6 +171,7 @@ namespace UnicontaClient.Pages.CustomPage
             LoadType(new Type[] { typeof(Uniconta.DataModel.GLDailyJournal), typeof(Uniconta.DataModel.GLAccount) });
 
             var cw = new CwSaleOfAsset(api);
+            cw.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             cw.DialogTableId = 2000000088;
             cw.Closed += async delegate
             {
@@ -247,6 +248,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (famLst.Count() == 0)
                 return;
             var cw = new CwGenerateDepreciation(api);
+            cw.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
 #if !SILVERLIGHT
             cw.DialogTableId = 2000000072;
 #endif

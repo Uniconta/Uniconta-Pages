@@ -28,7 +28,15 @@ namespace UnicontaClient.Pages.CustomPage
 {
     public class DocsSendLogDataGridClient : CorasauDataGridClient
     {
-        public override Type TableType { get { return typeof(DebtorSendLogClient); } }
+        public override Type TableType
+        {
+            get
+            {
+                return masterRecord is CreditorClient || masterRecord is CreditorOrderClient || masterRecord is CreditorInvoiceClient
+                    ? typeof(CreditorSendLogClient)
+                    : typeof(DebtorSendLogClient);
+            }
+        }
         public override bool Readonly { get { return true; } }
         public override IComparer GridSorting { get { return new LogDateSort(); } }
     }
@@ -87,6 +95,28 @@ namespace UnicontaClient.Pages.CustomPage
             InitQuery();
         }
 
+        public override void SetParameter(IEnumerable<ValuePair> Parameters)
+        {
+            foreach (var rec in Parameters)
+            {
+                if (rec.Name == null || rec.Name == "Master")
+                {
+                    UnicontaBaseEntity master;
+                    if (rec.Value == "Debtor")
+                        master = new DebtorClient();
+                    else if (rec.Value == "Creditor")
+                        master = new CreditorClient();
+                    else
+                        continue;
+
+                    dgDocsSendLogDataGrid.UpdateMaster(master);
+                    SetHeader();
+                    InitQuery();
+                }
+            }
+            base.SetParameter(Parameters);
+        }
+
         void SetHeader()
         {
             UnicontaBaseEntity masterClient = dgDocsSendLogDataGrid.masterRecord;
@@ -102,6 +132,25 @@ namespace UnicontaClient.Pages.CustomPage
                 Name.Visible = false;
                 var debtorMaster = masterClient as DebtorClient;
                 SetHeader(string.Format("{0} {1}/{2}", Uniconta.ClientTools.Localization.lookup("Debtor"), Uniconta.ClientTools.Localization.lookup("Log"), debtorMaster.Account));
+            }
+            else if (masterClient is CreditorClient)
+            {
+                Account.Visible = false;
+                Name.Visible = false;
+                var creditorMaster = masterClient as CreditorClient;
+                SetHeader(string.Format("{0} {1}/{2}", Uniconta.ClientTools.Localization.lookup("Creditor"), Uniconta.ClientTools.Localization.lookup("Log"), creditorMaster.Account));
+            }
+            else if (masterClient is CreditorOrderClient)
+            {
+                Account.Visible = false;
+                Name.Visible = false;
+                var creditorOrderMaster = masterClient as CreditorOrderClient;
+                SetHeader(string.Format("{0} {1}/{2}", Uniconta.ClientTools.Localization.lookup("PurchaseOrder"), Uniconta.ClientTools.Localization.lookup("Log"), creditorOrderMaster._OrderNumber));
+            }
+            else if (masterClient is CreditorInvoiceClient)
+            {
+                var credInvoiceMaster = masterClient as CreditorInvoiceClient;
+                SetHeader(string.Format("{0} {1}/{2}", Uniconta.ClientTools.Localization.lookup("PurchaseOrder"), Uniconta.ClientTools.Localization.lookup("Log"), credInvoiceMaster._OrderNumber));
             }
         }
 
@@ -126,12 +175,25 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (selectedItem._LogType == Uniconta.DataModel.DCDocType.eDelivery || selectedItem._LogType == Uniconta.DataModel.DCDocType.peppol)
             {
-                var xmlLst = await new InvoiceAPI(api).GetEdeliveryDoc(selectedItem);
-                if (xmlLst != null)
+                selectedItem._File = null;
+                if (selectedItem._File != null)
                 {
-                    var cw = new CWPreviewXMLViewer(xmlLst[0]);
-                    cw?.Show();
-                    return;
+                    ChildWindow cw = null;
+                    if (selectedItem._Fileextenson == FileextensionsTypes.XML)
+                    {
+                        cw = new CWPreviewXMLViewer(selectedItem._File);
+                        cw?.Show();
+                    }
+                }
+                else
+                {
+                    var xmlLst = await new InvoiceAPI(api).GetEdeliveryDoc(selectedItem);
+                    if (xmlLst != null)
+                    {
+                        var cw = new CWPreviewXMLViewer(xmlLst[0]);
+                        cw?.Show();
+                        return;
+                    }
                 }
             }
             

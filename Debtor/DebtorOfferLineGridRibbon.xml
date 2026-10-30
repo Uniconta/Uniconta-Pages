@@ -60,7 +60,7 @@
 	<RibbonItem>
 		<RibbonItem Action="InsertSubTotal" LocalizedNameKey="InsertSubTotal" Parameter="Line" Glyph="Add_16x16" LargeGlyph="Add_32x32"/>
 		<RibbonItem Action="PartInvItems" LocalizedNameKey="BOM" Module="InvBOM" LargeGlyph="Order_Lines_Highlighted_32x32" ShortcutKey="ALT+L">
-			<RibbonItem Action="UnfoldBOM" LocalizedNameKey="UnfoldBOM" Module="InvBOM" Glyph="CopyUserTable_16x16" LargeGlyph="CopyUserTable_16x16"/>
+			<RibbonItem Action="UnfoldBOM" LocalizedNameKey="UnfoldBOM" Module="InvBOM" Glyph="CopyUserTable_16x16" LargeGlyph="CopyUserTable_32x32"/>
 			<RibbonItem Action="CreateProduction" LocalizedNameKey="CreateOBJ" Parameter="Production" Module="Production" Glyph="Column_Head_16x16" LargeGlyph="Column_Head_16x16"/>
 		</RibbonItem>
 	</RibbonItem>

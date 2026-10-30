@@ -44,21 +44,21 @@ x:Class="UnicontaClient.Pages.CustomPage.MatchVoucherBSLinesPage"
                                         </Style>
                                     </localPage:CorasauDataGridTemplateColumnClient.CellStyle>
                                 </localPage:CorasauDataGridTemplateColumnClient>
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="PrimaryKeyId" Width="60" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="PrimaryKeyId" Width="60" AllowEditing="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingDate" Width="80" />
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="PayDate" Width="80" Visible="False" />
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Created" ShowTime="True" Width="120" AllowSorting="True" Visible="False">
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="PayDate" Width="80" Visible="False" AllowEditing="True"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Created" ShowTime="True" Width="120" AllowEditing="False" AllowSorting="True" Visible="False">
                                     <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
                                         <editor:TextEditSettings DisplayFormat="g" MaskType="DateTime" />
                                     </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
                                 </localPage:CorasauDataGridTemplateColumnClient>
-                                <localPage:CorasauDataGridTemplateColumnClient FieldName="Text" x:Name="vcText" Width="250" />
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="UserName" Width="100" Visible="False" />
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="UserLogidId" Width="100" Visible="False" />
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="ApproverName" Width="100" Visible="False" />
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="ApproverLogidId" Width="100" Visible="False" />
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentDate" Width="85" Visible="False" />
-                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Approved" Width="70" Visible="False" />
+                                <localPage:CorasauDataGridTemplateColumnClient FieldName="Text" x:Name="vcText" Width="250" AllowEditing="True"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="UserName" Width="100" Visible="False" AllowEditing="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="UserLogidId" Width="100" Visible="False" AllowEditing="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="ApproverName" Width="100" Visible="False" AllowEditing="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="ApproverLogidId" Width="100" Visible="False" AllowEditing="False"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentDate" Width="85" Visible="False" AllowEditing="True"/>
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="Approved" Width="70" Visible="False" AllowEditing="True"/>
                                 <localPage:CorasauDataGridForeignKeyColumnClient x:Name="CreditorAccount" Width="90" Visible="False" />
                                 <localPage:CorasauDataGridForeignKeyColumnClient x:Name="CreditorName" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient FieldName="Debit" x:Name="colDebit" AllowEditing="True" Width="85" Visible="False" />

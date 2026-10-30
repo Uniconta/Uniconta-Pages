@@ -82,6 +82,7 @@ namespace UnicontaClient.Pages.CustomPage
                      else
                      {
                          EraseYearWindow delDialog = new EraseYearWindow("", false);
+                         delDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                          delDialog.Closed += async delegate
                          {
                              if (delDialog.DialogResult == true)

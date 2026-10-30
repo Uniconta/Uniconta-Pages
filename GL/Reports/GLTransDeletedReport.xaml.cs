@@ -242,6 +242,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var glDelTranslst = dgDeletedTransGrid.GetVisibleRows() as IEnumerable<GLTransDeletedClient>;
             var cwObj = new CWCopyVoucherToJrnl(api);
+            cwObj.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             cwObj.DialogTableId = 2000000082;
             cwObj.Closed += async delegate
             {

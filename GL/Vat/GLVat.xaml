@@ -49,6 +49,7 @@ x:Class="UnicontaClient.Pages.CustomPage.GLVatPage"
                     <localPage:ComboBoxColumnClient x:Name="ShipmentCountry" Visible="False"/>
                     <localPage:ComboBoxColumnClient x:Name="RateType" Visible="False"/>
                     <localPage:ComboBoxColumnClient x:Name="MOSSType" Visible="False"/>
+                    <localPage:ComboBoxColumnClient x:Name="VatOperationCountry" Visible="False"/>
                 </localPage:GLVatGrid.Columns>
             </localPage:GLVatGrid>
         </CorasauControls:BusyIndicator>

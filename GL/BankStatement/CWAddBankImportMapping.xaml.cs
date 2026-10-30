@@ -24,7 +24,6 @@ namespace UnicontaClient.Pages.CustomPage
     public partial class CWAddBankImportMapping : ChildWindow
     {
         private CrudAPI api;
-        Uniconta.DataModel.BankStatement master;
         [ForeignKeyAttribute(ForeignKeyTable = typeof(GLVat))]
         public string Vat { get; set; }
 
@@ -45,29 +44,22 @@ namespace UnicontaClient.Pages.CustomPage
 
         [ForeignKeyAttribute(ForeignKeyTable = typeof(GLDimType5))]
         public string Dimension5 { get; set; }
-        public CWAddBankImportMapping(CrudAPI api, Uniconta.DataModel.BankStatement master, BankStatementLineClient bankStatement)
+
+        [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.GLOffsetAccountTemplate))]
+        public string AccountTemplate { get; set; }
+        public CWAddBankImportMapping(CrudAPI api, BankStatementLineClient bankStatement)
         {
             this.api = api;
             this.DataContext = this;
             InitializeComponent();
             this.Title = Uniconta.ClientTools.Localization.lookup("AutomaticAccountSelection");
-            if (string.IsNullOrWhiteSpace(cmdBankFormats.Text))
-                FocusManager.SetFocusedElement(cmdBankFormats, cmdBankFormats);
             this.Loaded += CW_Loaded;
-
-            if (master != null && master._BankImportId != 0) // last import
-            {
-                this.master = master;
-                cmdBankFormats.Visibility = Visibility.Collapsed;
-            }
-            else
-                SetBankFormats(true);
-
             chkEqual.IsChecked = chkContains.IsChecked = ckkStartWith.IsChecked = true;
             txtAccountType.Text = bankStatement.AccountType;
             txtAccount.Text = bankStatement._Account;
             txtText.Text = bankStatement._Text;
             leCharge.api = api;
+            leAccountTemplate.api = api;
             leVat.api = api;
             BindDimension();
         }
@@ -145,15 +137,8 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        async void SetBankFormats(bool initial)
-        {
-            var bankFormats = await api.Query<BankImportFormatClient>();
-            cmdBankFormats.ItemsSource = bankFormats;
-        }
-
         void CW_Loaded(object sender, RoutedEventArgs e)
         {
-            Dispatcher.BeginInvoke(new Action(() => { cmdBankFormats.Focus(); }));
             txtAccount.KeyDown += txtAccount_KeyDown;
         }
 
@@ -162,28 +147,24 @@ namespace UnicontaClient.Pages.CustomPage
             if (string.IsNullOrWhiteSpace(txtText.Text))
                 return;
 
-            var bankImportMap = new BankImportMap();
-            if (master != null)
-                bankImportMap.SetMaster(master);
-            else if (currentBankFormat != null)
-                bankImportMap.SetMaster(currentBankFormat);
-            else
-                return;
-
-            bankImportMap._AccountType = (GLJournalAccountType)AppEnums.GLAccountType.IndexOf(txtAccountType.Text);
-            bankImportMap._Account = txtAccount.Text;
-            bankImportMap._Text = txtText.Text;
-            bankImportMap._Equal = chkEqual.IsChecked.GetValueOrDefault();
-            bankImportMap._StartsWith = ckkStartWith.IsChecked.GetValueOrDefault();
-            bankImportMap._Contains = chkContains.IsChecked.GetValueOrDefault();
-            bankImportMap._Dim1 = leDim1.Text;
-            bankImportMap._Dim2 = leDim2.Text;
-            bankImportMap._Dim3 = leDim3.Text;
-            bankImportMap._Dim4 = leDim4.Text;
-            bankImportMap._Dim5 = leDim5.Text;
-            bankImportMap._Charge = Charge;
-            bankImportMap._Vat = Vat;
-            bankImportMap._RequireVoucher = chkRequireVoucher.IsChecked.GetValueOrDefault();
+            var bankImportMap = new BankImportMap
+            {
+                _AccountType = (GLJournalAccountType)AppEnums.GLAccountType.IndexOf(txtAccountType.Text),
+                _Account = txtAccount.Text,
+                _AccountTemplate = leAccountTemplate.Text,
+                _Text = txtText.Text.Trim(),
+                _Equal = chkEqual.IsChecked.GetValueOrDefault(),
+                _StartsWith = ckkStartWith.IsChecked.GetValueOrDefault(),
+                _Contains = chkContains.IsChecked.GetValueOrDefault(),
+                _Dim1 = leDim1.Text,
+                _Dim2 = leDim2.Text,
+                _Dim3 = leDim3.Text,
+                _Dim4 = leDim4.Text,
+                _Dim5 = leDim5.Text,
+                _Charge = Charge,
+                _Vat = Vat,
+                _RequireVoucher = chkRequireVoucher.IsChecked.GetValueOrDefault()
+            };
             var err = await api.Insert(bankImportMap);
             if (err != ErrorCodes.Succes)
                 UtilDisplay.ShowErrorCode(err);
@@ -192,11 +173,6 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         BankImportFormatClient currentBankFormat;
-        private void cmdBankFormats_SelectedIndexChanged(object sender, RoutedEventArgs e)
-        {
-            if (cmdBankFormats.SelectedItem == null) return;
-            currentBankFormat = cmdBankFormats.SelectedItem as BankImportFormatClient;
-        }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {

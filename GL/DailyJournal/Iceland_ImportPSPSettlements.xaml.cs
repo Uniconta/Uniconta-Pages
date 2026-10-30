@@ -19,9 +19,6 @@ using System.Text;
 using Uniconta.ClientTools;
 using Rapyd.CreditCard.Settlement;
 using static Rapyd.CreditCard.Settlement.Rapyd_CreditCardClient;
-#if !UNICORE
-using log4net.Layout;
-#endif
 using Straumur.CreditCard.Settlement;
 
 using UnicontaClient.Pages;

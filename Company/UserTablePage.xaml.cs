@@ -172,6 +172,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "CopyUserTable":
                     CWCopyUserFields winUserFields = new CWCopyUserFields(api);
+                    winUserFields.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     winUserFields.Closed += async delegate
                     {
                         if (winUserFields.DialogResult == true)
@@ -194,12 +195,27 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null && selectedItem._SharedFromCompanyId == 0)
                         AddDockItem(TabControls.TableHeaderSharePage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("SharedToCompany"), selectedItem._Name));
                     break;
+                case "CopyToApp":
+                    if (Utility.ConfirmCopyToApp())
+                        CopyToApp(selectedItem);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
-
+        async void CopyToApp(TableHeaderClient uf)
+        {
+            var currentApp = Utility.GetCurrentApp();
+            if (uf != null && currentApp != null)
+            {
+                var appTable = new AppTableHeaderClient();
+                appTable.SetMaster(uf);
+                appTable.SetMaster(currentApp);
+                var err = await api.Insert(appTable);
+                UtilDisplay.ShowErrorCode(err);
+            }
+        }
         async public static void GenerateClass(UnicontaBaseEntity selectedItem, bool isBaseClass, CrudAPI api, string className = null)
         {
             var cwGenerateClassType = new CWGenerateClassType();

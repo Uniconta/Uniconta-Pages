@@ -5,6 +5,7 @@ x:Class="UnicontaClient.Pages.CustomPage.InvPackagingProductPage"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
              xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+             xmlns:docking="http://schemas.devexpress.com/winfx/2008/xaml/docking"
              xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
              xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
@@ -14,38 +15,56 @@ x:Class="UnicontaClient.Pages.CustomPage.InvPackagingProductPage"
         </Grid.RowDefinitions>
         <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Inventory/ProductPackaging/InvPackagingProductPageRibbon.xml" x:Name="localMenu"/>
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
-            <local:InvPackagingProductPageGrid x:Name="dgInvPackagingProductGrid" AutoGenerateColumns="None">
-                <local:InvPackagingProductPageGrid.Columns>
-                    <local:ComboBoxColumnClient FieldName="ReportingType" x:Name="colReportingType" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Item" Visible="False" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Category">
-                        <local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" SelectedItem="{Binding DataContext.RowData.Row.Category,Mode=TwoWay}" ItemsSource="{Binding DataContext.RowData.Row.CategorySource,Mode= OneWay,RelativeSource={RelativeSource TemplatedParent}, UpdateSourceTrigger=PropertyChanged}" GotFocus="Category_GotFocus"/>
-                            </DataTemplate>
-                        </local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </local:CorasauDataGridTemplateColumnClient>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="PackagingType">
-                        <local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                            <DataTemplate>
-                                <CorasauControls:ComboBoxEditor x:Name="PART_Editor" SelectedItem="{Binding DataContext.RowData.Row.PackagingType,Mode=TwoWay}" ItemsSource="{Binding DataContext.RowData.Row.TypeSource,Mode= OneWay,RelativeSource={RelativeSource TemplatedParent}, UpdateSourceTrigger=PropertyChanged}" GotFocus="Type_GotFocus"/>
-                            </DataTemplate>
-                        </local:CorasauDataGridTemplateColumnClient.CellTemplate>
-                    </local:CorasauDataGridTemplateColumnClient>
-                    <local:ComboBoxColumnClient x:Name="WasteSorting" />
-                    <local:ComboBoxColumnClient x:Name="PackagingRateLevel" />
-                    <local:ComboBoxColumnClient x:Name="PackagingConsumer" />
-                    <local:ComboBoxColumnClient x:Name="PrimaryKeyId" Width="60" Visible="false" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Qty" Width="80" AllowThousandMask="True"  Mask="#######0.########"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Unit" Width="50" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="PriceBusiness" AllowThousandMask="True"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="PriceTotalBusiness" AllowThousandMask="True"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="PriceHousehold" AllowThousandMask="True"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="PriceTotalHousehold" AllowThousandMask="True"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Text" Width="250" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="NoReporting" />
-                </local:InvPackagingProductPageGrid.Columns>
-            </local:InvPackagingProductPageGrid>
+            <docking:DockLayoutManager x:Name="DockingControl" AllowCustomization="False">
+                <docking:LayoutGroup x:Name="lGroup" AllowDrag="False" AllowDock="False" AllowFloat="False" Orientation="Vertical" AllowContextMenu="False">
+                    <docking:LayoutPanel x:Name="layOutPackaging" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Lines}" FloatOnDoubleClick="False" AllowDrag="False" AllowDock="False" AllowClose="False" AllowContextMenu="False" AllowMaximize="False" AllowDockToDocumentGroup="False" ShowCloseButton="False" ShowPinButton="False">
+                        <local:InvPackagingProductPageGrid x:Name="dgInvPackagingProductGrid" AutoGenerateColumns="None">
+                            <local:InvPackagingProductPageGrid.Columns>
+                                <local:ComboBoxColumnClient FieldName="ReportingType" x:Name="colReportingType" />
+                                <local:CorasauDataGridTemplateColumnClient x:Name="Item" Visible="False" />
+                                <local:CorasauDataGridTemplateColumnClient x:Name="Category">
+                                    <local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                                        <DataTemplate>
+                                            <CorasauControls:ComboBoxEditor x:Name="PART_Editor" SelectedItem="{Binding DataContext.RowData.Row.Category,Mode=TwoWay}" ItemsSource="{Binding DataContext.RowData.Row.CategorySource,Mode= OneWay,RelativeSource={RelativeSource TemplatedParent}, UpdateSourceTrigger=PropertyChanged}" GotFocus="Category_GotFocus"/>
+                                        </DataTemplate>
+                                    </local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                                </local:CorasauDataGridTemplateColumnClient>
+                                <local:CorasauDataGridTemplateColumnClient x:Name="PackagingType">
+                                    <local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                                        <DataTemplate>
+                                            <CorasauControls:ComboBoxEditor x:Name="PART_Editor" SelectedItem="{Binding DataContext.RowData.Row.PackagingType,Mode=TwoWay}" ItemsSource="{Binding DataContext.RowData.Row.TypeSource,Mode= OneWay,RelativeSource={RelativeSource TemplatedParent}, UpdateSourceTrigger=PropertyChanged}" GotFocus="Type_GotFocus"/>
+                                        </DataTemplate>
+                                    </local:CorasauDataGridTemplateColumnClient.CellTemplate>
+                                </local:CorasauDataGridTemplateColumnClient>
+                                <local:ComboBoxColumnClient x:Name="WasteSorting" />
+                                <local:ComboBoxColumnClient x:Name="PackagingRateLevel" />
+                                <local:ComboBoxColumnClient x:Name="PackagingConsumer" />
+                                <local:ComboBoxColumnClient x:Name="PrimaryKeyId" Width="60" Visible="false" />
+                                <local:CorasauDataGridTemplateColumnClient x:Name="Qty" Width="80" AllowThousandMask="True"  Mask="#######0.########"/>
+                                <local:CorasauDataGridTemplateColumnClient x:Name="Unit" Width="50" />
+                                <local:CorasauDataGridTemplateColumnClient x:Name="PriceBusiness" AllowThousandMask="True"/>
+                                <local:CorasauDataGridTemplateColumnClient x:Name="PriceTotalBusiness" AllowThousandMask="True"/>
+                                <local:CorasauDataGridTemplateColumnClient x:Name="PriceHousehold" AllowThousandMask="True"/>
+                                <local:CorasauDataGridTemplateColumnClient x:Name="PriceTotalHousehold" AllowThousandMask="True"/>
+                                <local:CorasauDataGridTemplateColumnClient x:Name="Text" Width="250" />
+                                <local:CorasauDataGridTemplateColumnClient x:Name="NoReporting" />
+                            </local:InvPackagingProductPageGrid.Columns>
+                        </local:InvPackagingProductPageGrid>
+                    </docking:LayoutPanel>
+                    <docking:LayoutPanel x:Name="layOutPackagingModels" Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ProducerResponsibilityModels}" FloatOnDoubleClick="False" AllowDrag="False" AllowDock="False" AllowClose="False" AllowContextMenu="False" AllowMaximize="False" AllowDockToDocumentGroup="False" ShowCloseButton="False" ShowPinButton="False">
+                        <local:InvPackagingModelLineGrid x:Name="dgPackagingModelGrid" AutoGenerateColumns="None">
+                            <local:InvPackagingModelLineGrid.Columns>
+                                <local:CorasauDataGridTemplateColumnClient x:Name="colModelItem" FieldName="Item" Visible="False" />
+                                <local:CorasauDataGridTemplateColumnClient x:Name="PackingModel" Width="120" />
+                                <local:CorasauDataGridTemplateColumnClient x:Name="PackingModelName" Width="200" />
+                                <local:CorasauDataGridTemplateColumnClient x:Name="colModelQty" FieldName="Qty" Width="80" AllowThousandMask="True" Mask="#######0.########"/>
+                                <local:CorasauDataGridTemplateColumnClient x:Name="colModelText" FieldName="Text" Width="250" />
+                                <local:ComboBoxColumnClient x:Name="colModelRowId" FieldName="PrimaryKeyId" Width="60" Visible="false" />
+                            </local:InvPackagingModelLineGrid.Columns>
+                        </local:InvPackagingModelLineGrid>
+                    </docking:LayoutPanel>
+                </docking:LayoutGroup>
+            </docking:DockLayoutManager>
         </CorasauControls:BusyIndicator>
     </Grid>
 </Pages:GridBasePage>

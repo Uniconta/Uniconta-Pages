@@ -41,10 +41,10 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectBudgetPlaningLinePage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="WorkSpace" Width="80" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="70"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="EmployeeName" Width="100" Visible="False"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Width="80" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CategoryName" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PayrollCategory" Width="70" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PayrollCategoryName" Width="100" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Width="80" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CategoryName" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Item" Width="100" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="colVariant" FieldName="Variant">
                         <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>

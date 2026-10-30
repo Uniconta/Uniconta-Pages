@@ -91,7 +91,7 @@ namespace UnicontaClient.Pages.CustomPage
                     for (int i = 0; (i < vats.Length); i++)
                     {
                         var v = vats[i];
-                        if (string.Compare(v._ExternalCode, extcode, true) == 0)
+                        if (string.Equals(v._ExternalCode, extcode, StringComparison.OrdinalIgnoreCase))
                         {
                             vatcode = v._Vat;
                             break;

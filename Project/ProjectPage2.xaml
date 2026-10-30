@@ -62,11 +62,17 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectPage2"
                     <CorasauControls:CorasauLayoutItem x:Name="liSalesPrice" FieldName="SalesPrice">
                         <CorasauControls:DoubleEditor  FieldName="SalesPrice"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="liRevenueAccount" FieldName="RevenueAccount">
+                        <CorasauControls:LookupEditor x:Name="leRevenueAccount" Text="{Binding RevenueAccount,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem x:Name="liEndDiscountPct" FieldName="EndDiscountPct">
                         <CorasauControls:DoubleEditor FieldName="EndDiscountPct"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem x:Name="liPriceList" FieldName="PriceList">
                         <CorasauControls:LookupEditor x:Name="lePriceList" Text="{Binding PriceList,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="liLayoutGroup" FieldName="LayoutGroup">
+                        <CorasauControls:LookupEditor x:Name="leLayoutGroup" Text="{Binding LayoutGroup,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem x:Name="liPayment" FieldName="Payment">
                         <CorasauControls:LookupEditor x:Name="lePayment" Text="{Binding Payment,Mode=TwoWay}"/>

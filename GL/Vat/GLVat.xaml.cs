@@ -20,6 +20,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+using UnicontaClient.Pages.GL.WhereUsed;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -87,6 +88,10 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem == null)
                         return;
                     AddDockItem(TabControls.GLVatPage2, selectedItem);
+                    break;
+                case "WhereUsed":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.GLAccountWhereUsedPage, dgVat.syncEntity, GLAccountWhereUsedPage.GetDockHeader(selectedItem));
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);

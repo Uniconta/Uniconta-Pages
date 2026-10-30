@@ -42,7 +42,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override UnicontaBaseEntity ModifiedRow { get { return editrow; } set { editrow = (DebtorLayoutGroupClient)value; } }
         void InitPage(CrudAPI crudapi)
         {
-            txtCreditNote.api = txtInvoice.api = txtOffer.api = txtOrderConfirmation.api = txtPackNote.api = crudapi;
+            txtCreditNote.api = txtInvoice.api = txtOffer.api = txtOrderConfirmation.api = txtPackNote.api = leCompanyAddress.api = crudapi;
             layoutControl = layoutItems;
             SetSource();
             if (editrow == null && LoadedRow == null)

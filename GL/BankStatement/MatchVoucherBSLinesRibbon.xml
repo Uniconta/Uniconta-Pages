@@ -7,6 +7,7 @@
 	</RibbonItem>
 	<RibbonItem>
 		<RibbonItem Action="AutoMatch" LocalizedNameKey="AutoMatch" LargeGlyph="Default_Values_32x32" />
+    <RibbonItem Action="SaveVouchers"  LocalizedNameKey="SaveOBJ" Parameter="Vouchers" LargeGlyph="save-32x32" />
     <RibbonItem Action="SaveLines" LocalizedNameKey="SaveOBJ" Parameter="Lines" LargeGlyph="save-32x32" />
   </RibbonItem>
 	<RibbonItem>

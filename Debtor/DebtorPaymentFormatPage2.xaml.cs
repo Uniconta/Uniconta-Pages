@@ -102,6 +102,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 case (byte)DebtorPaymFormatType.Iceland:
                     CWDebtorPaymentSetupIceland dialogIceland = new CWDebtorPaymentSetupIceland(this.api, editrow);
+                    dialogIceland.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     dialogIceland.Closing += delegate
                     {
                         if (dialogIceland.DialogResult == true)
@@ -111,6 +112,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case (byte)DebtorPaymFormatType.NetsBS:
                     CWDebtorPaymentSetupNets dialogNets = new CWDebtorPaymentSetupNets(this.api, editrow);
+                    dialogNets.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     dialogNets.Closing += delegate
                     {
                         if (dialogNets.DialogResult == true)
@@ -121,6 +123,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 case (byte)DebtorPaymFormatType.SEPA:
                     CWDebtorPaymentSetupSEPA dialogSEPA = new CWDebtorPaymentSetupSEPA(this.api, editrow);
+                    dialogSEPA.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     dialogSEPA.Closing += delegate
                     {
                         if (dialogSEPA.DialogResult == true)

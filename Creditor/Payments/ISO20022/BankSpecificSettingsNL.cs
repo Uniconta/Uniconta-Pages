@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -120,7 +121,10 @@ namespace UnicontaISO20022CreditTransfer
             switch (companyBankEnum)
             {
                 case CompanyBankENUM.Rabobank:
-                    return BasePage.GetSystemDefaultDate().ToString("yyyy-MM-ddTHH:mm:ss");
+                    // ":" in a custom format string is a placeholder for the current culture's TimeSeparator, not
+                    // a literal - without InvariantCulture, a locale whose TimeSeparator isn't ":" (e.g. Vietnamese,
+                    // which uses ".") silently corrupts the ISO 8601 timestamp for a user on that locale.
+                    return BasePage.GetSystemDefaultDate().ToString("yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture);
 
                 default:
                     return DateTimeOffset.Now.ToString("o");

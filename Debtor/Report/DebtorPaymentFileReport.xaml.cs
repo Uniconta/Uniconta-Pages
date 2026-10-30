@@ -348,6 +348,7 @@ namespace UnicontaClient.Pages.CustomPage
         async void ImportFile()
         {
             CWDirectDebit cwwin = new CWDirectDebit(api, Uniconta.ClientTools.Localization.lookup("Upload File"));
+            cwwin.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             DebtorPaymentFormatClient debPaymentFormat = null;
 
             cwwin.Closing += delegate

@@ -13,6 +13,7 @@ x:Class="UnicontaClient.Pages.CustomPage.Vouchers"
            xmlns:dxat="http://schemas.devexpress.com/winfx/2008/xaml/accordion/themekeys"
            xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors">
     <UserControl.Resources>
+        <converter:VoucherStatusConverter x:Key="VoucherStatusConverter" />
         <converter:VisibilityBoolConverter x:Key="VisibilityBoolConverter" />
         <converter:RowIndexConverter x:Key="RowIndexConverter" />
         <sys:Double x:Key="{dxat:AccordionItemThemeKeys ResourceKey=RootItemHeaderHeight, IsThemeIndependent=true}">20</sys:Double>
@@ -169,6 +170,7 @@ x:Class="UnicontaClient.Pages.CustomPage.Vouchers"
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="PayAccount" Width="80" Visible="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="CreditorAccount" Width="80"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="60" Visible="False"/>
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="AutoPost" Width="60" Visible="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Payment" Visible="False" Width="70"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Project" Visible="False" Width="90"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Visible="False" Width="90"/>
@@ -227,13 +229,21 @@ x:Class="UnicontaClient.Pages.CustomPage.Vouchers"
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="SizeKB" Width="70" Visible="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="OnHold" HideHeaderCheck="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Reference" Visible="False" />
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Status" Width="60" ReadOnly="True" AllowEditing="False" Visible="False" >
+                            <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                                <ControlTemplate>
+                                    <Image Margin="5" VerticalAlignment="Center" Source="{Binding DataContext.RowData.Row.Status,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VoucherStatusConverter}}" 
+                                           Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
+                                </ControlTemplate>
+                            </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient>
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="ErrorMessage" Visible="False" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" Visible="False" AllowEditing="False" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="ViewInFolder" Visible="False" ColumnFilterMode="DisplayText" ReadOnly="True"/>
-
-
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Split" Visible="False" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="SplitFromDate" Visible="False" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="SplitToDate" Visible="False" />
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="SWIFT" Visible="False" />
                     </localPage:VouchersGrid.Columns>
                 </localPage:VouchersGrid>
             </Grid>

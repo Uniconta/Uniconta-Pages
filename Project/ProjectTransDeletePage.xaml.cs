@@ -206,10 +206,9 @@ namespace UnicontaClient.Pages.CustomPage
             var projectClient = (sender as TextBlock).Tag as ProjectClient;
             if (projectClient != null)
             {
-                var mail = string.Concat("mailto:", projectClient._Email);
-                System.Diagnostics.Process proc = new System.Diagnostics.Process();
-                proc.StartInfo.FileName = mail;
-                proc.Start();
+                if (string.IsNullOrWhiteSpace(projectClient._Email))
+                    return;
+                OfficeComponentUtil.SendEmailToOutlook(projectClient._Email);
             }
         }
         void DeleteOldTransactions(bool DeleteAll)

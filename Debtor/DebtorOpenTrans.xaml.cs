@@ -97,8 +97,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (tranOpenMaster != null && settles != null)
             {
-                TransactionAPI transApi = new TransactionAPI(api);
-                var err = await transApi.Settle(tranOpenMaster, settles);
+                var err = await new TransactionAPI(api).Settle(tranOpenMaster, settles);
                 tranOpenMaster = null;
                 settles = null;
                 SetStatusText();
@@ -191,6 +190,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 emailType = DebtorEmailType.CollectionLetter1;
                 CWCollectionLetter collectionLetterWin = new CWCollectionLetter();
+                collectionLetterWin.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                 collectionLetterWin.Closed += delegate
                 {
                     if (collectionLetterWin.DialogResult == true)
@@ -204,6 +204,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             var cwSendInvoice = new CWSendInvoice();
+            cwSendInvoice.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             cwSendInvoice.DialogTableId = 2000000031;
             cwSendInvoice.Closed += delegate
             {
@@ -223,12 +224,11 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (dialog.ConfirmationResult == CWConfirmationBox.ConfirmationResultEnum.Yes)
                 {
-                    TransactionAPI transApi = new TransactionAPI(this.api);
                     var masterAccount = dgDebtorTransOpen.masterRecord as DCAccount;
                     if (masterAccount != null)
                     {
                         busyIndicator.IsBusy = true;
-                        var errorCodes = await transApi.ReOpenAll(masterAccount, true, LeaveAllOpen);
+                        var errorCodes = await new TransactionAPI(this.api).ReOpenAll(masterAccount, true, LeaveAllOpen);
                         busyIndicator.IsBusy = false;
                         UtilDisplay.ShowErrorCode(errorCodes);
                         if (errorCodes == ErrorCodes.Succes)
@@ -246,12 +246,11 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (dialog.ConfirmationResult == CWConfirmationBox.ConfirmationResultEnum.Yes)
                 {
-                    TransactionAPI transApi = new TransactionAPI(this.api);
                     var masterAccount = dgDebtorTransOpen.masterRecord as DCAccount;
                     if (masterAccount != null)
                     {
                         busyIndicator.IsBusy = true;
-                        var errorCodes = await transApi.CloseAll(masterAccount);
+                        var errorCodes = await new TransactionAPI(this.api).CloseAll(masterAccount);
                         busyIndicator.IsBusy = false;
                         UtilDisplay.ShowErrorCode(errorCodes);
                     }
@@ -279,8 +278,8 @@ namespace UnicontaClient.Pages.CustomPage
                         openTran.IsSettled = false;
                     }
                 }
-                else if (settles != null && settles.Contains(rec))
-                    settles.Remove(rec);
+                else
+                    settles?.Remove(rec);
             }
             else
             {
@@ -290,7 +289,10 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     if (settles == null)
                         settles = new List<DebtorTransOpenClient>();
-                    settles.Add(rec);
+                    if (rec.AmountOpen >= 0)
+                        settles.Add(rec);
+                    else
+                        settles.Insert(0,rec);
                 }
             }
             SetStatusText();

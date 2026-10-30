@@ -238,7 +238,7 @@ namespace UnicontaClient.Pages.CustomPage
             var EAN = rec._EAN;
             if (string.IsNullOrWhiteSpace(EAN))
                 return;
-            var found = (from item in (InvItem[])Items.GetNotNullArray where string.Compare(item._EAN, EAN, StringComparison.CurrentCultureIgnoreCase) == 0 select item).FirstOrDefault();
+            var found = (from item in (InvItem[])Items.GetNotNullArray where string.Equals(item._EAN, EAN, StringComparison.CurrentCultureIgnoreCase) select item).FirstOrDefault();
             if (found != null)
             {
                 rec._EAN = found._EAN;

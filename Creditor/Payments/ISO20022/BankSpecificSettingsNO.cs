@@ -70,6 +70,23 @@ namespace UnicontaISO20022CreditTransfer
             }
         }
 
+        public override string XMLAttributeNS()
+        {
+            if (CredPaymFormat.NewPaymentFormat)
+                return BaseDocument.XMLNS_PAIN009;
+
+            return BaseDocument.XMLNS_PAIN003;
+        }
+
+        public override bool NewPaymentFormat()
+        {
+            if (CredPaymFormat.NewPaymentFormat)
+                return true;
+
+            return false;
+        }
+
+
         /// <summary>
         /// Country currency - used for calculation of Payment type
         /// </summary>
@@ -206,6 +223,14 @@ namespace UnicontaISO20022CreditTransfer
                 default:
                     return BaseDocument.EXTCATEGORYPURPOSE_SUPP;
             }
+        }
+
+        public override string InstructionPriority()
+        {
+            if (CredPaymFormat.NewPaymentFormat)
+                return null;
+
+            return BaseDocument.INSTRUCTIONPRIORITY_NORM;
         }
 
         /// <summary>

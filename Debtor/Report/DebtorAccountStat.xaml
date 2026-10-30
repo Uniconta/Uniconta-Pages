@@ -25,9 +25,9 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccountStat"
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FromDate}" Grid.Column="0" VerticalAlignment="Bottom" Margin="0,3,0,0"/>
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FromDate}" Grid.Column="0" VerticalAlignment="Center"/>
             <CorasauControls:DateEditor x:Name="txtDateFrm" Grid.Column="2" Margin="0,3,3,3"/>
-            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ToDate}" Grid.Column="4" VerticalAlignment="Bottom"/>
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ToDate}" Grid.Column="4" VerticalAlignment="Center"/>
             <CorasauControls:DateEditor x:Name="txtDateTo" Grid.Column="6" Margin="0,3,3,3"/>
         </Grid>
         <Rectangle Height="1" Fill="{StaticResource BorderColor}" Grid.Row="2" />
@@ -41,14 +41,14 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccountStat"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Qty" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CostValue" Mask="N0"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SalesValue" Mask="N0"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DB" Mask="N0"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Margin" Mask="N0"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="MarginRatio" Width="60"/>
                 </localPage:InvStatisticsGrid.Columns>
                 <localPage:InvStatisticsGrid.TotalSummary>
                     <localPage:SumColumn FieldName="Qty" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
                     <localPage:SumColumn FieldName="CostValue" SummaryType="Sum" DisplayFormat="{}{0:N0}"/>
                     <localPage:SumColumn FieldName="SalesValue" SummaryType="Sum" DisplayFormat="{}{0:N0}"/>
-                    <localPage:SumColumn FieldName="DB" SummaryType="Sum" DisplayFormat="{}{0:N0}"/>
+                    <localPage:SumColumn FieldName="Margin" SummaryType="Sum" DisplayFormat="{}{0:N0}"/>
                 </localPage:InvStatisticsGrid.TotalSummary>
             </localPage:InvStatisticsGrid>
         </CorasauControls:BusyIndicator>

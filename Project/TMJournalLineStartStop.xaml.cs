@@ -30,7 +30,7 @@ namespace UnicontaClient.Pages.CustomPage
     {
         SQLCache PayrollCache;
         Uniconta.DataModel.Employee Employee;
-        CompanySettingsClient companySettings;
+        CompanySettings companySettings;
         Company company;
         PrJournal projectJournal;
         public TMJournalLineStartStop(BaseAPI API)
@@ -44,6 +44,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgJournalLineStartStopPageGrid.IsTime = true;
             dgJournalLineStartStopPageGrid.api = api;
             company = api.CompanyEntity;
+            companySettings = company.Settings;
             dgJournalLineStartStopPageGrid.BusyIndicator = busyIndicator;
             SetRibbonControl(localMenu, dgJournalLineStartStopPageGrid);
             localMenu.OnItemClicked += localMenu_OnItemClicked;
@@ -68,13 +69,6 @@ namespace UnicontaClient.Pages.CustomPage
                 ribbonControl.DisableButtons("Resume");
         }
 
-        public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)
-        {
-            isReadOnly = false;
-            useBinding = false;
-            return false;
-        }
-
         public override bool IsCalculatedFieldsToBeHandled()
         {
             return false;
@@ -86,9 +80,9 @@ namespace UnicontaClient.Pages.CustomPage
             string prJournal = null;
             foreach (var rec in Parameters)
             {
-                if (string.Compare(rec.Name, "Employee", StringComparison.CurrentCultureIgnoreCase) == 0)
+                if (string.Equals(rec.Name, "Employee", StringComparison.CurrentCultureIgnoreCase))
                     employee = rec.Value;
-                if (string.Compare(rec.Name, "ProjectJournal", StringComparison.CurrentCultureIgnoreCase) == 0)
+                if (string.Equals(rec.Name, "ProjectJournal", StringComparison.CurrentCultureIgnoreCase))
                     prJournal = rec.Value;
             }
             var hdrString = new StringBuilder();
@@ -463,7 +457,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void TimeToRounding(ProjectJournalLineClient lineClient)
         {
-            var roundingEnum = AppEnums.TMRounding.IndexOf(companySettings.RoundingStop);
+            var roundingEnum = companySettings._RoundingStop;
             var time = lineClient.TimeTo.TimeOfDay.TotalSeconds;
             DateTime dt;
 
@@ -492,9 +486,6 @@ namespace UnicontaClient.Pages.CustomPage
         protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             PayrollCache = company.GetCache(typeof(Uniconta.DataModel.EmpPayrollCategory)) ?? await company.LoadCache(typeof(Uniconta.DataModel.EmpPayrollCategory), api).ConfigureAwait(false);
-            var settings = await api.Query<CompanySettingsClient>();
-            companySettings = settings.FirstOrDefault();
         }
-
     }
 }

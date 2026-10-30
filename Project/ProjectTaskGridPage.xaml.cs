@@ -117,7 +117,7 @@ namespace UnicontaClient.Pages.CustomPage
             string employee = null;
             foreach (var rec in Parameters)
             {
-                if (string.Compare(rec.Name, "Employee", StringComparison.CurrentCultureIgnoreCase) == 0)
+                if (string.Equals(rec.Name, "Employee", StringComparison.CurrentCultureIgnoreCase))
                     employee = rec.Value;
             }
             if (employee != null)
@@ -412,6 +412,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void CreateTaskFromTask()
         {
             var cwCreateTask = new CWCreateTaskFromTask(api, proj?._Number);
+            cwCreateTask.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             cwCreateTask.DialogTableId = 2000000104;
             cwCreateTask.Closed += async delegate
             {
@@ -435,6 +436,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void CreateBudgetTask(IEnumerable<ProjectTaskClient> taskLst)
         {
             var cwCreateBjtTask = new CwCreateBudgetTask(api, 1, taskLst.Count());
+            cwCreateBjtTask.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             cwCreateBjtTask.DialogTableId = 2000000180;
             cwCreateBjtTask.Closed += async delegate
             {
@@ -459,6 +461,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var icount = lst.Count();
             var cwProjectTaskClose = new CWProjectTaskClose(icount);
+            cwProjectTaskClose.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             cwProjectTaskClose.DialogTableId = 2000000089;
             cwProjectTaskClose.Closed += delegate
             {

@@ -171,9 +171,9 @@ namespace UnicontaClient.Pages.CustomPage
             string employee = null;
             foreach (var rec in Parameters)
             {
-                if (string.Compare(rec.Name, "Employee", StringComparison.CurrentCultureIgnoreCase) == 0)
+                if (string.Equals(rec.Name, "Employee", StringComparison.CurrentCultureIgnoreCase))
                     employee = rec.Value;
-                if (string.Compare(rec.Name, "Date", StringComparison.CurrentCultureIgnoreCase) == 0)
+                if (string.Equals(rec.Name, "Date", StringComparison.CurrentCultureIgnoreCase))
                     employeeCalenderStartDate = StringSplit.DateParse(rec.Value, DateFormat.dmy);
             }
             if (employee != null)
@@ -2005,6 +2005,7 @@ namespace UnicontaClient.Pages.CustomPage
         void TimeRegistration(TMJournalLineClient selectedItem)
         {
             var cw = new CwTransportRegistration(selectedItem, api);
+            cw.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             cw.Closed += delegate
             {
                 if (cw.DialogResult == true)
@@ -2060,6 +2061,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             var dDate = employee._TMCloseDate >= JournalLineDate && employee._TMCloseDate <= JournalLineDate.AddDays(6) ? employee._TMCloseDate : JournalLineDate.AddDays(6);
             CWTimePosting postingDialog = new CWTimePosting(dDate, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Period"), GetPeriod(JournalLineDate)), api.CompanyEntity.Name);
+            postingDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             postingDialog.DialogTableId = 2000000065;
             postingDialog.Closed += async delegate
             {

@@ -13,7 +13,7 @@
 		<RibbonItem Action="View" ShortcutKey="F7" LocalizedNameKey="View" LargeGlyph="View_Highlighted_32x32" />
 	</RibbonItem>
 	<RibbonItem>
-		<RibbonItem LocalizedNameKey="Send" Module="_OIOUBLSendOnServer" LargeGlyph="SendInvoiceMail_32x32">
+		<RibbonItem LocalizedNameKey="Send" LargeGlyph="SendInvoiceMail_32x32">
 			<RibbonItem Action="SendUBL" LocalizedNameKey="SendInvoicebyUBL"/>
 			<RibbonItem Action="ImportUBL" LocalizedNameKey="ImportSendCustomOIOUBL"/>
 		</RibbonItem>

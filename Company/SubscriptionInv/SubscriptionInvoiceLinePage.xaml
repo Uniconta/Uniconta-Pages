@@ -19,7 +19,7 @@ x:Class="UnicontaClient.Pages.CustomPage.SubscriptionInvoiceLinePage"
             <localPage:SubscriptionInvoiceLineGrid x:Name="dgSubInvoiceslineGrid" AutoGenerateColumns="None">
                 <localPage:SubscriptionInvoiceLineGrid.Columns>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="80" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Subscription" Width="50" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Subscriptionid" Width="50" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Company" Width="50"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CompanyName" Width="200"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Uid" Width="50"/>

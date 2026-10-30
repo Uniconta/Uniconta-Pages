@@ -147,13 +147,13 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         GeneratePollReport(selectedItem);
                     break;
-              
+
                 case "AiiaRegister":
                     if (selectedItem == null) return;
                     BankAiia(0, selectedItem); break;
                 case "AiiaUnregister":
                     if (selectedItem == null) return;
-                    BankAiia(2, selectedItem);break;
+                    BankAiia(2, selectedItem); break;
                 case "AiiaSync":
                     if (selectedItem == null) return;
                     BankAiia(3, selectedItem); break;
@@ -213,6 +213,7 @@ namespace UnicontaClient.Pages.CustomPage
         void GeneratePollReport(BankStatementClient selectedItem)
         {
             var toFromDateDialog = new CWCalculateCommission(api, fromDate, toDate);
+            toFromDateDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             toFromDateDialog.Title = Uniconta.ClientTools.Localization.lookup("Reconciliation");
             toFromDateDialog.OKButton.Content = Uniconta.ClientTools.Localization.lookup("Generate");
             toFromDateDialog.Closing += async delegate
@@ -371,7 +372,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                         if (errEnum == 0)
                         {
-                            CWShowBankAPILog cwLog = new CWShowBankAPILog(logText.Substring(index));
+                            CWShowBankAPILog cwLog = new CWShowBankAPILog(logText.Substring(index), csvList: action == 0);
                             cwLog.Show();
                         }
                         else
@@ -457,7 +458,7 @@ namespace UnicontaClient.Pages.CustomPage
                     cwBrowserView.Show();
                 }
             }
-            catch {}
+            catch { }
         }
         #endregion
 
@@ -541,6 +542,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (Wininterval.DialogResult == true)
                 {
                     EraseYearWindow erWindow = new EraseYearWindow(text, false);
+                    erWindow.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     erWindow.Closing += async delegate
                     {
                         if (erWindow.DialogResult == true)

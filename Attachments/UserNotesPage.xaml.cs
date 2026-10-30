@@ -206,14 +206,16 @@ namespace UnicontaClient.Pages.CustomPage
             dgNotesGrid.SelectedItem = null;
 
             await dgNotesGrid.SaveData();
+            var hasRecords = dgNotesGrid.VisibleRowCount > 0;
             var master = dgNotesGrid.masterRecord as IdKey;
             if (master != null)
             {
-                if (dgNotesGrid.VisibleRowCount > 0)
-                    master.HasNotes = true;
-                else
-                    master.HasNotes = false;
+                master.HasNotes = hasRecords;
                 globalEvents.OnRefresh(TabControls.UserNotesPage, master);
+                // update cache in case record is not from cache
+                var master2 = api.CompanyEntity.GetCache(((UnicontaBaseEntity)master).BaseEntityType())?.Get(master.RowId);
+                if (master2 != null)
+                    master2.HasNotes = hasRecords;
             }
             else if (master == null)
             {
@@ -221,7 +223,6 @@ namespace UnicontaClient.Pages.CustomPage
                 var hasNotesProp = tableType?.GetProperty("HasNotes");
                 if (hasNotesProp != null)
                 {
-                    var hasRecords = dgNotesGrid.VisibleRowCount > 0 ? true : false;
                     hasNotesProp.SetValue(dgNotesGrid.masterRecord, hasRecords, null);
                     globalEvents.OnRefresh(TabControls.UserNotesPage, dgNotesGrid.masterRecord);
                 }

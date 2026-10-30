@@ -18,8 +18,11 @@ x:Class="UnicontaClient.Pages.CustomPage.BankImportMapping"
         <UnicontaControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <localPage:BankImportMappingGrid x:Name="dgBankImportMapping" AutoGenerateColumns="None">
                 <localPage:BankImportMappingGrid.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Creditor" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" Width="200"/>
-                    <localPage:ComboBoxColumnClient x:Name="MapType" Width="100"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Equal" ShowCheckBoxInHeader="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="StartsWith" ShowCheckBoxInHeader="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Contains" ShowCheckBoxInHeader="False" />
                     <localPage:ComboBoxColumnClient x:Name="AccountType" Width="100"/>
                     <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Account">
                         <localPage:CorasauDataGridForeignKeyColumnClient.DisplayTemplate>
@@ -46,12 +49,12 @@ x:Class="UnicontaClient.Pages.CustomPage.BankImportMapping"
                             </DataTemplate>
                         </localPage:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                     </localPage:CorasauDataGridForeignKeyColumnClient>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Equal" ShowCheckBoxInHeader="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="StartsWith" ShowCheckBoxInHeader="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Contains" ShowCheckBoxInHeader="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AccountTemplate"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="70" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Charge" Width="70" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="RequireVoucher" Width="70" ShowCheckBoxInHeader="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Approver1" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Approver2" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim2" Width="70" FieldName="Dimension2" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim3" Width="70" FieldName="Dimension3" />

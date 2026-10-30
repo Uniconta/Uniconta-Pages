@@ -1,6 +1,7 @@
 using UnicontaClient.Models;
 using UnicontaClient.Pages;
 using UnicontaClient.Utilities;
+using Corasau.DebitorCreditor.Germany.EDelivery;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -93,6 +94,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void CreateMulitOrder(bool IsMultiOrder = true)
         {
             var cwCreateOrder = new CWCreateOrderFromProject(api);
+            cwCreateOrder.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             cwCreateOrder.DialogTableId = 2000000052;
             cwCreateOrder.Closed += async delegate
             {
@@ -176,6 +178,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void GenerateSelectedInvoice(ProjectClient selectedItem)
         {
             var generateInvoiceDialog = new CWProjectGenerateInvoice(api, BasePage.GetSystemDefaultDate(), showToFromDate: true, showEmailList: true, showSendOnlyEmailCheck: true);
+            generateInvoiceDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             generateInvoiceDialog.DialogTableId = 2000000051;
             generateInvoiceDialog.Closed += async delegate
             {
@@ -227,6 +230,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             invoicePosted = new Dictionary<InvoicePostingResult, ProjectClient>();
             var generateProjectInvoice = new CWProjectGenerateInvoice(api, BasePage.GetSystemDefaultDate(), true, true, false, true, false, true, true, true);
+            generateProjectInvoice.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             generateProjectInvoice.DialogTableId = 2000000050;
             generateProjectInvoice.Closed += async delegate
             {
@@ -307,7 +311,18 @@ namespace UnicontaClient.Pages.CustomPage
                     var standardPrint = await ValidateStandardPrint(invPost.Key, invPost.Value, CompanyLayoutType.Invoice);
 
                     if (standardPrint?.Report != null)
-                        xtraReports.Add(standardPrint);
+                    {
+                        if (standardPrint.AdditionalData is byte[] zugferdXmlData && zugferdXmlData.Length > 0)
+                        {
+                            var invoice = invPost.Key.Header as DebtorInvoiceClient;
+                            var invoiceNumber = invoice?.InvoiceNum;
+                            var dockname = string.Format("{0}: {1} {2}", Uniconta.ClientTools.Localization.lookup("ShowPrint"),
+                                Uniconta.ClientTools.Localization.lookup("Invoice"), invoiceNumber);
+                            AddDockItem(TabControls.StandardPrintReportPage, new object[] { standardPrint, Uniconta.ClientTools.Localization.lookup("Invoice") }, dockname);
+                        }
+                        else
+                            xtraReports.Add(standardPrint);
+                    }
                 }
 
                 if (xtraReports.Count > 0)
@@ -353,6 +368,26 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     standardPrint = new LayoutPrintReport(api, invoicePostingResult, layoutType);
                     await standardPrint.InitializePrint();
+                }
+
+                if (standardPrint?.Report != null && layoutType == CompanyLayoutType.Invoice &&
+                    ZugferdUtility.ShouldGenerateXml(projectInvoicePropsal.Debtor))
+                {
+                    var invoice = projectInvoicePropsal.DebtorInvoice;
+                    if (invoice != null && invoice._InvoiceNumber != 0)
+                    {
+                        var xmlBytes = await new EDocumentAPI(api).EDocumentGenerateZugferdXmlInvoice(invoice);
+                        if (xmlBytes == null || xmlBytes.Length < 10)
+                            UnicontaMessageBox.Show($"{Uniconta.ClientTools.Localization.lookup("Error")} {Uniconta.ClientTools.Localization.lookup("einvoice")}",
+                                Uniconta.ClientTools.Localization.lookup("Error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                        standardPrint.AdditionalData = xmlBytes;
+                    }
+                    else
+                    {
+                        // TODO ZUGFeRD project proforma: request the CII XML from the server
+                        // using the original project invoice calculation parameters.
+                        standardPrint.AdditionalData = null;
+                    }
                 }
             }
             catch (Exception ex)

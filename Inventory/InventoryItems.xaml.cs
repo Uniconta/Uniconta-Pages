@@ -422,6 +422,10 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         AddDockItem(TabControls.InvPackagingProductPage, dgInventoryItemsGrid.syncEntity);
                     break;
+                case "PackagingOverview":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.InvPackagingOverviewPage, dgInventoryItemsGrid.syncEntity);
+                    break;
                 case "InStock":
                     AddDockItem(TabControls.InventoryItemOnHand, dgInventoryItemsGrid.syncEntity, true);
                     break;

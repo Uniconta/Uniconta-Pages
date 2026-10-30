@@ -103,6 +103,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             DeletePostedJournal delDialog = new DeletePostedJournal(true);
+            delDialog.Args = Args; // pass original args
             delDialog.Closed += delegate
             {
                 if (delDialog.DialogResult == true)

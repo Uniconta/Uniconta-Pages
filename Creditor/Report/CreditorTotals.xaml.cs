@@ -35,7 +35,7 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public double _Total;
         [Display(Name = "Total", ResourceType = typeof(GLTableText))]
-        public double Total { get { return _Total; } set { _Total = value; } }
+        public double Total { get { return _Total; } }
     }
 
     public class CreditorTotalsGrid : CorasauDataGridClient
@@ -249,6 +249,7 @@ namespace UnicontaClient.Pages.CustomPage
                     tot += a[i];
                 rec._Total = tot;
             }
+            dgCreditorTotalsGrid.RefreshData();
             dgCreditorTotalsGrid.UpdateTotalSummary();
             /*
             var N = dgCreditorTotalsGrid.VisibleRowCount;

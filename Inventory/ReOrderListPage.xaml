@@ -56,6 +56,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ReOrderListPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Group" Width="90" AllowEditing="false"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="CostPrice" Width="90"  AllowEditing="false"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Unit" Width="50"  AllowEditing="false"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="FirstNeed" Width="90"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="QtyStock" Width="90"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="QtyOdr" Width="90"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="QtyResv" Width="90"/>

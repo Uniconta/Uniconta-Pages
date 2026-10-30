@@ -16,6 +16,7 @@ x:Class="UnicontaClient.Pages.CustomPage.UserTablePage"
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <localPage:UserTableGrid  x:Name="dgUserTable" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
                 <localPage:UserTableGrid.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AppId" Width="60" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Width="150" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Prompt" Width="150" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="TableBaseType" Width="100" />

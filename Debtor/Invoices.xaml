@@ -11,6 +11,7 @@ x:Class="UnicontaClient.Pages.CustomPage.Invoices"
     d:DesignHeight="300" d:DesignWidth="400">
     <UserControl.Resources>
         <Util:RowIndexConverter x:Key="RowIndexConverter" />
+        <Util:VisibilityBoolConverter x:Key="VisibilityBoolConverter" />
     </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
@@ -21,6 +22,18 @@ x:Class="UnicontaClient.Pages.CustomPage.Invoices"
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <localPage:InvoicesGrid  x:Name="dgInvoicesGrid" AutoGenerateColumns="None">
                 <localPage:InvoicesGrid.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="UserAttachment" ReadOnly="True" Width="30">
+                        <localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                            <DataTemplate>
+                                <Image Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Document_Attachment_16x16.svg}" Width="16" Height="16" VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                        <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Document_Attachment_16x16.svg}" MouseLeftButtonDown="HasDocImage_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.UserAttachment,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
+                            </ControlTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Account" Width="100" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Width="150" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="90" />
@@ -53,6 +66,7 @@ x:Class="UnicontaClient.Pages.CustomPage.Invoices"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Deleted" Width="60" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CostRestated" Width="60" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="VatAmount"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Rounded" Width="60" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PricesInclVat" Width="60"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Width="60"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SystemInfo" Width="151" Visible="False"/>
@@ -64,6 +78,17 @@ x:Class="UnicontaClient.Pages.CustomPage.Invoices"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="VatTotal" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="VatTotal2" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="VatTotal3" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VatTotalLCY" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VatTotal2LCY" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VatTotal3LCY" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VatTotalVatCountry" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VatTotal2VatCountry" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VatTotal3VatCountry" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VatBaseVatCountry" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VatBase2VatCountry" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VatBase3VatCountry" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VatCountry" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VatCountryCurrency" Width="60" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Project" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="WorkSpace" Visible="False"/>

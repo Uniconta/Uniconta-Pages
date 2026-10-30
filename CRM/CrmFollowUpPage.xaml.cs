@@ -118,7 +118,7 @@ namespace UnicontaClient.Pages.CustomPage
             string employee = null;
             foreach (var rec in Parameters)
             {
-                if (string.Compare(rec.Name, "Employee", StringComparison.CurrentCultureIgnoreCase) == 0)
+                if (string.Equals(rec.Name, "Employee", StringComparison.CurrentCultureIgnoreCase))
                     employee = rec.Value;
             }
             if (employee != null)
@@ -470,10 +470,9 @@ namespace UnicontaClient.Pages.CustomPage
             var crmFollowUp = (sender as TextBlock).Tag as CrmFollowUpClient;
             if (crmFollowUp != null)
             {
-                var mail = string.Concat("mailto:", crmFollowUp.ContactEmail);
-                System.Diagnostics.Process proc = new System.Diagnostics.Process();
-                proc.StartInfo.FileName = mail;
-                proc.Start();
+                if (string.IsNullOrWhiteSpace(crmFollowUp.ContactEmail))
+                    return;
+                OfficeComponentUtil.SendEmailToOutlook(crmFollowUp.ContactEmail);
             }
         }
 

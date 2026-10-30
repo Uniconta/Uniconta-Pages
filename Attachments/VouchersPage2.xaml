@@ -98,6 +98,9 @@ x:Class="UnicontaClient.Pages.CustomPage.VouchersPage2"
                         <CorasauControls:CorasauLayoutItem FieldName="PostingInstruction" x:Name="liPostingInstruction">
                             <CorasauControls:TextEditor x:Name="txedPostingInstruction" Text="{Binding PostingInstruction,Mode=TwoWay}"  />
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="SWIFT" x:Name="liSWIFT">
+                            <CorasauControls:TextEditor x:Name="txtSWIFT" Text="{Binding SWIFT,Mode=TwoWay}"  />
+                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="PaymentMethod" x:Name="liPaymentMethod">
                             <CorasauControls:ComboBoxEditor x:Name="cmbPaymentMethod" SelectedItem="{Binding PaymentMethod ,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>

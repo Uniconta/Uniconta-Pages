@@ -44,7 +44,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
             Comment = txtComment.Text;
-            this.DialogResult = (string.Compare(txtDelete.Text, ConfirmWord, StringComparison.CurrentCultureIgnoreCase) == 0);
+            this.DialogResult = (string.Equals(txtDelete.Text, ConfirmWord, StringComparison.CurrentCultureIgnoreCase));
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)

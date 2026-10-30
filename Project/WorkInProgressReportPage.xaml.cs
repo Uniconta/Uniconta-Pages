@@ -890,6 +890,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void PostAdjustments()
         {
             var adjustmentDialog = new CwPostAdjustments(api);
+            adjustmentDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             adjustmentDialog.Closing += async delegate
             {
                 if (adjustmentDialog.DialogResult == true)

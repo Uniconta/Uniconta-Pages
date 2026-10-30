@@ -132,6 +132,7 @@ namespace UnicontaClient.Pages.CustomPage
                         return;
                     var text = string.Format(Localization.lookup("JournalContainsLines"), selectedItem._Name);
                     EraseYearWindow EraseYearWindowDialog = new EraseYearWindow(text, false);
+                    EraseYearWindowDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     EraseYearWindowDialog.Closed += async delegate
                     {
                         if (EraseYearWindowDialog.DialogResult == true)
@@ -185,6 +186,7 @@ namespace UnicontaClient.Pages.CustomPage
         void MoveJournalLines(GLDailyJournalClient journal)
         {
             CwMoveJournalLines cwWin = new CwMoveJournalLines(api);
+            cwWin.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             cwWin.Closed += async delegate
             {
                 if (cwWin.DialogResult == true && cwWin.GLDailyJournal != null)

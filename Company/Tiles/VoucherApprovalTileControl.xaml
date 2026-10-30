@@ -1,0 +1,861 @@
+<UserControl xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.VoucherApprovalTileControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+             xmlns:Controls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+             xmlns:ClientControls="clr-namespace:UnicontaClient.Controls"
+             mc:Ignorable="d"
+             d:DesignHeight="420"
+             d:DesignWidth="560">
+
+    <UserControl.Resources>
+
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+
+        <Color x:Key="VoucherPendingApprovalColor">#C52B3A</Color>
+        <Color x:Key="VoucherApprovedColor">#10A578</Color>
+
+        <SolidColorBrush x:Key="VoucherPendingApprovalBrush" Color="{StaticResource VoucherPendingApprovalColor}"/>
+        <SolidColorBrush x:Key="VoucherApprovedBrush" Color="{StaticResource VoucherApprovedColor}"/>
+
+        <SolidColorBrush x:Key="VoucherPendingApprovalBackgroundBrush" Color="{StaticResource VoucherPendingApprovalColor}" Opacity="0.07"/>
+        <SolidColorBrush x:Key="VoucherApprovedBackgroundBrush" Color="{StaticResource VoucherApprovedColor}" Opacity="0.07"/>
+
+        <SolidColorBrush x:Key="VoucherApproveHoverBrush" Color="{StaticResource VoucherApprovedColor}" Opacity="0.20"/>
+        <SolidColorBrush x:Key="VoucherRejectHoverBrush" Color="{StaticResource VoucherPendingApprovalColor}" Opacity="0.20"/>
+
+        <SolidColorBrush x:Key="VoucherRejectedBackgroundBrush" Color="{StaticResource VoucherPendingApprovalColor}" Opacity="0.18"/>
+        <Geometry x:Key="VoucherThumbsUpGeometry">M15.2368 6.09057C15.2454 5.84057 15.4393 5.57859 15.9608 5.51306C16.4731 5.4487 17.1975 5.61681 17.8929 6.18403C18.1179 6.36753 18.2475 6.68645 18.2475 7.06983V9.94366C18.2475 10.6955 18.8041 11.3312 19.5494 11.4305L22.422 11.8133C22.8281 11.8885 23.128 12.0454 23.3701 12.2893C23.6222 12.5432 23.8399 12.9201 24.0257 13.4774C24.0512 13.5538 24.0749 13.6975 24.0814 13.9249C24.0876 14.1448 24.077 14.414 24.0511 14.725C23.9992 15.3468 23.8887 16.1039 23.748 16.9107C23.5025 18.3186 23.171 19.8451 22.9167 21.016L22.9163 21.018C22.8793 21.1881 22.844 21.3507 22.8108 21.5044C22.7809 21.6431 22.7548 21.731 22.7194 21.7983C22.5471 22.1253 22.1697 22.4467 20.9774 22.5006C19.041 22.5881 17.8402 22.3485 16.4131 22.0555L16.3545 22.0434C15.0074 21.7667 13.4683 21.4506 11 21.3384V13.267C12.5346 12.9599 14.8004 11.2411 15.2313 6.61336C15.2417 6.50178 15.2405 6.39506 15.2388 6.31044L15.2377 6.26063C15.2362 6.19365 15.2351 6.14251 15.2368 6.09057ZM18.525 5.40913C17.6486 4.69423 16.6569 4.41775 15.8362 4.52086C15.0247 4.62282 14.2686 5.14037 14.2374 6.05653C14.2346 6.13956 14.2366 6.22486 14.2381 6.29284L14.239 6.33056C14.2406 6.41116 14.2403 6.46949 14.2356 6.52064C13.8581 10.5748 12.049 11.9103 11 12.2331V12.0001C11 10.8955 10.1046 10.0001 9 10.0001H8C6.89543 10.0001 6 10.8955 6 12.0001V22.0001C6 23.1046 6.89543 24.0001 8 24.0001H9C9.98933 24.0001 10.8109 23.2817 10.9715 22.3382C13.3509 22.4473 14.8272 22.7506 16.1521 23.0227L16.2119 23.035C17.6598 23.3324 18.959 23.5928 21.0226 23.4995C22.3694 23.4387 23.1905 23.0495 23.6041 22.2644C23.7071 22.0689 23.7556 21.8672 23.7883 21.7155C23.821 21.5643 23.8558 21.4038 23.8924 21.2353L23.8935 21.2304C24.1474 20.0613 24.4838 18.5125 24.7332 17.0825C24.8759 16.2637 24.9921 15.4731 25.0476 14.8081C25.0753 14.4757 25.0886 14.1667 25.081 13.8966C25.0736 13.6339 25.0458 13.3756 24.9743 13.1611C24.7601 12.5184 24.4778 11.9857 24.0799 11.5848C23.6742 11.1761 23.1773 10.9336 22.589 10.8272L22.5775 10.8252L19.6815 10.4393C19.433 10.4062 19.2475 10.1943 19.2475 9.94366V7.06983C19.2475 6.48526 19.0501 5.83745 18.525 5.40913ZM8 11.0001H9C9.55228 11.0001 10 11.4478 10 12.0001V22.0001C10 22.5523 9.55228 23.0001 9 23.0001H8C7.44772 23.0001 7 22.5523 7 22.0001V12.0001C7 11.4478 7.44772 11.0001 8 11.0001Z</Geometry>
+        <Geometry x:Key="VoucherThumbsDownGeometry">M15.2368 24.4094C15.2454 24.6594 15.4393 24.9214 15.9608 24.9869C16.4731 25.0513 17.1975 24.8832 17.8929 24.316C18.1179 24.1325 18.2475 23.8135 18.2475 23.4302V20.5563C18.2475 19.8045 18.8041 19.1688 19.5494 19.0695L22.422 18.6867C22.8281 18.6115 23.128 18.4546 23.3701 18.2107C23.6222 17.9568 23.8399 17.5799 24.0257 17.0226C24.0512 16.9462 24.0749 16.8025 24.0814 16.5751C24.0876 16.3552 24.077 16.086 24.0511 15.775C23.9992 15.1532 23.8887 14.3961 23.748 13.5893C23.5025 12.1814 23.171 10.6549 22.9167 9.48399L22.9163 9.48203C22.8793 9.31188 22.844 9.14925 22.8108 8.99561C22.7809 8.85694 22.7548 8.76899 22.7194 8.7017C22.5471 8.37466 22.1697 8.05332 20.9774 7.99943C19.041 7.91191 17.8402 8.15147 16.4131 8.44453L16.3545 8.45656C15.0074 8.73327 13.4683 9.04944 11 9.16158V17.233C12.5346 17.5401 14.8004 19.2589 15.2313 23.8866C15.2417 23.9982 15.2405 24.1049 15.2388 24.1896L15.2377 24.2394C15.2362 24.3064 15.2351 24.3575 15.2368 24.4094ZM18.525 25.0909C17.6486 25.8058 16.6569 26.0823 15.8362 25.9791C15.0247 25.8772 14.2686 25.3596 14.2374 24.4435C14.2346 24.3604 14.2366 24.2751 14.2381 24.2072L14.239 24.1694C14.2406 24.0888 14.2403 24.0305 14.2356 23.9794C13.8581 19.9252 12.049 18.5897 11 18.2669V18.4999C11 19.6045 10.1046 20.4999 9 20.4999H8C6.89543 20.4999 6 19.6045 6 18.4999V8.49994C6 7.39537 6.89543 6.49994 8 6.49994H9C9.98933 6.49994 10.8109 7.21829 10.9715 8.16185C13.3509 8.05269 14.8272 7.74941 16.1521 7.47727L16.2119 7.46497C17.6598 7.16763 18.959 6.90719 21.0226 7.00045C22.3694 7.06133 23.1905 7.45052 23.6041 8.23557C23.7071 8.43108 23.7556 8.63284 23.7883 8.78452C23.821 8.93567 23.8558 9.09624 23.8924 9.26472L23.8935 9.26961C24.1474 10.4387 24.4838 11.9875 24.7332 13.4175C24.8759 14.2363 24.9921 15.0269 25.0476 15.6919C25.0753 16.0243 25.0886 16.3333 25.081 16.6034C25.0736 16.8661 25.0458 17.1244 24.9743 17.3389C24.7601 17.9816 24.4778 18.5143 24.0799 18.9152C23.6742 19.3239 23.1773 19.5664 22.589 19.6728L22.5775 19.6748L19.6815 20.0607C19.433 20.0938 19.2475 20.3057 19.2475 20.5563V23.4302C19.2475 24.0147 19.0501 24.6625 18.525 25.0909ZM8 19.4999H9C9.55228 19.4999 10 19.0522 10 18.4999V8.49994C10 7.94766 9.55228 7.49994 9 7.49994H8C7.44772 7.49994 7 7.94766 7 8.49994V18.4999C7 19.0522 7.44772 19.4999 8 19.4999Z</Geometry>
+        <Geometry x:Key="VoucherQuestionGeometry">M 12,7 C 12,1 22,1 22,7 C 22,11 17,11 17,16 M 17,20 L 17,22</Geometry>
+
+        <Style x:Key="VoucherHeadingStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="TextAlignment" Value="Center"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+
+        <Style x:Key="VoucherDescriptionStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}"/>
+            <Setter Property="Opacity" Value="0.68"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="TextAlignment" Value="Center"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+
+        <Style x:Key="VoucherTabButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="8,7"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8"
+                                Margin="0,0,8,0"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{DynamicResource PrimaryButtonBackgroundBrush}"/>
+                            </Trigger>
+                            <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource Self}}" Value="True">
+                                <Setter Property="Background" Value="{DynamicResource TertiaryButtonBackgroundBrush}"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </DataTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="VoucherApproveButtonStyle"
+               TargetType="Button"
+               BasedOn="{StaticResource UnicontaButtonWithGlyph}">
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background"
+                            Value="{StaticResource VoucherApproveHoverBrush}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="VoucherRejectButtonStyle"
+               TargetType="Button"
+               BasedOn="{StaticResource UnicontaButtonWithGlyph}">
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background"
+                            Value="{StaticResource VoucherRejectHoverBrush}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <DataTemplate x:Key="VoucherApprovalActionContentTemplate">
+            <TextBlock Text="{Binding}" TextWrapping="Wrap" TextAlignment="Center"/>
+        </DataTemplate>
+
+    </UserControl.Resources>
+
+    <Grid Background="{StaticResource LightBackground}">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- HEADER -->
+        <Grid x:Name="Header"
+              Margin="2,0,30,8">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="28"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Viewbox Width="20"
+                     Height="24"
+                     HorizontalAlignment="Left"
+                     VerticalAlignment="Center">
+                <Path Data="M3,1 L13,1 19,7 19,23 3,23 Z M13,1 L13,7 19,7 M7,12 L15,12 M7,16 L15,16"
+                      Stroke="{DynamicResource RibbonControlTabHeaderBackground}"
+                      StrokeThickness="1.8"
+                      StrokeLineJoin="Round"/>
+            </Viewbox>
+
+            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Vouchers}"
+                           FontSize="16"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource ForegroundBrush}"/>
+
+                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileUploadAndTrackYourInvoices}"
+                           Margin="0,1,0,0"
+                           FontSize="11"
+                           Opacity="0.62"
+                           Foreground="{StaticResource ForegroundBrush}"/>
+            </StackPanel>
+        </Grid>
+
+        <Grid x:Name="MasterDetailContent" Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition x:Name="PreviewColumn" Width="0"/>
+            </Grid.ColumnDefinitions>
+            <!-- IDLE / NORMAL STATE -->
+            <ScrollViewer x:Name="IdleContentScrollViewer"
+                      Grid.Column="0"
+                      Grid.RowSpan="2"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled"
+                      SizeChanged="IdleLayout_SizeChanged">
+
+                <Grid x:Name="IdleContent" SizeChanged="IdleLayout_SizeChanged">
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="8"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition x:Name="IdleFooterGap" Height="8"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- TABS -->
+                    <Border x:Name="VoucherTabs"
+                        Grid.Row="0"
+                        SizeChanged="IdleLayout_SizeChanged"
+                        Padding="4"
+                        CornerRadius="10"
+                        Background="{StaticResource LightBackgroundComponentBackground}"
+                        BorderBrush="{StaticResource LightBackgroundComponentBorder}"
+                        BorderThickness="1">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- NEEDS APPROVAL -->
+                            <Button x:Name="NeedsApprovalTabButton"
+                                Grid.Column="0"
+                                Style="{StaticResource VoucherTabButtonStyle}">
+                                <StackPanel HorizontalAlignment="Center">
+                                    <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=VoucherTileNeedsApproval}"
+                                           TextAlignment="Center"
+                                           TextWrapping="Wrap"/>
+                                    <TextBlock x:Name="NeedsApprovalCountText" Text="0"/>
+                                </StackPanel>
+                            </Button>
+
+                            <!-- AWAITING OTHERS -->
+                            <Button x:Name="AwaitingOthersTabButton"
+                                Grid.Column="1"
+                                Style="{StaticResource VoucherTabButtonStyle}">
+                                <StackPanel HorizontalAlignment="Center">
+                                    <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=VoucherTileAwaitingOthers}" TextAlignment="Center" TextWrapping="Wrap"/>
+                                    <TextBlock x:Name="AwaitingOthersCountText" Text="0"/>
+                                </StackPanel>
+                            </Button>
+
+                            <!-- APPROVED -->
+                            <Button x:Name="ApprovedTabButton"
+                                Grid.Column="2"
+                                Style="{StaticResource VoucherTabButtonStyle}">
+                                <StackPanel HorizontalAlignment="Center">
+                                    <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Approved}" TextAlignment="Center"/>
+                                    <TextBlock x:Name="ApprovedCountText" Text="0"/>
+                                </StackPanel>
+                            </Button>
+                        </Grid>
+                    </Border>
+
+                    <!-- VOUCHER LIST -->
+                    <Grid Grid.Row="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <ClientControls:SearchInput x:Name="VoucherSearch"
+                                          Grid.Row="0"
+                                          Height="32"
+                                          Margin="0,0,0,10"
+                                          Placeholder="Search vouchers"
+                                          SearchTextChanged="VoucherSearch_TextChanged"/>
+                        <ScrollViewer x:Name="VoucherListScrollViewer"
+                                  Grid.Row="1"
+                                  VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled"
+                                  PreviewMouseWheel="VoucherListScrollViewer_PreviewMouseWheel">
+
+                            <ListBox x:Name="VoucherList"
+                                 SelectionMode="Single"
+                                 SelectionChanged="VoucherList_SelectionChanged"
+                                 Background="Transparent"
+                                 BorderThickness="0"
+                                 Padding="0"
+                                 HorizontalContentAlignment="Stretch">
+                                <ListBox.Template>
+                                    <ControlTemplate TargetType="{x:Type ListBox}">
+                                        <ItemsPresenter/>
+                                    </ControlTemplate>
+                                </ListBox.Template>
+                                <ListBox.ItemContainerStyle>
+                                    <Style TargetType="{x:Type ListBoxItem}">
+                                        <EventSetter Event="MouseDoubleClick" Handler="VoucherItem_MouseDoubleClick"/>
+                                        <Setter Property="Cursor" Value="Hand"/>
+                                        <Setter Property="Padding" Value="0"/>
+                                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                                    <ContentPresenter HorizontalAlignment="Stretch"/>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </ListBox.ItemContainerStyle>
+
+                                <ListBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel/>
+                                    </ItemsPanelTemplate>
+                                </ListBox.ItemsPanel>
+
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+
+                                        <Border x:Name="VoucherBorder"
+                                            Margin="0,0,0,5"
+                                            Padding="9,7"
+                                            Background="{StaticResource LightBackgroundComponentBackground}"
+                                            BorderBrush="{StaticResource LightBackgroundComponentBorder}"
+                                            BorderThickness="2"
+                                            CornerRadius="8">
+
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="36"/>
+                                                    <ColumnDefinition Width="8"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <!-- RESPONSIVE INLINE ACTIONS -->
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <!-- DOWNLOAD -->
+                                                <Button Width="36"
+                                                    Height="40"
+                                                    Padding="0"
+                                                    BorderThickness="0"
+                                                    Background="Transparent"
+                                                    Cursor="Hand"
+                                                    Click="Download_Click">
+                                                    <Button.Template>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Border Background="#0D5145D9"
+                                                                CornerRadius="6">
+                                                                <Image Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=download-32x32}"
+                                                                   IsHitTestVisible="False"/>
+                                                            </Border>
+                                                        </ControlTemplate>
+                                                    </Button.Template>
+                                                </Button>
+
+                                                <!-- VOUCHER INFORMATION -->
+                                                <StackPanel Grid.Column="2"
+                                                        VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding Title}"
+                                                           FontSize="13"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="{StaticResource ForegroundBrush}"
+                                                           TextTrimming="CharacterEllipsis"/>
+
+                                                    <StackPanel Margin="0,2,0,0"
+                                                            Orientation="Horizontal">
+                                                        <TextBlock Text="{Binding DateText}"
+                                                               FontSize="11"
+                                                               Opacity="0.58"
+                                                               Foreground="{StaticResource ForegroundBrush}"/>
+                                                        <TextBlock Text="  ·  "
+                                                               FontSize="11"
+                                                               Opacity="0.45"
+                                                               Foreground="{StaticResource ForegroundBrush}"/>
+                                                        <TextBlock Text="{Binding AmountText}"
+                                                               FontSize="11"
+                                                               Opacity="0.58"
+                                                               Foreground="{StaticResource ForegroundBrush}"/>
+                                                    </StackPanel>
+                                                </StackPanel>
+                                                <!-- INLINE APPROVE / REJECT -->
+                                                <StackPanel Grid.Column="3"
+                                                            Visibility="Collapsed"
+                                                         Orientation="Horizontal"
+                                                         VerticalAlignment="Center"
+                                                         Margin="8,0,0,0">
+
+                                                    <StackPanel.Style>
+                                                        <Style TargetType="StackPanel">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                            <Style.Triggers>
+                                                                <MultiDataTrigger>
+                                                                    <MultiDataTrigger.Conditions>
+                                                                        <Condition Binding="{Binding IsWideLayout, RelativeSource={RelativeSource AncestorType={x:Type local:VoucherApprovalTileControl}}}" Value="True"/>
+                                                                        <Condition Binding="{Binding Tag, Source={x:Reference NeedsApprovalTabButton}}" Value="True"/>
+                                                                    </MultiDataTrigger.Conditions>
+                                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                                </MultiDataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </StackPanel.Style>
+                                                    <Button Style="{StaticResource VoucherApproveButtonStyle}" Width="32"
+                                                                  Height="32"
+                                                                  MinWidth="0"
+                                                                  MinHeight="0"
+                                                                  Padding="0"
+                                                                  Controls:ButtonAppearance.IconOnly="True"
+                                                                  Controls:ButtonAppearance.ShowBorder="False"
+                                                                  HorizontalAlignment="Center"
+                                                                  VerticalAlignment="Center"
+                                                                  Controls:ButtonAppearance.Variant="Primary"
+                                                                  Controls:ButtonAppearance.Glyph="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=approve_byemployee_32x32.svg}"
+                                                                  Tag="{Binding}"
+                                                                  ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Approve}"
+                                                                  Click="InlineApprove_Click"/>
+
+                                                    <Button Style="{StaticResource VoucherRejectButtonStyle}" Width="32"
+                                                                  Height="32"
+                                                                  MinWidth="0"
+                                                                  MinHeight="0"
+                                                                  Padding="0"
+                                                                  Controls:ButtonAppearance.IconOnly="True"
+                                                                  Controls:ButtonAppearance.ShowBorder="False"
+                                                                  Margin="4,0,0,0"
+                                                                  Controls:ButtonAppearance.Variant="Primary"
+                                                                  Controls:ButtonAppearance.Glyph="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=thumbsdown_32x32.svg}"
+                                                                  Tag="{Binding}"
+                                                                  ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Reject}"
+                                                                  Click="InlineReject_Click"/>
+                                                </StackPanel>
+
+                                                <!-- APPROVERS -->
+                                                <StackPanel Grid.Column="4">
+
+                                                    <!-- APPROVER 1 -->
+                                                    <Border Margin="8,0,0,2" Padding="9,4" CornerRadius="10"
+                                                            VerticalAlignment="Center" Visibility="{Binding Approver1Visibility}">
+                                                        <Border.Style>
+                                                            <Style TargetType="Border">
+                                                                <Setter Property="Background" Value="{DynamicResource LightBackgroundComponentBackground}"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding Approver1Approved}" Value="True">
+                                                                        <Setter Property="Background" Value="{StaticResource VoucherApprovedBackgroundBrush}"/>
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding Approver1Rejected}" Value="True">
+                                                                        <Setter Property="Background" Value="{StaticResource VoucherRejectedBackgroundBrush}"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Border.Style>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <Viewbox Width="16" Height="16" Margin="0,0,4,0" VerticalAlignment="Center">
+                                                                <Canvas Width="32" Height="32">
+                                                                    <Path>
+                                                                        <Path.Style>
+                                                                            <Style TargetType="Path">
+                                                                                <Setter Property="Data" Value="{StaticResource VoucherQuestionGeometry}"/>
+                                                                                <Setter Property="Stroke" Value="{DynamicResource NavigationSearchPopupSecondaryTextBrush}"/>
+                                                                                <Setter Property="StrokeThickness" Value="2.5"/>
+                                                                                <Setter Property="ToolTip" Value="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=VoucherTileNotYetApproved}"/>
+                                                                                <Style.Triggers>
+                                                                                    <DataTrigger Binding="{Binding Approver1Approved}" Value="True">
+                                                                                        <Setter Property="Data" Value="{StaticResource VoucherThumbsUpGeometry}"/>
+                                                                                        <Setter Property="StrokeThickness" Value="0"/>
+                                                                                        <Setter Property="Fill" Value="{StaticResource VoucherApprovedBrush}"/>
+                                                                                        <Setter Property="ToolTip" Value="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=Approved}"/>
+                                                                                    </DataTrigger>
+                                                                                    <DataTrigger Binding="{Binding Approver1Rejected}" Value="True">
+                                                                                        <Setter Property="Data" Value="{StaticResource VoucherThumbsDownGeometry}"/>
+                                                                                        <Setter Property="StrokeThickness" Value="0"/>
+                                                                                        <Setter Property="Fill" Value="{StaticResource VoucherPendingApprovalBrush}"/>
+                                                                                        <Setter Property="ToolTip" Value="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=Rejected}"/>
+                                                                                    </DataTrigger>
+                                                                                </Style.Triggers>
+                                                                            </Style>
+                                                                        </Path.Style>
+                                                                    </Path>
+                                                                </Canvas>
+                                                            </Viewbox>
+                                                            <TextBlock Text="{Binding Approver1}" FontSize="12" VerticalAlignment="Center">
+                                                                <TextBlock.Style>
+                                                                    <Style TargetType="TextBlock">
+                                                                        <Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}"/>
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding Approver1Approved}" Value="True">
+                                                                                <Setter Property="Foreground" Value="{StaticResource VoucherApprovedBrush}"/>
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </TextBlock.Style>
+                                                            </TextBlock>
+                                                        </StackPanel>
+                                                    </Border>
+
+                                                    <!-- APPROVER 2 -->
+                                                    <Border Margin="8,0,0,2" Padding="9,4" CornerRadius="10"
+                                                            VerticalAlignment="Center" Visibility="{Binding Approver2Visibility}">
+                                                        <Border.Style>
+                                                            <Style TargetType="Border">
+                                                                <Setter Property="Background" Value="{DynamicResource LightBackgroundComponentBackground}"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding Approver2Approved}" Value="True">
+                                                                        <Setter Property="Background" Value="{StaticResource VoucherApprovedBackgroundBrush}"/>
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding Approver2Rejected}" Value="True">
+                                                                        <Setter Property="Background" Value="{StaticResource VoucherRejectedBackgroundBrush}"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Border.Style>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <Viewbox Width="16" Height="16" Margin="0,0,4,0" VerticalAlignment="Center">
+                                                                <Canvas Width="32" Height="32">
+                                                                    <Path>
+                                                                        <Path.Style>
+                                                                            <Style TargetType="Path">
+                                                                                <Setter Property="Data" Value="{StaticResource VoucherQuestionGeometry}"/>
+                                                                                <Setter Property="Stroke" Value="{DynamicResource NavigationSearchPopupSecondaryTextBrush}"/>
+                                                                                <Setter Property="StrokeThickness" Value="2.5"/>
+                                                                                <Setter Property="ToolTip" Value="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=VoucherTileNotYetApproved}"/>
+                                                                                <Style.Triggers>
+                                                                                    <DataTrigger Binding="{Binding Approver2Approved}" Value="True">
+                                                                                        <Setter Property="Data" Value="{StaticResource VoucherThumbsUpGeometry}"/>
+                                                                                        <Setter Property="StrokeThickness" Value="0"/>
+                                                                                        <Setter Property="Fill" Value="{StaticResource VoucherApprovedBrush}"/>
+                                                                                        <Setter Property="ToolTip" Value="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=Approved}"/>
+                                                                                    </DataTrigger>
+                                                                                    <DataTrigger Binding="{Binding Approver2Rejected}" Value="True">
+                                                                                        <Setter Property="Data" Value="{StaticResource VoucherThumbsDownGeometry}"/>
+                                                                                        <Setter Property="StrokeThickness" Value="0"/>
+                                                                                        <Setter Property="Fill" Value="{StaticResource VoucherPendingApprovalBrush}"/>
+                                                                                        <Setter Property="ToolTip" Value="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=Rejected}"/>
+                                                                                    </DataTrigger>
+                                                                                </Style.Triggers>
+                                                                            </Style>
+                                                                        </Path.Style>
+                                                                    </Path>
+                                                                </Canvas>
+                                                            </Viewbox>
+                                                            <TextBlock Text="{Binding Approver2}" FontSize="12" VerticalAlignment="Center">
+                                                                <TextBlock.Style>
+                                                                    <Style TargetType="TextBlock">
+                                                                        <Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}"/>
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding Approver2Approved}" Value="True">
+                                                                                <Setter Property="Foreground" Value="{StaticResource VoucherApprovedBrush}"/>
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </TextBlock.Style>
+                                                            </TextBlock>
+                                                        </StackPanel>
+                                                    </Border>
+
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                        <DataTemplate.Triggers>
+                                            <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}}}"
+                                                     Value="True">
+                                                <Setter TargetName="VoucherBorder"
+                                                    Property="BorderBrush"
+                                                    Value="{DynamicResource NavigationSearchPopupItemSelectedBorderBrush}"/>
+                                            </DataTrigger>
+                                        </DataTemplate.Triggers>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </ScrollViewer>
+
+
+                        <!-- EMPTY LIST -->
+                        <Grid x:Name="EmptyVoucherList"
+                          Grid.Row="1"
+                          Visibility="Collapsed"
+                          Margin="8,6"
+                          MinHeight="180">
+
+                            <!-- Rounded dashed border -->
+                            <Rectangle RadiusX="10"
+                                   RadiusY="10"
+                                   Stroke="#D1D5DB"
+                                   StrokeThickness="1.5"
+                                   StrokeDashArray="4,4"
+                                   Fill="Transparent"
+                                   SnapsToDevicePixels="True"/>
+
+                            <!-- Empty state content -->
+                            <StackPanel HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Margin="24">
+
+                                <Image Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=upload_32x32.svg}"
+                                   Width="32"
+                                   Height="32"
+                                   Opacity="0.65"
+                                   HorizontalAlignment="Center"/>
+
+                                <TextBlock x:Name="EmptyVoucherListText"
+                                       Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileDragYourVoucherAttachmentsHereToUpload}"
+                                       TextAlignment="Center"
+                                       TextWrapping="Wrap"
+                                       MaxWidth="240"
+                                       Margin="0,16,0,0"
+                                       FontSize="14"
+                                       Foreground="{StaticResource ForegroundBrush}"
+                                       Opacity="0.65"/>
+                            </StackPanel>
+                        </Grid>
+
+                    </Grid>
+
+                    <!-- ADD VOUCHER -->
+                    <Button Style="{DynamicResource UnicontaButtonWithGlyph}" x:Name="AddVoucherButton"
+                                  Grid.Row="4"
+                                  SizeChanged="IdleLayout_SizeChanged"
+                                  Controls:ButtonAppearance.Glyph="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Add_16x16.svg}"
+                                  Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileAddVoucher}"
+                                  Controls:ButtonAppearance.Variant="Tertiary"
+                                  Click="AddInvoiceButton_Click"/>
+
+                    <!-- APPROVAL ACTIONS -->
+                    <UniformGrid x:Name="ApprovalActions"
+                             Grid.Row="4"
+                             Columns="2"
+                             Visibility="Collapsed"
+                             SizeChanged="IdleLayout_SizeChanged">
+
+                        <Button Style="{StaticResource VoucherApproveButtonStyle}" x:Name="ApproveButton"
+                                      Controls:ButtonAppearance.Variant="Primary"
+                                      Controls:ButtonAppearance.Glyph="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=approve_byemployee_32x32.svg}"
+                                      Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=Approve}"
+                                      ContentTemplate="{StaticResource VoucherApprovalActionContentTemplate}"
+                                      Height="Auto"
+                                      MinHeight="44"
+                                      MinWidth="0"
+                                      HorizontalContentAlignment="Stretch"
+                                      Margin="2"
+                                      IsEnabled="False"
+                                      Click="ApproveButton_Click"/>
+
+                        <Button Style="{StaticResource VoucherApproveButtonStyle}" x:Name="ApproveWithCommentButton"
+                                      Controls:ButtonAppearance.Variant="Primary"
+                                      Controls:ButtonAppearance.Glyph="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=approve_byadmin_32x32.svg}"
+                                      Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=ApproveWithComments}"
+                                      ContentTemplate="{StaticResource VoucherApprovalActionContentTemplate}"
+                                      Height="Auto"
+                                      MinHeight="44"
+                                      MinWidth="0"
+                                      HorizontalContentAlignment="Stretch"
+                                      Margin="2"
+                                      IsEnabled="False"
+                                      Click="ApproveWithCommentButton_Click"/>
+
+                        <Button Style="{StaticResource VoucherRejectButtonStyle}" x:Name="RejectButton"
+                                      Controls:ButtonAppearance.Variant="Primary"
+                                      Controls:ButtonAppearance.Glyph="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=thumbsdown_32x32.svg}"
+                                      Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=Reject}"
+                                      ContentTemplate="{StaticResource VoucherApprovalActionContentTemplate}"
+                                      Height="Auto"
+                                      MinHeight="44"
+                                      MinWidth="0"
+                                      HorizontalContentAlignment="Stretch"
+                                      Margin="2"
+                                      IsEnabled="False"
+                                      Click="RejectButton_Click"/>
+
+                        <Button Style="{DynamicResource UnicontaButtonWithGlyph}" x:Name="NewApproverButton"
+                                      Controls:ButtonAppearance.Variant="Primary"
+                                      Controls:ButtonAppearance.Glyph="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Change_Ownership_32x32.svg}"
+                                      Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=VoucherTileNewApprover}"
+                                      ContentTemplate="{StaticResource VoucherApprovalActionContentTemplate}"
+                                      Height="Auto"
+                                      MinHeight="44"
+                                      MinWidth="0"
+                                      HorizontalContentAlignment="Stretch"
+                                      Margin="2"
+                                      IsEnabled="False"
+                                      Click="NewApproverButton_Click"/>
+                    </UniformGrid>
+                </Grid>
+            </ScrollViewer>
+
+            <Border x:Name="PreviewPanel" Grid.Column="1" Margin="12,0,0,0"
+                    SizeChanged="IdleLayout_SizeChanged"
+                    Visibility="Collapsed"
+                    Background="{StaticResource LightBackgroundComponentBackground}"
+                    BorderBrush="{StaticResource LightBackgroundComponentBorder}" BorderThickness="0">
+                <Grid>
+                    <ContentControl x:Name="PreviewContent" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+                    <TextBlock x:Name="PreviewMessage" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileSelectAVoucherToPreview}"
+                               Style="{StaticResource VoucherDescriptionStyle}" Margin="16"
+                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- OTHER STATES -->
+        <Grid x:Name="StateContent"
+              Grid.Row="1"
+              Visibility="Collapsed" >
+
+            <!-- DRAG OVER -->
+            <Grid x:Name="DragOverContent"
+                  Visibility="Collapsed"
+                  IsHitTestVisible="False">
+
+                <Rectangle Margin="-8,-42,-8,-8"
+                           RadiusX="10"
+                           RadiusY="10"
+                           Stroke="{DynamicResource RibbonControlTabHeaderBackground}"
+                           StrokeThickness="2"
+                           StrokeDashArray="5,3"
+                           Fill="#095145D9"/>
+
+                <StackPanel HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Margin="20">
+
+                    <Grid Width="72"
+                          Height="82"
+                          Margin="0,0,0,20">
+
+                        <Path Data="M10,2 L45,2 64,21 64,78 10,78 Z M45,2 L45,21 64,21"
+                              Stroke="{DynamicResource RibbonControlTabHeaderBackground}"
+                              StrokeThickness="2.5"
+                              Fill="Transparent"/>
+
+                        <TextBlock Text="PDF"
+                                   VerticalAlignment="Bottom"
+                                   HorizontalAlignment="Right"
+                                   Margin="0,0,0,4"
+                                   Padding="6,2"
+                                   Background="#D43B5266"
+                                   Foreground="White"
+                                   FontWeight="Bold"
+                                   FontSize="13"/>
+                    </Grid>
+
+                    <TextBlock x:Name="DragOverTitle"
+                               Style="{StaticResource VoucherHeadingStyle}"
+                               FontSize="23"
+                               Foreground="{DynamicResource RibbonControlTabHeaderBackground}"/>
+
+                    <TextBlock x:Name="DragOverDescription"
+                               Style="{StaticResource VoucherDescriptionStyle}"
+                               Margin="0,8,0,0"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- PROCESSING -->
+            <Grid x:Name="ProcessingContent"
+                  Visibility="Collapsed">
+
+                <StackPanel HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Margin="20">
+
+                    <Grid Width="60"
+                          Height="60"
+                          Margin="0,0,0,20">
+
+                        <Ellipse Stroke="#335145D9"
+                                 StrokeThickness="6"/>
+
+                        <Path Data="M30,3 A27,27 0 0 1 57,30"
+                              Stroke="{DynamicResource RibbonControlTabHeaderBackground}"
+                              StrokeThickness="6"
+                              StrokeStartLineCap="Round"
+                              Fill="Transparent">
+
+                            <Path.RenderTransform>
+                                <RotateTransform x:Name="ProcessingRotation"
+                                                 CenterX="30"
+                                                 CenterY="30"/>
+                            </Path.RenderTransform>
+                        </Path>
+                    </Grid>
+
+                    <TextBlock x:Name="ProcessingTitle"
+                               Style="{StaticResource VoucherHeadingStyle}"
+                               FontSize="18"/>
+
+                    <TextBlock x:Name="ProcessingDescription"
+                               Style="{StaticResource VoucherDescriptionStyle}"
+                               Margin="0,7,0,0"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- SUCCESS -->
+            <Grid x:Name="SuccessContent"
+                  Visibility="Collapsed">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Margin="20,8">
+
+                    <Border Width="70"
+                            Height="70"
+                            CornerRadius="35"
+                            Background="#1810A578"
+                            Margin="0,0,0,18">
+
+                        <Path Data="M18,36 L29,47 52,23"
+                              Stroke="{StaticResource VoucherApprovedBrush}"
+                              StrokeThickness="4"
+                              StrokeStartLineCap="Round"
+                              StrokeEndLineCap="Round"/>
+                    </Border>
+
+                    <TextBlock x:Name="SuccessTitle"
+                               Style="{StaticResource VoucherHeadingStyle}"
+                               FontSize="19"/>
+
+                    <TextBlock x:Name="SuccessDescription"
+                               Style="{StaticResource VoucherDescriptionStyle}"
+                               Margin="0,7,0,0"
+                               MaxWidth="330"/>
+                </StackPanel>
+
+                <StackPanel Grid.Row="1"
+                            HorizontalAlignment="Center"
+                            Margin="0,8,0,0">
+
+                    <Button Style="{DynamicResource UnicontaButtonWithGlyph}" Width="260"
+                                      Controls:ButtonAppearance.Glyph="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=View_16x16.svg}"
+                                      Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileViewVoucher}"
+                                      Controls:ButtonAppearance.Variant="Primary"
+                                      Click="ViewVoucherButton_Click"/>
+
+                    <Button Style="{DynamicResource UnicontaButtonWithGlyph}" Width="260"
+                                      Margin="0,8,0,0"
+                                      Controls:ButtonAppearance.Glyph="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Add_16x16.svg}"
+                                      Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileAddAnotherInvoice}"
+                                      Controls:ButtonAppearance.Variant="Secondary"
+                                      Click="ReturnToStartButton_Click"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- ERROR -->
+            <Grid x:Name="ErrorContent" Visibility="Collapsed">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Margin="20">
+
+                    <Border Width="70"
+                    Height="70"
+                    CornerRadius="35"
+                    Background="#18C52B3A"
+                    Margin="0,0,0,18">
+
+                        <Grid>
+                            <Path Data="M22,22 L48,48 M48,22 L22,48"
+                          Stroke="{StaticResource VoucherPendingApprovalBrush}"
+                          StrokeThickness="4"
+                          StrokeStartLineCap="Round"
+                          StrokeEndLineCap="Round"/>
+                        </Grid>
+                    </Border>
+
+                    <TextBlock x:Name="ErrorTitle"
+                       Style="{StaticResource VoucherHeadingStyle}"
+                       FontSize="18"/>
+
+                    <TextBlock x:Name="ErrorDescription"
+                       Style="{StaticResource VoucherDescriptionStyle}"
+                       Margin="0,7,0,0"
+                       MaxWidth="330"/>
+                </StackPanel>
+
+                <Button Grid.Row="1"
+                        x:Name="ErrorReturnToStartButton"
+                        Style="{DynamicResource UnicontaButtonWithGlyph}"
+                        Width="260"
+                        HorizontalAlignment="Center"
+                        Margin="0,8,0,0"
+                        Controls:ButtonAppearance.Glyph="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Add_16x16.svg}"
+                        Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileAddAnotherInvoice}"
+                        Controls:ButtonAppearance.Variant="Secondary"
+                        Click="ReturnToStartButton_Click"/>
+
+            </Grid> 
+
+        </Grid>
+    </Grid>
+</UserControl>

@@ -2,6 +2,7 @@ using UnicontaClient.Models;
 using UnicontaClient.Pages;
 using DevExpress.Xpf.Grid;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -36,6 +37,30 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public override Type TableType { get { return typeof(InvPackagingProductClient); } }
         public override bool Readonly { get { return false; } }
+        protected virtual bool ModelLines { get { return false; } }
+
+        protected override IList ToList(UnicontaBaseEntity[] Arr)
+        {
+            if (Arr != null)
+            {
+                var rows = Arr.Where(r => (((InvPackagingProduct)r)._PackingModel != null) == ModelLines).ToArray();
+                var typed = Array.CreateInstance(Arr.GetType().GetElementType(), rows.Length);
+                Array.Copy(rows, typed, rows.Length);
+                Arr = (UnicontaBaseEntity[])typed;
+            }
+            return base.ToList(Arr);
+        }
+    }
+
+    public class InvPackagingModelLineGrid : InvPackagingProductPageGrid
+    {
+        protected override bool ModelLines { get { return true; } }
+
+        public override void SetDefaultValues(UnicontaBaseEntity dataEntity, int selectedIndex)
+        {
+            base.SetDefaultValues(dataEntity, selectedIndex);
+            ((InvPackagingProductClient)dataEntity)._Weight = 1; // one of the model
+        }
     }
 
     public partial class InvPackagingProductPage : GridBasePage
@@ -55,6 +80,7 @@ namespace UnicontaClient.Pages.CustomPage
         protected override void SyncEntityMasterRowChanged(UnicontaBaseEntity args)
         {
             dgInvPackagingProductGrid.UpdateMaster(args);
+            dgPackagingModelGrid.UpdateMaster(args);
             SetHeader();
             BindGrid();
         }
@@ -79,11 +105,36 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
             dgInvPackagingProductGrid.View.DataControl.CurrentItemChanged += DataControl_CurrentItemChanged;
             dgInvPackagingProductGrid.tableView.ShowingEditor += TableView_ShowingEditor;
+
+            dgPackagingModelGrid.api = api;
+            dgPackagingModelGrid.UpdateMaster(master);
+            dgPackagingModelGrid.BusyIndicator = busyIndicator;
+            dgInvPackagingProductGrid.GotFocus += (s, e) => modelGridFocus = false;
+            dgPackagingModelGrid.GotFocus += (s, e) => modelGridFocus = true;
         }
+
+        bool modelGridFocus;
+        InvPackagingProductPageGrid ActiveGrid { get { return modelGridFocus ? dgPackagingModelGrid : dgInvPackagingProductGrid; } }
+
+        public override void AssignMultipleGrid(List<CorasauDataGrid> gridCtrls)
+        {
+            gridCtrls.Add(dgInvPackagingProductGrid);
+            gridCtrls.Add(dgPackagingModelGrid);
+        }
+
+        public override async Task InitQuery()
+        {
+            await base.InitQuery();
+            await dgPackagingModelGrid.Filter(null);
+            FocusOnGrid(dgInvPackagingProductGrid);
+            modelGridFocus = false;
+        }
+
+        protected override bool FocusOnLastGrid => false;
 
         Task BindGrid()
         {
-            return dgInvPackagingProductGrid.Filter(null);
+            return Task.WhenAll(dgInvPackagingProductGrid.Filter(null), dgPackagingModelGrid.Filter(null));
         }
 
         private void TableView_ShowingEditor(object sender, ShowingEditorEventArgs e)
@@ -190,27 +241,38 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void LocalMenu_OnItemClicked(string ActionType)
         {
-            var selectedItem = dgInvPackagingProductGrid.SelectedItem as InvPackagingProductClient;
+            var grid = ActiveGrid;
+            var selectedItem = grid.SelectedItem as InvPackagingProductClient;
             switch (ActionType)
             {
                 case "AddRow":
-                    dgInvPackagingProductGrid.AddRow();
+                    grid.AddRow();
                     break;
                 case "DeleteRow":
-                    dgInvPackagingProductGrid.DeleteRow();
+                    grid.DeleteRow();
                     break;
                 case "SaveGrid":
                     Save();
                     break;
                 case "CopyRow":
                     if (selectedItem != null)
-                        dgInvPackagingProductGrid.CopyRow();
+                        grid.CopyRow();
                     break;
                 case "CopyFromItem":
                     CopyFromItem();
                     break;
                 case "CopyFromBOM":
                     CopyFromBOM();
+                    break;
+                case "PackagingOverview":
+                    if (dgInvPackagingProductGrid.masterRecord != null)
+                        AddDockItem(TabControls.InvPackagingOverviewPage, dgInvPackagingProductGrid.masterRecord);
+                    break;
+                case "RefreshGrid":
+                    gridRibbon_BaseActions(ActionType);
+                    if (dgPackagingModelGrid.HasUnsavedData)
+                        Utility.ShowConfirmationOnRefreshGrid(dgPackagingModelGrid);
+                    dgPackagingModelGrid.Filter(null);
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -224,6 +286,12 @@ namespace UnicontaClient.Pages.CustomPage
             foreach (var item in dgInvPackagingProductGrid.GetVisibleRows() as IEnumerable<InvPackagingProductClient>)
             {
                 i++;
+                if (item._Category == 0)
+                {
+                    var msg = $"{string.Format(Uniconta.ClientTools.Localization.lookup("MandatoryField"), Uniconta.ClientTools.Localization.lookup("PackagingCategory"))}, {Uniconta.ClientTools.Localization.lookup("RowNumber")}: {i}";
+                    UnicontaMessageBox.Show(msg, Uniconta.ClientTools.Localization.lookup("Error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
                 if (item._Reporting == ReportingType.Packing && item._WasteSorting == 0)
                 {
                     var msg = $"{string.Format(Uniconta.ClientTools.Localization.lookup("MandatoryField"), Uniconta.ClientTools.Localization.lookup("WasteSorting"))}, {Uniconta.ClientTools.Localization.lookup("RowNumber")}: {i}";
@@ -231,11 +299,25 @@ namespace UnicontaClient.Pages.CustomPage
                     return;
                 }
             }
+            i = 0;
+            foreach (var item in dgPackagingModelGrid.GetVisibleRows() as IEnumerable<InvPackagingProductClient>)
+            {
+                i++;
+                if (item._PackingModel == null)
+                {
+                    var msg = $"{string.Format(Uniconta.ClientTools.Localization.lookup("MandatoryField"), Uniconta.ClientTools.Localization.lookup("Configuration"))}, {Uniconta.ClientTools.Localization.lookup("RowNumber")}: {i}";
+                    UnicontaMessageBox.Show(msg, Uniconta.ClientTools.Localization.lookup("Error"), MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+            }
 
-            var savetask = saveGrid(); 
+            var savetask = saveGrid();
             if (savetask != null)
                 await savetask;
+            if (dgPackagingModelGrid.HasUnsavedData)
+                await dgPackagingModelGrid.SaveData();
             await dgInvPackagingProductGrid.RefreshTask();
+            await dgPackagingModelGrid.RefreshTask();
         }
         void CopyFromItem()
         {
@@ -247,9 +329,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     var lines = await api.Query(Activator.CreateInstance(dgInvPackagingProductGrid.TableTypeUser) as UnicontaBaseEntity, new[] { item }, null);
                     if (lines?.Length > 0)
-                    {
-                        dgInvPackagingProductGrid.PasteRows(lines);
-                    }
+                        PasteLines(lines);
                 }
             };
             itemDialog.Show();
@@ -271,8 +351,18 @@ namespace UnicontaClient.Pages.CustomPage
                     if (newLines?.Length > 0)
                         lines.AddRange(newLines);
                 }
-                dgInvPackagingProductGrid.PasteRows(lines);
+                PasteLines(lines);
             }
+        }
+
+        void PasteLines(IEnumerable<UnicontaBaseEntity> lines)
+        {
+            var packagingLines = lines.Where(l => ((InvPackagingProduct)l)._PackingModel == null).ToList();
+            var modelLines = lines.Where(l => ((InvPackagingProduct)l)._PackingModel != null).ToList();
+            if (packagingLines.Count > 0)
+                dgInvPackagingProductGrid.PasteRows(packagingLines);
+            if (modelLines.Count > 0)
+                dgPackagingModelGrid.PasteRows(modelLines);
         }
         private void Category_GotFocus(object sender, RoutedEventArgs e)
         {

@@ -7,7 +7,8 @@ x:Class="UnicontaClient.Pages.CustomPage.WorkInstallationPage"
         xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
         xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
         xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
-        xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools">
+        xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
+        xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors">
     <UserControl.Resources>
         <Util:RowIndexConverter x:Key="RowIndexConverter" />
         <Util:VisibilityBoolConverter x:Key="VisibilityBoolConverter" />
@@ -47,6 +48,7 @@ x:Class="UnicontaClient.Pages.CustomPage.WorkInstallationPage"
                         </local:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </local:CorasauDataGridTemplateColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="DCAccount" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="CreditorAccount" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="AccountName" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Code" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="Name" />
@@ -66,6 +68,11 @@ x:Class="UnicontaClient.Pages.CustomPage.WorkInstallationPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Blocked" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="DeliveryTerm" Visible="false" Width="100" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="DeliveryId" Visible="false" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="EndpointId" Visible="False">
+                        <local:CorasauDataGridTemplateColumnClient.EditSettings>
+                            <editor:TextEditSettings MaskType="RegEx" Mask="{StaticResource EndPointIdValidationRegx}" />
+                        </local:CorasauDataGridTemplateColumnClient.EditSettings>
+                    </local:CorasauDataGridTemplateColumnClient>
                 </local:WorkInstallationGrid.Columns>
             </local:WorkInstallationGrid>
         </CorasauControls:BusyIndicator>

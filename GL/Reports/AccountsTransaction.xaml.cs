@@ -1,17 +1,9 @@
-using Uniconta.API.GeneralLedger;
-using Uniconta.API.System;
-using UnicontaClient.Models;
-using UnicontaClient.Utilities;
-using Uniconta.ClientTools;
-using Uniconta.ClientTools.Controls;
-using Uniconta.ClientTools.DataModel;
-using Uniconta.ClientTools.Page;
-using Uniconta.ClientTools.Util;
-using Uniconta.Common;
-using Uniconta.Common.Utility;
 using DevExpress.Xpf.Grid;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -22,14 +14,24 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
-using UnicontaClient.Pages.GL.ChartOfAccount.Reports;
-using Uniconta.DataModel;
-using System.Collections;
-using UnicontaClient.Controls.Dialogs;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using Uniconta.Client.Pages;
+using Uniconta.API.GeneralLedger;
 using Uniconta.API.Service;
+using Uniconta.API.System;
+using Uniconta.Client.Pages;
+using Uniconta.ClientTools;
+using Uniconta.ClientTools.Controls;
+using Uniconta.ClientTools.Controls.AI.Assistant.Capabilities;
+using Uniconta.ClientTools.DataModel;
+using Uniconta.ClientTools.Page;
+using Uniconta.ClientTools.Util;
+using Uniconta.Common;
+using Uniconta.Common.Utility;
+using Uniconta.DataModel;
+using UnicontaClient.Controls.Dialogs;
+using UnicontaClient.Models;
+using UnicontaClient.Pages.GL.ChartOfAccount.Reports;
+using UnicontaClient.Pages.GL.TransactionOrigin;
+using UnicontaClient.Utilities;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -46,8 +48,9 @@ namespace UnicontaClient.Pages.CustomPage
         }
     }
 
-    public partial class AccountsTransaction : GridBasePage
+    public partial class AccountsTransaction : GridBasePage, IGLPostingSourceTraceConsumer
     {
+        private readonly Dictionary<int, PostingTraceVoucherContext> postingTraceContexts = new Dictionary<int, PostingTraceVoucherContext>();
         public override string NameOfControl { get { return TabControls.AccountsTransaction; } }
         string AccountNumber;
         List<UnicontaBaseEntity> masterlist;
@@ -161,7 +164,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             dgAccountsTransGrid.UpdateMaster(args);
             SetPageHeader();
-            BindGrid();
+            BindGrid(false);
         }
         private void InitializePage(List<UnicontaBaseEntity> masters = null)
         {
@@ -208,7 +211,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             foreach (var rec in Parameters)
             {
-                if (string.Compare(rec.Name, "QueryonPageLoad", StringComparison.CurrentCultureIgnoreCase) == 0)
+                if (string.Equals(rec.Name, "QueryonPageLoad", StringComparison.CurrentCultureIgnoreCase))
                 {
                     bool callinitQuery;
                     if (bool.TryParse(rec.Value, out callinitQuery))
@@ -229,8 +232,10 @@ namespace UnicontaClient.Pages.CustomPage
                 return Filter();
         }
 
-        private void BindGrid()
+        private void BindGrid(bool ForcePrimary = true)
         {
+            if (ForcePrimary)
+                api.ForcePrimarySQL = true;
             var rb = ribbonControl;
             if (rb != null)
             {
@@ -356,6 +361,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem == null)
                         return;
                     var deleteDialog = new DeletePostedJournal();
+                    deleteDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     deleteDialog.Closed += async delegate
                     {
                         if (deleteDialog.DialogResult == true)
@@ -465,6 +471,10 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         JournalPosted(selectedItem, api);
                     break;
+                case "PostingSourceTrace":
+                    if (selectedItem != null)
+                        ShowPostingSourceTrace();
+                    break;
                 case "ChangeDate":
                     if (selectedItem == null) return;
                     var dateSelector = new CWDateSelector(selectedItem.Date, true);
@@ -511,10 +521,11 @@ namespace UnicontaClient.Pages.CustomPage
                     FilterWithAccountingYear(true);
                     break;
                 case "RefreshGrid":
-                    BindGrid();
+                    BindGrid(false);
                     break;
                 case "ShowConvertedAmount":
                     var currencyDialog = new CWExchangeRate(false, Uniconta.ClientTools.Localization.lookup("Currency"));
+                    currencyDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     currencyDialog.Closing += delegate
                     {
                         if (currencyDialog.DialogResult == true)
@@ -532,6 +543,46 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
             }
         }
+
+        public override List<IAIAssistantCapability> GetAIAssistantCapabilities(bool hasFileAttached)
+        {
+            var capabilities = base.GetAIAssistantCapabilities(hasFileAttached);
+            capabilities.Add(new OpenTransactionOriginCapability(this));
+            capabilities.Add(new ReviewVoucherCapability(this));
+            return capabilities;
+        }
+
+        public void ShowPostingSourceTrace(GLTransClient selectionOverride = null)
+        {
+            if (selectionOverride != null)
+                dgAccountsTransGrid.SelectedItem = selectionOverride;
+
+            AddDockItem(TabControls.GLPostingSourceTrace,
+                        new object[]
+                        {
+                            dgAccountsTransGrid.syncEntity,
+                            new GLPostingSourceTraceOpenparms
+                            {
+                                Consumer = this,
+                                SelectionOverride = selectionOverride
+                            }
+                        },
+                        Uniconta.ClientTools.Localization.lookup("PostingSourceTrace"));
+        }
+
+        async Task<PostingTraceVoucherContext> IGLPostingSourceTraceConsumer.GetPostingTraceContextAsync(GLTransClient transaction, CrudAPI api)
+        {
+            if (postingTraceContexts.TryGetValue(transaction.Voucher, out var context))
+                return context;
+
+            var transactions = (await api.Query<GLTransClient>(transaction)).Where(x => x != null).ToArray();
+            context = new PostingTraceVoucherContext(transactions,
+                item => new InvoicePostingTraceResolver().TracePostingAsync(item, api));
+            postingTraceContexts[transaction.Voucher] = context;
+            return context;
+        }
+
+        GLTransClient IGLPostingSourceTraceConsumer.GetSelectedVoucherTransaction() => dgAccountsTransGrid.SelectedItem as GLTransClient;
 
         void ChangeProject()
         {
@@ -656,6 +707,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var gltranslst = dgAccountsTransGrid.GetVisibleRows() as IEnumerable<GLTransClient>;
             var cwObj = new CWCopyVoucherToJrnl(api);
+            cwObj.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             cwObj.DialogTableId = 2000000082;
             cwObj.Closed += async delegate
             {
@@ -744,6 +796,7 @@ namespace UnicontaClient.Pages.CustomPage
         void RemoveVat(GLTransClient selectedItem)
         {
             var cwObj = new CwEditTransaction(api, hideVat: true);
+            cwObj.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             cwObj.Closed += async delegate
             {
                 if (cwObj.DialogResult == true)
@@ -762,6 +815,7 @@ namespace UnicontaClient.Pages.CustomPage
         void AddVat(GLTransClient selectedItem)
         {
             var cwObj = new CwEditTransaction(api);
+            cwObj.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             cwObj.Closed += async delegate
             {
                 if (cwObj.DialogResult == true)
@@ -780,6 +834,7 @@ namespace UnicontaClient.Pages.CustomPage
         void SetNewAccount(GLTransClient selectedItem)
         {
             var cwObj = new CwEditTransaction(api, hideComments: true, hideVat: true, IsCreditor: (selectedItem._DCType == GLTransRefType.Creditor));
+            cwObj.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             cwObj.Closed += async delegate
             {
                 if (cwObj.DialogResult == true)
@@ -825,12 +880,14 @@ namespace UnicontaClient.Pages.CustomPage
                             vouchersClient._Fileextension = DocumentConvert.GetDocumentType(fileInfo.FileExtension);
                         }
                         addVouchersDialog = new CWAddVouchers(api, vouchersClient, true);
+                        addVouchersDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     }
                 };
                 dragDropWindow.Show();
             }
             else
                 addVouchersDialog = new CWAddVouchers(api, false, null);
+            addVouchersDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
 
             if (addVouchersDialog == null) return;
 

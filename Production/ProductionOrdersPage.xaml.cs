@@ -184,6 +184,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                     {
                         CWOrderFromOrder cwOrderFromOrder = new CWOrderFromOrder(api);
+                        cwOrderFromOrder.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                         cwOrderFromOrder.DialogTableId = 2000000084;
                         cwOrderFromOrder.Closed += async delegate
                         {
@@ -413,6 +414,7 @@ namespace UnicontaClient.Pages.CustomPage
         void CreateOrderLines(ProductionOrderClient productionOrder)
         {
             CWProductionOrderLine dialog = new CWProductionOrderLine(productionOrder, api, false, null);
+            dialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             dialog.DialogTableId = 2000000078;
             dialog.Closing += async delegate
             {

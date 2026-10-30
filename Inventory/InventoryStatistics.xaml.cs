@@ -66,6 +66,8 @@ namespace UnicontaClient.Pages.CustomPage
             var Comp = api.CompanyEntity;
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
             UtilDisplay.RemoveMenuCommand(rb, "ShowCurrentRowData");
+            if(api.CompanyEntity.HideCostPrice)
+                MarginRatio.Visible = MarginRatio.ShowInColumnChooser = CostValue.Visible = CostValue.ShowInColumnChooser = Margin.Visible = Margin.ShowInColumnChooser = false;
         }
 
         void localMenu_OnItemClicked(string ActionType)

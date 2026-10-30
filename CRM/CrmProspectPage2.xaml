@@ -74,6 +74,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CrmProspectPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="EAN" x:Name="liEAN">
                         <CorasauControls:TextEditor Text="{Binding EAN,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="VatNumber" x:Name="liVatNumber">
+                        <CorasauControls:TextEditor Text="{Binding VatNumber,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="Blocked" x:Name="liBlocked" >
                         <CorasauControls:CheckEditor x:Name="Blocked" IsChecked="{Binding Blocked,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>

@@ -211,6 +211,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                     {
                         CWOrderFromOrder cwOrderFromOrder = new CWOrderFromOrder(api);
+                        cwOrderFromOrder.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                         cwOrderFromOrder.RelatedOrder= selectedItem.RelatedOrder;
                         cwOrderFromOrder.DialogTableId = 2000000027;
                         cwOrderFromOrder.Closed += async delegate
@@ -315,6 +316,18 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null && api.CompanyEntity.ApprovePurchaseOrders)
                         Utility.ApproveOrder(api, selectedItem);
                     break;
+                case "ExportEDocument":
+                    if (selectedItem != null)
+                        ExportEDocument(dgCreditorOrdersGrid.SelectedItems.Cast<CreditorOrderClient>().ToList());
+                    break;
+                case "SendEDocument":
+                    if (selectedItem != null)
+                        SendEDocument(dgCreditorOrdersGrid.SelectedItems.Cast<CreditorOrderClient>().ToList());
+                    break;
+                case "DocSendLog":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.DocsSendLogGridPage, dgCreditorOrdersGrid.syncEntity);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -364,6 +377,7 @@ namespace UnicontaClient.Pages.CustomPage
             bool showSendByEmail = creditor != null ? (!string.IsNullOrEmpty(creditor._InvoiceEmail) || creditor._EmailDocuments) : false;
 
             CWGenerateInvoice GenrateInvoiceDialog = new CWGenerateInvoice(true, string.Empty, true, true, showNoEmailMsg: !showSendByEmail, AccountName: accountName);
+            GenrateInvoiceDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             GenrateInvoiceDialog.DialogTableId = 2000000002;
             GenrateInvoiceDialog.SetSendAsEmailCheck(false);
            
@@ -552,6 +566,167 @@ namespace UnicontaClient.Pages.CustomPage
             attachedVoucher._Data = buf;
         }
 
+        async private void ExportEDocument(List<CreditorOrderClient> orders)
+        {
+            if (orders.Count == 0) return;
+
+            if (UnicontaMessageBox.Show(
+                    string.Concat(Uniconta.ClientTools.Localization.lookup("QtyMarked"), " ", orders.Count),
+                    string.Format(Uniconta.ClientTools.Localization.lookup("ExportOBJ"), Uniconta.ClientTools.Localization.lookup("eOrder")),
+                    MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                return;
+
+            creditorCache = creditorCache ?? await api.LoadCache(typeof(Uniconta.DataModel.Creditor));
+            string FileNameMask(CreditorOrderClient order)
+            {
+                var cred = creditorCache?.Get(order._DCAccount) as Uniconta.DataModel.Creditor;
+                var prefix = cred != null && cred._InvoiceInXML ? "Nemhandel_" : "Peppol_";
+                return string.Concat(prefix, Uniconta.ClientTools.Localization.lookup("Order"), "_{0}.xml");
+            }
+
+            string targetDir;
+
+            string appDocPeppolPath = null;
+            var session = api.session;
+            if (session.User._AppDocPath != string.Empty && Directory.Exists(session.User._AppDocPath))
+            {
+                try
+                {
+                    appDocPeppolPath = Path.Combine(session.User._AppDocPath, "Peppol");
+                    Directory.CreateDirectory(appDocPeppolPath);
+                }
+                catch (Exception ex)
+                {
+                    UnicontaMessageBox.Show(ex);
+                    appDocPeppolPath = null;
+                }
+            }
+
+            if (orders.Count == 1 && appDocPeppolPath == null)
+            {
+                var saveDialog = UtilDisplay.LoadSaveFileDialog;
+                saveDialog.FileName = string.Format(FileNameMask(orders[0]), orders[0]._OrderNumber);
+                saveDialog.Filter = "XML-File | *.xml";
+                if (saveDialog.ShowDialog() != true) return;
+
+                busyIndicator.IsBusy = true;
+                busyIndicator.BusyContent = string.Format(Uniconta.ClientTools.Localization.lookup("ExportingFile"), "...");
+                try
+                {
+                    var xmlBytes = await new EDocumentAPI(api).EDocumentGenerateOrder(orders[0]);
+                    if (xmlBytes == null || xmlBytes.Length == 0)
+                    {
+                        UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NoResult"), Uniconta.ClientTools.Localization.lookup("Error"));
+                        return;
+                    }
+                    TrimAndWrite(saveDialog.FileName, xmlBytes);
+                }
+                catch (Exception ex) { UnicontaMessageBox.Show(ex); }
+                finally { busyIndicator.IsBusy = false; }
+                return;
+            }
+
+            if (appDocPeppolPath != null)
+                targetDir = appDocPeppolPath;
+            else
+            {
+                var folderDialog = UtilDisplay.LoadFolderBrowserDialog;
+                if (folderDialog.ShowDialog() != true) return;
+#if MAC
+                targetDir = folderDialog.FolderName;
+#else
+                targetDir = folderDialog.SelectedPath;
+#endif
+            }
+
+            busyIndicator.IsBusy = true;
+            busyIndicator.BusyContent = string.Format(Uniconta.ClientTools.Localization.lookup("ExportingFile"), "...");
+            int saved = 0, failed = 0;
+            try
+            {
+                var edocAPI = new EDocumentAPI(api);
+                foreach (var order in orders)
+                {
+                    try
+                    {
+                        var xmlBytes = await edocAPI.EDocumentGenerateOrder(order);
+                        if (xmlBytes == null || xmlBytes.Length == 0) { failed++; continue; }
+                        var path = Path.Combine(targetDir, string.Format(FileNameMask(order), order._OrderNumber));
+                        TrimAndWrite(path, xmlBytes);
+                        saved++;
+                    }
+                    catch { failed++; }
+                }
+            }
+            finally { busyIndicator.IsBusy = false; }
+
+            if (appDocPeppolPath != null && saved > 0)
+            {
+                UnicontaMessageBox.Show(
+                    string.Format(Uniconta.ClientTools.Localization.lookup("SaveFileMsgOBJ"), saved,
+                        saved == 1 ? Uniconta.ClientTools.Localization.lookup("Order") : Uniconta.ClientTools.Localization.lookup("Orders"),
+                        appDocPeppolPath),
+                    Uniconta.ClientTools.Localization.lookup("Message"),
+                    MessageBoxButton.OK);
+            }
+        }
+
+        private static void TrimAndWrite(string path, byte[] xmlBytes)
+        {
+            int validLen = xmlBytes.Length;
+            while (validLen > 0 && xmlBytes[validLen - 1] == 0)
+                validLen--;
+            if (validLen < xmlBytes.Length)
+                Array.Resize(ref xmlBytes, validLen);
+            File.WriteAllBytes(path, xmlBytes);
+        }
+
+        private async void SendEDocument(List<CreditorOrderClient> orders)
+        {
+            if (orders.Count == 0) return;
+
+            if (UnicontaMessageBox.Show(
+                    string.Concat(Uniconta.ClientTools.Localization.lookup("QtyMarked"), " ", orders.Count),
+                    Uniconta.ClientTools.Localization.lookup("SendOrderbyUBL"),
+                    MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                return;
+
+            busyIndicator.IsBusy = true;
+            busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
+            var edocAPI = new EDocumentAPI(api);
+
+            var errors = new List<string>();
+            try
+            {
+                foreach (var order in orders)
+                {
+                    var errorCode = await edocAPI.EDocumentSendOrder(order);
+                    if (errorCode == ErrorCodes.Succes)
+                    {
+                        order.SystemInfo = Uniconta.ClientTools.Localization.lookup("DocSent");
+                        continue;
+                    }
+
+                    var standardError = await api.session.GetErrors(errorCode);
+                    var stformattedErr = UtilDisplay.GetFormattedErrorCode(errorCode, standardError.FirstOrDefault());
+                    order.SystemInfo = stformattedErr;
+                    errors.Add(string.Format("{0}({1}): \n{2}",
+                        Uniconta.ClientTools.Localization.lookup("OrderNumber"), order._OrderNumber, stformattedErr));
+                }
+            }
+            finally
+            {
+                busyIndicator.IsBusy = false;
+            }
+
+            if (errors.Count == 1)
+                UnicontaMessageBox.Show(errors[0], Uniconta.ClientTools.Localization.lookup("Warning"));
+            else if (errors.Count > 0)
+                new CWErrorBox(errors.ToArray(), true).Show();
+            else
+                UnicontaMessageBox.Show(string.Concat(Uniconta.ClientTools.Localization.lookup("eOrder")," ", Uniconta.ClientTools.Localization.lookup("DocSent").ToLower()), Uniconta.ClientTools.Localization.lookup("Message"));
+        }
+
         static public void ShowOrderLines(byte thisDCType, DCOrder order, GridBasePage page, CorasauDataGrid grid)
         {
             string orderMsg, lineMsg, ctrl;
@@ -613,6 +788,7 @@ namespace UnicontaClient.Pages.CustomPage
             bool showUpdateInv = comp.Storage || (doctype == CompanyLayoutType.PurchasePacknote && comp.CreditorPacknote);
             CWGenerateInvoice GenrateOfferDialog = new CWGenerateInvoice(false, doctype.ToString(), showInputforInvNumber: doctype == CompanyLayoutType.PurchasePacknote ? true : false,
                 isShowInvoiceVisible: true, askForEmail: true, showNoEmailMsg: !showSendByMail, debtorName: creditorName, isShowUpdateInv: showUpdateInv);
+            GenrateOfferDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
 
             switch (doctype)
             {

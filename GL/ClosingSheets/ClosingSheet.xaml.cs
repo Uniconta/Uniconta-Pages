@@ -1,9 +1,4 @@
-using UnicontaClient.Models;
-using UnicontaClient.Utilities;
-using Uniconta.ClientTools;
-using Uniconta.ClientTools.DataModel;
-using Uniconta.ClientTools.Page;
-using Uniconta.Common;
+using DevExpress.Xpf.Grid;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +12,12 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using Uniconta.API.Service;
+using Uniconta.ClientTools;
+using Uniconta.ClientTools.DataModel;
+using Uniconta.ClientTools.Page;
+using Uniconta.Common;
+using UnicontaClient.Models;
+using UnicontaClient.Utilities;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -49,6 +50,8 @@ namespace UnicontaClient.Pages.CustomPage
             
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgClosingSheet.RowDoubleClick += dgClosingSheet_RowDoubleClick;
+
+            ((TableView)dgClosingSheet.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
         }
         void dgClosingSheet_RowDoubleClick()
         {

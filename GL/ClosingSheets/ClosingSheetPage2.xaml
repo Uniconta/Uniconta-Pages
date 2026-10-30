@@ -64,35 +64,35 @@ x:Class="UnicontaClient.Pages.CustomPage.ClosingSheetPage2"
                         <StackPanel Orientation="Horizontal">
                             <CorasauControls:LookupEditor x:Name="dim1lookupeditior" Text="{Binding Dimension1,Mode=TwoWay}" >
                             </CorasauControls:LookupEditor>
-                            <CorasauControls:CheckEditor Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=IncludeAll}" x:Name="chkIncludeAll1" IsChecked="{Binding IncludeAll1,Mode=TwoWay}" Margin="10,0,0,0"/>
+                            <CorasauControls:CheckEditor Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=IncludeAll}" x:Name="chkIncludeAll1" IsChecked="{Binding IncludeAll1,Mode=TwoWay}" Margin="10,0,0,0" Width="Auto"/>
                         </StackPanel>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem x:Name="lbldim2">
                         <StackPanel Orientation="Horizontal">
                             <CorasauControls:LookupEditor x:Name="dim2lookupeditior" Text="{Binding Dimension2,Mode=TwoWay}">
                             </CorasauControls:LookupEditor>
-                            <CorasauControls:CheckEditor x:Name="chkIncludeAll2" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=IncludeAll}" IsChecked="{Binding IncludeAll2,Mode=TwoWay}" Margin="10,0,0,0"/>
+                            <CorasauControls:CheckEditor x:Name="chkIncludeAll2" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=IncludeAll}" IsChecked="{Binding IncludeAll2,Mode=TwoWay}" Margin="10,0,0,0" Width="Auto"/>
                         </StackPanel>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem x:Name="lbldim3">
                         <StackPanel Orientation="Horizontal">
                             <CorasauControls:LookupEditor x:Name="dim3lookupeditior" Text="{Binding Dimension3,Mode=TwoWay}" >
                             </CorasauControls:LookupEditor>
-                            <CorasauControls:CheckEditor x:Name="chkIncludeAll3" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=IncludeAll}" IsChecked="{Binding IncludeAll3,Mode=TwoWay}" Margin="10,0,0,0"/>
+                            <CorasauControls:CheckEditor x:Name="chkIncludeAll3" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=IncludeAll}" IsChecked="{Binding IncludeAll3,Mode=TwoWay}" Margin="10,0,0,0" Width="Auto"/>
                         </StackPanel>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem x:Name="lbldim4">
                         <StackPanel Orientation="Horizontal">
                             <CorasauControls:LookupEditor x:Name="dim4lookupeditior" Text="{Binding Dimension4,Mode=TwoWay}" >
                             </CorasauControls:LookupEditor>
-                            <CorasauControls:CheckEditor x:Name="chkIncludeAll4" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=IncludeAll}" IsChecked="{Binding IncludeAll4,Mode=TwoWay}" Margin="10,0,0,0"/>
+                            <CorasauControls:CheckEditor x:Name="chkIncludeAll4" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=IncludeAll}" IsChecked="{Binding IncludeAll4,Mode=TwoWay}" Margin="10,0,0,0" Width="Auto"/>
                         </StackPanel>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem x:Name="lbldim5">
                         <StackPanel Orientation="Horizontal">
                             <CorasauControls:LookupEditor x:Name="dim5lookupeditior" Text="{Binding Dimension5,Mode=TwoWay}" >
                             </CorasauControls:LookupEditor>
-                            <CorasauControls:CheckEditor x:Name="chkIncludeAll5" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=IncludeAll}" IsChecked="{Binding IncludeAll5,Mode=TwoWay}" Margin="10,0,0,0"/>
+                            <CorasauControls:CheckEditor x:Name="chkIncludeAll5" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=IncludeAll}" IsChecked="{Binding IncludeAll5,Mode=TwoWay}" Margin="10,0,0,0" Width="Auto"/>
                         </StackPanel>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
@@ -133,6 +133,14 @@ x:Class="UnicontaClient.Pages.CustomPage.ClosingSheetPage2"
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
 
+            </CorasauControls:CorasauLayoutGroup>
+
+            <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpSecond">
+                <CorasauControls:CorasauLayoutGroup x:Name="grpComment" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Comment}" Orientation="Vertical" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
+                    <CorasauControls:CorasauLayoutItem FieldName="Comment" x:Name="liComment">
+                        <CorasauControls:TextEditor Text="{Binding Comment,Mode=TwoWay}" MaxLength="4000" x:Name="txtComment" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Height="80"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutGroup>
         </CorasauControls:CorasauLayoutControl>
     </Grid>

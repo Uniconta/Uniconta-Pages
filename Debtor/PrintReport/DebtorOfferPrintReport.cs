@@ -31,5 +31,10 @@ namespace UnicontaClient.Pages.CustomPage
             debtorOfferUser.CopyFrom(DebtorInvoice, Debtor);
             return debtorOfferUser;
         }
+
+        protected override Language GetLanguage()
+        {
+            return DebtorOffer._Prospect != 0 ? DebtorOffer?.CrmProspect?._Language ?? base.GetLanguage() : base.GetLanguage();
+        }
     }
 }

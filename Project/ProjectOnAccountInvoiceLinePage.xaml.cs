@@ -123,6 +123,7 @@ namespace UnicontaClient.Pages.CustomPage
                 var Invapi = new Uniconta.API.Project.InvoiceAPI(api);
                 var savetask = saveGrid();
                 CWProjectGenerateInvoice GenrateInvoiceDialog = new CWProjectGenerateInvoice(api, GetSystemDefaultDate(), true, true, true, true, true);
+                GenrateInvoiceDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                 GenrateInvoiceDialog.DialogTableId = 2000000047;
                 GenrateInvoiceDialog.Closed += async delegate
                 {

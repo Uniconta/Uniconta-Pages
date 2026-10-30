@@ -81,13 +81,16 @@ namespace UnicontaClient.Pages.CustomPage
             editrow.PropertyChanged += Editrow_PropertyChanged;
             txtCompanyRegNo.EditValueChanged += TxtCVR_EditValueChanged;
             lePid.api = leOrigPid.api = api;
-            if (BasePage.session.User._Role == (byte)Uniconta.Common.User.UserRoles.Reseller)
+            var user = BasePage.session.User;
+            if (user._Role == (byte)Uniconta.Common.User.UserRoles.Reseller && user.Pid != 60)
             {
                 this.liPid.Visibility = Visibility.Collapsed;
                 this.liResellerName.Visibility = Visibility.Collapsed;
+                AssignedByUniconta.IsReadOnly = true;
             }
+            cmbProbablity.ItemsSource = new int[] { 10, 25, 40, 60, 90 };
         }
-
+         
         private void frmRibbon_OnItemClicked(string ActionType)
         {
             frmRibbon_BaseActions(ActionType);
@@ -121,6 +124,19 @@ namespace UnicontaClient.Pages.CustomPage
                     var zip = city[2];
                     if (!string.IsNullOrEmpty(zip))
                         editrow.ZipCode = zip;
+                }
+            }
+            else if (e.PropertyName == "AssignedByUniconta")
+            {
+                if (editrow.AssignedByUniconta)
+                {
+                    editrow.OrigPid = 60;
+                    leOrigPid.IsReadOnly = true;
+                }
+                else
+                {
+                    editrow.OrigPid = 0;
+                    leOrigPid.IsReadOnly = false;
                 }
             }
         }
@@ -162,7 +178,7 @@ namespace UnicontaClient.Pages.CustomPage
                         if (address != null)
                         {
                             var streetAddress = address.CompleteStreet;
-                            if (string.Compare(ci.life.name, editrow._Name, StringComparison.CurrentCultureIgnoreCase) == 0 && streetAddress == editrow._Address1 &&
+                            if (string.Equals(ci.life.name, editrow._Name, StringComparison.CurrentCultureIgnoreCase) && streetAddress == editrow._Address1 &&
                                 address.zipcode == editrow._ZipCode)
                                 return; // we wil not override since address has not changed
 
@@ -197,6 +213,9 @@ namespace UnicontaClient.Pages.CustomPage
                         if (editrow.IndustryCode == null)
                             editrow.IndustryCode = ci.industry?.primary?.code;
                     }
+                    var employeeCount = ci.employment?.months?[0].amount;
+                    if (employeeCount != null)
+                        editrow.EmployeeCount = employeeCount.GetValueOrDefault();
                 }
                 else
                     onlyRunOnce = false;
@@ -206,12 +225,9 @@ namespace UnicontaClient.Pages.CustomPage
         private void Email_ButtonClicked(object sender)
         {
             var txtEmail = ((CorasauLayoutItem)sender).Content as TextEditor;
-            if (txtEmail == null)
+            if (string.IsNullOrWhiteSpace(txtEmail?.Text))
                 return;
-            var mail = string.Concat("mailto:", txtEmail.Text);
-            System.Diagnostics.Process proc = new System.Diagnostics.Process();
-            proc.StartInfo.FileName = mail;
-            proc.Start();
+            OfficeComponentUtil.SendEmailToOutlook(txtEmail.Text);
         }
 
         private void liZipCode_ButtonClicked(object sender)

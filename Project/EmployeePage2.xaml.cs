@@ -117,10 +117,9 @@ namespace UnicontaClient.Pages.CustomPage
 
         void OpenEmail(string email)
         {
-            var mail = string.Concat("mailto:", email);
-            System.Diagnostics.Process proc = new System.Diagnostics.Process();
-            proc.StartInfo.FileName = mail;
-            proc.Start();
+            if (string.IsNullOrWhiteSpace(email))
+                return;
+            OfficeComponentUtil.SendEmailToOutlook(email);
         }
 
         private void LiZipCode_OnButtonClicked(object sender)

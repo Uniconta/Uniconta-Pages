@@ -387,6 +387,8 @@ namespace UnicontaClient.Pages.CustomPage
                     await savetask;
 
                 CWDirectDebit cwwin = new CWDirectDebit(api, Uniconta.ClientTools.Localization.lookup("Validate"));
+                cwwin.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
+
                 cwwin.Closing += async delegate
                 {
                     if (cwwin.DialogResult == true)
@@ -537,6 +539,8 @@ namespace UnicontaClient.Pages.CustomPage
             if (doMergePaym)
             {
                 CWDirectDebit cwwin = new CWDirectDebit(api, Uniconta.ClientTools.Localization.lookup("MergePayments"));
+                cwwin.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
+
 
                 cwwin.Closing += async delegate
                 {
@@ -588,6 +592,8 @@ namespace UnicontaClient.Pages.CustomPage
                 await savetask;
 
             CWDirectDebit cwwin = new CWDirectDebit(api, Uniconta.ClientTools.Localization.lookup("Export"));
+            cwwin.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
+
            
             cwwin.Closing += async delegate
             {
@@ -844,7 +850,9 @@ namespace UnicontaClient.Pages.CustomPage
       
         private void GenerateJournalLines()
         {
-            DirectDebitToJournal cwwin = new DirectDebitToJournal(api); 
+            DirectDebitToJournal cwwin = new DirectDebitToJournal(api);
+            cwwin.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
+
 
             cwwin.Closed += async delegate
             {

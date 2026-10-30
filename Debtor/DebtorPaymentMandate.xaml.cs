@@ -191,6 +191,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void CallValidateMandate()
         {
             CWDirectDebit cwwin = new CWDirectDebit(api, Uniconta.ClientTools.Localization.lookup("Validate"));
+            cwwin.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             cwwin.Closing += delegate
             {
                 if (cwwin.DialogResult == true)
@@ -276,6 +277,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void RegisterMandate(IEnumerable<DebtorMandateDirectDebit> lstMandates)
         {
             CWDirectDebit cwwin = new CWDirectDebit(api, Uniconta.ClientTools.Localization.lookup("Register"), true);
+            cwwin.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
 
             cwwin.Closing += delegate
             {
@@ -305,6 +307,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void UnregisterMandate(IEnumerable<DebtorMandateDirectDebit> lstMandates)
         {
             CWDirectDebit cwwin = new CWDirectDebit(api, Uniconta.ClientTools.Localization.lookup("UnRegister"));
+            cwwin.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
 
             cwwin.Closing += delegate
             {
@@ -333,6 +336,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void ChangeMandateId(IEnumerable<DebtorMandateDirectDebit> lstMandates)
         {
             CWDirectDebit cwwin = new CWDirectDebit(api, string.Format(Uniconta.ClientTools.Localization.lookup("ChangeOBJ"), Uniconta.ClientTools.Localization.lookup("Mandates")));
+            cwwin.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
 
             cwwin.Closing += delegate
             {
@@ -368,6 +372,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void ActivateMandateId(IEnumerable<DebtorMandateDirectDebit> lstMandates)
         {
             CWDirectDebit cwwin = new CWDirectDebit(api, string.Format(Uniconta.ClientTools.Localization.lookup("Activate")), showActivateWarning: true);
+            cwwin.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
 
             cwwin.Closing += delegate
             {
@@ -418,6 +423,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void ImportMandate()
         {
             CWDirectDebit cwwin = new CWDirectDebit(api, string.Format(Uniconta.ClientTools.Localization.lookup("Load"), Uniconta.ClientTools.Localization.lookup("Mandates")));
+            cwwin.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
 
             cwwin.Closing += delegate
             {

@@ -1,5 +1,3 @@
-using UnicontaClient.Pages;
-using UnicontaClient.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,18 +13,20 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Uniconta.API.Inventory;
+using Uniconta.API.Service;
 using Uniconta.ClientTools;
 using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
+using Uniconta.Common.Utility;
 using Uniconta.DataModel;
 using UnicontaClient.Controls.Dialogs;
 using UnicontaClient.Models;
-using Uniconta.API.Inventory;
-using Uniconta.API.Service;
-using Uniconta.Common.Utility;
+using UnicontaClient.Pages;
+using UnicontaClient.Utilities;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -157,14 +157,19 @@ namespace UnicontaClient.Pages.CustomPage
         public string Project { get { return _Project; } set { _Project = value; NotifyPropertyChanged("Project"); } }
 
         public bool _Expanded;
-               
+
 
         [Display(Name = "Added", ResourceType = typeof(InventoryText))]
         public bool Added { get { return _Expanded; } }
 
         internal string invPurchaseAccount;
         [Display(Name = "InvPurchaseAccount", ResourceType = typeof(InventoryText))]
-        public String InvPurchaseAccount { get { return invPurchaseAccount; }  set { invPurchaseAccount = value; NotifyPropertyChanged("InvPurchaseAccount"); } }
+        public String InvPurchaseAccount { get { return invPurchaseAccount; } set { invPurchaseAccount = value; NotifyPropertyChanged("InvPurchaseAccount"); } }
+
+        internal DateTime _FirstNeed;
+        [Display(Name = "FirstNeed", ResourceType = typeof(InvItemStorageClientText))]
+        [NoSQL]
+        public DateTime FirstNeed { get { return _FirstNeed; } }
 
         internal object invPurchaseAccSource;
         public object InvPurchaseAccSource { get { return invPurchaseAccSource; } }
@@ -194,6 +199,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override bool IsDataChaged { get { return false; } }
         bool _useStorage;
         static public bool ReorderPrWarehouse, ReorderPrLocation;
+        static WarehouseType[] excludedWarehouseTypes;
 
         private void InitPage(UnicontaBaseEntity _master)
         {
@@ -206,6 +212,7 @@ namespace UnicontaClient.Pages.CustomPage
             gridControl.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             localMenu.OnChecked += LocalMenu_OnChecked;
+            GetMenuItem();
             var Comp = api.CompanyEntity;
             _useStorage = Comp.Storage;
             if (!_useStorage)
@@ -252,6 +259,43 @@ namespace UnicontaClient.Pages.CustomPage
 
             Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
             Utility.SetupVariants(api, colVariant, VariantName, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);
+        }
+        void GetMenuItem()
+        {
+            RibbonBase rb = (RibbonBase)localMenu.DataContext;
+            var comboItem = UtilDisplay.GetMenuCommandByName(rb, "ExcludedWarehouse");
+            if (comboItem != null)
+            {
+                var warehousevalues = AppEnums.WarehouseType.Values;
+                comboItem.ComboBoxItemSource = warehousevalues;
+                if (excludedWarehouseTypes != null && excludedWarehouseTypes.Length > 0)
+                {
+                    var selectedWarehouseValues = excludedWarehouseTypes
+                        .Select(type => warehousevalues[(int)type])
+                        .ToArray();
+
+                    comboItem.CheckedComboBoxEditValue = selectedWarehouseValues;
+                    comboItem.SelectedItem = string.Join(", ", selectedWarehouseValues);
+                }
+                localMenu.OnCheckBoxedComboBoxSelectionChanged += LocalMenu_OnCheckBoxedComboBoxSelectionChanged;
+            }
+        }
+
+        private void LocalMenu_OnCheckBoxedComboBoxSelectionChanged(string ActionType, IReadOnlyList<string> CheckedValues, IReadOnlyList<string> UncheckedValues)
+        {
+            if (ActionType != "ExcludedWarehouse")
+                return;
+
+            excludedWarehouseTypes = CheckedValues?
+                .Select(AppEnums.WarehouseType.TryIndexOf)
+                .Select(index => (WarehouseType)index)
+                .Distinct()
+                .ToArray();
+
+            if (excludedWarehouseTypes != null && excludedWarehouseTypes.Length == 0)
+                excludedWarehouseTypes = null;
+
+            InitQuery();
         }
 
         private void LocalMenu_OnChecked(string ActionType, bool IsChecked)
@@ -326,7 +370,7 @@ namespace UnicontaClient.Pages.CustomPage
                             {
                                 var item = new ReOrderListPageGridClient();
                                 StreamingManager.Copy(cw.InvItem, item);
-                                dgReOrderList.PasteRows(new [] { item });
+                                dgReOrderList.PasteRows(new[] { item });
                             }
                         }
                     };
@@ -365,6 +409,7 @@ namespace UnicontaClient.Pages.CustomPage
                     dgReOrderList.SelectedItem = null;
                     {
                         CwMoveBtwWareHouse cwJournal = new CwMoveBtwWareHouse(api);
+                        cwJournal.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                         cwJournal.Closed += delegate
                         {
                             if (cwJournal.DialogResult == true)
@@ -417,7 +462,7 @@ namespace UnicontaClient.Pages.CustomPage
         private async Task Filter(IEnumerable<PropValuePair> propValuePair, FilterSorter PropSort, bool firstTime)
         {
             SetBusy();
-            Task< Uniconta.DataModel.InvItemStorage[]> ReservedTask;
+            Task<Uniconta.DataModel.InvItemStorage[]> ReservedTask;
 
             DateTime FromDate = txtDateFrm.DateTime, ToDate = txtDateTo.DateTime;
 
@@ -467,7 +512,7 @@ namespace UnicontaClient.Pages.CustomPage
                     reservedSort = new InvItemStorageClientSort(api.CompanyEntity.Warehouse, api.CompanyEntity.Location);
                     Array.Sort(Reserved, reservedSort);
                     searchrec = new Uniconta.DataModel.InvItemStorage();
-                    if (! ReOrderListPage.ReorderPrWarehouse)
+                    if (!ReOrderListPage.ReorderPrWarehouse)
                         ReOrderListPage.ReorderPrLocation = false;
 
                     if (ToDate == DateTime.MinValue)
@@ -509,6 +554,9 @@ namespace UnicontaClient.Pages.CustomPage
                                         r._QtyReserved -= (ord._Qty - ord._QtyDelivered);
                                     else
                                         r._QtyOrdered -= (ord._Qty - ord._QtyDelivered);
+
+                                    if (r._FirstNeed == DateTime.MinValue || d < r._FirstNeed)
+                                        r._FirstNeed = d;
                                 }
                             }
                         }
@@ -522,6 +570,9 @@ namespace UnicontaClient.Pages.CustomPage
             var lst = new List<ReOrderListPageGridClient>(200);
             if (lstEntity != null)
             {
+                if (excludedWarehouseTypes != null && this.wh == null)
+                    this.wh = await api.LoadCache(typeof(Uniconta.DataModel.InvWarehouse));
+
                 foreach (var rec in lstEntity)
                 {
                     if (rec._ItemType == (byte)Uniconta.DataModel.ItemType.Service)
@@ -530,10 +581,10 @@ namespace UnicontaClient.Pages.CustomPage
                         continue;
 
                     AddEntry(lst, rec);
-                 }
+                }
             }
 
-            dgReOrderList.ItemsSource = lst;
+            dgReOrderList.ItemsSource = lst.ToArray();
             dgReOrderList.Visibility = Visibility.Visible;
 
             ClearBusy();
@@ -544,12 +595,14 @@ namespace UnicontaClient.Pages.CustomPage
             ReOrderListPageGridClient varrec;
 
             bool found = false;
+            DateTime FirstNeed = DateTime.MinValue;
             double QtyReserved = 0d, QtyOrdered = 0d, Qty = 0d;
             double MinStockLevel = rec._MinStockLevel;
             double MaxStockLevel = rec._MaxStockLevel;
             string Variant1 = null, Variant2 = null, Variant3 = null, Variant4 = null, Variant5 = null, Warehouse = null, Location = null;
             if (searchrec != null)
             {
+                WarehouseType[] excluded = excludedWarehouseTypes;
                 var _useVariants = rec._UseVariants;
                 searchrec._Item = rec._Item;
                 var pos = Array.BinarySearch(Reserved, searchrec, reservedSort);
@@ -561,6 +614,23 @@ namespace UnicontaClient.Pages.CustomPage
                     var r = Reserved[pos];
                     if (r._Item != rec._Item)
                         break;
+
+                    if (excluded != null && r._Warehouse != null)
+                    {
+                        bool found1 = false;
+                        var wh1 = wh.Get(r._Warehouse) as Uniconta.DataModel.InvWarehouse;
+                        for (int i = 0; (i < excluded.Length); i++)
+                        {
+                            if (wh1._UseFor == excluded[i])
+                            {
+                                found1 = true;
+                                break;
+                            }
+                        }
+                        if (found1)
+                            continue;
+                    }
+
                     if (_useVariants || ReorderPrWarehouse)
                     {
                         if (!found || Variant1 != r._Variant1 || Variant2 != r._Variant2 || Variant3 != r._Variant3 || Variant4 != r._Variant4 || Variant5 != r._Variant5 ||
@@ -578,6 +648,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 varrec._Variant3 = Variant3;
                                 varrec._Variant4 = Variant4;
                                 varrec._Variant5 = Variant5;
+                                varrec._FirstNeed = FirstNeed;
                                 if (ReorderPrWarehouse)
                                 {
                                     varrec._Warehouse = Warehouse;
@@ -586,6 +657,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 }
                                 AddToLst(lst, varrec, QtyReserved, QtyOrdered, Qty, MinStockLevel, MaxStockLevel);
                                 QtyReserved = 0d; QtyOrdered = 0d; Qty = 0d;
+                                FirstNeed = DateTime.MinValue;
                             }
                             Variant1 = r._Variant1;
                             Variant2 = r._Variant2;
@@ -614,6 +686,9 @@ namespace UnicontaClient.Pages.CustomPage
                     Qty += r._Qty;
                     QtyOrdered += r._QtyOrdered;
                     QtyReserved += r._QtyReserved;
+                    if (FirstNeed == DateTime.MinValue || FirstNeed < r._FirstNeed)
+                        FirstNeed = r._FirstNeed;
+
                     found = true;
                 }
             }
@@ -634,6 +709,7 @@ namespace UnicontaClient.Pages.CustomPage
             varrec._Variant3 = Variant3;
             varrec._Variant4 = Variant4;
             varrec._Variant5 = Variant5;
+            varrec._FirstNeed = FirstNeed;
             if (ReorderPrWarehouse)
             {
                 varrec._Warehouse = Warehouse;
@@ -690,22 +766,21 @@ namespace UnicontaClient.Pages.CustomPage
                 lst.Add(rec);
         }
 
-        SQLCache items;
+        SQLCache items, wh;
         protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
         {
             var api = this.api;
             if (this.items == null)
                 this.items = api.GetCache(typeof(Uniconta.DataModel.InvItem)) ?? await api.LoadCache(typeof(Uniconta.DataModel.InvItem)).ConfigureAwait(false);
             if (api.CompanyEntity.Warehouse)
-                LoadType(new Type[] { typeof(Uniconta.DataModel.Creditor), typeof(Uniconta.DataModel.InvWarehouse), typeof(Uniconta.DataModel.InvJournal) });
-            else
-                LoadType(new Type[] { typeof(Uniconta.DataModel.Creditor), typeof(Uniconta.DataModel.InvJournal) });
+                this.wh = api.GetCache(typeof(Uniconta.DataModel.InvWarehouse)) ?? await api.LoadCache(typeof(Uniconta.DataModel.InvWarehouse)).ConfigureAwait(false);
+            LoadType(new Type[] { typeof(Uniconta.DataModel.Creditor), typeof(Uniconta.DataModel.InvJournal) });
         }
 
         class SearchItem : IComparer<ReOrderListPageGridClient>
         {
             public int Compare(ReOrderListPageGridClient x, ReOrderListPageGridClient y)
-            {  
+            {
                 var c = string.Compare(x._Item, y._Item);
                 if (c != 0)
                     return c;
@@ -837,7 +912,7 @@ namespace UnicontaClient.Pages.CustomPage
                                     continue;
 
                                 recItem = AddEntry(newItems, item);
-                                if (newItems.Count == 0 || !object.ReferenceEquals(recItem, newItems[newItems.Count-1]))
+                                if (newItems.Count == 0 || !object.ReferenceEquals(recItem, newItems[newItems.Count - 1]))
                                     newItems.Add(recItem);
                             }
                         }
@@ -852,7 +927,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (newItems.Count > 0)
             {
-                foreach(var rec in newItems)
+                foreach (var rec in newItems)
                 {
                     if (SetPurchaseQty(rec, rec.MinStockLevel, rec.MaxStockLevel))
                     {
@@ -947,7 +1022,7 @@ namespace UnicontaClient.Pages.CustomPage
                             if (HasWarehouse && (!PrWarehouse || !PrLocation))
                             {
                                 bool found = false;
-                                foreach(var lin in orderList)
+                                foreach (var lin in orderList)
                                 {
                                     if (lin._Item == item._Item && lin._Variant1 == item._Variant1 && lin._Variant2 == item._Variant2 && lin._Variant3 == item._Variant3 && lin._Variant4 == item._Variant4 && lin._Variant5 == item._Variant5 &&
                                         (!PrWarehouse || lin._Warehouse == item._Warehouse) &&
@@ -992,7 +1067,7 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                     }
                     DCOrderLine last = null;
-                    while(LineStart < orderList.Count)
+                    while (LineStart < orderList.Count)
                     {
                         var lin = orderList[LineStart++];
                         var item = (InvItem)items.Get(lin._Item);
@@ -1292,7 +1367,12 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (api.CompanyEntity.PurchaseAccounts && rec.invPurchaseAccSource == null)
             {
-                rec.invPurchaseAccSource = await api.Query<InvPurchaseAccountClient>(rec);
+                var invPurchaseAccountObj = Activator.CreateInstance(api.CompanyEntity.GetUserType(typeof(InvPurchaseAccountClient))) as UnicontaBaseEntity;
+                
+                if(invPurchaseAccountObj == null)
+                    return;
+
+                rec.invPurchaseAccSource = await api.Query(invPurchaseAccountObj, new List<UnicontaBaseEntity>() { rec },null);
                 rec.NotifyPropertyChanged("InvPurchaseAccSource");
             }
         }

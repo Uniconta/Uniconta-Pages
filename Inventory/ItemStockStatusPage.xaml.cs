@@ -1,5 +1,6 @@
 using UnicontaClient.Pages;
 using UnicontaClient.Utilities;
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,8 +16,13 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Uniconta.API.Service;
+using Uniconta.API.GeneralLedger;
+using Uniconta.API.System;
 using Uniconta.ClientTools;
+using Uniconta.ClientTools.AI;
+using Uniconta.ClientTools.AI.Services.Context;
 using Uniconta.ClientTools.Controls;
+using Uniconta.ClientTools.Controls.AI.Assistant.DataProviders;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
@@ -113,6 +119,14 @@ namespace UnicontaClient.Pages.CustomPage
             return null;
         }
 
+        internal DateTime StockStatusToDate => ToDate.DateTime.Date;
+        internal IEnumerable<InvStockStatus> StockStatusRows => dgItemStockStatusGrid.GetVisibleRows().OfType<InvStockStatus>();
+
+        public override IEnumerable<IAIAssistantDataProvider> GetAIAssistantDataProviders()
+        {
+            return base.GetAIAssistantDataProviders().Concat(new IAIAssistantDataProvider[] { new InventoryLedgerReconciliationDataProvider(this, api) });
+        }
+
         protected override void OnLayoutLoaded()
         {
             base.OnLayoutLoaded();
@@ -204,6 +218,88 @@ namespace UnicontaClient.Pages.CustomPage
                 inputs.AddRange(itemFilterValues);
 
             return dgItemStockStatusGrid.Filter(inputs, itemPropSort);
+        }
+    }
+
+    public sealed class InventoryLedgerReconciliationDataProvider : IAIAssistantDataProvider
+    {
+        readonly ItemStockStatusPage page;
+        readonly CrudAPI api;
+
+        public InventoryLedgerReconciliationDataProvider(ItemStockStatusPage page, CrudAPI api)
+        {
+            this.page = page;
+            this.api = api;
+        }
+
+        public string Name => "InventoryLedgerReconciliation";
+        public string Description => "Reconciles the stock value in the current filtered Item stock status grid with inventory ledger account balances as of the page's To date.";
+        public string UserFriendlyText => "Reconciling inventory with the general ledger";
+        public Type Contract => typeof(CurrentRecordsDataRequest);
+
+        public async Task<AIAssistantDataProviderResult> RequestDataAsync(IGPTService gptService, IGPTConversationContext context)
+        {
+            var toDate = page.StockStatusToDate;
+            var rows = page.StockStatusRows.ToArray();
+            var groupCache = await api.LoadCache<InvGroupClient>();
+            var accountCache = await api.LoadCache<GLAccountClient>();
+            var groups = groupCache?.ToArray() ?? new InvGroupClient[0];
+            var accounts = accountCache?.ToArray() ?? new GLAccountClient[0];
+
+            var stockByAccount = rows.Join(groups, row => row.ItemGroup, group => group.Group, (row, group) => new { row, group })
+                                     .Where(x => !string.IsNullOrWhiteSpace(x.group.InvAccount))
+                                     .GroupBy(x => x.group.InvAccount)
+                                     .Select(group => new
+                                     {
+                                         Account = group.Key,
+                                         StockValue = group.Sum(x => x.row.CostValue)
+                                     })
+                                     .ToArray();
+
+            var accountByNumber = accounts.ToDictionary(account => account.Account, StringComparer.OrdinalIgnoreCase);
+            var accountRowIds = stockByAccount.Select(stock => accountByNumber.TryGetValue(stock.Account, out var account) ? account.RowId : 0)
+                                              .Where(rowId => rowId != 0)
+                                              .Distinct()
+                                              .ToList();
+
+            var financialBalances = accountRowIds.Count == 0 ? null : await new ReportAPI(api).GenerateTotal(accountRowIds, DateTime.MinValue, toDate);
+            var balanceByAccount = financialBalances == null ? 
+                new Dictionary<string, double>(StringComparer.OrdinalIgnoreCase) : 
+                new ReportAPI(api).Format(financialBalances, new SQLCache(accountCache.ToArray()))
+                                  .ToDictionary(balance => balance.Account._Account, balance => balance.SumAll() / 100d, StringComparer.OrdinalIgnoreCase);
+
+            var reconciliationAccounts = stockByAccount.Select(stock =>
+            {
+                accountByNumber.TryGetValue(stock.Account, out var account);
+                balanceByAccount.TryGetValue(stock.Account, out var ledgerBalance);
+                return new
+                {
+                    stock.Account,
+                    Name = account?.Name,
+                    stock.StockValue,
+                    LedgerBalance = ledgerBalance,
+                    Difference = stock.StockValue - ledgerBalance
+                };
+            }).ToArray();
+            var totalStockValue = reconciliationAccounts.Sum(account => account.StockValue);
+            var totalLedgerBalance = reconciliationAccounts.Sum(account => account.LedgerBalance);
+            var data = JsonConvert.SerializeObject(new
+            {
+                ToDate = toDate,
+                Accounts = reconciliationAccounts,
+                TotalStockValue = totalStockValue,
+                TotalLedgerBalance = totalLedgerBalance,
+                Difference = totalStockValue - totalLedgerBalance
+            });
+
+            return new AIAssistantDataProviderResult
+            {
+                Contract = "{}",
+                Data = "Data: " + data,
+                ReturnedData = data,
+                UserMessage = AIAssistantDataProviderDisplayOptions.Select(this,
+                    string.Format("{0} fetched {1} account(s)", Name, reconciliationAccounts.Length))
+            };
         }
     }
 }

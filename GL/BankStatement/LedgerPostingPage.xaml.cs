@@ -296,6 +296,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 case "ImportVoucher":
                     CWAddVouchers addVouvhersDialog = new CWAddVouchers(api);
+                    addVouvhersDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     addVouvhersDialog.Show();
                     break;
 
@@ -395,6 +396,7 @@ namespace UnicontaClient.Pages.CustomPage
         void TransferBankStatementToJournal()
         {
             CWTransferBankStatement winTransfer = new CWTransferBankStatement(fromDate, toDate, api, master, IsLedgerPosting:true);
+            winTransfer.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             winTransfer.Closed += async delegate
             {
                 if (winTransfer.DialogResult == true)

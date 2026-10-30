@@ -1146,6 +1146,8 @@ namespace UnicontaClient.Pages.CustomPage
             hdrData.exportServiceUrl = CorasauDataGrid.GetExportServiceConnection(this.api);
             string header = ParentControl.Caption.ToString();
             hdrData.BalanceName = header;
+
+
             DevExpress.XtraReports.UI.XtraReport frontPageReport = null;
             if (PassedCriteria.ObjBalance._PrintFrontPage)
                 frontPageReport = await GetFrontPageXtraReport(cmplClient, PassedCriteria.ObjBalance);
@@ -1153,12 +1155,29 @@ namespace UnicontaClient.Pages.CustomPage
             if (!string.IsNullOrEmpty(PassedCriteria.Template))
             {
                 templateReportData[3] = frontPageReport;
+#if MAC
+                await PrintBalanceTemplateAsync(templateReportData, frontPageReport).ContinueWith(t =>
+                {
+                    if (t.Exception != null)
+                        UnicontaMessageBox.Show(t.Exception);
+                }, TaskScheduler.FromCurrentSynchronizationContext());
+
+#else
                 AddDockItem(TabControls.BalanceReportTemplatePrint, templateReportData, string.Concat(Uniconta.ClientTools.Localization.lookup("ReportCriteria"), ":", header), null, true);//new templated report                         
+#endif
             }
             else
             {
+#if MAC
+                await PrintBalanceAsync(listdata, frontPageReport).ContinueWith(t =>
+                {
+                    if (t.Exception != null)
+                        UnicontaMessageBox.Show(t.Exception);
+                }, TaskScheduler.FromCurrentSynchronizationContext());
+#else
                 AddDockItem(TabControls.BalanceReportPrint, new object[4] { hdrData, listdata, PassedCriteria.ObjBalance, frontPageReport },
                 string.Concat(Uniconta.ClientTools.Localization.lookup("ReportCriteria"), ":", header), null, true);
+#endif
             }
         }
 
@@ -1238,3 +1257,102 @@ namespace UnicontaClient.Pages.CustomPage
         }
     }
 }
+
+#if MAC
+using UnicontaClient.Pages;
+namespace UnicontaClient.Pages.CustomPage
+{
+    using System;
+    using System.Threading.Tasks;
+    using UnicontaClient.Utilities;
+
+    public partial class BalanceReport
+    {
+        private bool balancedPdfExportInProgress;
+
+        /// <summary>
+        /// Prints the balance report to a PDF file and opens it in the default PDF viewer.
+        /// </summary>
+        /// <param name="listdata"></param>
+        /// <returns></returns>
+        private async Task PrintBalanceAsync(LineDetailsData listdata, DevExpress.XtraReports.UI.XtraReport report)
+        {
+            if (balancedPdfExportInProgress)
+                return;
+
+            balancedPdfExportInProgress = true;
+
+            try
+            {
+                var settings = PassedCriteria.ObjBalance
+                    ?? throw new InvalidOperationException("Balance report settings are missing.");
+
+                if (listdata == null || listdata.BalanceReportlist.Count == 0)
+                    throw new InvalidOperationException("There are no prepared balance report rows to print.");
+
+                var exporter = new BalanceGridPdfExporter(hdrData, listdata.BalanceReportlist, settings, report);
+
+                busyIndicator.IsBusy = true;
+                busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
+                var pdfPath = await exporter.ExportBalanceReport();
+
+                if (!string.IsNullOrEmpty(pdfPath))
+                    UtilDisplay.ExecuteShell("open", MacToolUtil.GetArgumentListForPdfViewer(pdfPath));
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                busyIndicator.IsBusy = false;
+                balancedPdfExportInProgress = false;
+            }
+        }
+
+        /// <summary>
+        /// Prints the balance report using a template to a PDF file and opens it in the default PDF viewer.
+        /// </summary>
+        /// <param name="templatedParameters"></param>
+        /// <returns></returns>
+        private async Task PrintBalanceTemplateAsync(object[] templatedParameters, DevExpress.XtraReports.UI.XtraReport report)
+        {
+            if (balancedPdfExportInProgress)
+                return;
+
+            balancedPdfExportInProgress = true;
+
+            try
+            {
+                if (templatedParameters[0] is TemplateDataContext templateDataContext)
+                {
+                    var settings = templatedParameters[2] as Balance ?? throw new InvalidOperationException("Balance report settings are missing.");
+
+                    var hdrData = templatedParameters[1] as HeaderData ?? throw new InvalidOperationException("Header data is missing");
+
+                    if (templateDataContext.TemplateReportlist?.Count == 0)
+                        throw new InvalidOperationException("There are no prepared balance report rows to print.");
+
+                    var exporter = new BalanceTemplateGridPdfExporter(hdrData, templateDataContext.TemplateReportlist, settings, report);
+
+                    busyIndicator.IsBusy = true;
+                    busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
+                    var pdfPath = await exporter.ExportBalanceReport();
+
+                    if (!string.IsNullOrEmpty(pdfPath))
+                        UtilDisplay.ExecuteShell("open", MacToolUtil.GetArgumentListForPdfViewer(pdfPath));
+                }
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                busyIndicator.IsBusy = false;
+                balancedPdfExportInProgress = false;
+            }
+        }
+    }
+}
+#endif

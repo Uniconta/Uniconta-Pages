@@ -106,7 +106,8 @@ namespace UnicontaClient.Pages.CustomPage
                 UnicontaMessageBox.Show(string.Format(Uniconta.ClientTools.Localization.lookup("MandatoryField"), (Uniconta.ClientTools.Localization.lookup("ToAccount"))), Uniconta.ClientTools.Localization.lookup("Warning"));
                 return;
             }
-            DeletePostedJournal delDialog = new DeletePostedJournal(true);        
+            DeletePostedJournal delDialog = new DeletePostedJournal(true);
+            delDialog.Args = Args; // pass original args
             delDialog.Closed += async delegate
             {
                 if (delDialog.DialogResult == true)

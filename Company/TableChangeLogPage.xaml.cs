@@ -113,7 +113,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var paramName = param.Name;
                     var paramValue = param.Value;
 
-                    if (string.IsNullOrEmpty(paramName) || string.Compare(param.Name, "table", StringComparison.OrdinalIgnoreCase) == 0)
+                    if (string.IsNullOrEmpty(paramName) || string.Equals(param.Name, "table", StringComparison.OrdinalIgnoreCase))
                     {
                         string importtableType = paramValue;
                         if (!string.IsNullOrEmpty(importtableType) && company != null)
@@ -127,7 +127,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 for (int i = 0; i < tablestype.Count; i++)
                                 {
                                     var tType = tablestype[i];
-                                    if (string.Compare(tType.Name, importtableType, StringComparison.OrdinalIgnoreCase) == 0)
+                                    if (string.Equals(tType.Name, importtableType, StringComparison.OrdinalIgnoreCase))
                                     {
                                         TableType = tType;
                                         isvalid = true;

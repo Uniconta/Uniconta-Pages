@@ -89,6 +89,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem?.OpenTran != null)
                     {
                         var cwSendInvoice = new CWSendInvoice();
+                        cwSendInvoice.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                         cwSendInvoice.DialogTableId = 2000000031;
                         cwSendInvoice.Closed += delegate
                         {

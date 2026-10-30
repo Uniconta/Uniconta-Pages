@@ -262,9 +262,7 @@ namespace UnicontaClient.Pages.CustomPage
 
 #if MAC
                             var report = printReport.Report;
-                            var memoryStream = UnistreamReuse.Create();
-                            report.ExportToPdf(memoryStream);
-                            var control = UtilDisplay.LoadControl(memoryStream.ToArrayAndRelease(), FileextensionsTypes.PDF, false, false, null);
+                            var control = MacPageUtil.PreviewReportsOnMac(report);
                             AddDockItem(TabControls.ShowControlPage, new object[] { control }, dockName);
 #else
                             reportName = await Utilities.Utility.GetLocalizedReportName(api, debtInvoice, CompanyLayoutType.Packnote);

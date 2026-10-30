@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <RibbonItem TabId="0" LocalizedNameKey="Home">
+    <!---When we create new TabPage -->
+    <RibbonItem Action="Save" ShortcutKey="Ctrl+S" LocalizedNameKey="Save" LargeGlyph="save-32x32"/>
+    <RibbonItem Action="Cancel" LocalizedNameKey="Cancel" LargeGlyph="close-32x32"/>
+    <RibbonItem Action="Delete" ShortcutKey="Shift+DELETE" LocalizedNameKey="Delete" LargeGlyph="Delete_32x32"/>
+    <RibbonItem Action="SaveFile" LocalizedNameKey="SaveOBJ" Parameter="Dll" LargeGlyph="Save_GoToLines_32x32"/>
+  </RibbonItem>
+</root>

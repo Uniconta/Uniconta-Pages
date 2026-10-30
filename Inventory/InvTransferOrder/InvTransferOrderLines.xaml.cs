@@ -639,6 +639,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                     {
                         CwUsePriceFromBOM cw = new CwUsePriceFromBOM();
+                        cw.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                         cw.DialogTableId = 2000000062;
                         cw.Closing += delegate
                         {
@@ -772,6 +773,7 @@ namespace UnicontaClient.Pages.CustomPage
             bool showUpdateInv = comp.Storage || ((doctype == CompanyLayoutType.TransferPacknote || doctype == CompanyLayoutType.PickingList) && comp.CreditorPacknote);
             CWGenerateInvoice GenrateOfferDialog = new CWGenerateInvoice(false, doctype.ToString(), showInputforInvNumber: false, isShowInvoiceVisible: true,
                 askForEmail: false, showNoEmailMsg: !showSendByMail, isShowUpdateInv: showUpdateInv);
+            GenrateOfferDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             switch (doctype)
             {
                 case CompanyLayoutType.PickingList:

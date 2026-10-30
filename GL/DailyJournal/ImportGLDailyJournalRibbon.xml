@@ -7,10 +7,7 @@
     <RibbonItem Action="EditBankFormat" LocalizedNameKey="EditOBJ" Parameter="BankFormatName" Glyph="Edit_16x16" LargeGlyph="Edit_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="LookupAccounts" LocalizedNameKey="AutomaticAccountSelection" ControlName="BankImportMapping" LargeGlyph="Match_32x32"/>
-  </RibbonItem>
-  <RibbonItem>
     <RibbonItem Action="Import" LocalizedNameKey="Import" LargeGlyph="Import_32x32"/>
-   <RibbonItem Action="ViewBankstatement" LocalizedNameKey="ViewOBJ" Parameter="BankStatement" LargeGlyph="View_32x32"/>
+    <RibbonItem Action="ViewBankstatement" LocalizedNameKey="ViewOBJ" Parameter="BankStatement" LargeGlyph="View_32x32"/>
   </RibbonItem>
 </root>

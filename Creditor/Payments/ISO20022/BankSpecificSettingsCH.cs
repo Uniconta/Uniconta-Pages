@@ -54,6 +54,22 @@ namespace UnicontaISO20022CreditTransfer
             return string.Empty;
         }
 
+        public override string XMLAttributeNS()
+        {
+            if (CredPaymFormat.NewPaymentFormat)
+                return BaseDocument.XMLNS_PAIN009;
+
+            return @"http://www.six-interbank-clearing.com/de/pain.001.001.03.ch.02.xsd";
+        }
+
+        public override bool NewPaymentFormat()
+        {
+            if (CredPaymFormat.NewPaymentFormat)
+                return true;
+
+            return false;
+        }
+
         /// <summary>
         /// Country currency - used for calculation of Payment type
         /// </summary>
@@ -114,14 +130,6 @@ namespace UnicontaISO20022CreditTransfer
             };
 
             return replaceCharactersRegEx;
-        }
-
-        /// <summary>
-        /// XML Attribute NS
-        /// </summary>
-        public override string XMLAttributeNS()
-        {
-            return @"http://www.six-interbank-clearing.com/de/pain.001.001.03.ch.02.xsd";
         }
 
         /// <summary>
@@ -228,6 +236,9 @@ namespace UnicontaISO20022CreditTransfer
 
         public override string InstructionPriority()
         {
+            if (CredPaymFormat.NewPaymentFormat)
+                return null;
+
             switch (CredPaymFormat.Bank)
             {
                 case chBank.CreditSuisse:

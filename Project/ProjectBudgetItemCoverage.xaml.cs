@@ -522,6 +522,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "GenerateJournalLines":
                     dgPrjBugtItmCov.SelectedItem = null;
                     CwMoveBtwWareHouse cwJournal = new CwMoveBtwWareHouse(true,api);
+                    cwJournal.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     cwJournal.Closed += delegate
                     {
                         if (cwJournal.DialogResult == true)

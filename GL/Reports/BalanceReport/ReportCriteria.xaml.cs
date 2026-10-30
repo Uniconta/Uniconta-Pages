@@ -124,7 +124,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             foreach (var rec in Parameters)
             {
-                if (string.IsNullOrEmpty(rec.Name) || string.Compare(rec.Name, "Balance", StringComparison.CurrentCultureIgnoreCase) == 0)
+                if (string.IsNullOrEmpty(rec.Name) || string.Equals(rec.Name, "Balance", StringComparison.CurrentCultureIgnoreCase))
                 {
                     this.DefaultBalance = rec.Value;
                     if (itemsBalance != null)

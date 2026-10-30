@@ -96,7 +96,7 @@ namespace UnicontaClient.Pages.CustomPage
                 key = Utility.GetHeaderString(dgInvSeriesBatchGrid.masterRecord);
 
             if (string.IsNullOrEmpty(key)) return;
-            string header = string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("SerialBatchNumbers"), key);
+            string header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("SerialBatchNumbers"), key);
             SetHeader(header);
         }
 
@@ -133,6 +133,8 @@ namespace UnicontaClient.Pages.CustomPage
                 if (ShowWh)
                     Warehouse.Visible = true;
             }
+            if (pageMaster is InvTrans)
+                QtyMarked.Visible = true;
         }
 
         async protected override void LoadCacheInBackGround()

@@ -26,6 +26,7 @@ namespace UnicontaClient.Pages.CustomPage
         private int storage;
 
         [InputFieldData]
+        [AppEnum(EnumName = "ProductionRegister")]
         [Display(Name = "Storage", ResourceType = typeof(InputFieldDataText))]
         public int Storage { get { return storage; } set { storage = value; } }
 

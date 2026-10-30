@@ -127,6 +127,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "JoinDimensions":
                     var cwJoinTwoDimension = new CWJoinTwoDimensions(api, cmbDimensions.SelectedItem as string);
+                    cwJoinTwoDimension.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     cwJoinTwoDimension.Closed += async delegate
                      {
                          if (cwJoinTwoDimension.DialogResult == true)
@@ -153,6 +154,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void ReOrganizeDimensions()
         {
             var cwMoveDimensions = new CWMoveDimensions(api);
+            cwMoveDimensions.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             cwMoveDimensions.Closed += delegate
             {
                 if (cwMoveDimensions.DialogResult == true)

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -66,6 +67,23 @@ namespace UnicontaISO20022CreditTransfer
             }
         }
 
+        public override string XMLAttributeNS()
+        {
+            if (CredPaymFormat.NewPaymentFormat)
+                return BaseDocument.XMLNS_PAIN009;
+
+            return BaseDocument.XMLNS_PAIN003;
+        }
+
+        public override bool NewPaymentFormat()
+        {
+            if (CredPaymFormat.NewPaymentFormat)
+                return true;
+
+            return false;
+        }
+
+
         /// <summary>
         /// Country currency - used for calculation of Payment type
         /// </summary>
@@ -98,7 +116,10 @@ namespace UnicontaISO20022CreditTransfer
             switch (companyBankEnum)
             {
                 case CompanyBankENUM.SEB:
-                    return DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss");
+                    // ":" in a custom format string is a placeholder for the current culture's TimeSeparator, not
+                    // a literal - without InvariantCulture, a locale whose TimeSeparator isn't ":" (e.g. Vietnamese,
+                    // which uses ".") silently corrupts the ISO 8601 timestamp for a user on that locale.
+                    return DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture);
 
                 default:
                     return DateTimeOffset.Now.ToString("o");
@@ -253,6 +274,13 @@ namespace UnicontaISO20022CreditTransfer
             }
         }
 
+        public override string InstructionPriority()
+        {
+            if (CredPaymFormat.NewPaymentFormat)
+                return null;
+
+            return BaseDocument.INSTRUCTIONPRIORITY_NORM;
+        }
 
         /// <summary>
         /// Exclude section CdtrAgt

@@ -1,19 +1,12 @@
-using Uniconta.API.DebtorCreditor;
-using UnicontaClient.Models;
-using UnicontaClient.Utilities;
-using Uniconta.ClientTools;
-using Uniconta.ClientTools.Controls;
-using Uniconta.ClientTools.DataModel;
-using Uniconta.ClientTools.Page;
-using Uniconta.Common;
-using Uniconta.Common.Utility;
-using Uniconta.DataModel;
+using DevExpress.Xpf.Grid;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -23,12 +16,26 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using Uniconta.API.DebtorCreditor;
+using Uniconta.ClientTools;
+using Uniconta.ClientTools.AI;
+using Uniconta.ClientTools.AI.Prompts;
+using Localization = Uniconta.ClientTools.Localization;
+using Uniconta.ClientTools.AI.Services;
+using Uniconta.ClientTools.AI.Services.Context;
+using Uniconta.ClientTools.Controls;
+using Uniconta.ClientTools.DataModel;
+using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
-using DevExpress.Xpf.Grid;
-using System.ComponentModel.DataAnnotations;
+using Uniconta.Common;
+using Uniconta.Common.Utility;
+using Uniconta.DataModel;
 using UnicontaClient.Controls.Dialogs;
+using UnicontaClient.Models;
 using UnicontaClient.Pages;
 using UnicontaClient.Pages;
+using UnicontaClient.Utilities;
+using UnicontaClient.Pages.GL.TransactionOrigin;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
@@ -764,6 +771,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                     {
                         CwUsePriceFromBOM cw = new CwUsePriceFromBOM();
+                        cw.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                         cw.DialogTableId = 2000000062;
                         cw.Closing += delegate
                         {
@@ -817,12 +825,14 @@ namespace UnicontaClient.Pages.CustomPage
                 case "RecalculateOrderPrices":
                     RecalculateOrderPrices();
                     break;
+
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
             RecalculateAmount();
         }
+
         private void RecalculateOrderPrices()
         {
             var orderLst = dgCreditorOrderLineGrid.GetVisibleRows();
@@ -928,6 +938,7 @@ namespace UnicontaClient.Pages.CustomPage
             bool showUpdateInv = comp.Storage || (doctype == CompanyLayoutType.PurchasePacknote && comp.CreditorPacknote);
             CWGenerateInvoice GenrateOfferDialog = new CWGenerateInvoice(false, doctype.ToString(), showInputforInvNumber: doctype == CompanyLayoutType.PurchasePacknote ? true : false, isShowInvoiceVisible: true,
                 askForEmail: true, showNoEmailMsg: !showSendByMail, debtorName: creditorName, isShowUpdateInv: showUpdateInv);
+            GenrateOfferDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             switch (doctype)
             {
                 case CompanyLayoutType.PurchaseOrder:
@@ -1076,6 +1087,7 @@ namespace UnicontaClient.Pages.CustomPage
             var accountName = Util.ConcatParenthesis(orderMaster._DCAccount, orderMaster.Name);
             bool showSendByEmail = dc != null ? (!string.IsNullOrEmpty(dc._InvoiceEmail) || dc._EmailDocuments) : false;
             CWGenerateInvoice GenrateInvoiceDialog = new CWGenerateInvoice(true, string.Empty, true, true, showNoEmailMsg: !showSendByEmail, AccountName: accountName);
+            GenrateInvoiceDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             GenrateInvoiceDialog.DialogTableId = 2000000001;
             GenrateInvoiceDialog.SetSendAsEmailCheck(false);
             GenrateInvoiceDialog.SetInvoiceNumber(dbOrder._InvoiceNumber);

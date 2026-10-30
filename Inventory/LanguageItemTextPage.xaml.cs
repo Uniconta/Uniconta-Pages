@@ -86,7 +86,7 @@ namespace UnicontaClient.Pages.CustomPage
             string masterValue = null;
             foreach (var rec in Parameters)
             {
-                if (string.Compare(rec.Name, "MasterName", StringComparison.CurrentCultureIgnoreCase) == 0)
+                if (string.Equals(rec.Name, "MasterName", StringComparison.CurrentCultureIgnoreCase))
                     masterValue = rec.Value;
             }
 

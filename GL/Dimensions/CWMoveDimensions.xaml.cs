@@ -95,6 +95,7 @@ namespace Uniconta.ClientTools.Controls
         private void MoveButton_Click(object sender, RoutedEventArgs e)
         {
             var startDialog = new EraseYearWindow("", true);
+            startDialog.Args = Args; // pass original args
             startDialog.Closed += async delegate
             {
                 if (startDialog.DialogResult == true)

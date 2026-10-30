@@ -417,7 +417,7 @@ namespace UnicontaClient.Pages.CustomPage
             var EAN = rec._EAN;
             if (string.IsNullOrWhiteSpace(EAN))
                 return;
-            var found = (from item in (InvItem[])Items.GetNotNullArray where string.Compare(item._EAN, EAN, StringComparison.CurrentCultureIgnoreCase) == 0 select item).FirstOrDefault();
+            var found = (from item in (InvItem[])Items.GetNotNullArray where string.Equals(item._EAN, EAN, StringComparison.CurrentCultureIgnoreCase) select item).FirstOrDefault();
             if (found != null)
             {
                 rec._EAN = found._EAN;
@@ -751,6 +751,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                     {
                         CwUsePriceFromBOM cw = new CwUsePriceFromBOM();
+                        cw.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                         cw.DialogTableId = 2000000046;
                         cw.Closing += delegate
                         {
@@ -873,6 +874,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             var generateOfferDialog = new CWGenerateInvoice(false, CompanyLayoutType.Offer.ToString(), askForEmail: true, showNoEmailMsg: !showSendByMail, debtorName: debtorName, isDebtorOrder: true);
+            generateOfferDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             generateOfferDialog.DialogTableId = 2000000075;
             generateOfferDialog.ShowAllowCredMax(debtor._CreditMax != 0);
             generateOfferDialog.Closed += delegate

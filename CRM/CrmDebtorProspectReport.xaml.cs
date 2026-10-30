@@ -33,6 +33,13 @@ namespace UnicontaClient.Pages.CustomPage
         public override Type TableType { get { return typeof(CrmProspectView); } }
         public override bool CanInsert { get { return false; } }
         public override bool Readonly { get { return true; } }
+
+        /// <summary>
+        /// Method overridden, the Debtor/Prospect grid contains instances of both CrmDebtorView and CrmProspectView
+        /// </summary>
+        /// <param name="length"></param>
+        /// <returns></returns>
+        protected override Array CreateVisibleRowsArray(int length) => Array.CreateInstance(typeof(ICrmProspect), length);
     }
 
     public partial class CrmDebtorProspectReport : GridBasePage
@@ -59,7 +66,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override bool CheckIfBindWithUserfield(out bool isReadOnly, out bool useBinding)
         {
-            isReadOnly = useBinding= true;
+            isReadOnly = useBinding = true;
             return true;
         }
 
@@ -212,7 +219,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Orders":
                     if (dgCrmDebtorProspect.syncEntity == null || selectedItem == null || !selectedItem.IsDebtor)
                         return;
-                    AddDockItem(TabControls.DebtorOrders, dgCrmDebtorProspect.syncEntity,string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Orders"), selectedItem.Name));
+                    AddDockItem(TabControls.DebtorOrders, dgCrmDebtorProspect.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Orders"), selectedItem.Name));
                     break;
                 case "Offers":
                     if (selectedItem is CrmProspectView)
@@ -256,6 +263,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (crmProspect == null) return;
 
             CWConvertProspectToDebtor cwwin = new CWConvertProspectToDebtor(api, crmProspect);
+            cwwin.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             cwwin.Closing += async delegate
             {
                 if (cwwin.DialogResult == true)
@@ -311,10 +319,9 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (prospect != null)
             {
-                var mail = string.Concat("mailto:", prospect.ContactEmail);
-                System.Diagnostics.Process proc = new System.Diagnostics.Process();
-                proc.StartInfo.FileName = mail;
-                proc.Start();
+                if (string.IsNullOrWhiteSpace(prospect.ContactEmail))
+                    return;
+                OfficeComponentUtil.SendEmailToOutlook(prospect.ContactEmail);
             }
         }
 #endif

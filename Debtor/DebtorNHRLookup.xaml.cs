@@ -221,7 +221,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (s1.Length == 0)
                     s1 = null;
             }
-            return string.Compare(s1, s2, StringComparison.CurrentCultureIgnoreCase) == 0;
+            return string.Equals(s1, s2, StringComparison.CurrentCultureIgnoreCase);
         }
 
         async void LoadDebtorList()

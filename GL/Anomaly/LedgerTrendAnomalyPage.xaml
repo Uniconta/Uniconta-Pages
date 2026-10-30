@@ -1,0 +1,94 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+   xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.LedgerTrendAnomalyPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"
+    xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl x:Name="localMenu" XMLSourcePath=";component/Pages/GL/Anomaly/LedgerTrendAnomalyRibbon.xml" Grid.Row="0"/>
+        <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <localPage:LedgerTrendAnomalyGrid x:Name="dgResults" AutoGenerateColumns="None">
+                <localPage:LedgerTrendAnomalyGrid.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AccountNumber" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Account}" Width="90" AllowEditing="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AccountName" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Name}" Width="160" AllowEditing="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PeriodMinus2" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PeriodBeforePrevious}" Width="80" AllowEditing="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PeriodMinus1" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PreviousPeriod}" Width="80" AllowEditing="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CurrentPeriod" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CurrentPeriod}" Width="100" AllowEditing="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountMinus2" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AmountPeriodMinus2}" Width="100" AllowEditing="False">
+                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Value, StringFormat={}{0:N2}}" HorizontalAlignment="Right" VerticalAlignment="Center"  Margin="4,0"/>
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountMinus1" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AmountPeriodMinus1}" Width="100" AllowEditing="False">
+                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Value, StringFormat={}{0:N2}}" HorizontalAlignment="Right" VerticalAlignment="Center"  Margin="4,0"/>
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CurrentAmount" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CurrentAmount}" Width="110" AllowEditing="False">
+                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Value, StringFormat={}{0:N2}}" HorizontalAlignment="Right" VerticalAlignment="Center"  Margin="4,0"/>
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PreviousMovement" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PreviousMovement}" Width="120" AllowEditing="False">
+                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Value, StringFormat={}{0:N2}}" HorizontalAlignment="Right" VerticalAlignment="Center"  Margin="4,0"/>
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CurrentMovement" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CurrentMovement}" Width="120" AllowEditing="False">
+                        <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Value, StringFormat={}{0:N2}}" HorizontalAlignment="Right" VerticalAlignment="Center"  Margin="4,0"/>
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CurrentPercentageChange" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PercentageChange}" Width="80" AllowEditing="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="RiskLevel" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Risk}" Width="70" AllowEditing="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AIRiskLevel" Width="80" AllowEditing="False">
+                        <localPage:CorasauDataGridTemplateColumnClient.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="AI " />
+                                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Risk}" />
+                            </StackPanel>
+                        </localPage:CorasauDataGridTemplateColumnClient.Header>
+                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Reasons" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Reasons}" Width="260" AllowEditing="False">
+                        <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                            <editor:TextEditSettings TextWrapping="Wrap"/>
+                        </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="TopCurrentPeriodTransactionsText" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TopCurrentTransactions}" Width="320" AllowEditing="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AIExplanation" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AIReason}" Width="320" AllowEditing="False">
+                        <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                            <editor:TextEditSettings TextWrapping="Wrap"/>
+                        </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AICertaintyPercentage" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AICertaintyPercentage}" Width="100" AllowEditing="False"/>
+                </localPage:LedgerTrendAnomalyGrid.Columns>
+            </localPage:LedgerTrendAnomalyGrid>
+        </CorasauControls:BusyIndicator>
+        <StatusBar Grid.Row="2" MinHeight="24">
+            <StatusBarItem>
+                <TextBlock x:Name="StatusText" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Ready}"/>
+            </StatusBarItem>
+            <Separator/>
+            <StatusBarItem HorizontalAlignment="Right">
+                <ProgressBar x:Name="AIProgressBar" Width="160" Height="18" Minimum="0" Maximum="100" Value="0" Visibility="Collapsed"/>
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
+</Pages:GridBasePage>

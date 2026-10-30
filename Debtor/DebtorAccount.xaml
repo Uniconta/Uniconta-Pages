@@ -166,6 +166,11 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccount"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DirectDebitActive" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim5" Width="70" FieldName="Dimension5" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="EAN" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="EndpointId" Visible="False">
+                        <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                            <editor:TextEditSettings MaskType="RegEx" Mask="{StaticResource EndPointIdValidationRegx}" />
+                        </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                    </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:ComboBoxColumnClient x:Name="BankAccountType" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SWIFT" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="BankAccount" Visible="False"/>
@@ -189,7 +194,8 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccount"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="MicroEnterprise" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="NoPackagingReporting" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="VIESDate" Visible="False" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VIESStatus" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VIESStatus" Width="130" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="WIdNo" Visible="False" />
                 </localPage:DebtorAccountGrid.Columns>
                 <localPage:DebtorAccountGrid.TotalSummary>
                     <localPage:SumColumn FieldName="CurBalance" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>

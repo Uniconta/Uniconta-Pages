@@ -55,7 +55,52 @@ namespace UnicontaClient.Pages.CustomPage
         {
             InitPage(null);
         }
+        public override void SetParameter(IEnumerable<ValuePair> Parameters)
+        {
+            string table = null, key = null;
+            foreach (var rec in Parameters)
+            {
+                if (string.IsNullOrEmpty(rec.Name) || string.Equals(rec.Name, "Table", StringComparison.CurrentCultureIgnoreCase))
+                    table = rec.Value;
+                else if (string.Equals(rec.Name, "Key", StringComparison.CurrentCultureIgnoreCase))
+                    key = rec.Value;
+            }
 
+            if (!string.IsNullOrEmpty(table))
+            {
+                table = table.Trim();
+                var tables = CwSelectTableForAllDocumnets.CreateTablelist(api);
+                var tbl = tables.FirstOrDefault(t => t.Type != null && MatchTableName(t.Name, table));
+                if (tbl != null)
+                {
+                    var master = Activator.CreateInstance(tbl.Type) as UnicontaBaseEntity;
+                    if (master != null)
+                    {
+                        dgDocsGrid.masterRecords = new List<UnicontaBaseEntity>() { master };
+                        List<PropValuePair> filter = null;
+                        if (!string.IsNullOrEmpty(key))
+                         this.GridFilter = new List<PropValuePair>() { PropValuePair.GenereteWhereElements("TableRowId",typeof(string), key) };
+                    }
+                }
+            }
+            base.SetParameter(Parameters);
+        }
+
+        static bool MatchTableName(string name, string tableText)
+        {
+            if (string.IsNullOrEmpty(name))
+                return false;
+            if (string.Equals(name, tableText, StringComparison.CurrentCultureIgnoreCase))
+                return true;
+            int idx = name.IndexOf('(');
+            if (idx < 0)
+                return false;
+            var typeName = name.Substring(0, idx).Trim();
+            int end = name.LastIndexOf(')');
+            var localizedName = (end > idx ? name.Substring(idx + 1, end - idx - 1) : name.Substring(idx + 1)).Trim();
+            return string.Equals(typeName, tableText, StringComparison.CurrentCultureIgnoreCase) ||
+                   string.Equals(localizedName, tableText, StringComparison.CurrentCultureIgnoreCase);
+        }
         void InitPage(List<UnicontaBaseEntity> rec)
         {
             InitializeComponent();

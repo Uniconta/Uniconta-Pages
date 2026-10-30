@@ -160,12 +160,12 @@ namespace UnicontaClient.Pages.CustomPage
         {
             foreach (var rec in Parameters)
             {
-                if (rec.Name == null || string.Compare(rec.Name, "Dashboard", StringComparison.CurrentCultureIgnoreCase) == 0)
+                if (rec.Name == null || string.Equals(rec.Name, "Dashboard", StringComparison.CurrentCultureIgnoreCase))
                 {
                     dashboardName = rec.Value;
                     SetHeader(string.Concat(Uniconta.ClientTools.Localization.lookup("Dashboard"), ": ", dashboardName));
                 }
-                if (string.Compare(rec.Name, "Field", StringComparison.CurrentCultureIgnoreCase) == 0)
+                if (string.Equals(rec.Name, "Field", StringComparison.CurrentCultureIgnoreCase))
                 {
                     masterField = rec.Value;
                 }
@@ -738,6 +738,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             dState = new DashboardState();
             company = api.CompanyEntity;
+            CriteriaOperator.RegisterCustomFunction(new DashBoardView.GetAppEnumNamesIndexFunction());
             CriteriaOperator.RegisterCustomFunction(new DashBoardView.ExchangeRateFunction(new CrudAPI(api)));
             CriteriaOperator.RegisterCustomFunction(new DashBoardView.GetConditionalLocalizeFunction());
             InitializeComponent();
@@ -848,7 +849,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (rowId != 0)
                     _selectedDashBoard = dbrdLst?.FirstOrDefault(x => x.RowId == rowId) as DashboardClient;
                 else
-                    _selectedDashBoard = dbrdLst?.FirstOrDefault(x => string.Compare(x._Name, dashboardName, StringComparison.CurrentCultureIgnoreCase) == 0) as DashboardClient;
+                    _selectedDashBoard = dbrdLst?.FirstOrDefault(x => string.Equals(x._Name, dashboardName, StringComparison.CurrentCultureIgnoreCase)) as DashboardClient;
             }
             if (_selectedDashBoard != null)
             {
@@ -1336,7 +1337,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (getSaved() == null)
                 setSaved(name);
-            else if ((IsLocalizationKey(name)) && (IsLocalizationKey(saved)) && string.Compare(name, saved, StringComparison.OrdinalIgnoreCase) != 0)
+            else if ((IsLocalizationKey(name)) && (IsLocalizationKey(saved)) && !string.Equals(name, saved, StringComparison.OrdinalIgnoreCase))
                 setSaved(name);
             else
                 name = saved;

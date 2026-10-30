@@ -427,6 +427,7 @@ namespace UnicontaClient.Pages.CustomPage
         void DeleteClosingSheetLine()
         {
             CWPostClosingSheet postingDialog = new CWPostClosingSheet(masterRecord._ToDate, true);
+            postingDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             postingDialog.Closed += async delegate
             {
                 if (postingDialog.DialogResult == true)
@@ -452,6 +453,7 @@ namespace UnicontaClient.Pages.CustomPage
         void PostClosingSheet()
         {
             CWPostClosingSheet postingDialog = new CWPostClosingSheet(masterRecord._ToDate);
+            postingDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             postingDialog.DialogTableId = 2000000017;
             postingDialog.Closed += async delegate
             {

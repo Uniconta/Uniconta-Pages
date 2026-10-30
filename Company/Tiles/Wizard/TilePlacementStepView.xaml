@@ -1,0 +1,41 @@
+<UserControl xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.TilePlacementStepView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
+    <StackPanel>
+        <TextBlock Text="{Binding Data.SelectionSummary}" TextWrapping="Wrap" Foreground="{DynamicResource WizardSecondaryTextBrush}"/>
+        <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileScope}" Style="{DynamicResource TileWizardLabelStyle}"/>
+        <controls:ComboBoxEditor IsTextEditable="False" DisplayMember="Caption" ValueMember="Value" ItemsSource="{Binding Data.ScopeOptions}" EditValue="{Binding Data.SelectedScope, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{DynamicResource TileWizardComboBoxStyle}" AutomationProperties.Name="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileScope}"
+                                 ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileScopeHelp}"/>
+        <StackPanel Visibility="{Binding Data.IsProfile, Converter={StaticResource bool2VisibilityConverter}}">
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Profile}" Style="{DynamicResource TileWizardLabelStyle}"/>
+            <controls:ComboBoxEditor ItemsSource="{Binding Data.Profiles}" DisplayMember="KeyStr" ValueMember="KeyStr" IsTextEditable="False"
+                                     EditValue="{Binding Data.Profile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource TileWizardComboBoxStyle}"/>
+        </StackPanel>
+        <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileDashboardOptional}" Style="{DynamicResource TileWizardLabelStyle}"/>
+        <controls:TextEditor Text="{Binding Data.DashboardTab, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{DynamicResource TileWizardTextEditorStyle}" AutomationProperties.Name="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Dashboard}"
+                             ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileDashboardHelp}"/>
+        <StackPanel Visibility="{Binding Data.ShowData, Converter={StaticResource bool2VisibilityConverter}}">
+            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileGoTo}" Style="{DynamicResource TileWizardLabelStyle}"/>
+            <controls:ComboBoxEditor IsEditable="True" ItemsSource="{Binding Data.NavigationTargets}" SelectedItem="{Binding Data.NavigationTarget, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{DynamicResource TileWizardComboBoxStyle}" AutomationProperties.Name="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileGoTo}"
+                                     ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileNavigationHelp}"/>
+        </StackPanel>
+        <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Group}" Style="{DynamicResource TileWizardLabelStyle}"/>
+        <DockPanel>
+            <Button Content="+" Command="{Binding Data.AddGroupCommand}" DockPanel.Dock="Right" Width="32" MinWidth="0" Height="32" Padding="4" Margin="8,0,0,0"
+                    Style="{DynamicResource PrimaryButtonStyle}" ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileGroupHelp}"/>
+            <controls:ComboBoxEditor IsEditable="True" ItemsSource="{Binding Data.Groups}" SelectedItem="{Binding Data.SelectedGroup, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     IsReadOnly="{Binding Data.IsAddingGroup}"
+                                     Style="{DynamicResource TileWizardComboBoxStyle}" AutomationProperties.Name="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Group}"
+                                     ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileExistingGroupHelp}"/>
+        </DockPanel>
+        <controls:TextEditor Text="{Binding Data.Group, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,8,0,0"
+                             Visibility="{Binding Data.IsAddingGroup, Converter={StaticResource bool2VisibilityConverter}}"
+                             Style="{DynamicResource TileWizardTextEditorStyle}" AutomationProperties.Name="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileNewGroup}"
+                             ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileNewGroupHelp}"/>
+    </StackPanel>
+</UserControl>

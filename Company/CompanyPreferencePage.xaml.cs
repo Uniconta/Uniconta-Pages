@@ -21,6 +21,7 @@ using Uniconta.API.Service;
 using DevExpress.XtraSpreadsheet.Model;
 using Uniconta.API.System;
 using Uniconta.Common.User;
+using Uniconta.ClientTools.Util;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -55,10 +56,16 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (!api.CompanyEntity.CreditorBankApprovement)
                 liNemhandelUpdateBankDetails.Visibility = Visibility.Collapsed;
-
+            HideMenuItems();
             Loaded += async (s, e) => await InitAsync();
+            
         }
-
+        private void HideMenuItems()
+        {
+            var rb = (Uniconta.ClientTools.Controls.RibbonBase)frmRibbon.DataContext;
+            if (rb != null)
+                UtilDisplay.RemoveMenuCommand(rb, new[] { "ExpandAll", "CollapseAll" });
+        }
         private async Task InitAsync()
         {
             if (api.CompanyEntity.DocumentScanner == 0)

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <root>
-	<RibbonItem TabId="0" LocalizedNameKey="Home">
+	<RibbonItem TabId="0" TabHeader="Home" LocalizedNameKey="Add">
 		<!---When we create a new TabPage -->
 		<RibbonItem Action="AddRow" LocalizedNameKey="Add" LargeGlyph="Add_32x32"/>
 		<RibbonItem Action="CopyRecord" LocalizedNameKey="Copy"   LargeGlyph="Copy_32x32" ShortcutKey="Shift+F2"/>
 	</RibbonItem>
-	<RibbonItem>
+	<RibbonItem LocalizedNameKey="Delete">
 		<RibbonItem Action="DeleteRow" ShortcutKey="Shift+DELETE" LocalizedNameKey="Delete" Glyph="Delete_16x16" LargeGlyph="Delete_32x32"/>
 		<RibbonItem Action="RemoveFromInbox" LocalizedNameKey="RemoveFromInbox" LargeGlyph="close-32x32" />
 	</RibbonItem>
@@ -31,12 +31,18 @@
 	<RibbonItem>
 		<RibbonItem Action="PageViewMode" ShortcutKey="" LocalizedNameKey="HideOBJ" Parameter="Folders"  LargeGlyph="Hide_Folder_32x32"/>
 	</RibbonItem>
-	<RibbonItem>
-		<RibbonItem Action="ViewDownloadRow" ShortcutKey="F7" LocalizedNameKey="View" LargeGlyph="View_Highlighted_32x32" />
-		<RibbonItem Action="CheckIfPosted" LocalizedNameKey="CheckIfPosted" LargeGlyph="Check_Journal_32x32"/>
-		<RibbonItem Action="Transactions" LocalizedNameKey="AccountsTransaction" LargeGlyph="Posted_Transaction_32x32"/>
-	</RibbonItem>
-	<RibbonItem>
+  <RibbonItem LocalizedNameKey="Show">
+    <RibbonItem Action="ViewDownloadRow" ShortcutKey="F7" LocalizedNameKey="View" LargeGlyph="View_Highlighted_32x32" />
+    <RibbonItem Action="CheckIfPosted" LocalizedNameKey="CheckIfPosted" LargeGlyph="Check_Journal_32x32"/>
+    <RibbonItem Action="Transactions" LocalizedNameKey="AccountsTransaction" LargeGlyph="Posted_Transaction_32x32"/>
+  </RibbonItem>
+	<RibbonItem LocalizedNameKey="Posting">
+		<RibbonItem LocalizedNameKey="PostingRule" LargeGlyph="Match_32x32">
+			<RibbonItem Action="AddMapping" LocalizedNameKey="Add" Glyph="Add_16x16"/>
+			<RibbonItem Action="LookupAccounts" LocalizedNameKey="View" Glyph="Match_Add_16x16"/>
+			<RibbonItem Action="UnicontaScanSettings" LocalizedNameKey="Setup" Glyph="Settings_32x32"/>
+			<RibbonItem Action="ApplyPostingRules" LocalizedNameKey="Apply" Glyph="Invoice_16x16"/>
+		</RibbonItem>
 		<RibbonItem Action="GenerateJournalLines" LocalizedNameKey="GenerateJournalLines" ControlName="GL_DailyJournal" LargeGlyph="Move_32x32" ShortcutKey="Ctrl+J" />
 		<RibbonItem Action="ViewJournalLines" LocalizedNameKey="Journallines" ControlName="GL_DailyJournal" LargeGlyph="Journal_Lines_32x32" />
 		<RibbonItem Action="PostJournal" LocalizedNameKey="PostDirectly" ControlName="GL_DailyJournal" LargeGlyph="Posted_Journal_32x32"/>
@@ -53,6 +59,8 @@
 			<RibbonItem Action="DocumentScanUpload" LocalizedNameKey="Upload" Glyph="Export_16x16" />
 			<RibbonItem Action="CorrectScannedData" LocalizedNameKey="CorrectScannedData" Glyph="Edit_16x16" />
 			<RibbonItem Action="ViewCorrectScannedData" LocalizedNameKey="ViewCorrectScannedData" Glyph="View_16x16" />
+			<RibbonItem Action="VoucherScanSettings" LocalizedNameKey="VoucherScanSettings" Glyph="Settings_32x32" />
+			<RibbonItem Action="VoucherScannerLog" LocalizedNameKey="VoucherScannerLog" Glyph="Server_Count_32x32" />
 		</RibbonItem>
 	</RibbonItem>
 	<RibbonItem>
@@ -65,8 +73,9 @@
 	</RibbonItem>
 	<RibbonItem>
 		<RibbonItem Action="OffSetAccount" LocalizedNameKey="OffSetAccount" ShortcutKey="Ctrl+M" LargeGlyph="Offset_Account_32x32"/>
+		<RibbonItem Action="NormallyUsedCostAccount" Module="DetermineCostAccount" LocalizedNameKey="NormallyUsedCostAccount" LargeGlyph="PreviousUsed" ButtonType="AI"/>
 	</RibbonItem>
-	<RibbonItem>
+	<RibbonItem LocalizedNameKey="Move">
 		<RibbonItem Action="CopyOrMoveVoucher" LocalizedNameKey="CopyOrMoveOBJ" Parameter="Attachments" LargeGlyph="Job_Change_32x32" />
 		<RibbonItem Action="MoveToCompany" LocalizedNameKey="MoveToCompany" LargeGlyph="CopyUserTable_32x32" />
 	</RibbonItem>

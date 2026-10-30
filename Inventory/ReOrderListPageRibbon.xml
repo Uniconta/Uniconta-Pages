@@ -10,6 +10,7 @@
     <RibbonItem Action="ClearFilter" ShortcutKey="Ctrl+K" LocalizedNameKey="ClearFilter" Glyph="Filter_Clear_32x32" LargeGlyph="Filter_Clear_32x32"/>
     <RibbonItem Action="PerWarehouse" LocalizedNameKey="PerOBJ" Parameter="Warehouse" Module="Warehouse" ButtonType="CheckBox" />
     <RibbonItem Action="PerLocation" LocalizedNameKey="PerOBJ" Parameter="Location" Module="Location" ButtonType="CheckBox" />
+    <RibbonItem Action="ExcludedWarehouse" LocalizedNameKey="RemoveOBJ" Parameter="WarehouseType" Module="Warehouse" ButtonType="CheckBoxComboBox" />
   </RibbonItem>
   <RibbonItem>
     <!---next group in same Tab-->
@@ -36,9 +37,9 @@
 	<RibbonItem Action="Storage" LocalizedNameKey="OnHand" LargeGlyph="Storage_32x32"/>
   </RibbonItem>
   <RibbonItem LocalizedNameKey="ToOrder">
-    <RibbonItem Action="UnfoldBOM" LocalizedNameKey="UnfoldBOM" Module="InvBOM"  Glyph="CopyUserTable_16x16" LargeGlyph="CopyUserTable_16x16"/>
+    <RibbonItem Action="UnfoldBOM" LocalizedNameKey="UnfoldBOM" Module="InvBOM" LargeGlyph="CopyUserTable_32x32"/>
     <RibbonItem Action="CreateOrder" LocalizedNameKey="CreateOBJ" Parameter="CreditorOrders" LargeGlyph="Orders_32x32" />
-    <RibbonItem Action="CreateProductionOrder" LocalizedNameKey="CreateOBJ" Parameter="ProductionOrder" Module="Production" LargeGlyph="Pack_Note_32x32" />
+    <RibbonItem Action="CreateProductionOrder" LocalizedNameKey="CreateOBJ" Parameter="ProductionOrders" Module="Production" LargeGlyph="Pack_Note_32x32" />
     <RibbonItem Action="ReportAsFinished" LocalizedNameKey="ReportAsFinished" Module="InvBOM" LargeGlyph="Order_Lines_Highlighted_32x32" />
     <RibbonItem Action="CreateTransferOrder" LocalizedNameKey="CreateOBJ" Parameter="TransferOrder" Module="Warehouse" LargeGlyph="Orders_32x32" />
 	<RibbonItem Action="MoveFromWarehouse" LocalizedNameKey="MoveFromWarehouse" Module="Warehouse" LargeGlyph="Journal_Lines_Highlighted_32x32" />

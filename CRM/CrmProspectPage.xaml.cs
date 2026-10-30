@@ -10,6 +10,7 @@ using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
+using Uniconta.Common.User;
 using Uniconta.DataModel;
 using UnicontaClient.Models;
 using UnicontaClient.Utilities;
@@ -39,9 +40,18 @@ namespace UnicontaClient.Pages.CustomPage
         {
             InitPage();
         }
+        int partnerId;
+        public CrmProspectPage(PartnerProspectClient partnerProspect)
+            : base(partnerProspect)
+        {
+            partnerId = partnerProspect.RowId;
+            InitPage();
+        }
         private void InitPage()
         {
             InitializeComponent();
+            if (partnerId != 0)
+                this.GridFilter = new System.Collections.Generic.List<PropValuePair> { PropValuePair.GenereteWhereElements("PartnerProspectId", typeof(int), partnerId.ToString()) };
             LayoutControl = crmDetailControl.layoutItems;
             dgCrmProspectGrid.api = api;
             dgCrmProspectGrid.BusyIndicator = busyIndicator;
@@ -49,6 +59,11 @@ namespace UnicontaClient.Pages.CustomPage
 
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
+            if (api.session.User._Role < (byte)UserRoles.Reseller)
+            {
+                UtilDisplay.RemoveMenuCommand(ribbonControl.DataContext as RibbonBase, "ConvertToPartnerProspect");
+                PartnerProspectId.Visible = false;
+            }
         }
         protected override void OnLayoutCtrlLoaded()
         {
@@ -143,6 +158,10 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         ConvertProspectToDebtor(selectedItem);
                     break;
+                case "ConvertToPartnerProspect":
+                    if (selectedItem != null)
+                        ConvertProspectToPartnerProspect(selectedItem);
+                    break;
                 case "DeleteRow":
                     dgCrmProspectGrid.DeleteRow();
                     break;
@@ -180,6 +199,42 @@ namespace UnicontaClient.Pages.CustomPage
             CorasauDataGrid.CopyAndClearRowId(selectedItem, prospect, api);
             var parms = new object[2] { prospect, false };
             AddDockItem(TabControls.CrmProspectPage2, parms, Uniconta.ClientTools.Localization.lookup("Prospects"), "Add_16x16");
+        }
+
+        void ConvertProspectToPartnerProspect(CrmProspectClient selectedItem)
+        {
+            var partnerProspect = CreatePartnerProspectFromCrm(selectedItem);
+            if (partnerProspect == null)
+                return;
+
+            var parms = new object[2] { partnerProspect, false };
+            AddDockItem(TabControls.PartnerProspectPage2, parms, Uniconta.ClientTools.Localization.lookup("PartnerProspects"), "Add_16x16");
+        }
+
+        PartnerProspectClient CreatePartnerProspectFromCrm(CrmProspectClient source)
+        {
+            if (source == null)
+                return null;
+
+            var target = new PartnerProspectClient();
+            target.SetMaster(api.CompanyEntity);
+            target.Name = source.Name;
+            target.Address1 = source.Address1;
+            target.Address2 = source.Address2;
+            target.Address3 = source.Address3;
+            target.City = source.City;
+            target.ZipCode = source.ZipCode;
+            target.Country = source.Country;
+            target.CompanyRegNo = source.CompanyRegNo;
+            target.Phone = source.Phone;
+            target.Blocked = source.Blocked;
+            target.UserLanguage = source.UserLanguage;
+            target.ContactEmail = source.ContactEmail;
+            target.ContactPerson = source.ContactPerson;
+            target.MobilPhone = source.MobilPhone;
+            target.Www = source.Www;
+            target.IndustryCode = source.IndustryCode;
+            return target;
         }
 
         bool copyRowIsEnabled = false;
@@ -255,6 +310,7 @@ namespace UnicontaClient.Pages.CustomPage
         void ConvertProspectToDebtor(CrmProspectClient crmProspect)
         {
             CWConvertProspectToDebtor cwwin = new CWConvertProspectToDebtor(api, crmProspect);
+            cwwin.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             cwwin.Closing += async delegate
             {
                 if (cwwin.DialogResult == true)
@@ -290,10 +346,9 @@ namespace UnicontaClient.Pages.CustomPage
             var prospectClient = (sender as TextBlock).Tag as CrmProspectClient;
             if (prospectClient != null)
             {
-                var mail = string.Concat("mailto:", prospectClient._ContactEmail);
-                System.Diagnostics.Process proc = new System.Diagnostics.Process();
-                proc.StartInfo.FileName = mail;
-                proc.Start();
+                if (string.IsNullOrWhiteSpace(prospectClient._ContactEmail))
+                    return;
+                OfficeComponentUtil.SendEmailToOutlook(prospectClient._ContactEmail);
             }
         }
 

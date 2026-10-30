@@ -81,19 +81,17 @@ x:Class="UnicontaClient.Pages.CustomPage.PartnerProspectPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Address3" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="ZipCode" Width="50"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="City" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="InActive"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="AssignedByUniconta"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Phone"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="ContactPerson"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="ContactEmail" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Www" Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="MobilPhone" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="PostingAccount" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="CompanyRegNo" Width="90"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="UserLanguage" Visible="False"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Blocked" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="CurrentERP" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="CompanyType" />
-                    <local:CorasauDataGridTemplateColumnClient x:Name="CommingFrom" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ComingFrom" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="NumberOfUsers" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="LinkedToUid" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="LinkedToUserName" />
@@ -108,10 +106,9 @@ x:Class="UnicontaClient.Pages.CustomPage.PartnerProspectPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Logistic" Width="70"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Production" Width="70"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Project" Width="70"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Time" Width="70"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Crm" Width="70"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Asset" Width="70"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Mobil" Width="120" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="VatNumber" Visible="False"/>
                 </local:PartnerProspectGrid.Columns>
             </local:PartnerProspectGrid>
         </CorasauControls:BusyIndicator>

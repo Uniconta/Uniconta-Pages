@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <RibbonItem TabId="0" LocalizedNameKey="Home">
+    <!---When we create new TabPage -->
+    <RibbonItem Action="Save" ShortcutKey="Ctrl+S" LocalizedNameKey="Save" LargeGlyph="save-32x32"/>
+    <RibbonItem Action="Cancel" LocalizedNameKey="Cancel" LargeGlyph="close-32x32"/>
+    <RibbonItem Action="Delete" LocalizedNameKey="Delete" LargeGlyph="delete_32x32"/>
+  </RibbonItem>
+</root>

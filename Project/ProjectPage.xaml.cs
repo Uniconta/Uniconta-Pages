@@ -398,6 +398,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void CreateBudget()
         {
             var cwCreateBjt = new CwCreateUpdateBudget(api, 0);
+            cwCreateBjt.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             cwCreateBjt.DialogTableId = 2000000177;
             cwCreateBjt.Closed += async delegate
             {
@@ -423,6 +424,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void CreateBudgetTask()
         {
             var cwCreateBjtTask = new CwCreateBudgetTask(api, 0);
+            cwCreateBjtTask.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             cwCreateBjtTask.DialogTableId = 2000000179;
             cwCreateBjtTask.Closed += async delegate
             {
@@ -450,6 +452,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void UpdatePrices()
         {
             var cwUpdateBjt = new CwCreateUpdateBudget(api, 1);
+            cwUpdateBjt.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             cwUpdateBjt.DialogTableId = 2000000178;
             cwUpdateBjt.Closed += async delegate
             {
@@ -476,6 +479,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void CreateTaskFromTask()
         {
             var cwCreateTask = new CWCreateTaskFromTask(api);
+            cwCreateTask.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             cwCreateTask.DialogTableId = 2000000105;
             cwCreateTask.Closed += async delegate
             {
@@ -636,6 +640,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void PrintProjectInvoicePostingResult(ProjectClient selectedItem)
         {
                 var generateInvoiceDialog = new CWProjectGenerateInvoice(api, BasePage.GetSystemDefaultDate(), showToFromDate: true, showEmailList: true, showSendOnlyEmailCheck: true);
+                generateInvoiceDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                 generateInvoiceDialog.DialogTableId = 2000000047;
                 generateInvoiceDialog.Closed += async delegate
                 {
@@ -851,10 +856,9 @@ namespace UnicontaClient.Pages.CustomPage
             var projectClient = (sender as TextBlock).Tag as ProjectClient;
             if (projectClient != null)
             {
-                var mail = string.Concat("mailto:", projectClient._Email);
-                System.Diagnostics.Process proc = new System.Diagnostics.Process();
-                proc.StartInfo.FileName = mail;
-                proc.Start();
+                if (string.IsNullOrWhiteSpace(projectClient._Email))
+                    return;
+                OfficeComponentUtil.SendEmailToOutlook(projectClient._Email);
             }
         }
         void DeleteOldTransactions()

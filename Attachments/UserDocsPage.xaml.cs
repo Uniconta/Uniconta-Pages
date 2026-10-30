@@ -221,7 +221,12 @@ namespace UnicontaClient.Pages.CustomPage
             isCompUserDoc = true;
             InitPage(sourcedata);
         }
-
+        public UserDocsPage(CrudAPI api)
+            : base(api, null)
+        {
+            InitializeComponent();
+            InitPage(api.CompanyEntity);
+        }
         private void InitPage(UnicontaBaseEntity masterRecord)
         {
             if (!isCompUserDoc)
@@ -630,23 +635,22 @@ namespace UnicontaClient.Pages.CustomPage
             if (screenName == TabControls.UserDocsPage2)
             {
                 dgDocsGrid.UpdateItemSource(argument);
+                var hasRecords = dgDocsGrid.VisibleRowCount > 0;
                 var master = dgDocsGrid.masterRecord as IdKey;
                 if (master != null)
                 {
-                    if (dgDocsGrid.VisibleRowCount > 0)
-                        master.HasDocs = true;
-                    else
-                        master.HasDocs = false;
+                    master.HasDocs = hasRecords;
+                    // update cache in case record is not from cache
+                    var master2 = api.CompanyEntity.GetCache(((UnicontaBaseEntity)master).BaseEntityType())?.Get(master.RowId);
+                    if (master2 != null)
+                        master2.HasDocs = hasRecords;
                 }
                 else if (master == null)
                 {
                     var tableType = dgDocsGrid.masterRecord?.GetType();
                     var hasDocsProp = tableType?.GetProperty("HasDocs");
                     if (hasDocsProp != null)
-                    {
-                        var hasRecords = dgDocsGrid.VisibleRowCount > 0 ? true : false;
                         hasDocsProp.SetValue(dgDocsGrid.masterRecord, hasRecords, null);
-                    }
                 }
                 SetColumn();
             }

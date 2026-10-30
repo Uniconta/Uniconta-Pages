@@ -135,6 +135,7 @@ namespace UnicontaClient.Pages.CustomPage
         void PostPayments()
         {
             var postingDialog = new CWPostPayment(api);
+            postingDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             postingDialog.Closing += async delegate
             {
                 if (postingDialog.DialogResult == true)

@@ -11,6 +11,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorInvoice"
     d:DesignHeight="300" d:DesignWidth="400">
     <UserControl.Resources>
         <Util:RowIndexConverter x:Key="RowIndexConverter" />
+        <Util:VisibilityBoolConverter x:Key="VisibilityBoolConverter" />
     </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
@@ -21,6 +22,18 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorInvoice"
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <localPage:CreditorInvoicesGrid  x:Name="dgCrdInvoicesGrid" AutoGenerateColumns="None">
                 <localPage:CreditorInvoicesGrid.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="UserAttachment" ReadOnly="True"  Width="30">
+                        <localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                            <DataTemplate>
+                                <Image Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Document_Attachment_16x16.svg}" Width="16" Height="16" VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.HeaderTemplate>
+                        <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <Image Margin="5" Tag="{Binding DataContext.RowData.Row,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" VerticalAlignment="Center" Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Document_Attachment_16x16.svg}" MouseLeftButtonDown="HasDocImage_MouseLeftButtonDown" Visibility="{Binding DataContext.RowData.Row.UserAttachment,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VisibilityBoolConverter}}" Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
+                            </ControlTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                    </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="HasVoucher" Width="50"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Account" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Width="150" />
@@ -90,6 +103,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorInvoice"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="NumberSerie" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="VoucherX" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryTime" Visible="false"/>
+                    
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" ShowInColumnChooser="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim2" Width="70" FieldName="Dimension2" ShowInColumnChooser="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim3" Width="70" FieldName="Dimension3" ShowInColumnChooser="False"/>

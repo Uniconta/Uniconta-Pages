@@ -86,7 +86,6 @@ namespace UnicontaClient.Pages.CustomPage
         List<PropValuePair> inputs;
         List<UnicontaBaseEntity> inputsMaster;
 
-        int monthNumber, quarterNo, year;
         double normQty, budgetQty;
         DateTime fromDate, toDate;
 
@@ -135,9 +134,6 @@ namespace UnicontaClient.Pages.CustomPage
             if (budgetGrp != null)
                 inputsMaster.Add((ProjectBudgetGroup)BudgetGroupCache.Get(projectBudgetGrp));
 
-            monthNumber = filterDateValues[0];
-            quarterNo = filterDateValues[1];
-            year = filterDateValues[2];
             normQty = qtyValues[0];
             budgetQty = qtyValues[1];
             fromDate = dates[0];
@@ -149,25 +145,8 @@ namespace UnicontaClient.Pages.CustomPage
             busyIndicator.IsBusy = true;
             var projLst = await api.Query<ProjectBudgetLineLocal>(inputsMaster, inputs);
             IEnumerable<ProjectBudgetLineLocal> lst;
-            if (year > 0 && monthNumber > 0)
-                lst = projLst?.Where(x => x.Date.Year == year && x.Date.Month == monthNumber);
-            else if (year > 0 && quarterNo > 0)
-            {
-                var months = GetMonthNo(quarterNo);
-                lst = projLst?.Where(x => x.Date.Year == year && x.Date.Month >= months[0] && x.Date.Month <= months[1]);
-            }
-            else if (monthNumber > 0 && quarterNo > 0)
-                lst = null;
-            else if (monthNumber > 0)
-                lst = projLst?.Where(x => x.Date.Month == monthNumber);
-            else if (year > 0)
-                lst = projLst?.Where(x => x.Date.Year == year);
-            else if (quarterNo > 0)
-            {
-                var months = GetMonthNo(quarterNo);
-                lst = projLst?.Where(x => x.Date.Month >= months[0] && x.Date.Month <= months[1]);
-                period = string.Format("{0} {1}", months[0], year);
-            }
+            if (fromDate != DateTime.MinValue || toDate != DateTime.MaxValue)
+                lst = projLst?.Where(x => x.Date >= fromDate && x.Date <= toDate);
             else
                 lst = null;
 
@@ -177,21 +156,6 @@ namespace UnicontaClient.Pages.CustomPage
             dgProjectBgtPlangLine.Visibility = Visibility.Visible;
         }
      
-        int[] GetMonthNo(int qtNo)
-        {
-            int[] months =  null;
-            if (qtNo == 1)
-                months = new int[] { 1, 3 };
-            else if (qtNo == 2)
-                months = new int[] { 4, 6 };
-            else if (qtNo == 3)
-                months = new int[] { 7, 9 };
-            else if (qtNo == 4)
-                months = new int[] { 10, 12 };
-            return months; 
-        }
-
-        string period;
         void SetStatusText(double bgtHrs)
         {
             RibbonBase rb = (RibbonBase)localMenu.DataContext;

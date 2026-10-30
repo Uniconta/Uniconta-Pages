@@ -246,6 +246,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                     {
                         CWOrderFromInvoice cwOrderInvoice = new CWOrderFromInvoice(api);
+                        cwOrderInvoice.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                         cwOrderInvoice.DialogTableId = 2000000032;
                         cwOrderInvoice.Closed += async delegate
                         {

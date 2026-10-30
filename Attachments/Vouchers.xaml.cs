@@ -1,33 +1,35 @@
+using Bilagscan;
+using DevExpress.Xpf.Bars;
+using DevExpress.Xpf.Core;
+using DevExpress.Xpf.Grid;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Uniconta.ClientTools.Page;
-using Uniconta.ClientTools.DataModel;
-using Uniconta.Common;
-using UnicontaClient.Utilities;
-using UnicontaClient.Models;
+using Uniconta.API.DebtorCreditor;
+using Uniconta.API.GeneralLedger;
+using Uniconta.API.Service;
 using Uniconta.ClientTools;
 using Uniconta.ClientTools.Controls;
-using System.Threading.Tasks;
-using Uniconta.API.GeneralLedger;
-using System.Windows;
+using Uniconta.ClientTools.Controls.AI.Assistant.Capabilities;
+using Uniconta.ClientTools.DataModel;
+using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
-using Uniconta.DataModel;
-using System.Collections;
-using Uniconta.API.Service;
-using UnicontaClient.Controls.Dialogs;
-using Uniconta.Common.Utility;
-using UnicontaClient.Controls;
-using DevExpress.Xpf.Bars;
-using UnicontaClient.Pages.Attachments;
-using Uniconta.API.DebtorCreditor;
-using DevExpress.Xpf.Grid;
-using Localization = Uniconta.ClientTools.Localization;
-using Bilagscan;
+using Uniconta.Common;
 using Uniconta.Common.User;
-using System.Diagnostics;
+using Uniconta.Common.Utility;
+using Uniconta.DataModel;
+using UnicontaClient.Controls;
+using UnicontaClient.Controls.Dialogs;
+using UnicontaClient.Models;
+using UnicontaClient.Pages.Attachments;
+using UnicontaClient.Utilities;
+using Localization = Uniconta.ClientTools.Localization;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -41,6 +43,27 @@ namespace UnicontaClient.Pages.CustomPage
         public override IComparer GridSorting { get { return new SortDocAttached(); } }
         public override bool IsAutoSave { get { return false; } }
         private bool _canInsert;
+        internal static void PrepareVoucherAttachment(VouchersClient rec)
+        {
+            if (rec._Fileextension == FileextensionsTypes.JPEG ||
+                rec._Fileextension == FileextensionsTypes.BMP ||
+                rec._Fileextension == FileextensionsTypes.GIF ||
+                rec._Fileextension == FileextensionsTypes.TIFF)
+            {
+                rec._ScanDoc = true;
+                var imageBytes = FileBrowseControl.ImageResize(rec._Data, ".jpg");
+                if (imageBytes != null)
+                {
+                    rec._Data = imageBytes;
+                    rec._Fileextension = FileextensionsTypes.JPEG;
+                    rec._NoCompress = true;
+                }
+            }
+            else if (rec._Fileextension == FileextensionsTypes.PDF ||
+                     rec._Fileextension == FileextensionsTypes.PNG)
+                rec._ScanDoc = true;
+        }
+
         async public override Task<ErrorCodes> SaveData()
         {
             SelectedItem = null;
@@ -62,23 +85,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     rec = addedRows[iCtr].DataItem as VouchersClient;
                     vouchersClient[iCtr] = rec;
-                    if (rec._Fileextension == FileextensionsTypes.JPEG ||
-                        rec._Fileextension == FileextensionsTypes.BMP ||
-                        rec._Fileextension == FileextensionsTypes.GIF ||
-                        rec._Fileextension == FileextensionsTypes.TIFF)
-                    {
-                        rec._ScanDoc = true;
-                        var imageBytes = FileBrowseControl.ImageResize(rec._Data, ".jpg");
-                        if (imageBytes != null)
-                        {
-                            rec._Data = imageBytes;
-                            rec._Fileextension = FileextensionsTypes.JPEG;
-                            rec._NoCompress = true;
-                        }
-                    }
-                    else if (rec._Fileextension == FileextensionsTypes.PDF ||
-                             rec._Fileextension == FileextensionsTypes.PNG)
-                        rec._ScanDoc = true;
+                    PrepareVoucherAttachment(rec);
 
                     if (rec._Data != null && rec._Data.Length > TableAddOnData.MaxDocSize)
                     {
@@ -253,6 +260,17 @@ namespace UnicontaClient.Pages.CustomPage
             var menuMacNoSupport = new string[2] { "SplitPDF", "JoinPDF" };
             UtilDisplay.RemoveMenuCommand(rb, menuMacNoSupport);
 #endif
+        }
+
+
+        public override List<IAIAssistantCapability> GetAIAssistantCapabilities(bool hasFileAttached)
+        {
+            var capabilities = base.GetAIAssistantCapabilities(hasFileAttached);
+            var selectedVoucher = dgVoucherGrid.SelectedItem as VouchersClient;
+            if (selectedVoucher != null && !dgVoucherGrid.Readonly)
+                capabilities.Add(new RecordManipulationCapability());
+
+            return capabilities;
         }
 
         public async override Task InitQuery()
@@ -798,7 +816,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                             if (object.ReferenceEquals(lst, dgVoucherGrid.ItemsSource))
                             {
-                                task = postingApi.GenerateJournalFromDocument(journalName, journalDate, journals.IsCreditAmount, OnlyApproved, journals.AddVoucherNumber);
+                                task = postingApi.GenerateJournalFromDocument(journalName, journalDate, journals.IsCreditAmount, OnlyApproved, journals.AddVoucherNumber, journals.LineWithAutoPost);
                                 foreach (var doc in lst)
                                     if (!doc._OnHold)
                                         doc.InJournal = true;
@@ -885,7 +903,7 @@ namespace UnicontaClient.Pages.CustomPage
                             PostingResult postingResult;
                             if (object.ReferenceEquals(lst, dgVoucherGrid.ItemsSource))
                             {
-                                postingResult = await postingApi.PostJournalFromDocument(journalName, journalDate, comment, simulate, cwjournal.IsCreditAmount, OnlyApproved, new GLTransClientTotal(), null);
+                                postingResult = await postingApi.PostJournalFromDocument(journalName, journalDate, comment, simulate, cwjournal.IsCreditAmount, OnlyApproved, new GLTransClientTotal(), null, cwjournal.LineWithAutoPost);
                             }
                             else
                             {
@@ -942,6 +960,13 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "OffSetAccount":
                     CallOffsetAccount(selectedItem);
+                    break;
+                case "NormallyUsedCostAccount":
+                    if (selectedItem != null)
+                    {
+                        var determineCostAccount = new CWAIDetermineCostAccount(api, selectedItem);
+                        determineCostAccount.Show();
+                    }
                     break;
                 case "DocumentScanUpload":
                     if (api.CompanyEntity.DocumentScanner != PayableDocumentScanners.None)
@@ -1042,6 +1067,30 @@ namespace UnicontaClient.Pages.CustomPage
                 case "ViewCorrectScannedData":
                     AddDockItem(TabControls.VoucherScanCorrectionPage, null, true, Localization.lookup("ViewCorrectScannedData"), "View_16x16");
                     break;
+                case "VoucherScannerLog":
+                    AddDockItem(TabControls.VoucherScannerLogPage, null, true, Localization.lookup("VoucherScannerLog"), "View_16x16");
+                    break;
+                case "VoucherScanSettings":
+                    OpenVoucherScanSettings();
+                    break;
+                case "UnicontaScanSettings":
+                    OpenUnicontaScanSettings();
+                    break;
+                case "AddMapping":
+                    if (selectedItem != null)
+                    {
+                        (new CWAddVoucherPostingRule(api, selectedItem)
+                        {
+                            Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api)
+                        }).Show();
+                    }
+                    break;
+                case "LookupAccounts":
+                    AddDockItem(TabControls.BankImportMapping, new VouchersClient(), Uniconta.ClientTools.Localization.lookup("Mappings"));
+                    break;
+                case "ApplyPostingRules":
+                    ApplyPostingRules();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -1079,8 +1128,7 @@ namespace UnicontaClient.Pages.CustomPage
                         if (selectedItem._DocumentRef != 0)
                             VoucherCache.RemoveGlobalVoucherCache(selectedItem.CompanyId, selectedItem._DocumentRef);
                         busyIndicator.IsBusy = true;
-                        var postingApiInv = new PostingAPI(api);
-                        var errorCodes = await postingApiInv.AddPhysicalVoucher(selectedItem, doc, cwconfirm.ForAllTransactions, cwconfirm.AppendDoc);
+                        var errorCodes = await new PostingAPI(api).AddPhysicalVoucher(selectedItem, doc, cwconfirm.ForAllTransactions, cwconfirm.AppendDoc);
                         busyIndicator.IsBusy = false;
                         if (errorCodes == ErrorCodes.Succes)
                             dgVoucherGrid.RemoveFocusedRowFromGrid();
@@ -1627,6 +1675,13 @@ namespace UnicontaClient.Pages.CustomPage
             menu.Add(moveToMenu);
         }
 
+        protected override IAIAssistantCapability GetAIFileUploadCapability() => new FileUploadCapability( (metaData, data) =>
+        {
+            UnicontaClient.Utilities.Utility.AddContentToGrid(gridControl, data, metaData.ShortDescription, metaData.GetFileextensionType(), isVoucher: true);
+
+            return Task.FromResult(AIAssistantCapabilityResult.Success("The document was added to the grid, press save to commit changes to the database."));
+        });
+
         private void BinMenu_ItemClick(object sender, ItemClickEventArgs e)
         {
             string bin = Convert.ToString(e.Item.Content);
@@ -1785,6 +1840,106 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
+        async void ApplyPostingRules()
+        {
+            var maps = await api.Query<BankImportMap>(new Document());
+            if (maps == null || maps.Length == 0)
+                return;
+            int cnt = 0;
+            foreach (var document in (IEnumerable<VouchersClient>)dgVoucherGrid.GetVisibleRows())
+            {
+                if (document._AutoPost)
+                    continue;
+
+                BankImportMap mapFound = null;
+                string t = document._Text;
+                string TextExt = document._PostingInstruction;
+
+                for (int i = 0; i < 6; i++)
+                {
+                    if (i == 3)
+                    {
+                        if (TextExt == null)
+                            break;
+                        t = TextExt;
+                    }
+
+                    int maplen = 0;
+                    for (int m = 0; (m < maps.Length); m++)
+                    {
+                        var map = maps[m];
+                        if (map._Creditor != null)
+                        {
+                            if (map._Creditor != document._CreditorAccount)
+                                continue;
+                            if (map._Text == null)
+                            {
+                                if (mapFound != null && mapFound._Creditor != null)
+                                    continue;
+                                maplen = 1;
+                                mapFound = map;
+                                continue;
+                            }
+                        }
+                        var idx = map.FindText(t, i);
+                        if (idx >= 0 && map._Text.Length > maplen)
+                        {
+                            maplen = map._Text.Length;
+                            mapFound = map;
+                        }
+                    }
+                    if (mapFound != null)
+                        break;
+                }
+                if (mapFound != null)
+                {
+                    cnt++;
+                    dgVoucherGrid.SetLoadedRow(document);
+
+                    if (mapFound._Vat != null)
+                        document.Vat = mapFound._Vat;
+                    /*
+                    if (mapFound._AccountTemplate != null)
+                    {
+                        document._AutoPost = true;
+                        document.CostAccount = null;
+                    }
+                    else 
+                    */
+                    if (mapFound._Account != null)
+                        document.CostAccount = mapFound._Account;
+
+                    if (document._CreditorAccount == null && mapFound._OffsetAccount != null)
+                    {
+                        document.PayAccount = mapFound._OffsetAccount;
+                        document.AutoPost = true;
+                    }
+                    if (document.CostAccount != null)
+                        document.AutoPost = true;
+                    if (mapFound._Dim1 != null)
+                        document.Dimension1 = mapFound._Dim1;
+                    if (mapFound._Dim2 != null)
+                        document.Dimension2 = mapFound._Dim2;
+                    if (mapFound._Dim3 != null)
+                        document.Dimension3 = mapFound._Dim3;
+                    if (mapFound._Dim4 != null)
+                        document.Dimension4 = mapFound._Dim4;
+                    if (mapFound._Dim5 != null)
+                        document.Dimension5 = mapFound._Dim5;
+                    if (mapFound._Approver1 != null)
+                        document.Approver1 = mapFound._Approver1;
+                    if (mapFound._Approver2 != null)
+                        document.Approver2 = mapFound._Approver2;
+
+                    dgVoucherGrid.SetModifiedRow(document);
+                }
+            }
+            if (cnt == 0)
+                UtilDisplay.ShowErrorCode(ErrorCodes.NoLinesFound);
+            else
+                UnicontaMessageBox.Show(Localization.lookup("NumberOfRecords") + ": " + NumberConvert.ToString(cnt), Localization.lookup("Information"), MessageBoxButton.OK);
+        }
+
         void SetFooterDetailText()
         {
             txtCreditorName.Text = VouchersClientText.CreditorName;
@@ -1912,6 +2067,20 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             return orgNo;
+        }
+
+        private void OpenVoucherScanSettings()
+        {
+            // The ribbon hides the manual upload command when auto-scan is on. That is evaluated when the page
+            // opens, so a changed auto-scan setting takes effect the next time the page is opened.
+            var cw = new CWVoucherScanSettings(api);
+            cw.Show();
+        }
+
+        private void OpenUnicontaScanSettings()
+        {
+            var cw = new CWUnicontaScanSettings(api);
+            cw.Show();
         }
 
         private async void CorrectScannedData(VouchersClient voucher)

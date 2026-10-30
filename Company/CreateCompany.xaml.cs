@@ -145,6 +145,7 @@ namespace UnicontaClient.Pages.CustomPage
             chkSet0InAct.IsEnabled = true;
             chkInvoiceVatPriceCheck.IsEnabled = false;
             chkInvoiceVatPriceCheck.Visibility = Visibility.Collapsed;
+            lblInvoiceVatPriceCheck.Visibility = Visibility.Collapsed;
             chkConcatC5ItemNames.IsEnabled = false;
             lblConcatC5ItemNames.Visibility = Visibility.Collapsed;
             chkConcatC5ItemNames.Visibility = Visibility.Collapsed;
@@ -214,6 +215,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 chkInvoiceVatPriceCheck.IsEnabled = true;
                 chkInvoiceVatPriceCheck.Visibility = Visibility.Visible;
+                lblInvoiceVatPriceCheck.Visibility = Visibility.Visible;
 
                 cmbImportDimension.IsEnabled = false;
 
@@ -259,11 +261,36 @@ namespace UnicontaClient.Pages.CustomPage
                 lblInvConEmail.Visibility = Visibility.Collapsed;
                 cmbInvoiceOrContactMail.Visibility = Visibility.Collapsed;
             }
+            else if (cmbImportFrom.SelectedIndex == (int)ImportFrom.BlueOffice)
+            {
+                cmbImportDimension.IsEnabled = false;
+
+                lblDimC5.Visibility = Visibility.Collapsed;
+                cmbImportDimension.Visibility = Visibility.Collapsed;
+
+                lblInvConEmail.Visibility = Visibility.Collapsed;
+                cmbInvoiceOrContactMail.Visibility = Visibility.Collapsed;
+
+                lblSet0InCustAcc.Visibility = Visibility.Collapsed;
+                lblSet0InVendAcc.Visibility = Visibility.Collapsed;
+                chkSet0InCustAcc.Visibility = Visibility.Collapsed;
+                chkSet0InVendAcc.Visibility = Visibility.Collapsed;
+
+                lblerrorAccount.Visibility = Visibility.Visible;
+                txtNavErrorAccount.Visibility = Visibility.Visible;
+
+                lblAccountForPrimo.Visibility = Visibility.Visible;
+                txtAccountForPrimo.Visibility = Visibility.Visible;
+
+                lblImportInvoice.Visibility = Visibility.Visible;
+                chkImportInvoice.IsChecked = true;
+            }
             else // e-conomic
             {
                 cmbImportDimension.IsEnabled = false;
                 chkInvoiceVatPriceCheck.IsEnabled = true;
                 chkInvoiceVatPriceCheck.Visibility = Visibility.Visible;
+                lblInvoiceVatPriceCheck.Visibility = Visibility.Visible;
                 lblDimC5.Visibility = Visibility.Collapsed;
                 cmbImportDimension.Visibility = Visibility.Collapsed;
 
@@ -325,6 +352,9 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case (int)ImportFrom.economic_Germany:
                     editrow.Country = CountryCode.Germany;
+                    break;
+                case (int)ImportFrom.BlueOffice:
+                    editrow.Country = CountryCode.Switzerland;
                     break;
             }
         }
@@ -478,6 +508,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case ImportFrom.Ax30_eCTRL: editrow._ConvertedFrom = (int)ConvertFromType.eCtrl; break;
                 case ImportFrom.dk_Iceland: editrow._ConvertedFrom = (int)ConvertFromType.dk_Iceland; break;
                 case ImportFrom.Dinero: editrow._ConvertedFrom = (int)ConvertFromType.Dinero; break;
+                case ImportFrom.BlueOffice: editrow._ConvertedFrom = (int)ConvertFromType.BlueOffice; break;
             }
             if (setupType == 1)
             {

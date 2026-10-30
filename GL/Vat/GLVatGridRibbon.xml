@@ -5,6 +5,7 @@
     <RibbonItem Action="AddRow" LocalizedNameKey="Add" ControlName="GLVatPage2" Glyph="Add_16x16" LargeGlyph="Add_32x32"/>
     <RibbonItem Action="CopyRow" LocalizedNameKey="Copy" LargeGlyph="Copy_32x32"/>
     <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="Edit" Glyph="Edit_16x16" LargeGlyph="Edit_32x32"/>
+    <RibbonItem Action="WhereUsed" LocalizedNameKey="WhereUsed" Glyph="WhereUsed" LargeGlyph="WhereUsed"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh" LargeGlyph="refresh"/>

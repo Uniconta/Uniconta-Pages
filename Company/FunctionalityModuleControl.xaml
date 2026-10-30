@@ -1,0 +1,101 @@
+<UserControl xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.FunctionalityModuleControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+    x:Name="ModuleControl" Visibility="{Binding Visibility}">
+    <Border Width="240" Margin="5" Padding="16" Background="Transparent"
+            BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"
+            BorderThickness="1" CornerRadius="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <StackPanel>
+            <Grid MinHeight="65" Margin="0,0,0,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="44"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Border Width="36" Height="36" CornerRadius="18" Background="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" Opacity="0.16" VerticalAlignment="Top"/>
+                <Image Width="22" Height="22" VerticalAlignment="Top" Margin="7" Source="{Binding IconSource, ElementName=ModuleControl}"/>
+                <StackPanel Grid.Column="1">
+                    <TextBlock FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" TextWrapping="Wrap"
+
+                               Text="{Binding Title}"/>
+                    <TextBlock FontSize="11" TextWrapping="Wrap" Margin="0,5,0,0" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"
+                               Text="{Binding Description}"/>
+                </StackPanel>
+            </Grid>
+            <Expander IsExpanded="{Binding AreFeaturesExpanded, Mode=TwoWay}" HorizontalAlignment="Stretch">
+                    <Expander.Header>
+                        <TextBlock FontWeight="SemiBold" Text="{Binding FeaturesTitle}"/>
+                    </Expander.Header>
+                    <Expander.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Expand all" Click="ExpandAll_Click"/>
+                            <MenuItem Header="Collapse all" Click="CollapseAll_Click"/>
+                        </ContextMenu>
+                    </Expander.ContextMenu>
+
+                <StackPanel>
+                        <ItemsControl ItemsSource="{Binding VisibleFeatures}" Margin="0,10,0,0">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,0,0,11" Visibility="{Binding Visibility}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="24"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <CorasauControls:CheckEditor VerticalAlignment="Top"
+                                                                     IsChecked="{Binding IsEnabled, Mode=TwoWay}"
+                                                                     IsEnabled="{Binding CanEdit}"/>
+
+                                        <Expander Grid.Column="1"
+                                                  HorizontalAlignment="Stretch"
+                                                  IsExpanded="{Binding IsDescriptionExpanded, Mode=TwoWay}">
+                                            <Expander.Header>
+                                                <TextBlock FontWeight="SemiBold"
+                                                           TextWrapping="Wrap"
+                                                           Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
+                                                           Text="{Binding Title}"/>
+                                            </Expander.Header>
+
+                                            <TextBlock FontSize="11"
+                                                       TextWrapping="Wrap"
+                                                       Margin="0,3,0,0"
+                                                       Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"
+                                                       Text="{Binding Description}"/>
+                                        </Expander>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <ItemsControl ItemsSource="{Binding VisibleOptions}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Margin="0,0,0,11">
+                                        <Expander HorizontalAlignment="Stretch"
+                                                  IsExpanded="{Binding IsDescriptionExpanded, Mode=TwoWay}">
+                                            <Expander.Header>
+                                                <TextBlock FontWeight="SemiBold"
+                                                           TextWrapping="Wrap"
+                                                           Text="{Binding Title}"/>
+                                            </Expander.Header>
+
+                                            <TextBlock FontSize="11"
+                                                       TextWrapping="Wrap"
+                                                       Margin="0,3,0,0"
+                                                       Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"
+                                                       Text="{Binding Description}"/>
+                                        </Expander>
+
+                                        <CorasauControls:ComboBoxEditor Margin="0,5,0,0"
+                                                                        ItemsSource="{Binding Items}"
+                                                                        SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Expander>
+        </StackPanel>
+    </Border>
+</UserControl>

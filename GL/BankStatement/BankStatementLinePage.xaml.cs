@@ -178,7 +178,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             foreach (var rec in Parameters)
             {
-                if (string.Compare(rec.Name, "Bank", StringComparison.CurrentCultureIgnoreCase) == 0)
+                if (string.Equals(rec.Name, "Bank", StringComparison.CurrentCultureIgnoreCase))
                 {
                     var cache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.BankStatement), api);
                     master = (Uniconta.DataModel.BankStatement)cache.Get(rec.Value);
@@ -728,7 +728,11 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "AddMapping":
                     if (selectedItem != null)
-                        (new CWAddBankImportMapping(api, master, selectedItem)).Show();
+                    {
+                        var bankImportMappingDialog = new CWAddBankImportMapping(api, selectedItem);
+                        bankImportMappingDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
+                        bankImportMappingDialog.Show();
+                    }
                     break;
                 case "OffSetAccount":
                     if (selectedItem != null)
@@ -757,6 +761,12 @@ namespace UnicontaClient.Pages.CustomPage
                 case "SendVoucherReminder":
                     if (selectedItem != null)
                         Utility.SendVoucherReminder(api, selectedItem._Date, selectedItem._AmountCur != 0 ? selectedItem._AmountCur : selectedItem._Amount, selectedItem._Currency, selectedItem._Text);
+                    break;
+                case "LookupAccounts":
+                    AddDockItem(TabControls.BankImportMapping, new BankStatementClient(), Uniconta.ClientTools.Localization.lookup("Mappings"));
+                    break;
+                case "ApplyPostingRules":
+                    ApplyPostingRules();
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -1094,6 +1104,7 @@ namespace UnicontaClient.Pages.CustomPage
         void TransferBankStatementToJournal()
         {
             CWTransferBankStatement winTransfer = new CWTransferBankStatement(fromDate, toDate, api, master);
+            winTransfer.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             winTransfer.DialogTableId = 2000000016;
             winTransfer.Closed += async delegate
             {
@@ -1142,6 +1153,84 @@ namespace UnicontaClient.Pages.CustomPage
             }
             bst.Updated = true;
             bst.Mark = false;
+        }
+
+        async void ApplyPostingRules()
+        {
+            var maps = await api.Query<BankImportMap>();
+            if (maps == null || maps.Length == 0)
+                return;
+            int cnt = 0;
+            foreach (var lin in (IEnumerable<BankStatementLineGridClient>)dgBankStatementLine.GetVisibleRows())
+            {
+                if (lin._AutoPost || !lin.AllowEditing)
+                    continue;
+
+                BankImportMap mapFound = null;
+                string t = lin._Text;
+                string TextExt = lin._Info;
+
+                for (int i = 0; i < 6; i++)
+                {
+                    if (i == 3)
+                    {
+                        if (TextExt == null)
+                            break;
+                        t = TextExt;
+                    }
+
+                    int maplen = 0;
+                    for (int m = 0; (m < maps.Length); m++)
+                    {
+                        var map = maps[m];
+                        var idx = map.FindText(t, i);
+                        if (idx >= 0 && map._Text.Length > maplen)
+                        {
+                            maplen = map._Text.Length;
+                            mapFound = map;
+                        }
+                    }
+                    if (mapFound != null)
+                        break;
+                }
+                if (mapFound != null)
+                {
+                    cnt++;
+                    dgBankStatementLine.SetLoadedRow(lin);
+
+                    if (mapFound._Vat != null)
+                        lin.Vat = mapFound._Vat;
+                    if (mapFound._Account != null)
+                    {
+                        if (lin._AccountType != (byte)mapFound._AccountType)
+                        {
+                            lin._AccountType = (byte)mapFound._AccountType;
+                            lin.NotifyPropertyChanged("AccountType");
+                        }
+                        lin.Account = mapFound._Account;
+                        if (mapFound._RequireVoucher && lin._DocumentRef == null)
+                            lin._AutoPostConVoucher = true;
+                        else
+                            lin.AutoPost = true;
+                    }
+                    if (mapFound._Dim1 != null)
+                        lin.Dimension1 = mapFound._Dim1;
+                    if (mapFound._Dim2 != null)
+                        lin.Dimension2 = mapFound._Dim2;
+                    if (mapFound._Dim3 != null)
+                        lin.Dimension3 = mapFound._Dim3;
+                    if (mapFound._Dim4 != null)
+                        lin.Dimension4 = mapFound._Dim4;
+                    if (mapFound._Dim5 != null)
+                        lin.Dimension5 = mapFound._Dim5;
+
+                    dgBankStatementLine.SetModifiedRow(lin);
+                }
+            }
+            if (cnt == 0)
+                UtilDisplay.ShowErrorCode(ErrorCodes.NoLinesFound);
+            else
+                UnicontaMessageBox.Show(Localization.lookup("NumberOfRecords") + ": " + NumberConvert.ToString(cnt), Localization.lookup("Information"), MessageBoxButton.OK);
         }
 
         void AutoReconciliation()
@@ -1903,7 +1992,7 @@ namespace UnicontaClient.Pages.CustomPage
                     var lstAct = ((IEnumerable<GLTransClientTotalBank>)dgAccountsTransGrid.ItemsSource);
                     if (lstAct != null)
                     {
-                        var BankStatementLine = selectedbsl.Id;
+                        var BankStatementLine = selectedbsl.Id();
                         foreach (var r in lstAct)
                         {
                             if (r.BankStatementLine == BankStatementLine)
@@ -2005,7 +2094,7 @@ namespace UnicontaClient.Pages.CustomPage
                         var BankStatementLine = selectedTrans.BankStatementLine;
                         foreach (var r in lstbsl)
                         {
-                            if (r.Id == BankStatementLine)
+                            if (r.Id() == BankStatementLine)
                             {
                                 lastSelectedbsl = new List<BankStatementLineGridClient>() { r };
                                 dgBankStatementLine.CurrentItem = r;

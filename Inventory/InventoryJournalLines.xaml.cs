@@ -115,7 +115,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             foreach (var rec in Parameters)
             {
-                if (string.Compare(rec.Name, "Journal", StringComparison.CurrentCultureIgnoreCase) == 0)
+                if (string.Equals(rec.Name, "Journal", StringComparison.CurrentCultureIgnoreCase))
                 {
                     var cache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.InvJournal), api);
                     journal = (Uniconta.DataModel.InvJournal)cache.Get(rec.Value);
@@ -451,7 +451,7 @@ namespace UnicontaClient.Pages.CustomPage
             var EAN = rec._EAN;
             if (string.IsNullOrWhiteSpace(EAN))
                 return;
-            var found = (from item in (InvItem[])items.GetNotNullArray where string.Compare(item._EAN, EAN, StringComparison.CurrentCultureIgnoreCase) == 0 select item).FirstOrDefault();
+            var found = (from item in (InvItem[])items.GetNotNullArray where string.Equals(item._EAN, EAN, StringComparison.CurrentCultureIgnoreCase) select item).FirstOrDefault();
             if (found != null)
             {
                 rec._EAN = found._EAN;

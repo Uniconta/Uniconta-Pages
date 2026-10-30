@@ -117,6 +117,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void chkAddFollowUp_Checked(object sender, RoutedEventArgs e)
         {
             var cw = new CwAddFollowUp(api);
+            cw.Args = Args; // pass through args
             cw.Closed += delegate
             {
                 if (cw.DialogResult == true)

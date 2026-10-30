@@ -93,12 +93,12 @@ namespace UnicontaClient.Pages.CustomPage
         {
             foreach (var rec in Parameters)
             {
-                if (string.Compare(rec.Name, "Budget", StringComparison.CurrentCultureIgnoreCase) == 0)
+                if (string.Equals(rec.Name, "Budget", StringComparison.CurrentCultureIgnoreCase))
                 {
                     var cache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.GLBudget), api);
                     master = (Uniconta.DataModel.GLBudget)cache.Get(rec.Value);
                 }
-                else if (string.Compare(rec.Name, "Account", StringComparison.CurrentCultureIgnoreCase) == 0)
+                else if (string.Equals(rec.Name, "Account", StringComparison.CurrentCultureIgnoreCase))
                 {
                     var cache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.GLAccount), api);
                     master = (Uniconta.DataModel.GLAccount)cache.Get(rec.Value);
@@ -213,6 +213,7 @@ namespace UnicontaClient.Pages.CustomPage
                 toDate = budgetMaster._ToDate;
             }
             CWBudgetLineDialog objCWBudgetLineDialog = new CWBudgetLineDialog(api, fromDate, toDate);
+            objCWBudgetLineDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             objCWBudgetLineDialog.Closed += delegate
             {              
                 if (objCWBudgetLineDialog.DialogResult == true)

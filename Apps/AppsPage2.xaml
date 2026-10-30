@@ -1,0 +1,79 @@
+<Pages:FormBasePage xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.AppsPage2"
+           xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+           xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+           xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+           xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <UnicontaControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Pages/Apps/AppsPage2Ribbon.xml" Grid.Row="0"/>
+        <UnicontaControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1"
+                                               HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <UnicontaControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
+                <UnicontaControls:CorasauLayoutGroup View="GroupBox" x:Name="grpDescription"
+                                                     Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}"
+                                                     Orientation="Vertical"
+                                                     UnicontaControls:CorasauLayoutControl.AllowHorizontalSizing="True"
+                                                     HorizontalAlignment="Left">
+                    <UnicontaControls:CorasauLayoutItem FieldName="Name" x:Name="liName">
+                        <UnicontaControls:TextEditor Text="{Binding Name,Mode=TwoWay}"/>
+                    </UnicontaControls:CorasauLayoutItem>
+                    <UnicontaControls:CorasauLayoutItem FieldName="Comment" x:Name="liComment">
+                        <UnicontaControls:TextEditor Text="{Binding Comment,Mode=TwoWay}"/>
+                    </UnicontaControls:CorasauLayoutItem>
+                    <UnicontaControls:CorasauLayoutItem FieldName="AppId" x:Name="liAppId">
+                        <UnicontaControls:TextEditor Text="{Binding AppId}" IsReadOnly="True"/>
+                    </UnicontaControls:CorasauLayoutItem>
+                    <UnicontaControls:CorasauLayoutItem FieldName="URL" x:Name="liURL">
+                        <UnicontaControls:TextEditor Text="{Binding URL,Mode=TwoWay}"/>
+                    </UnicontaControls:CorasauLayoutItem>
+                    <UnicontaControls:CorasauLayoutItem FieldName="Pid" x:Name="liPid">
+                        <UnicontaControls:TextEditor Text="{Binding Pid}" IsReadOnly="True"/>
+                    </UnicontaControls:CorasauLayoutItem>
+                </UnicontaControls:CorasauLayoutGroup>
+                <UnicontaControls:CorasauLayoutGroup View="GroupBox" x:Name="grpSettings"
+                                                     Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Settings}"
+                                                     Orientation="Vertical"
+                                                     UnicontaControls:CorasauLayoutControl.AllowHorizontalSizing="True"
+                                                     HorizontalAlignment="Left">
+                    <UnicontaControls:CorasauLayoutItem FieldName="Open" x:Name="liOpen">
+                        <UnicontaControls:CheckEditor IsChecked="{Binding Open,Mode=TwoWay}"/>
+                    </UnicontaControls:CorasauLayoutItem>
+                    <UnicontaControls:CorasauLayoutItem FieldName="InTest" x:Name="liInTest">
+                        <UnicontaControls:CheckEditor IsChecked="{Binding InTest,Mode=TwoWay}"/>
+                    </UnicontaControls:CorasauLayoutItem>
+                    <UnicontaControls:CorasauLayoutItem FieldName="Blocked" x:Name="liBlocked">
+                        <UnicontaControls:CheckEditor IsChecked="{Binding Blocked,Mode=TwoWay}"/>
+                    </UnicontaControls:CorasauLayoutItem>
+                    <UnicontaControls:CorasauLayoutItem FieldName="Free" x:Name="liFree">
+                        <UnicontaControls:CheckEditor IsChecked="{Binding Free,Mode=TwoWay}"/>
+                    </UnicontaControls:CorasauLayoutItem>
+                    <UnicontaControls:CorasauLayoutItem FieldName="OnlyOwnCustomers" x:Name="liOnlyOwnCustomers">
+                        <UnicontaControls:CheckEditor IsChecked="{Binding OnlyOwnCustomers,Mode=TwoWay}"/>
+                    </UnicontaControls:CorasauLayoutItem>
+                    <UnicontaControls:CorasauLayoutItem FieldName="NetFramework" x:Name="liNetFramework">
+                        <UnicontaControls:CheckEditor IsChecked="{Binding NetFramework,Mode=TwoWay}"/>
+                    </UnicontaControls:CorasauLayoutItem>
+                    <UnicontaControls:CorasauLayoutItem FieldName="NetCore" x:Name="liNetCore">
+                        <UnicontaControls:CheckEditor IsChecked="{Binding NetCore,Mode=TwoWay}"/>
+                    </UnicontaControls:CorasauLayoutItem>
+                    <UnicontaControls:CorasauLayoutItem FieldName="MainVersion" x:Name="liMainVersion">
+                        <UnicontaControls:IntegerEditor EditValue="{Binding MainVersion,Mode=TwoWay}"/>
+                    </UnicontaControls:CorasauLayoutItem>
+                    <UnicontaControls:CorasauLayoutItem FieldName="MinorVersion" x:Name="liMinorVersion">
+                        <UnicontaControls:IntegerEditor EditValue="{Binding MinorVersion,Mode=TwoWay}"/>
+                    </UnicontaControls:CorasauLayoutItem>
+                    <UnicontaControls:CorasauLayoutItem FieldName="FromAppId" x:Name="liFromAppId">
+                        <UnicontaControls:IntegerEditor EditValue="{Binding FromAppId,Mode=TwoWay}"/>
+                    </UnicontaControls:CorasauLayoutItem>
+                    
+                </UnicontaControls:CorasauLayoutGroup>
+            </UnicontaControls:CorasauLayoutGroup>
+        </UnicontaControls:CorasauLayoutControl>
+    </Grid>
+</Pages:FormBasePage>

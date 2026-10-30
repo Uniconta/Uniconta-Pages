@@ -194,6 +194,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                     {
                         CWOrderFromOrder cwOrderFromOrder = new CWOrderFromOrder(api);
+                        cwOrderFromOrder.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                         cwOrderFromOrder.RelatedOrder= selectedItem.RelatedOrder;
                         cwOrderFromOrder.DialogTableId = 2000000027;
                         cwOrderFromOrder.Closed += async delegate
@@ -397,6 +398,7 @@ namespace UnicontaClient.Pages.CustomPage
             bool showUpdateInv = comp.Storage || ((doctype == CompanyLayoutType.TransferPacknote || doctype == CompanyLayoutType.PickingList) && comp.CreditorPacknote);
             CWGenerateInvoice GenrateOfferDialog = new CWGenerateInvoice(false, doctype.ToString(), showInputforInvNumber: false, isShowInvoiceVisible: true,
                 askForEmail: false, showNoEmailMsg: !showSendByMail, isShowUpdateInv: showUpdateInv);
+            GenrateOfferDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             switch (doctype)
             {
                 case CompanyLayoutType.PickingList:

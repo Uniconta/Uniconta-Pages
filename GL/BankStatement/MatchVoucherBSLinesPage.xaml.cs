@@ -53,7 +53,6 @@ namespace UnicontaClient.Pages.CustomPage
                 fromDate = firstDayOfMonth.AddMonths(-2);
             }
             bankTransApi = new BankStatementAPI(api);
-            dgVoucherGrid.Readonly = true;
             this.master = master as BankStatementClient;
             dgBSLinesGrid.tableView.ShowGroupPanel = false;
             SetRibbonControl(localMenu, dgBSLinesGrid);
@@ -385,6 +384,10 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "AutoMatch":
                     AutoMatch();
+                    break;
+                case "SaveVouchers":
+                    dgVoucherGrid.View.PostEditor();
+                    dgVoucherGrid.SaveData();
                     break;
                 case "SaveLines":
                     SaveLines();

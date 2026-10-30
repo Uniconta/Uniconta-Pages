@@ -87,6 +87,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "ApprovalSetup":
                     var smtps = dgEmailSetupGrid.ItemsSource as IList<CompanySMTPClient>;
                     var approverEmailDialog = new CWApprovalEmailSetup(api, smtps);
+                    approverEmailDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     approverEmailDialog.Show();
                     break;
                 case "AddNote":

@@ -44,7 +44,7 @@ namespace UnicontaClient.Pages.CustomPage
             copyAttachments = cbxCopyAttachments.IsChecked.GetValueOrDefault();
             copyUsers = cbxCopyUsers.IsChecked.GetValueOrDefault();
             name = txtName.Text;
-            this.DialogResult = (string.Compare(txtStart.Text, ConfirmWord, StringComparison.CurrentCultureIgnoreCase) == 0);
+            this.DialogResult = (string.Equals(txtStart.Text, ConfirmWord, StringComparison.CurrentCultureIgnoreCase));
          
         }
 

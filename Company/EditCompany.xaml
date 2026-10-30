@@ -6,8 +6,12 @@ x:Class="UnicontaClient.Pages.CustomPage.EditCompany"
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
     xmlns:dxinteraction="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+    xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
     xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     xmlns:Utilities="clr-namespace:UnicontaClient.Utilities">
+    <UserControl.Resources>
+        <local:EmptyToZeroConverter x:Key="EmptyToZeroConverter"></local:EmptyToZeroConverter>
+    </UserControl.Resources>
     <CorasauControls:BusyIndicator x:Name="busyIndicator" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
         <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
             <Grid.RowDefinitions>
@@ -137,7 +141,7 @@ x:Class="UnicontaClient.Pages.CustomPage.EditCompany"
                             <CorasauControls:TextEditor Text="{Binding IBAN,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="MobilePay">
-                            <CorasauControls:TextEditor Text="{Binding MobilePay,Mode=TwoWay}"/>
+                            <CorasauControls:TextEditor Text="{Binding MobilePay,Mode=TwoWay,Converter={StaticResource EmptyToZeroConverter}}" AllowNullInput="True"/>
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
 
@@ -184,6 +188,9 @@ x:Class="UnicontaClient.Pages.CustomPage.EditCompany"
                         <CorasauControls:CorasauLayoutItem FieldName="AllowPurchaseVatOnSales" x:Name="liAllowPurchaseVatOnSales">
                             <CorasauControls:CheckEditor IsChecked="{Binding AllowPurchaseVatOnSales,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="RoundInvoice" x:Name="liRoundInvoice">
+                            <CorasauControls:CheckEditor IsChecked="{Binding RoundInvoice,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="UseVatOperation" x:Name="liUseVatOperation">
                             <CorasauControls:CheckEditor IsChecked="{Binding UseVatOperation,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
@@ -226,6 +233,9 @@ x:Class="UnicontaClient.Pages.CustomPage.EditCompany"
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="VatNumber">
                             <CorasauControls:TextEditor Text="{Binding VatNumber,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="WIdNo">
+                            <CorasauControls:TextEditor Text="{Binding WIdNo ,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="Court">
                             <CorasauControls:TextEditor Text="{Binding Court,Mode=TwoWay}"/>

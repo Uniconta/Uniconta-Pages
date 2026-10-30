@@ -42,9 +42,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             InitializeComponent();
             InitPage(crudApi);
-#if !SILVERLIGHT
             FocusManager.SetFocusedElement(txtName, txtName);
-#endif
         }
         void InitPage(CrudAPI crudapi)
         {

@@ -1,0 +1,46 @@
+<Pages:FormBasePage xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.AppReportsPage2"
+                    xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+      xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Assets/FormRibbonNoLayout.xml" Grid.Row="0"/>
+        <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Vertical" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+            <CorasauControls:CorasauLayoutGroup x:Name="grpDescription" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical"  
+                                                    CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                <CorasauControls:CorasauLayoutItem x:Name="liName" FieldName="Name" LabelVerticalAlignment="Top">
+                    <CorasauControls:TextEditor x:Name="teName" Text="{Binding Name}"  />
+                </CorasauControls:CorasauLayoutItem>
+                <CorasauControls:CorasauLayoutItem x:Name="liComment" FieldName="Comment" LabelVerticalAlignment="Top">
+                    <CorasauControls:TextEditor  Text="{Binding Comment}" AcceptsReturn="True" TextWrapping="Wrap" HorizontalContentAlignment="Left" 
+                                                MinHeight="100" VerticalContentAlignment="Top" MaxHeight="120" />
+                </CorasauControls:CorasauLayoutItem>
+                <CorasauControls:CorasauLayoutItem x:Name="liUserRole" FieldName="UserRole">
+                    <CorasauControls:ComboBoxEditor SelectedItem="{Binding UserRole}"  />
+                </CorasauControls:CorasauLayoutItem>
+            </CorasauControls:CorasauLayoutGroup>
+            <CorasauControls:CorasauLayoutGroup x:Name="grpAllowUsers" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AllowUsersTo}" Orientation="Vertical"  
+                                                    CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                <CorasauControls:CorasauLayoutItem x:Name="liAllUsers" FieldName="AllUsers">
+                    <CorasauControls:CheckEditor IsChecked="{Binding AllUsers}"    />
+                </CorasauControls:CorasauLayoutItem>
+                <CorasauControls:CorasauLayoutItem x:Name="liOpenForEdit" FieldName="OpenForEdit">
+                    <CorasauControls:CheckEditor IsChecked="{Binding OpenForEdit}"    />
+                </CorasauControls:CorasauLayoutItem>
+            </CorasauControls:CorasauLayoutGroup>
+            <CorasauControls:CorasauLayoutGroup x:Name="grpSelectCompany" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SelectCompanies}" Orientation="Vertical"  
+                                                    CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                <CorasauControls:CorasauLayoutItem x:Name="liAllCompanies" FieldName="AllCompanies">
+                    <CorasauControls:CheckEditor x:Name="chkAllCompnaies" IsChecked="{Binding AllCompanies}" />
+                </CorasauControls:CorasauLayoutItem>
+                
+            </CorasauControls:CorasauLayoutGroup>
+        </CorasauControls:CorasauLayoutControl>
+    </Grid>
+</Pages:FormBasePage>

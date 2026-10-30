@@ -85,6 +85,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void CW_Loaded(object sender, RoutedEventArgs e)
         {
+            txtLineWithAutoPost.Text = InputFieldDataText.LineWithAutoPost;
             if (BankAsOffset)
                 cbBankAccountPos.SelectedIndex = 1;
             else

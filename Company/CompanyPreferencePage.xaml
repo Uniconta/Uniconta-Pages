@@ -125,6 +125,9 @@ x:Class="UnicontaClient.Pages.CustomPage.CompanyPreferencePage"
                         <CorasauControls:CorasauLayoutItem FieldName="CategoryGroup">
                             <CorasauControls:TextEditor Text="{Binding CategoryGroup,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="PackingFeeOnInvoice">
+                            <CorasauControls:CheckEditor IsChecked="{Binding PackingFeeOnInvoice,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Project}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" MinWidth="420">
                         <CorasauControls:CorasauLayoutItem FieldName="DimFromProject">
@@ -152,18 +155,21 @@ x:Class="UnicontaClient.Pages.CustomPage.CompanyPreferencePage"
                             <CorasauControls:CheckEditor IsChecked="{Binding ProjectBudgetMonth,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
-                    <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=NemHandel}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" MinWidth="420">
+                    <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=EDocuments}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" MinWidth="420">
                         <CorasauControls:CorasauLayoutItem FieldName="OIOUBLIncludes">
                             <CorasauControls:ComboBoxEditor x:Name="cmbOIOUBLIncludes" SelectedItem="{Binding OIOUBLIncludes,Mode=TwoWay}"  />
-                        </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="DeactivateSendNemhandel">
-                            <CorasauControls:CheckEditor IsChecked="{Binding DeactivateSendNemhandel,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem x:Name="liNemhandelUpdateBankDetails" FieldName="NemhandelUpdateBankDetails">
                             <CorasauControls:CheckEditor IsChecked="{Binding NemhandelUpdateBankDetails,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="NemhandelAutoCreateCreditor">
                             <CorasauControls:CheckEditor IsChecked="{Binding NemhandelAutoCreateCreditor,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="EDocumentAutoCreateOrder">
+                            <CorasauControls:CheckEditor IsChecked="{Binding EDocumentAutoCreateOrder,Mode=TwoWay}" />
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="DeactivateSendNemhandel">
+                            <CorasauControls:CheckEditor IsChecked="{Binding DeactivateSendNemhandel,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>

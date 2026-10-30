@@ -27,21 +27,11 @@ using UnicontaClient.Models;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
-    public class CreditorDeliveryNoteLocal : CreditorDeliveryNoteClient
-    {
-        [Display(Name = "System Info")]
-        public string SystemInfo { get { return _SystemInfo; } }
-        public string _SystemInfo;
-
-        internal void NotifySystemInfoSet()
-        {
-            NotifyPropertyChanged("SystemInfo");
-        }
-    }
+   
 
     public class CreditorDeliveryNotesGrid : CorasauDataGridClient
     {
-        public override Type TableType => typeof(CreditorDeliveryNoteLocal);
+        public override Type TableType => typeof(CreditorDeliveryNoteClient);
         public override IComparer GridSorting => new DCInvoiceSort();
     }
 
@@ -124,7 +114,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void LocalMenu_OnItemClicked(string ActionType)
         {
-            var selectedItem = dgCreditorDeliveryNoteGrid.SelectedItem as CreditorDeliveryNoteLocal;
+            var selectedItem = dgCreditorDeliveryNoteGrid.SelectedItem as CreditorDeliveryNoteClient;
             string purchaseHeader;
             if (selectedItem != null)
                 purchaseHeader = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Order"), selectedItem._OrderNumber);
@@ -148,7 +138,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "ShowDeliveryNote":
                     if (selectedItem == null || dgCreditorDeliveryNoteGrid.SelectedItems == null)
                         return;
-                    var selectedItems = dgCreditorDeliveryNoteGrid.SelectedItems.Cast<CreditorDeliveryNoteLocal>();
+                    var selectedItems = dgCreditorDeliveryNoteGrid.SelectedItems.Cast<CreditorDeliveryNoteClient>();
                     ShowDeliveryNote(selectedItems);
                     break;
                 case "SendDeliveryNote":
@@ -176,9 +166,10 @@ namespace UnicontaClient.Pages.CustomPage
             InitQuery();
         }
 
-        private void SendDeliveryNote(CreditorDeliveryNoteLocal credDeliverNoteClient)
+        private void SendDeliveryNote(CreditorDeliveryNoteClient credDeliverNoteClient)
         {
             CWSendInvoice cwsendInvoice = new CWSendInvoice();
+            cwsendInvoice.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             cwsendInvoice.DialogTableId = 2000000066;
             cwsendInvoice.Closed += async delegate
              {
@@ -197,7 +188,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         DebtorMessagesClient[] messagesLookup;
         bool hasLookups;
-        async private void ShowDeliveryNote(IEnumerable<CreditorDeliveryNoteLocal> packNoteItems)
+        async private void ShowDeliveryNote(IEnumerable<CreditorDeliveryNoteClient> packNoteItems)
         {
             busyIndicator.IsBusy = true;
             busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
@@ -305,7 +296,7 @@ namespace UnicontaClient.Pages.CustomPage
             finally { busyIndicator.IsBusy = false; }
         }
 
-        async private void OpenOutLook(CreditorDeliveryNoteLocal invClient)
+        async private void OpenOutLook(CreditorDeliveryNoteClient invClient)
         {
             try
             {
@@ -324,7 +315,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         bool IsGeneratingPacknote;
         StandardPrintReportPage standardPrintPreviewPage;
-        private async Task<IPrintReport> PrintPacknote(CreditorDeliveryNoteLocal creditorInvoice)
+        private async Task<IPrintReport> PrintPacknote(CreditorDeliveryNoteClient creditorInvoice)
         {
             IPrintReport iprintReport = null;
             var creditorPrint = new UnicontaClient.Pages.CreditorPrintReport(creditorInvoice, api, Uniconta.DataModel.CompanyLayoutType.PurchasePacknote);

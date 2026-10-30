@@ -1,0 +1,17 @@
+<UserControl xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.TileReviewStepView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
+    <StackPanel>
+        <TextBlock Text="{Binding Data.Summary}" TextWrapping="Wrap"/>
+        <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileTitleOptional}" Style="{DynamicResource TileWizardLabelStyle}"/>
+        <controls:TextEditor Text="{Binding Data.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{DynamicResource TileWizardTextEditorStyle}" AutomationProperties.Name="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileTitle}"
+                             ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileTitleHelp}"/>
+        <Button Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileSuggestATitle}" Command="{Binding Data.SuggestHeadingCommand}" HorizontalAlignment="Left" Margin="0,8,0,0"
+                Style="{DynamicResource PrimaryButtonStyle}" Height="32"
+                ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileSuggestTitleHelp}"/>
+        <TextBlock Text="{Binding Data.HeadingStatus}" TextWrapping="Wrap" Margin="0,8,0,0" Foreground="{DynamicResource WizardSecondaryTextBrush}"/>
+    </StackPanel>
+</UserControl>

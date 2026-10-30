@@ -103,7 +103,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             foreach (var rec in Parameters)
             {
-                if (string.Compare(rec.Name, "Bank", StringComparison.CurrentCultureIgnoreCase) == 0)
+                if (string.Equals(rec.Name, "Bank", StringComparison.CurrentCultureIgnoreCase))
                 {
                     var cache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.BankStatement), api);
                     master = (Uniconta.DataModel.BankStatement)cache.Get(rec.Value);

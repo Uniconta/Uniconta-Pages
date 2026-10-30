@@ -201,61 +201,20 @@ namespace UnicontaClient.Pages.CustomPage
                     var linesByJournal = allLines.GroupBy(l => l.JournalPostedId).ToDictionary(g => g.Key, g => g.ToArray());
                     var linesByInvoice = allLines.GroupBy(l => l.InvoiceNumber).ToDictionary(g => g.Key, g => g.ToArray());
 
-                    var packagingProducts = (await api.Query<InvPackagingProductClient>()).Where(p => p.ReportingType == reporting).ToArray();
+                    var expander = new PackagingExpander(api);
+                    await expander.Load();
                     var packagingProductsByItem = new Dictionary<string, List<InvPackagingProductClient>>();
-                    if (packagingProducts != null && packagingProducts.Length > 0)
+                    foreach (var packItem in expander.ItemsWithPackaging())
                     {
-                        foreach (var p in packagingProducts.Where(p => !string.IsNullOrEmpty(p._Item)))
-                        {
-                            if (!packagingProductsByItem.TryGetValue(p._Item, out var list))
-                            {
-                                list = new List<InvPackagingProductClient>();
-                                packagingProductsByItem[p._Item] = list;
-                            }
-                            list.Add(p);
-                        }
-                    }
-
-                    var itemsWithModel = items?.Where(s => s._PackingModel != null);
-                    if (itemsWithModel != null && itemsWithModel.Any())
-                    {
-                        var invPackModelLines = (await api.Query<InvPackingProductModelLine>()).Where(p => p._Reporting == reportingType).ToArray();
-                        if (invPackModelLines != null && invPackModelLines.Length > 0)
-                        {
-                            var invPackModelLinesDict = invPackModelLines.GroupBy(l => l._Model).ToDictionary(g => g.Key, g => g.ToArray());
-                            foreach (var item in itemsWithModel)
-                            {
-                                if (!invPackModelLinesDict.TryGetValue(item._PackingModel, out var modelLines))
-                                    continue;
-                                foreach (var line in modelLines)
-                                {
-                                    packagingProductsByItem.TryGetValue(item._Item, out var existingPacks);
-                                    var packList = existingPacks != null ? existingPacks.ToList() : new List<InvPackagingProductClient>();
-
-                                    packList.Add(new InvPackagingProductClient
-                                    {
-                                        CompanyId = api.CompanyId,
-                                        _Item = item._Item,
-                                        _Category = line._Category,
-                                        _Packaging = line._Packaging,
-                                        _WasteSorting = line._WasteSorting,
-                                        _PackagingRateLevel = line._PackagingRateLevel,
-                                        _PaymentGrouping = line._PaymentGrouping,
-                                        _NoReporting = line._NoReporting,
-                                        _Weight = line._Weight,
-                                        _Price1 = line._Price1,
-                                        _Price2 = line._Price2,
-                                    });
-
-                                    packagingProductsByItem[item._Item] = packList;
-                                }
-                            }
-                        }
+                        var packLines = expander.ExpandOwn(packItem).Where(l => l._Reporting == reportingType).ToList<InvPackagingProductClient>();
+                        if (packLines.Count > 0)
+                            packagingProductsByItem[packItem._Item] = packLines;
                     }
 
                     int cntTotal = invoices.Length;
                     int cnt = 0;
-                   
+                    var bomLinesCache = new Dictionary<string, InvBOMClient[]>();
+
                     foreach (var rec in invoices)
                     {
                         cnt++;
@@ -295,11 +254,15 @@ namespace UnicontaClient.Pages.CustomPage
                             if (item == null)
                                 continue;
 
-                            if (!packagingProductsByItem.TryGetValue(line.Item, out var packsForItem))
-                                continue;
-
                             if (packLstByJournalAndItem.TryGetValue((line.JournalPostedId, line.Item), out var packTransLst))
                                 continue;
+
+                            if (!packagingProductsByItem.TryGetValue(line.Item, out var packsForItem))
+                            {
+                                if (item._ItemType == (byte)Uniconta.DataModel.ItemType.ProductionBOM)
+                                    await ExpandBOMPackaging(packLst, packLstByJournalAndItem, bomLinesCache, packagingProductsByItem, item, -line.Qty, consumer, delCountry, line, reportedByCustomer, debtor, convertAccount, convertInvoicenumber, 0);
+                                continue;
+                            }
 
                             foreach (var pack in packsForItem)
                             {
@@ -335,6 +298,10 @@ namespace UnicontaClient.Pages.CustomPage
 
             }
 
+            var postedCache = comp.GLPosted;
+            if (postedCache != null && packLst != null && packLst.Any(p => p._JournalPostedId != 0 && postedCache.Get(p._JournalPostedId) == null))
+                postedCache.SetCache(await api.Query<GLDailyJournalPostedClient>());
+
             if (packLst == null)
                 dgInvPackagingTransGrid.ItemsSource = null;
             else
@@ -343,6 +310,84 @@ namespace UnicontaClient.Pages.CustomPage
                 dgInvPackagingTransGrid.SortBy(JournalPostedId);
             }
             busyIndicator.IsBusy = false;
+        }
+
+        async Task<InvBOMClient[]> GetBOMLines(Dictionary<string, InvBOMClient[]> bomLinesCache, InvItem bomItem)
+        {
+            if (bomLinesCache.TryGetValue(bomItem._Item, out var lines))
+                return lines;
+
+            var master = api.CompanyEntity.CreateUserType<InvBOMClient>();
+            master._ItemPart = bomItem._Item;
+            lines = await api.Query<InvBOMClient>(master);
+            bomLinesCache[bomItem._Item] = lines;
+            return lines;
+        }
+
+        // ProductionBOM's components when the BOM item itself has no packaging data, recursing into any
+        // component that is itself an un-packaged ProductionBOM. Stops at the first level where packaging
+        // is found, so a component with its own packaging is not also exploded into its sub-components.
+        async Task ExpandBOMPackaging(List<InvPackagingTransClient> packLst, Dictionary<(int JournalPostedId, string Item), InvPackagingTransClient[]> packLstByJournalAndItem, Dictionary<string, InvBOMClient[]> bomLinesCache,
+            Dictionary<string, List<InvPackagingProductClient>> packagingProductsByItem, InvItem bomItem, double qty, bool consumer,
+            CountryCode delCountry, DebtorInvoiceLines line, bool reportedByCustomer, Debtor debtor, string convertAccount, int? convertInvoicenumber, int level)
+        {
+            if (level > 25)
+                return;
+
+            var bomLines = await GetBOMLines(bomLinesCache, bomItem);
+            if (bomLines == null || bomLines.Length == 0)
+                return;
+
+            foreach (var bom in bomLines)
+            {
+                var part = (InvItem)items.Get(bom.ItemPart);
+                if (part == null)
+                    continue;
+
+                // Already got its packaging posted (under its own item number) at original invoicing time - skip it,
+                // and don't descend further into its own sub-components either.
+                if (packLstByJournalAndItem.ContainsKey((line.JournalPostedId, part._Item)))
+                    continue;
+
+                var partQty = bom.GetBOMQty(qty);
+
+                if (packagingProductsByItem.TryGetValue(part._Item, out var packsForPart))
+                {
+                    foreach (var pack in packsForPart)
+                    {
+                        var isReportByCustomer = (pack._NoReporting || debtor._NoPackagingReporting) && !debtor._MicroEnterprise;
+                        if (!isReportByCustomer && reportedByCustomer)
+                            continue;
+
+                        var lineConsumer = consumer;
+                        if (pack._PaymentGrouping != Uniconta.DataModel.PackagingConsumer.None)
+                            lineConsumer = pack._PaymentGrouping == Uniconta.DataModel.PackagingConsumer.Household;
+
+                        packLst.Add(new InvPackagingTransClient
+                        {
+                            CompanyId = api.CompanyId,
+                            _Category = pack._Category,
+                            _WasteSorting = pack._WasteSorting,
+                            _PackagingRateLevel = pack._PackagingRateLevel,
+                            _Consumer = lineConsumer,
+                            _Country = delCountry == api.CompanyEntity._CountryId ? 0 : delCountry,
+                            _Item = part._Item,
+                            _Date = line._Date,
+                            _JournalPostedId = line.JournalPostedId,
+                            _Packaging = pack._Packaging,
+                            _Weight = partQty * pack._Weight,
+                            _Price = lineConsumer ? pack.PriceHousehold : pack.PriceBusiness,
+                            IsCreated = true,
+                            _ConvertAccount = convertAccount,
+                            _ConvertInvoiceNumber = convertInvoicenumber
+                        });
+                    }
+                }
+                else if (part._ItemType == (byte)Uniconta.DataModel.ItemType.ProductionBOM)
+                {
+                    await ExpandBOMPackaging(packLst, packLstByJournalAndItem, bomLinesCache, packagingProductsByItem, part, partQty, consumer, delCountry, line, reportedByCustomer, debtor, convertAccount, convertInvoicenumber, level + 1);
+                }
+            }
         }
 
         private static CountryCode ResolveDeliveryCountry(DebtorInvoiceClient invoice, Debtor debtor, SQLTableCache<WorkInstallation> installations, SQLTableCache<Debtor> debtorsCache)
@@ -449,7 +494,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (c != 0)
                     return false;
 
-                return !includePackagingType || string.Compare(x.PackagingType, y.PackagingType) == 0;
+                return !includePackagingType || string.Equals(x.PackagingType, y.PackagingType);
             }
             public int GetHashCode(InvPackagingTransClient x)
             {

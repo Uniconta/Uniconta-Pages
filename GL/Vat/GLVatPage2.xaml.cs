@@ -138,5 +138,18 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
         }
+
+        private async void cbVatCountry_SelectedIndexChanged(object sender, RoutedEventArgs e)
+        {
+            if(cbVatCountry.SelectedItem == null)
+                return;
+
+            var selectedCountry = (CountryCode)cbVatCountry.EditValue;
+            var filters = new List<PropValuePair>() { PropValuePair.GenereteWhereElements("Country", typeof(CountryCode), ((int)selectedCountry).ToString()) };
+
+            var glVatTypeList = await api.Query<GLVatTypeClient>(filters);
+
+            cbVatOperationCountry.ItemsSource = glVatTypeList;
+        }
     }
 }

@@ -85,7 +85,21 @@ namespace UnicontaClient.Pages.CustomPage
             dgWorkInstallation.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
         }
-
+        protected override void OnLayoutLoaded()
+        {
+            base.OnLayoutLoaded();
+            var master = dgWorkInstallation.masterRecord as DCAccount;
+            if (master?.__DCType() == 2)
+            {
+                DCAccount.Visible = DCAccount.ShowInColumnChooser = false;
+                CreditorAccount.Visible = CreditorAccount.ShowInColumnChooser = true;
+            }
+            else
+            {
+                DCAccount.Visible = DCAccount.ShowInColumnChooser = true;
+                CreditorAccount.Visible = CreditorAccount.ShowInColumnChooser = false;
+            }
+        }
         public override void Utility_Refresh(string screenName, object argument = null)
         {
             if (screenName == TabControls.WorkInstallationPage2)
@@ -98,19 +112,23 @@ namespace UnicontaClient.Pages.CustomPage
             switch (ActionType)
             {
                 case "AddRow":
+                    var master = dgWorkInstallation.masterRecord;
                     var newItem = dgWorkInstallation.GetChildInstance();
                     object[] param = new object[3];
                     param[0] = newItem;
                     param[1] = false;
-                    param[2] = dgWorkInstallation.masterRecord;
+                    param[2] = master;
                     var header = Uniconta.ClientTools.Localization.lookup("WorkInstallation");
-                    if (dgWorkInstallation.masterRecord != null)
-                        header = Uniconta.ClientTools.Localization.lookup("DeliveryAddresses");
+                    if (master != null)
+                    {
+                        var act = (master as DCAccount)?._Account ?? "";
+                        header = string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("DeliveryAddresses"), act);
+                    }
                     AddDockItem(TabControls.WorkInstallationPage2, param, header, "Add_16x16");
                     break;
                 case "EditRow":
                     if (selectedItem != null)
-                    {
+                    { 
                         object[] para = new object[3];
                         para[0] = selectedItem;
                         para[1] = true;

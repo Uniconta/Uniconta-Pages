@@ -28,6 +28,10 @@
     <RibbonItem Action="AllowedIPAdresses" LocalizedNameKey="AllowedIPAdresses" LargeGlyph="Account-statement_32x32"/>
   </RibbonItem>
 	<RibbonItem>
-		<RibbonItem Action="RegisterEdelivery" LocalizedNameKey="RegisterEdelivery" LargeGlyph="Nemhandel_Connect_32x32"/>
+		<RibbonItem LocalizedNameKey="ReceiveOBJ" Parameter="eDocuments"  LargeGlyph="Nemhandel_Connect_32x32">
+			<RibbonItem Action="Nemhandel" LocalizedNameKey="Nemhandel" LargeGlyph="Nemhandel_Connect_32x32"/>
+			<RibbonItem Action="EDocumentInbound" LocalizedNameKey="Peppol" LargeGlyph="Nemhandel_Connect_32x32"/>
+			<RibbonItem Action="EDocumentAdm" LocalizedNameKey="AdministratorOBJ" Parameter="e-dokument" EnableSeperator="True" LargeGlyph="Nemhandel_Connect_32x32"/>
+		</RibbonItem>
 	</RibbonItem>
 </root>

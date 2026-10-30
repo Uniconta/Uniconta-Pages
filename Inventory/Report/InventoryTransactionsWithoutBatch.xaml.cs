@@ -228,6 +228,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem == null)
                         return;
                     var cwChangeVaraints = new CWModifyVariants(api, selectedItem);
+                    cwChangeVaraints.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     cwChangeVaraints.Closing += delegate
                     {
                         if (cwChangeVaraints.DialogResult == true)
@@ -241,6 +242,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem == null)
                         return;
                     var cwchangeStorage = new CWModiyStorage(api);
+                    cwchangeStorage.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     cwchangeStorage.Closing += async delegate
                     {
                         if (cwchangeStorage.DialogResult == true)

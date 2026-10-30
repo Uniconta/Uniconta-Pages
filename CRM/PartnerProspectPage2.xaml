@@ -7,9 +7,11 @@ x:Class="UnicontaClient.Pages.CustomPage.PartnerProspectPage2"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
         xmlns:Controls="clr-namespace:UnicontaClient.Controls" 
+        xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
         xmlns:Util="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools">
     <UserControl.Resources>
         <Util:RowIndexConverter x:Key="RowIndexConverter" />
+        <local:EmptyToZeroConverter x:Key="EmptyToZeroConverter"></local:EmptyToZeroConverter>
     </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
@@ -37,7 +39,7 @@ x:Class="UnicontaClient.Pages.CustomPage.PartnerProspectPage2"
                         <CorasauControls:TextEditor Text="{Binding IndustryCodeRef.Name,Mode=TwoWay}" x:Name="txtIndustryName"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="EmployeeCount" x:Name="liemployeeCount">
-                        <CorasauControls:IntegerEditor EditValue="{Binding EmployeeCount,Mode=TwoWay}"/>
+                        <CorasauControls:IntegerEditor EditValue="{Binding EmployeeCount,Mode=TwoWay, Converter={StaticResource EmptyToZeroConverter}}"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="Address1" x:Name="liAddress1">
                         <CorasauControls:TextEditor Text="{Binding Address1,Mode=TwoWay}"/>
@@ -75,11 +77,8 @@ x:Class="UnicontaClient.Pages.CustomPage.PartnerProspectPage2"
                     <CorasauControls:CorasauLayoutItem x:Name="liWww" FieldName="Www" Style="{StaticResource LayoutItemsstyle}" ButtonClicked="liWww_ButtonClicked"  ButtonContent="&#x1f310;" Padding="0">
                         <CorasauControls:TextEditor Text="{Binding Www,Mode=TwoWay}" MaskType="RegEx" Mask="{StaticResource UrlValidationRegx}"/>
                     </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="MobilPhone" x:Name="liMobilPhone">
-                        <CorasauControls:TextEditor Text="{Binding MobilPhone,Mode=TwoWay}"/>
-                    </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="InActive" x:Name="liInActive" >
-                        <CorasauControls:CheckEditor x:Name="InActive" IsChecked="{Binding InActive,Mode=TwoWay}"/>
+                    <CorasauControls:CorasauLayoutItem FieldName="AssignedByUniconta" x:Name="liAssignedByUniconta" >
+                        <CorasauControls:CheckEditor x:Name="AssignedByUniconta" IsChecked="{Binding AssignedByUniconta,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="Pid" x:Name="liPid" >
                         <CorasauControls:LookupEditor x:Name="lePid" Text="{Binding Pid,Mode=TwoWay}" />
@@ -87,15 +86,18 @@ x:Class="UnicontaClient.Pages.CustomPage.PartnerProspectPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="ResellerName" x:Name="liResellerName" >
                         <CorasauControls:TextEditor  Text="{Binding ResellerName,Mode=OneWay}" IsReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="VatNumber" x:Name="liVatNumber">
+                        <CorasauControls:TextEditor Text="{Binding VatNumber,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutGroup>
             <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="lastGroup">
-                <CorasauControls:CorasauLayoutGroup View="GroupBox"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Settings}" Orientation="Vertical" Width="500" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                <CorasauControls:CorasauLayoutGroup View="GroupBox"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Settings}" Orientation="Vertical" Width="Auto" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem FieldName="CurrentERP" x:Name="liCurrentERP">
                         <CorasauControls:ComboBoxEditor x:Name="cbCurrentERP" SelectedItem="{Binding CurrentERP,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="OrigPid" x:Name="liOrigPid">
-                        <CorasauControls:LookupEditor x:Name="leOrigPid" Text="{Binding OrigPid,Mode=TwoWay}" />
+                        <CorasauControls:LookupEditor x:Name="leOrigPid" Text="{Binding OrigPid,Mode=TwoWay, Converter={StaticResource EmptyToZeroConverter}}"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="CompanyType" x:Name="liCompanyType">
                         <CorasauControls:ComboBoxEditor x:Name="cbCompanyType" SelectedItem="{Binding CompanyType,Mode=TwoWay}"/>
@@ -107,13 +109,13 @@ x:Class="UnicontaClient.Pages.CustomPage.PartnerProspectPage2"
                         <CorasauControls:ComboBoxEditor x:Name="cbComingFrom" SelectedItem="{Binding ComingFrom,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="NumberOfUsers" x:Name="liNumberOfUsers">
-                        <CorasauControls:IntegerEditor EditValue="{Binding NumberOfUsers,Mode=TwoWay}"/>
+                        <CorasauControls:IntegerEditor EditValue="{Binding NumberOfUsers,Mode=TwoWay, Converter={StaticResource EmptyToZeroConverter}}"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="LinkedToUid" x:Name="liLinkedToUid">
-                        <CorasauControls:IntegerEditor EditValue="{Binding LinkedToUid,Mode=TwoWay}"/>
+                        <CorasauControls:IntegerEditor EditValue="{Binding LinkedToUid,Mode=TwoWay}" SetMask="False"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="CreatedUid" x:Name="liCreatedUid">
-                        <CorasauControls:IntegerEditor EditValue="{Binding CreatedUid,Mode=TwoWay}"/>
+                        <CorasauControls:IntegerEditor EditValue="{Binding CreatedUid,Mode=TwoWay}" SetMask="False"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="Created" x:Name="liCreated">
                         <CorasauControls:DateEditor DateTime="{Binding Created, Mode=TwoWay}" />
@@ -123,7 +125,7 @@ x:Class="UnicontaClient.Pages.CustomPage.PartnerProspectPage2"
                         <CorasauControls:DateEditor DateTime="{Binding Updated}" IsReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>-->
                 </CorasauControls:CorasauLayoutGroup>
-                <CorasauControls:CorasauLayoutGroup View="GroupBox"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FollowUp}" Orientation="Vertical" Width="500" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                <CorasauControls:CorasauLayoutGroup View="GroupBox"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FollowUp}" Orientation="Vertical" Width="Auto" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem FieldName="FollowUpAction" x:Name="liFollowUpAction">
                         <CorasauControls:ComboBoxEditor x:Name="cbFollowUpAction" SelectedItem="{Binding FollowUpAction,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
@@ -131,67 +133,95 @@ x:Class="UnicontaClient.Pages.CustomPage.PartnerProspectPage2"
                         <CorasauControls:ComboBoxEditor x:Name="cbCloseReason" SelectedItem="{Binding CloseReason,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="Probability" x:Name="liProbability">
-                        <CorasauControls:IntegerEditor EditValue="{Binding Probability,Mode=TwoWay}"/>
+                        <StackPanel Orientation="Horizontal">
+                            <CorasauControls:ComboBoxEditor x:Name="cmbProbablity" MinWidth="100"  EditValue="{Binding Probability,Mode=TwoWay, Converter={StaticResource EmptyToZeroConverter}}"/>
+                            <TextBlock Text=" %"/>
+                        </StackPanel>
                     </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem FieldName="Subscriptionid" x:Name="liSubscriptionid">
-                        <CorasauControls:IntegerEditor EditValue="{Binding Subscriptionid,Mode=TwoWay}"/>
+                    <CorasauControls:CorasauLayoutItem FieldName="Sid" x:Name="liSubscriptionid">
+                        <CorasauControls:IntegerEditor EditValue="{Binding Sid,Mode=TwoWay}" SetMask="False"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="SubscriptionCreated" x:Name="liSubscriptionCreated">
                         <CorasauControls:DateEditor EditValue="{Binding SubscriptionCreated,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Modules}" LabelVerticalAlignment="Top" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Margin="0 5 0 0">
-                        <UniformGrid Columns="3" HorizontalAlignment="Stretch">
-                            <CorasauControls:CorasauLayoutItem FieldName="Ledger" x:Name="liLedger">
-                                <CorasauControls:CheckEditor  IsChecked="{Binding Ledger,Mode=TwoWay}" HorizontalAlignment="Right"/>
+                        <UniformGrid Columns="3" HorizontalAlignment="Stretch" >
+                            <CorasauControls:CorasauLayoutItem x:Name="liLedger">
+                                <CorasauControls:CheckEditor IsChecked="{Binding Ledger,Mode=TwoWay}" Width="Auto" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=GeneralLedger}"/>
                             </CorasauControls:CorasauLayoutItem>
-                            <CorasauControls:CorasauLayoutItem FieldName="Customer" x:Name="liCustomer">
-                                <CorasauControls:CheckEditor   IsChecked="{Binding Customer,Mode=TwoWay}" HorizontalAlignment="Right"/>
+                            <CorasauControls:CorasauLayoutItem x:Name="liInventory">
+                                <CorasauControls:CheckEditor IsChecked="{Binding Inventory,Mode=TwoWay}" Width="Auto" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Storage}"/>
                             </CorasauControls:CorasauLayoutItem>
-                            <CorasauControls:CorasauLayoutItem FieldName="Vendor" x:Name="liVendor">
-                                <CorasauControls:CheckEditor  IsChecked="{Binding Vendor,Mode=TwoWay}" HorizontalAlignment="Right"/>
+                            <CorasauControls:CorasauLayoutItem x:Name="liPurchase">
+                                <CorasauControls:CheckEditor IsChecked="{Binding Purchase,Mode=TwoWay}" Width="Auto" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SalesAndPurchage}"/>
                             </CorasauControls:CorasauLayoutItem>
-                            <CorasauControls:CorasauLayoutItem FieldName="Inventory" x:Name="liInventory">
-                                <CorasauControls:CheckEditor  IsChecked="{Binding Inventory,Mode=TwoWay}" HorizontalAlignment="Right"/>
+                            <CorasauControls:CorasauLayoutItem x:Name="liProduction">
+                                <CorasauControls:CheckEditor IsChecked="{Binding Production,Mode=TwoWay}" Width="Auto"  Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Production}"/>
                             </CorasauControls:CorasauLayoutItem>
-                            <CorasauControls:CorasauLayoutItem FieldName="Purchase" x:Name="liPurchase">
-                                <CorasauControls:CheckEditor  IsChecked="{Binding Purchase,Mode=TwoWay}" HorizontalAlignment="Right"/>
+                            <CorasauControls:CorasauLayoutItem x:Name="liProject" >
+                                <CorasauControls:CheckEditor IsChecked="{Binding Project,Mode=TwoWay}" Width="Auto"  Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Project}"/>
                             </CorasauControls:CorasauLayoutItem>
-                            <CorasauControls:CorasauLayoutItem FieldName="Production" x:Name="liProduction">
-                                <CorasauControls:CheckEditor  IsChecked="{Binding Production,Mode=TwoWay}" HorizontalAlignment="Right"/>
+                           <CorasauControls:CorasauLayoutItem x:Name="liCrm" >
+                                <CorasauControls:CheckEditor IsChecked="{Binding Crm,Mode=TwoWay}" Width="Auto"  Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CRM}"/>
                             </CorasauControls:CorasauLayoutItem>
-                            <CorasauControls:CorasauLayoutItem FieldName="Project" x:Name="liProject" >
-                                <CorasauControls:CheckEditor  IsChecked="{Binding Project,Mode=TwoWay}" HorizontalAlignment="Right"/>
+                            <CorasauControls:CorasauLayoutItem x:Name="liAsset" >
+                                <CorasauControls:CheckEditor IsChecked="{Binding Asset,Mode=TwoWay}" Width="Auto" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Asset}"/>
                             </CorasauControls:CorasauLayoutItem>
-                            <CorasauControls:CorasauLayoutItem FieldName="Time" x:Name="liTime" >
-                                <CorasauControls:CheckEditor  IsChecked="{Binding Time,Mode=TwoWay}" HorizontalAlignment="Right"/>
+                            <CorasauControls:CorasauLayoutItem x:Name="liScan">
+                                <CorasauControls:CheckEditor IsChecked="{Binding Scan,Mode=TwoWay}" Width="Auto" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Scanning}"/>
                             </CorasauControls:CorasauLayoutItem>
-                            <CorasauControls:CorasauLayoutItem FieldName="Crm" x:Name="liCrm" >
-                                <CorasauControls:CheckEditor  IsChecked="{Binding Crm,Mode=TwoWay}" HorizontalAlignment="Right"/>
+                            <CorasauControls:CorasauLayoutItem x:Name="liAutoBanking">
+                                <CorasauControls:CheckEditor IsChecked="{Binding AutoBanking,Mode=TwoWay}" Width="Auto"  Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AutoBanking}"/>
                             </CorasauControls:CorasauLayoutItem>
-                            <CorasauControls:CorasauLayoutItem FieldName="Asset" x:Name="liAsset" >
-                                <CorasauControls:CheckEditor  IsChecked="{Binding Asset,Mode=TwoWay}" HorizontalAlignment="Right"/>
+                            <CorasauControls:CorasauLayoutItem x:Name="liTools">
+                                <CorasauControls:CheckEditor IsChecked="{Binding Tools,Mode=TwoWay}" Width="Auto" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Tools}"/>
                             </CorasauControls:CorasauLayoutItem>
-                            <CorasauControls:CorasauLayoutItem FieldName="Mobil" x:Name="liMobil" >
-                                <CorasauControls:CheckEditor  IsChecked="{Binding Mobil,Mode=TwoWay}" HorizontalAlignment="Right"/>
+                            <CorasauControls:CorasauLayoutItem x:Name="liReports">
+                                <CorasauControls:CheckEditor IsChecked="{Binding Reports,Mode=TwoWay}" Width="Auto" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Reports}"/>
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem x:Name="liDashboard">
+                                <CorasauControls:CheckEditor IsChecked="{Binding Dashboard,Mode=TwoWay}" Width="Auto" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Dashboard}"/>
                             </CorasauControls:CorasauLayoutItem>
                         </UniformGrid>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Apps}" LabelVerticalAlignment="Top" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Margin="0 5 0 0">
                         <UniformGrid Columns="3" HorizontalAlignment="Stretch">
-                            <CorasauControls:CorasauLayoutItem FieldName="AssistantApp" x:Name="liAssistantApp">
-                                <CorasauControls:CheckEditor  IsChecked="{Binding AssistantApp,Mode=TwoWay}" HorizontalAlignment="Right"/>
+                            <CorasauControls:CorasauLayoutItem x:Name="liAssistantApp">
+                                <CorasauControls:CheckEditor IsChecked="{Binding AssistantApp,Mode=TwoWay}" Width="Auto" Content="Assistant"/>
                             </CorasauControls:CorasauLayoutItem>
-                            <CorasauControls:CorasauLayoutItem FieldName="WorkApp" x:Name="liWorkApp">
-                                <CorasauControls:CheckEditor   IsChecked="{Binding WorkApp,Mode=TwoWay}" HorizontalAlignment="Right"/>
+                            <CorasauControls:CorasauLayoutItem x:Name="liWorkApp">
+                                <CorasauControls:CheckEditor  IsChecked="{Binding WorkApp,Mode=TwoWay}" Width="Auto" Content="Work"/>
                             </CorasauControls:CorasauLayoutItem>
-                            <CorasauControls:CorasauLayoutItem FieldName="UploadApp" x:Name="liUploadApp">
-                                <CorasauControls:CheckEditor  IsChecked="{Binding UploadApp,Mode=TwoWay}" HorizontalAlignment="Right"/>
+                            <CorasauControls:CorasauLayoutItem x:Name="liUploadApp">
+                                <CorasauControls:CheckEditor IsChecked="{Binding UploadApp,Mode=TwoWay}" Width="Auto" Content="Upload"/>
                             </CorasauControls:CorasauLayoutItem>
-                            <CorasauControls:CorasauLayoutItem FieldName="AuthenticatorApp" x:Name="liAuthenticatorApp" >
-                                <CorasauControls:CheckEditor  IsChecked="{Binding AuthenticatorApp,Mode=TwoWay}" HorizontalAlignment="Right"/>
+                            <CorasauControls:CorasauLayoutItem x:Name="liAuthenticatorApp" >
+                                <CorasauControls:CheckEditor IsChecked="{Binding AuthenticatorApp,Mode=TwoWay}" Width="Auto" Content="Authenticator"/>
                             </CorasauControls:CorasauLayoutItem>
-                            <CorasauControls:CorasauLayoutItem FieldName="InvoiceApp" x:Name="liInvoiceApp">
-                                <CorasauControls:CheckEditor  IsChecked="{Binding InvoiceApp,Mode=TwoWay}" HorizontalAlignment="Right"/>
+                            <CorasauControls:CorasauLayoutItem x:Name="liInvoiceApp">
+                                <CorasauControls:CheckEditor IsChecked="{Binding InvoiceApp,Mode=TwoWay}" Width="Auto" Content="Invoice"/>
+                            </CorasauControls:CorasauLayoutItem>
+                        </UniformGrid>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Integrations}" LabelVerticalAlignment="Top" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Margin="0 5 0 0">
+                        <UniformGrid Columns="3" HorizontalAlignment="Stretch">
+                            <CorasauControls:CorasauLayoutItem x:Name="liWebshop">
+                                <CorasauControls:CheckEditor IsChecked="{Binding Webshop,Mode=TwoWay}" Width="Auto"  Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Webshop}"/>
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem x:Name="liPOS">
+                                <CorasauControls:CheckEditor IsChecked="{Binding POS,Mode=TwoWay}" Width="Auto" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=POS}"/>
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem x:Name="liPay">
+                                <CorasauControls:CheckEditor IsChecked="{Binding Pay,Mode=TwoWay}" Width="Auto"  Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PayrollModule}"/>
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem x:Name="liWMS">
+                                <CorasauControls:CheckEditor IsChecked="{Binding WMS,Mode=TwoWay}" Width="Auto"  Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=WMS}"/>
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem x:Name="liOdataPowerBI">
+                                <CorasauControls:CheckEditor IsChecked="{Binding OdataPowerBI,Mode=TwoWay}" Width="Auto"  Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OdataPowerBI}"/>
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem x:Name="liOther">
+                                <CorasauControls:CheckEditor IsChecked="{Binding Other,Mode=TwoWay}" Width="Auto"  Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Other}"/>
                             </CorasauControls:CorasauLayoutItem>
                         </UniformGrid>
                     </CorasauControls:CorasauLayoutItem>

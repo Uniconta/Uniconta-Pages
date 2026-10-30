@@ -106,6 +106,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DocumentsApprovalPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SizeKB" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OnHold" AllowEditing="true" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Reference" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SWIFT" Visible="False" />
                 </localPage:DocumentsApprovalPageGrid.Columns>
             </localPage:DocumentsApprovalPageGrid>
         </CorasauControls:BusyIndicator>

@@ -16,7 +16,8 @@ x:Class="UnicontaClient.Pages.CustomPage.AddUserFields"
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <localPage:TableFieldGrid  x:Name="dgUserField" AutoGenerateColumns="None" HorizontalAlignment="Stretch">
                 <localPage:TableFieldGrid.Columns>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="FieldNumber" Width="35"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="FieldNumber" Width="40"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AppID" Width="40"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Type" Width="80" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Prompt" />

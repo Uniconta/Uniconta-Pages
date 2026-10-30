@@ -184,12 +184,12 @@ namespace UnicontaClient.Pages.CustomPage
         {
             foreach (var rec in Parameters)
             {
-                if (string.Compare(rec.Name, "Item", StringComparison.CurrentCultureIgnoreCase) == 0)
+                if (string.Equals(rec.Name, "Item", StringComparison.CurrentCultureIgnoreCase))
                 {
                     var cache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.InvItem), api);
                     invClient = (Uniconta.DataModel.InvItem)cache.Get(rec.Value);
                 }
-                else if (string.Compare(rec.Name, "Quantity", StringComparison.CurrentCultureIgnoreCase) == 0)
+                else if (string.Equals(rec.Name, "Quantity", StringComparison.CurrentCultureIgnoreCase))
                     Quantity = Uniconta.Common.Utility.NumberConvert.ToDoubleNoThousandSeperator(rec.Value);
             }
             base.SetParameter(Parameters);

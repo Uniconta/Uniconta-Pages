@@ -1,5 +1,5 @@
 <Pages:FormBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
-   xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
 x:Class="UnicontaClient.Pages.CustomPage.CreateCompany"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
@@ -108,7 +108,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreateCompany"
                             <CorasauControls:CorasauLayoutItem x:Name="lblSet0InVendAcc" Visibility="Collapsed" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Set0InVendAccount}">
                                 <CorasauControls:CheckEditor x:Name="chkSet0InVendAcc" Visibility="Collapsed" IsChecked="False" />
                             </CorasauControls:CorasauLayoutItem>
-                            <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=InclVat}">
+                            <CorasauControls:CorasauLayoutItem x:Name="lblInvoiceVatPriceCheck" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=InclVat}">
                                 <CorasauControls:CheckEditor x:Name="chkInvoiceVatPriceCheck"/>
                             </CorasauControls:CorasauLayoutItem>
                             <CorasauControls:CorasauLayoutItem x:Name="lblConcatC5ItemNames" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ConcatC5ItemNames}">

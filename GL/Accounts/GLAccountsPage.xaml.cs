@@ -1,14 +1,15 @@
-using Uniconta.API.System;
-using Uniconta.ClientTools.Controls;
-using Uniconta.ClientTools.DataModel;
-using Uniconta.ClientTools.Page;
-using Uniconta.Common;
-using Uniconta.Common.Utility;
-using Uniconta.DataModel;
+using DevExpress.Data.Filtering;
+using DevExpress.Xpf.Core;
+using DevExpress.Xpf.Editors.Settings;
+using DevExpress.Xpf.Grid;
+using DevExpress.Xpf.Grid.LookUp;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -16,20 +17,21 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
-using Uniconta.ClientTools;
-using Uniconta.ClientTools.Util;
-using System.Collections.ObjectModel;
-using DevExpress.Xpf.Grid.LookUp;
-using DevExpress.Xpf.Editors.Settings;
-using UnicontaClient.Models;
-using UnicontaClient.Utilities;
-using System.Threading.Tasks;
-using System.Collections;
-using DevExpress.Xpf.Grid;
 using Uniconta.API.Service;
-using DevExpress.Xpf.Core;
-using DevExpress.Data.Filtering;
+using Uniconta.API.System;
+using Uniconta.ClientTools;
+using Uniconta.ClientTools.Controls;
+using Uniconta.ClientTools.DataModel;
+using Uniconta.ClientTools.Page;
+using Uniconta.ClientTools.Util;
+using Uniconta.Common;
+using Uniconta.Common.Utility;
+using Uniconta.DataModel;
 using UnicontaClient.Controls.Dialogs;
+using UnicontaClient.Models;
+using UnicontaClient.Pages.GL.TransactionOrigin;
+using UnicontaClient.Pages.GL.WhereUsed;
+using UnicontaClient.Utilities;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -191,12 +193,50 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         AddDockItem(TabControls.GLTransSettlePage, dgGLTable.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("SettleTran"), selectedItem._Account));
                     break;
+
+                case "WhereUsed":
+                case "whereUsed":
+                    ShowWhereUsed(selectedItem);
+                    break;
+
+                case "MatchStdAccounts":
+                    ResetRecordData();
+
+                    var accountsToMatch = GetMultiSelectedOrVisibleAccounts();
+                    AddDockItem(TabControls.GLStandardAccountMatchPage, accountsToMatch, Uniconta.ClientTools.Localization.lookup("MatchStdAccounts"));
+                    break;
+
+                case "LedgerTrendAnomaly":
+                    ResetRecordData();
+
+                    var accountsToAnalyze = GetMultiSelectedOrVisibleAccounts();
+                    AddDockItem(TabControls.LedgerTrendAnomalyPage, accountsToAnalyze, Uniconta.ClientTools.Localization.lookup("AnomalyAnalysis"));
+                    break;
+
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
-       
+
+        private GLAccountClient[] GetMultiSelectedOrVisibleAccounts()
+        {
+            var selectedAccounts = dgGLTable.SelectedItems?.OfType<GLAccountClient>().ToArray();
+
+            if (selectedAccounts?.Length > 1)
+                return selectedAccounts;
+
+            return dgGLTable.GetVisibleRows()?.OfType<GLAccountClient>().ToArray() ?? Array.Empty<GLAccountClient>();
+        }
+
+        private void ShowWhereUsed(GLAccountClient selectedItem)
+        {
+            if (selectedItem == null)
+                return;
+
+            AddDockItem(TabControls.GLAccountWhereUsedPage, dgGLTable.syncEntity, GLAccountWhereUsedPage.GetDockHeader(selectedItem));
+        }
+
         void CopyRecord(GLAccountClient selectedItem)
         {
             if (selectedItem == null)

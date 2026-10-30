@@ -1,0 +1,69 @@
+<UserControl xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.GL.TransactionOrigin.Visuals.PostingTraceDiagramView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vis="clr-namespace:UnicontaClient.Pages.CustomPage.GL.TransactionOrigin.Visuals"
+             Background="{StaticResource PostingTraceDiagramBackgroundBrush}"
+             Foreground="{StaticResource PostingTraceForegroundBrush}">
+
+    <UserControl.Resources>
+        <vis:ConfidenceToBrushConverter x:Key="ConfidenceToBrushConverter" />
+        <vis:ConfidenceToThicknessConverter x:Key="ConfidenceToThicknessConverter" />
+
+        <DataTemplate DataType="{x:Type vis:VoucherDiagramNodeViewModel}">
+            <vis:VoucherDiagramNodeView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vis:TransactionDiagramNodeViewModel}">
+            <vis:TransactionDiagramNodeView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vis:SectionDiagramNodeViewModel}">
+            <vis:SectionDiagramNodeView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vis:ReasonDiagramNodeViewModel}">
+            <vis:ReasonDiagramNodeView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vis:DiagramNodeViewModel}">
+            <vis:PostingTraceDiagramNodeView />
+        </DataTemplate>
+    </UserControl.Resources>
+    <ScrollViewer x:Name="DiagramScrollViewer"
+                  HorizontalScrollBarVisibility="Auto"
+                  VerticalScrollBarVisibility="Auto"
+                  CanContentScroll="False">
+        <Grid Width="{Binding DiagramWidth}"
+              Height="{Binding DiagramHeight}"
+              MinWidth="{Binding ViewportWidth, ElementName=DiagramScrollViewer}"
+              MinHeight="{Binding ViewportHeight, ElementName=DiagramScrollViewer}">
+            <Canvas Background="{StaticResource PostingTraceDiagramBackgroundBrush}"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch">
+                <ItemsControl ItemsSource="{Binding Connectors}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type vis:DiagramConnectorViewModel}">
+                            <Line X1="{Binding X1}" Y1="{Binding Y1}" X2="{Binding X2}" Y2="{Binding Y2}"
+                                  Stroke="{Binding Confidence, Converter={StaticResource ConfidenceToBrushConverter}}"
+                                  StrokeThickness="{Binding Confidence, Converter={StaticResource ConfidenceToThicknessConverter}}"
+                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <ItemsControl ItemsSource="{Binding Nodes}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate><Canvas /></ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemContainerStyle>
+                        <Style TargetType="ContentPresenter">
+                            <Setter Property="Canvas.Left" Value="{Binding X}" />
+                            <Setter Property="Canvas.Top" Value="{Binding Y}" />
+                        </Style>
+                    </ItemsControl.ItemContainerStyle>
+                </ItemsControl>
+            </Canvas>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

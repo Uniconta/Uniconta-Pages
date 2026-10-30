@@ -5,7 +5,7 @@
 		<RibbonItem Action="Save" ShortcutKey="Ctrl+S" LocalizedNameKey="Save" Glyph="save-16x16" LargeGlyph="save-32x32"/>
 		<RibbonItem Action="EditJournalLine"  LocalizedNameKey="EditOBJ" Parameter="Journalline"  LargeGlyph="Edit_32x32"/>
 	</RibbonItem>
-	<RibbonItem>
+	<RibbonItem LocalizedNameKey="Period">
 		<RibbonItem Action="Pre" LocalizedNameKey="PrevMonth" LargeGlyph="Previous_32x32"/>
 		<RibbonItem Action="Next" LocalizedNameKey="NextMonth" LargeGlyph="Next_32x32"/>
 		<RibbonItem Action="Interval" LocalizedNameKey="Period" LargeGlyph="Interval_32x32"/>
@@ -36,18 +36,22 @@
 			<RibbonItem Action="DragDrop" LocalizedNameKey="DragAndDrop" Glyph="DragDrop_File_16x16" ShortcutKey="CTRL+G"/>
 		</RibbonItem>
 	</RibbonItem>
-	<RibbonItem>
+	<RibbonItem LocalizedNameKey="Show">
 		<RibbonItem Action="VoucherTransactions" ShortcutKey="Alt+T" LocalizedNameKey="VoucherTransactions" LargeGlyph="Voucher_Transactions_32x32" />
 		<RibbonItem Action="AccountsTransaction" LocalizedNameKey="AccountsTransaction" LargeGlyph="Posted_Transaction_32x32"/>
 		<RibbonItem Action="OpenTran" LocalizedNameKey="OpenTrans" ShortcutKey="F8" LargeGlyph="Open_Transaction_32x32" />
 	</RibbonItem>
-	<RibbonItem>
+	<RibbonItem LocalizedNameKey="Reconciliation">
 		<RibbonItem Action="AddMatch" LocalizedNameKey="AddOBJ" Parameter="Match" LargeGlyph="Match_Add_32x32"/>
 		<RibbonItem Action="RemoveMatch" LocalizedNameKey="RemoveOBJ" Parameter="Match" LargeGlyph="Match_Remove_32x32" />
 		<RibbonItem Action="AutoReconciliation" LocalizedNameKey="AutoReconciliation" LargeGlyph="Match_Lines_32x32" />
 		<RibbonItem Action="VoidTransaction" LocalizedNameKey="VoidTransaction" ShortcutKey="F9" LargeGlyph="Cancel_Voucher_32x32" />
 		<RibbonItem Action="Adjustment" LocalizedNameKey="SettleOBJ" Parameter="Dif" LargeGlyph="Budget_32x32" />
-		<RibbonItem Action="AddMapping" LocalizedNameKey="AddOBJ" Parameter="PostingRule" LargeGlyph="Match_32x32" />
+		<RibbonItem LocalizedNameKey="PostingRule" LargeGlyph="Match_32x32">
+			<RibbonItem Action="AddMapping" LocalizedNameKey="Add" Glyph="Add_16x16"/>
+			<RibbonItem Action="LookupAccounts" LocalizedNameKey="View" Glyph="Match_Add_16x16"/>
+			<RibbonItem Action="ApplyPostingRules" LocalizedNameKey="Apply" Glyph="Invoice_16x16"/>
+		</RibbonItem>
 	</RibbonItem>
 	<RibbonItem>
 		<RibbonItem Action="TransferBankStatement" LocalizedNameKey="GenerateJournalLines" LargeGlyph="Generate_32x32" />

@@ -63,6 +63,13 @@
 	<RibbonItem>
 		<RibbonItem Action="ApproveOrder" LocalizedNameKey="Approve" LargeGlyph="Allow_32x32"/>
 	</RibbonItem>
+	<RibbonItem LocalizedNameKey="eOrder">
+		<RibbonItem Action="SendEDocument" LocalizedNameKey="SendOrderbyUBL" LargeGlyph="SendInvoiceMail_32x32"/>
+		<RibbonItem LocalizedNameKey="Functions" LargeGlyph="Generate_32x32">
+			<RibbonItem Action="DocSendLog" LocalizedNameKey="Log" ControlName="DocsSendLogGridPage" LargeGlyph="Server_Count_32x32" />
+			<RibbonItem Action="ExportEDocument" LocalizedNameKey="ExportOBJ" Parameter="eOrder" LargeGlyph="Import_32x32"/>
+		</RibbonItem>
+	</RibbonItem>
 	<RibbonItem TabId="1" LocalizedNameKey="EditAll">
 		<RibbonItem Action="EditAll"  LocalizedNameKey="EditAll"  LargeGlyph="Edit_32x32"/>
 	</RibbonItem>

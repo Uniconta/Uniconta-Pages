@@ -45,6 +45,10 @@
     <RibbonItem Action="ConvertToDebtor" LocalizedNameKey="ConvertToDebtor" LargeGlyph="Convert_To_User_32x32">
     </RibbonItem>
   </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="ConvertToPartnerProspect" LocalizedNameKey="AddToOBJ" Parameter="Partner CRM" LargeGlyph="Owner_32x32">
+    </RibbonItem>
+  </RibbonItem>
 	<RibbonItem>
 		<RibbonItem Action="ValidateFunctions" LocalizedNameKey="Validate" LargeGlyph="Check_Journal_32x32">
 			<RibbonItem Action="ValidateAddress" LocalizedNameKey="address" />

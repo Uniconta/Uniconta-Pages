@@ -1,15 +1,17 @@
-using UnicontaClient.Models;
-using UnicontaClient.Utilities;
-using Uniconta.ClientTools;
-using Uniconta.ClientTools.DataModel;
-using Uniconta.ClientTools.Page;
-using Uniconta.Common;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Uniconta.API.Service;
+using Uniconta.ClientTools;
+using Uniconta.ClientTools.DataModel;
+using Uniconta.ClientTools.Page;
+using Uniconta.ClientTools.Util;
+using Uniconta.Common;
 using Uniconta.DataModel;
+using UnicontaClient.Models;
+using UnicontaClient.Utilities;
+using static Uniconta.DataModel.TableField;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -109,7 +111,9 @@ namespace UnicontaClient.Pages.CustomPage
                 else
                     return;
 
-                api.CompanyEntity.UpdateUserField(pageMasterTableId, (dgUserField.ItemsSource as IEnumerable<Uniconta.DataModel.TableField>).ToArray());
+                var arr = (dgUserField.ItemsSource as IEnumerable<Uniconta.DataModel.TableField>).ToArray();
+                Array.Sort(arr, new TableFieldSort());
+                api.CompanyEntity.UpdateUserField(pageMasterTableId, arr);
 
                 if (rowMaster == null)
                     api.CompanyEntity.UpdateUserType(Global.BaseType2ClientRefType(rowType));
@@ -138,13 +142,20 @@ namespace UnicontaClient.Pages.CustomPage
                     object[] paramEdit = new object[3];
                     paramEdit[0] = selectedItem;
                     paramEdit[1] = dgUserField.masterRecord;
-                    var fields = ((IList)dgUserField.ItemsSource);
-                    var lastItem = fields[fields.Count - 1];
-                    paramEdit[2] = selectedItem == lastItem;
+                    var fields = ((IList<TableFieldsClient>)dgUserField.ItemsSource);
+                    TableFieldsClient lastItem = null;
+                    for (int i = 0; i < fields.Count; i++)
+                    {
+                        if (fields[i].AppId != 0)
+                            break;
+                        lastItem = fields[i];
+                    }
+                    paramEdit[2] = lastItem == lastItem;
                     AddDockItem(TabControls.AddUserFieldsPage2, paramEdit, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("UserFields"), selectedItem._Name));
                     break;
                 case "CopyUserfields":
                     CWCopyUserFields winUserFields = new CWCopyUserFields(master, api);
+                    winUserFields.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     winUserFields.Closed += async delegate
                      {
                          if (winUserFields.DialogResult == true)
@@ -163,12 +174,27 @@ namespace UnicontaClient.Pages.CustomPage
                     if (master != null)
                         GenerateClassCode(master, false);
                     break;
+                case "CopyToApp":
+                    if (Utility.ConfirmCopyToApp())
+                        CopyToApp(selectedItem);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
-
+        async void CopyToApp(TableFieldsClient uf)
+        {
+            var currentApp = Utility.GetCurrentApp();
+            if (uf != null && currentApp != null)
+            {
+                var appField = new AppTableField();
+                appField.SetMaster(uf);
+                appField.SetMaster(currentApp);
+                var err = await api.Insert(appField);
+                UtilDisplay.ShowErrorCode(err);
+            }
+        }
         async private void GenerateClassCode(UnicontaBaseEntity master, bool isBaseClass)
         {
             string className = string.Empty;

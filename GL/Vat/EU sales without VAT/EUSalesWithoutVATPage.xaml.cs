@@ -407,7 +407,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             debtors = debtors ?? await api.LoadCache(typeof(Uniconta.DataModel.Debtor));
 
-            var euSalesdebtors = listOfEU.Where(t => t.DebtorRegNo != null && Country2Language.IsEU(t.Country)).GroupBy(s => s.DebtorRef); //TODO:Test om DebtorRef virker!!
+            var euSalesdebtors = listOfEU.Where(t => t.DebtorRegNo != null && Country2Language.IsEU(t.Country)).GroupBy(s => s.DebtorRef);
             var cntTotal = euSalesdebtors.Count();
             foreach (var deb in euSalesdebtors)
             {
@@ -417,7 +417,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 var debtornew = deb.Key;
 
-                if (debtornew == null || debtornew._VIESStatus != Uniconta.DataModel.VIESStatus.None)
+                if (debtornew == null || debtornew._VIESStatus == Uniconta.DataModel.VIESStatus.Valid || debtornew._VIESStatus == Uniconta.DataModel.VIESStatus.Invalid) //TODO:Skal også rettes i Intrastat
                     continue;
 
                 cnt++;

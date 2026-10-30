@@ -251,7 +251,10 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrdersPage2"
                         <CorasauControls:CorasauLayoutItem FieldName="LayoutGroup" x:Name="liLayoutGroup">
                             <CorasauControls:LookupEditor x:Name="leLayoutGroup" EditValue="{Binding LayoutGroup,Mode=TwoWay}"  />
                         </CorasauControls:CorasauLayoutItem>
-                    </CorasauControls:CorasauLayoutGroup>
+                        <CorasauControls:CorasauLayoutItem FieldName="ExemptDuty" x:Name="liExemptDuty">
+                            <CorasauControls:CheckEditor  IsChecked="{Binding ExemptDuty,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpApproval"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Approval}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="450" >
                         <CorasauControls:CorasauLayoutItem FieldName="Approver" x:Name="liApprover">
                             <CorasauControls:LookupEditor x:Name="leApprover"  EditValue="{Binding Approver,Mode=TwoWay}"/>

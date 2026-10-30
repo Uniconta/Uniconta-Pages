@@ -1,13 +1,19 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
 using Uniconta.API.Service;
-using UnicontaClient.Models;
+using Uniconta.ClientTools;
+using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
+using Uniconta.ClientTools.Util;
 using Uniconta.Common;
-using System.Collections.Generic;
-using Uniconta.ClientTools;
-using System.Threading.Tasks;
-using System.Linq;
+using Uniconta.Reports;
+using Uniconta.Reports.Utilities;
+using UnicontaClient.Models;
+using UnicontaClient.Utilities;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -40,17 +46,84 @@ namespace UnicontaClient.Pages.CustomPage
 
         void localMenu_OnItemClicked(string ActionType)
         {
+            var selectedItem = dgDashboardpage.SelectedItem as DashboardClient;
             switch (ActionType)
             {
                 case "OpenDashboard":
                     OpenDashboard();
+                    break;
+                case "CopyToApp":
+                    ConfirmAndCopyToApp(selectedItem);
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
+      
+        async void ConfirmAndCopyToApp(DashboardClient selectedItem)
+        {
+            var currentApp = Utility.GetCurrentApp();
+            if (selectedItem != null && currentApp != null)
+            {
 
+                var filter = new List<PropValuePair>() { PropValuePair.GenereteParameter("Name", typeof(string), selectedItem._Name) };
+                var appExisting = (await api.Query<AppDashboardClient>(currentApp, filter))?.Where(r => r.Name == selectedItem._Name).FirstOrDefault();
+                if (appExisting != null)
+                {
+                    CWConfirmationBox confirmOverwrite = new CWConfirmationBox(Uniconta.ClientTools.Localization.lookup("ProceedConfirmation"), Uniconta.ClientTools.Localization.lookup("Confirmation"), false, true, Uniconta.ClientTools.Localization.lookup("Overwrite"));
+                    confirmOverwrite.Closed += async delegate
+                    {
+                        if (confirmOverwrite.ConfirmationResult == Uniconta.ClientTools.Controls.CWConfirmationBox.ConfirmationResultEnum.Yes)
+                        {
+                            if (confirmOverwrite.HasConfrimationChecked)
+                                CopyToApp(selectedItem, appExisting);
+                            else
+                                CopyToApp(selectedItem, null);
+                        }
+                    };
+                    confirmOverwrite.Show();
+                }
+                else
+                {
+                    if (Utility.ConfirmCopyToApp())
+                        CopyToApp(selectedItem, null);
+                }
+
+            }
+        }
+        async void CopyToApp(DashboardClient selectedItem, AppDashboardClient copyTo)
+        {
+            var currentApp = Utility.GetCurrentApp();
+            if (selectedItem != null && currentApp != null)
+            {
+                try
+                {
+                    busyIndicator.IsBusy = true;
+                    busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("Saving");
+                    await api.Read(selectedItem);
+                    AppDashboardClient appDashboard = null;
+                    if (copyTo == null)
+                    {
+                        appDashboard = new AppDashboardClient();
+                        appDashboard.SetMaster(currentApp);
+                    }
+                    else
+                        appDashboard = copyTo;
+
+                    appDashboard.SetMaster(selectedItem as Uniconta.DataModel.UserReport);
+                    appDashboard._Name = selectedItem._Name;
+                    var errCode = copyTo == null ? await api.Insert(appDashboard) : await api.Update(appDashboard);
+                    UtilDisplay.ShowErrorCode(errCode);
+                    busyIndicator.IsBusy = false;
+                }
+                catch (Exception ex)
+                {
+                    UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"), MessageBoxButton.OK, MessageBoxImage.Error);
+                    busyIndicator.IsBusy = false;
+                }
+            }
+        }
         void OpenDashboard()
         {
             var selectedItem = dgDashboardpage.SelectedItem as DashboardClient;

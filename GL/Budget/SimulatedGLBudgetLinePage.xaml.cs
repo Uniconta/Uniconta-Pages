@@ -61,6 +61,7 @@ namespace UnicontaClient.Pages.CustomPage
                 /*
                 case "CopyRow":
                     CWCopyBudget cwCopyBudget = new CWCopyBudget(selectedItem.Name);
+                    cwCopyBudget.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     cwCopyBudget.Closing += async delegate
                     {
                         if (cwCopyBudget.DialogResult == true)

@@ -1,5 +1,3 @@
-using UnicontaClient.Models;
-using UnicontaClient.Pages;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,10 +13,14 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Uniconta.API.Service;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
 using Uniconta.DataModel;
+using UnicontaClient.Controls.Dialogs.DutchXafExport.Model;
+using UnicontaClient.Models;
+using UnicontaClient.Pages;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -41,19 +43,21 @@ namespace UnicontaClient.Pages.CustomPage
         public override string NameOfControl { get { return TabControls.BankImportMapping; } }
 
         SQLCache LedgerCache, DebtorCache, CreditorCache;
-
+        public BankImportMapping(BaseAPI API) : base(API, string.Empty)
+        {
+            Init(null);
+        }
         public BankImportMapping(UnicontaBaseEntity master)
            : base(master)
         {
+            Init(master);
+        }
+        public void Init(UnicontaBaseEntity master)
+        {
             InitializeComponent();
-            var masterRecord = master as Uniconta.DataModel.BankImportFormat;
-            if (masterRecord == null)
-                throw new Exception("This page only supports master BankImportFormat");
-            List<UnicontaBaseEntity> masterList = new List<UnicontaBaseEntity>();
-            masterList.Add(master);
+            dgBankImportMapping.UpdateMaster(master);
             localMenu.dataGrid = dgBankImportMapping;
             dgBankImportMapping.api = api;
-            dgBankImportMapping.masterRecords = masterList;
             SetRibbonControl(localMenu, dgBankImportMapping);
             dgBankImportMapping.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
@@ -63,11 +67,14 @@ namespace UnicontaClient.Pages.CustomPage
             DebtorCache = Comp.GetCache(typeof(Debtor));
             CreditorCache = Comp.GetCache(typeof(Uniconta.DataModel.Creditor));
         }
-
         protected override void OnLayoutLoaded()
         {
             base.OnLayoutLoaded();
             UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
+            if (dgBankImportMapping.masterRecord is VouchersClient)
+                HideColumns(this.AccountType, this.AccountTemplate, this.OffsetAccountType, this.Charge, this.RequireVoucher);
+            else if (dgBankImportMapping.masterRecord is BankStatementClient)
+                HideColumns(this.Creditor, this.Approver1, this.Approver2);
         }
 
         void DataControl_CurrentItemChanged(object sender, DevExpress.Xpf.Grid.CurrentItemChangedEventArgs e)

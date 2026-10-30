@@ -301,16 +301,21 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "AttachSerialBatch":
                     if (selectedItem != null)
+                    {
+                        api.ForcePrimarySQL = true;
                         AddDockItem(TabControls.AttachInvSeriesBatch, selectedItem, Uniconta.ClientTools.Localization.lookup("SerialBatchNumbers"));
+                    }
                     break;
                 case "ChangeVariant":
                     if (selectedItem == null)
                         return;
                     var cwChangeVaraints = new CWModifyVariants(api, selectedItem);
+                    cwChangeVaraints.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     cwChangeVaraints.Closing += delegate
                     {
                         if (cwChangeVaraints.DialogResult == true)
                         {
+                            api.ForcePrimarySQL = true;
                             gridRibbon_BaseActions("RefreshGrid");
                         }
                     };
@@ -320,6 +325,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem == null)
                         return;
                     var cwchangeStorage = new CWModiyStorage(api);
+                    cwchangeStorage.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     cwchangeStorage.Closing += async delegate
                     {
                         if (cwchangeStorage.DialogResult == true)
@@ -337,7 +343,10 @@ namespace UnicontaClient.Pages.CustomPage
                                 result = await tranApi.ChangeStorage(selectedItem, newWarehouse, newLocation);
 
                             if (result == ErrorCodes.Succes)
+                            {
+                                api.ForcePrimarySQL = true;
                                 gridRibbon_BaseActions("RefreshGrid");
+                            }
                             else
                                 UtilDisplay.ShowErrorCode(result);
                         }
@@ -431,12 +440,25 @@ namespace UnicontaClient.Pages.CustomPage
         }
         async private void JournalPosted(InvTransClient selectedItem)
         {
-            var result = await api.Query(new GLDailyJournalPostedClient(), new UnicontaBaseEntity[] { selectedItem }, null);
-            if (result != null && result.Length == 1)
+            if (selectedItem.JournalPostedId > 0)
             {
-                CWGLPostedClientFormView cwPostedClient = new CWGLPostedClientFormView(result[0]);
-                cwPostedClient.Show();
+                var result = await api.Query(new GLDailyJournalPostedClient(), new UnicontaBaseEntity[] { selectedItem }, null);
+                if (result != null && result.Length == 1)
+                {
+                    var cwPostedClient = new CWGLPostedClientFormView(result[0]);
+                    cwPostedClient.Show();
+                }
             }
+            else
+            {
+                var invResult = await api.Query(new InvJournalPostedClient(), new UnicontaBaseEntity[] { selectedItem }, null);
+                if (invResult != null && invResult.Length == 1)
+                {
+                    var cwPostedClient = new CWInvPostedClientFormView(invResult[0]);
+                    cwPostedClient.Show();
+                }
+            }
+           
         }
 
         async void MarkInvTrans(InvTransClient selectedItem)

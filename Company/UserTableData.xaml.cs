@@ -103,7 +103,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 var paramName = param.Name;
                 var paramValue = param.Value;
-                if (string.IsNullOrEmpty(paramName) || string.Compare(param.Name, "table", StringComparison.OrdinalIgnoreCase) == 0)
+                if (string.IsNullOrEmpty(paramName) || string.Equals(param.Name, "table", StringComparison.OrdinalIgnoreCase))
                 {
                     tablename = paramValue;
                     break;
@@ -227,7 +227,7 @@ namespace UnicontaClient.Pages.CustomPage
                         var ribbonNode = new TreeRibbon();
                         ribbonNode.Name = !string.IsNullOrEmpty(ur._Prompt) ? UserFieldControl.LocalizePrompt(ur._Prompt) : ur._Name;
                         ribbonNode.ActionName = string.Concat("UserTableData;", ur._Name);
-                        ribbonNode.LargeGlyph = "CopyUserTable_16x16";
+                        ribbonNode.LargeGlyph = "CopyUserTable_32x32";
                         ribbonNode.Glyph = "CopyUserTable_16x16";
                         ribbonNode.Child = new List<TreeRibbon>();
                         childList.Add(ribbonNode);

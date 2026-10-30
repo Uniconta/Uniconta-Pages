@@ -1,24 +1,29 @@
-using UnicontaClient.Models;
-using UnicontaClient.Utilities;
+using DevExpress.Office.Utils;
+using DevExpress.Xpf.Editors;
+using DevExpress.Xpf.Grid;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Input;
+using System.Windows.Threading;
+using Uniconta.API.DebtorCreditor;
+using Uniconta.API.Service;
 using Uniconta.ClientTools;
+using Uniconta.ClientTools.AI;
+using Uniconta.ClientTools.AI.Prompts;
+using Uniconta.ClientTools.Controls;
+using Uniconta.ClientTools.Controls.AI.Assistant.Capabilities;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
-using Uniconta.DataModel;
-using Uniconta.ClientTools.Controls;
-using Uniconta.API.DebtorCreditor;
-using System.Windows.Threading;
-using DevExpress.Xpf.Grid;
-using Uniconta.API.Service;
-using DevExpress.Xpf.Editors;
 using Uniconta.Common.Utility;
+using Uniconta.DataModel;
+using UnicontaClient.Models;
+using UnicontaClient.Utilities;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
@@ -799,7 +804,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 debtorName = dc?._Name ?? dbOrder._DCAccount;
                 accountName = Util.ConcatParenthesis(dbOrder._DCAccount, dbOrder.Name);
-                invoiceInXML = dc != null && dc.IsPeppolSupported && dc._einvoice;
+                invoiceInXML = dc != null && dc._einvoice;
             }
             else
             {
@@ -810,13 +815,13 @@ namespace UnicontaClient.Pages.CustomPage
             bool isOrderOrQuickInv = api.CompanyEntity._CountryId == CountryCode.Germany ? false : true;
 
             CWGenerateInvoice GenrateInvoiceDialog = new CWGenerateInvoice(true, string.Empty, false, askForEmail: true, showNoEmailMsg: !hasEmail, debtorName: debtorName, isOrderOrQuickInv: isOrderOrQuickInv, isDebtorOrder: true, InvoiceInXML: invoiceInXML, AccountName: accountName);
+            GenrateInvoiceDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             GenrateInvoiceDialog.DialogTableId = 2000000005;
             GenrateInvoiceDialog.SetInvPrintPreview(showInvPrintPrv);
             if (dbOrder._InvoiceDate != DateTime.MinValue)
                 GenrateInvoiceDialog.SetInvoiceDate(dbOrder._InvoiceDate);
 
-            if (!api.CompanyEntity._DeactivateSendNemhandel)
-                GenrateInvoiceDialog.SentByEInvoice(api, UtilCommon.GetEndPoint(dbOrder, dc, api));
+            GenrateInvoiceDialog.SentByEInvoice(api, UtilCommon.GetEndPoint(dbOrder, dc, api), debtor: dc, isOneTimeDebtor: dbOrder.OneTimeDebtor != null);
 
             GenrateInvoiceDialog.ShowAllowCredMax(dc._CreditMax != 0);
             GenrateInvoiceDialog.Closed += async delegate
@@ -1273,6 +1278,105 @@ namespace UnicontaClient.Pages.CustomPage
                 Order.ContactName = null;
             }
         }
-    }
-}
 
+        public override List<IAIAssistantCapability> GetAIAssistantCapabilities(bool hasFileAttached)
+        {
+            var retVal = base.GetAIAssistantCapabilities(hasFileAttached);
+
+            retVal.Add(new ArchiveDocumentCapability());
+
+            return retVal;
+        }
+    }
+
+    #region AI Capabilities
+    /// <summary>
+    /// Archives information about the focused business record in the external document archive.
+    /// </summary>
+    public sealed class ArchiveDocumentCapability : PromptCapabilityBase<ArchiveDocumentCapability.ArchiveResult>, IAIAssistantCapabilityButton
+    {
+        [PromptDefinitionReplacement("GitHubAccessToken")]
+        public sealed class ArchiveResult : IGPTToolGitHub
+        {
+            public bool Archived { get; set; }
+            public string FilePath { get; set; }
+            public string Description { get; set; }
+
+        }
+
+        public ArchiveDocumentCapability() : base(
+            nameof(ArchiveDocumentCapability),
+            "Archive document",
+            "Archives the current business document in the external document archive. " +
+            "Use when the user asks to archive, file, store, or save the current invoice, order, " +
+            "transaction, or other business document in the document archive.",
+            weight: 80,
+            "Archive this invoice",
+            "File this document",
+            "Store this invoice in the document archive",
+            "Archive the current document")
+        {
+        }
+
+        protected override PromptDefinition GetPromptDefinition() => PromptProvider.From(() => ArchiveDocumentPrompt);
+
+        protected override PromptDefinition ReplacePromptValues(PromptDefinition prompt, IAIAssistantCapabilityContext capabilityContext)
+        {
+            var record = capabilityContext.AssistantConsumer.AIRecordData?.FocussedRow;
+
+            var recordContext = record == null ? string.Empty : Uniconta.ClientTools.AI.Services.OpenAI.GPTService.BuildUnicontaEntityContextText(new[] { record }) ?? string.Empty;
+
+            return base.ReplacePromptValues(prompt, capabilityContext)
+                .Replace("RecordContext", recordContext)
+                .Replace("RepositoryOwner", "pvzUniconta")
+                .Replace("RepositoryName", "uniconta-ai-demo");
+        }
+
+        [PromptDefinition("Capability.ArchiveDocumentCapability", "Prompt used to archive the current business document using the external document archive.")]
+        [PromptDefinitionReplacement("RecordContext", "The serialized current business record.")]
+        [PromptDefinitionReplacement("RepositoryOwner", "The GitHub repository owner used by the demonstration document archive.")]
+        [PromptDefinitionReplacement("RepositoryName", "The GitHub repository used as the demonstration document archive.")]
+        public static PromptDefinition ArchiveDocumentPrompt => NewPromptDefinition(
+            "Archive the supplied invoice line using the available document archive tool. " +
+            
+            "Create exactly one Markdown document containing the relevant business information from the record, make it a fancy pro forma invoice markdown. " +
+            "Do not invent values that are not present in the supplied record. " +
+
+            "Use repository owner '{{RepositoryOwner}}' and repository '{{RepositoryName}}'. " +
+            "Use branch 'main'. " +
+
+            "Choose a clear business-oriented file name and archive path. " +
+            "Prefer a structure based on document type and year when that information can be determined. " +
+            "For example: invoices/2026/invoice-12345.md. " +
+
+            "The document should contain a short heading followed by the important identifying and financial information. " +
+            "Do not include technical serialization details, internal property names unless useful, or empty values. " +
+
+            "Only report Archived = true after the document archive tool has successfully written the file. " +
+            "Return the exact created path in FilePath and a short business-readable description in Description.",
+
+            "Current business record:\n{{RecordContext}}");
+
+        protected override Task<AIAssistantCapabilityResult> ExecuteResponse(IAIAssistantCapabilityContext context, ArchiveResult response)
+        {
+            if (response == null || !response.Archived)
+            {
+                return Task.FromResult(AIAssistantCapabilityResult.Fail("The document could not be archived."));
+            }
+
+            var message = new StringBuilder();
+
+            message.AppendLine("The document was archived successfully.");
+
+            if (!string.IsNullOrWhiteSpace(response.Description))
+                message.AppendLine(response.Description);
+
+            if (!string.IsNullOrWhiteSpace(response.FilePath))
+                message.Append("Archive location: ").Append(response.FilePath);
+
+            return Task.FromResult(
+                AIAssistantCapabilityResult.Success(message.ToString()));
+        }
+    }
+    #endregion
+}

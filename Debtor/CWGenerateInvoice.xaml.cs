@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.Windows;
+using Uniconta.Common;
 using Uniconta.Common.Utility;
 using Uniconta.DataModel;
 using Uniconta.ClientTools.Page;
@@ -21,7 +22,9 @@ using Uniconta.ClientTools.Controls;
 using Uniconta.API.System;
 using Uniconta.ClientTools.Util;
 using Uniconta.API.Service;
+using Uniconta.API.DebtorCreditor;
 using System.Text.RegularExpressions;
+using Corasau.DebitorCreditor.Germany.EDelivery;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -71,7 +74,7 @@ namespace UnicontaClient.Pages.CustomPage
         public List<object> AdditionalOrders { get; set; }
         [Display(Name = "PhysicalVouchers", ResourceType = typeof(InputFieldDataText))]
         public int PhysicalVoucherRef { get; set; }
-        [Display(Name = "AllowSkipCreditMax", ResourceType = typeof(InputFieldDataText))] 
+        [Display(Name = "AllowSkipCreditMax", ResourceType = typeof(InputFieldDataText))]
         public bool AllowSkipCreditMax { get; set; } = false;
 
         #endregion
@@ -83,6 +86,8 @@ namespace UnicontaClient.Pages.CustomPage
         protected override bool ShowTableValueButton { get { return true; } }
         private bool invoiceInXml;
         private bool IsSendXmlSalesInvoice;
+        private bool isZugferdDebtor;
+        private bool sendEmailByDefault;
         CreditorOrderClient _dcOrder;
         CrudAPI _api;
         #endregion
@@ -142,7 +147,8 @@ namespace UnicontaClient.Pages.CustomPage
                 else
                 {
                     liNoEmailMsg.Visibility = txtNoMailMsg.Visibility = Visibility.Collapsed;
-                    chkSendEmail.IsChecked = true;
+                    sendEmailByDefault = true;
+                    chkSendEmail.IsChecked = chkOIOUBL.IsChecked != true;
                 }
             }
             else
@@ -168,7 +174,6 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         #endregion
-
 
         #region Public Methods
         public void SetSendAsEmailCheck(bool isChecked)
@@ -224,28 +229,226 @@ namespace UnicontaClient.Pages.CustomPage
 
         public void SetOIOUBLLabelText(bool sendXmlSalesInvoice) { } //Method to backward compatible
 
-        public void SentByEInvoice(CrudAPI api, Tuple<NHRNetworkType, NHREndPointType, string> endPoint, bool forceEnableEinvoice = false)
+        public void SentByEInvoice(CrudAPI api, Tuple<NHRNetworkType, NHREndPointType, string, string> endPoint, bool forceEnableEinvoice = false, DCAccount debtor = null, bool isOneTimeDebtor = false)
         {
+            // ZUGFeRD: the XML is embedded in the invoice PDF, there is no separate e-invoice delivery
+            if (ZugferdUtility.ShouldGenerateXml(debtor))
+            {
+                isZugferdDebtor = true;
+                chkOIOUBL.IsChecked = false;
+                chkSendEmail.IsChecked = sendEmailByDefault;
+                lgUBL.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            if (api.CompanyEntity._DeactivateSendNemhandel && endPoint != null && endPoint.Item1 != NHRNetworkType.Peppol)
+                return;
+
             IsSendXmlSalesInvoice = true;
-            var enableEinvoice = api.CompanyEntity._OIOUBLSendOnServer && invoiceInXml && (endPoint == null || endPoint.Item3 != null);
+
+            if (IsNemhandelCheckWithoutNetwork(api, endPoint, debtor))
+            {
+                chkOIOUBL.IsChecked = false;
+                liGenerateOIOUBLClicked.IsEnabled = false;
+                lblReceiverEndPointStatus.Content = null;
+                CheckNemhandelWithoutNetwork(api, endPoint, debtor, isOneTimeDebtor);
+                return;
+            }
+            var isPeppolEndpoint = endPoint != null && endPoint.Item1 == NHRNetworkType.Peppol;
+            var enableEinvoice = (isPeppolEndpoint || api.CompanyEntity._OIOUBLSendOnServer) && invoiceInXml && (endPoint == null || endPoint.Item3 != null);
             chkOIOUBL.IsChecked = enableEinvoice;
             liGenerateOIOUBLClicked.IsEnabled = enableEinvoice || forceEnableEinvoice;
+
+            lblReceiverEndPointStatus.Content = null;
 
             if (!enableEinvoice || endPoint == null)
                 return;
 
             liReceiverEndPoint.Visibility = Visibility.Visible;
-            var endPointId = Regex.Replace(endPoint.Item3, "[^0-9]", "");
-            var baseUrl = api.session.Connection.Target == APITarget.Live ? NHR.NHR_WEB : NHR.NHR_WEB_DEMO;
-            var keyValue = endPoint.Item2 == NHREndPointType.GLN ? "&key=" : "DK%3ACVR&key=";
-            var NHRUrl = string.Concat(baseUrl, keyValue, endPointId);
 
-            if (endPoint.Item1 == NHRNetworkType.Peppol)
-                lblReceiverEndPoint.Content = string.Concat("Peppol", Environment.NewLine, Uniconta.ClientTools.Localization.lookup(endPoint.Item2 == NHREndPointType.GLN ? "GLNnumber" : "CompanyRegNo"), ": ", endPoint.Item3);
+            var isPeppol = endPoint.Item1 == NHRNetworkType.Peppol;
+            var network = isPeppol ? EDocumentNetwork.Peppol : EDocumentNetwork.Nemhandel;
+            string fullEndPointId;
+
+            if (endPoint.Item2 == NHREndPointType.EndPointId)
+            {
+                fullEndPointId = endPoint.Item3;
+                if (isPeppol)
+                {
+                    var parts = endPoint.Item3.Split(new[] { ':' }, 2);
+                    var overrideText = string.Concat("Peppol: ", endPoint.Item3);
+                    lblReceiverEndPoint.Content = parts.Length == 2
+                        ? UtilDisplay.CreateHyperLinkTextControl(UnicontaClient.Utilities.EDocumentHelper.BuildSmpLookupUrl(parts[0], parts[1]), overrideText)
+                        : (object)overrideText;
+                }
+                else
+                {
+                    var parts = endPoint.Item3.Split(new[] { ':' }, 2);
+                    var overrideText = string.Concat("Nemhandel: ", endPoint.Item3);
+                    if (parts.Length == 2 && (parts[0] == "0088" || parts[0] == "0184"))
+                    {
+                        var NHRUrl = UnicontaClient.Utilities.EDocumentHelper.BuildNhrLookupUrl(isGln: parts[0] == "0088", parts[1]);
+                        lblReceiverEndPoint.Content = UtilDisplay.CreateHyperLinkTextControl(NHRUrl, overrideText);
+                    }
+                    else
+                        lblReceiverEndPoint.Content = overrideText;
+                }
+
+                UpdateReceiverCapability(api, network, fullEndPointId);
+                return;
+            }
+
+            var isGeba = endPoint.Item4 == UnicontaClient.Utilities.EDocumentHelper.DeGebaScheme;
+            var endPointId = isGeba ? endPoint.Item3 : Regex.Replace(endPoint.Item3, "[^0-9]", "");
+            var label = string.Concat(Uniconta.ClientTools.Localization.lookup(endPoint.Item2 == NHREndPointType.GLN ? "GLNnumber" : "CompanyRegNo"), ": ", endPointId);
+
+            if (isPeppol)
+            {
+                var peppolUrl = UnicontaClient.Utilities.EDocumentHelper.BuildSmpLookupUrl(endPoint.Item4, endPointId);
+                lblReceiverEndPoint.Content = UtilDisplay.CreateHyperLinkTextControl(peppolUrl, string.Concat("Peppol: ", label));
+                fullEndPointId = string.Concat(endPoint.Item4, ":", endPointId);
+            }
             else
-                lblReceiverEndPoint.Content = UtilDisplay.CreateHyperLinkTextControl(NHRUrl, string.Concat(Uniconta.ClientTools.Localization.lookup(endPoint.Item2 == NHREndPointType.GLN ? "GLNnumber" : "CompanyRegNo"), ": ", endPointId));
+            {
+                var NHRUrl = UnicontaClient.Utilities.EDocumentHelper.BuildNhrLookupUrl(isGln: endPoint.Item2 == NHREndPointType.GLN, endPointId);
+                lblReceiverEndPoint.Content = UtilDisplay.CreateHyperLinkTextControl(NHRUrl, string.Concat("Nemhandel: ", label));
+
+                var nemhandelScheme = endPoint.Item2 == NHREndPointType.GLN ? "0088" : "0184";
+                fullEndPointId = string.Concat(nemhandelScheme, ":", endPointId);
+            }
+
+            UpdateReceiverCapability(api, network, fullEndPointId);
         }
-        
+
+        int _receiverCapabilityRequestId;
+        CrudAPI _nemhandelApi;
+        DCAccount _nemhandelDebtor;
+        string _nemhandelEndpointToSave;
+        bool _nemhandelSaveEndpointId;
+
+        static bool IsNemhandelCheckWithoutNetwork(CrudAPI api, Tuple<NHRNetworkType, NHREndPointType, string, string> endPoint, DCAccount debtor)
+        {
+            var comp = api.CompanyEntity;
+            return debtor != null && endPoint != null && endPoint.Item1 == NHRNetworkType.None && !string.IsNullOrEmpty(endPoint.Item3) &&
+                   !debtor._InvoiceInXML && !debtor._InvoiceInPepPol && comp._OIOUBLSendOnServer &&
+                   UnicontaClient.Utilities.EDocumentHelper.IsNemhandelSenderCountry(comp._CountryId) &&
+                   UnicontaClient.Utilities.EDocumentHelper.IsNemhandelSenderCountry(debtor._Country);
+        }
+
+        private async void CheckNemhandelWithoutNetwork(CrudAPI api, Tuple<NHRNetworkType, NHREndPointType, string, string> endPoint, DCAccount debtor, bool isOneTimeDebtor)
+        {
+            var requestId = ++_receiverCapabilityRequestId;
+
+            liReceiverEndPoint.Visibility = Visibility.Visible;
+            lblReceiverEndPoint.Content = null;
+            lblReceiverEndPointStatus.Foreground = System.Windows.Media.Brushes.Gray;
+            lblReceiverEndPointStatus.Content = string.Format(Uniconta.ClientTools.Localization.lookup("CheckingAbleToReceiveOBJ"), Uniconta.ClientTools.Localization.lookup("einvoice"));
+
+            var edocAPI = new EDocumentAPI(api);
+            var ableToReceive = new List<(string Scheme, string Value)>();
+            var isCvr = endPoint.Item2 == NHREndPointType.CVR;
+            var cvr = isCvr ? Regex.Replace(endPoint.Item3, "[^0-9]", "") : null;
+            var tooManyEndpoints = false;
+
+            if (isCvr)
+            {
+                var search = await edocAPI.EDocumentSearchNemhandelReceivers(cvr, maxAbleToReceive: 2, documentType: EDocumentDocumentType.Invoice);
+                if (requestId != _receiverCapabilityRequestId)
+                    return;
+                if (search != null)
+                {
+                    tooManyEndpoints = search.TooManyEndpoints;
+                    foreach (var rec in search.Receivers)
+                        if (rec.AbleToReceive)
+                            ableToReceive.Add((rec.Scheme, rec.Value));
+                }
+            }
+            else
+            {
+                var fullEndPointId = endPoint.Item2 == NHREndPointType.GLN
+                    ? string.Concat(UnicontaClient.Utilities.EDocumentHelper.GlnScheme, ":", Regex.Replace(endPoint.Item3, "[^0-9]", ""))
+                    : endPoint.Item3;
+                var result = await edocAPI.EDocumentLookupParticipantByEndPointId(EDocumentNetwork.Nemhandel, fullEndPointId, documentType: EDocumentDocumentType.Invoice);
+                if (requestId != _receiverCapabilityRequestId)
+                    return;
+                var parts = fullEndPointId.Split(new[] { ':' }, 2);
+                if (result != null && result.ParticipantAbleToReceive && parts.Length == 2)
+                    ableToReceive.Add((parts[0], parts[1]));
+            }
+
+            if (isCvr && (tooManyEndpoints || ableToReceive.Count > 1))
+            {
+                lblReceiverEndPoint.Content = UtilDisplay.CreateHyperLinkTextControl(UnicontaClient.Utilities.EDocumentHelper.BuildNhrLookupUrl(isGln: false, cvr),
+                    string.Concat("Nemhandel: ", Uniconta.ClientTools.Localization.lookup("CompanyRegNo"), ": ", cvr));
+                lblReceiverEndPointStatus.ClearValue(ForegroundProperty); 
+                lblReceiverEndPointStatus.Content = new TextBlock
+                {
+                    TextWrapping = TextWrapping.Wrap,
+                    Text = string.Format(Uniconta.ClientTools.Localization.lookup("SeveralGLNNumbersInfoOBJ"), Uniconta.ClientTools.Localization.lookup("einvoice"))
+                };
+                return;
+            }
+
+            if (ableToReceive.Count != 1)
+            {
+                liReceiverEndPoint.Visibility = Visibility.Collapsed;
+                lblReceiverEndPointStatus.Content = null;
+                return;
+            }
+
+            var (scheme, value) = ableToReceive[0];
+            var isGln = scheme == UnicontaClient.Utilities.EDocumentHelper.GlnScheme;
+            var label = string.Concat(Uniconta.ClientTools.Localization.lookup(isGln ? "GLNnumber" : "CompanyRegNo"), ": ", value);
+            lblReceiverEndPoint.Content = isGln || scheme == "0184"
+                ? UtilDisplay.CreateHyperLinkTextControl(UnicontaClient.Utilities.EDocumentHelper.BuildNhrLookupUrl(isGln, value), string.Concat("Nemhandel: ", label))
+                : (object)string.Concat("Nemhandel: ", scheme, ":", value);
+            lblReceiverEndPointStatus.Foreground = System.Windows.Media.Brushes.Green;
+            lblReceiverEndPointStatus.Content = string.Concat("✓ ", string.Format(Uniconta.ClientTools.Localization.lookup("AbleToReceiveOBJ"), Uniconta.ClientTools.Localization.lookup("einvoice")));
+
+            if (isOneTimeDebtor)
+                return;
+
+            _nemhandelApi = api;
+            _nemhandelDebtor = debtor;
+            _nemhandelEndpointToSave = string.Concat(scheme, ":", value);
+            _nemhandelSaveEndpointId = isCvr && !(scheme == "0184" && value == cvr);
+            liGenerateOIOUBLClicked.IsEnabled = true;
+        }
+
+        private async void UpdateReceiverCapability(CrudAPI api, EDocumentNetwork network, string endPointId)
+        {
+            var requestId = ++_receiverCapabilityRequestId;
+
+            lblReceiverEndPointStatus.Foreground = System.Windows.Media.Brushes.Gray;
+            lblReceiverEndPointStatus.Content = string.Format(Uniconta.ClientTools.Localization.lookup("CheckingAbleToReceiveOBJ"), Uniconta.ClientTools.Localization.lookup("einvoice"));
+
+            var edocAPI = new EDocumentAPI(api);
+            var result = await edocAPI.EDocumentLookupParticipantByEndPointId(network, endPointId, documentType: EDocumentDocumentType.Invoice);
+
+            if (requestId != _receiverCapabilityRequestId)
+                return;
+
+            if (result == null)
+            {
+                lblReceiverEndPointStatus.Content = null;
+                return;
+            }
+
+            if (result.ParticipantAbleToReceive)
+            {
+                lblReceiverEndPointStatus.Foreground = System.Windows.Media.Brushes.Green;
+                lblReceiverEndPointStatus.Content = string.Concat("✓ ", string.Format(Uniconta.ClientTools.Localization.lookup("AbleToReceiveOBJ"), Uniconta.ClientTools.Localization.lookup("einvoice")));
+            }
+            else
+            {
+                lblReceiverEndPointStatus.Foreground = System.Windows.Media.Brushes.OrangeRed;
+                lblReceiverEndPointStatus.Content = string.Concat("⚠ ", string.Format(Uniconta.ClientTools.Localization.lookup("UnableToReceiveOBJ"), Uniconta.ClientTools.Localization.lookup("einvoice")));
+                chkOIOUBL.IsChecked = false;
+                if (chkSendEmail.IsEnabled)
+                    chkSendEmail.IsChecked = true;
+            }
+        }
+
         public void ShowAllowCredMax(bool isShow)
         {
             liAllowSkipCreditMax.Visibility = isShow ? Visibility.Visible : Visibility.Collapsed;
@@ -262,14 +465,14 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else
                 if (e.Key == Key.Enter)
-            {
-                if (CancelButton.IsFocused)
                 {
-                    SetDialogResult(false);
-                    return;
+                    if (CancelButton.IsFocused)
+                    {
+                        SetDialogResult(false);
+                        return;
+                    }
+                    OKButton_Click(null, null);
                 }
-                OKButton_Click(null, null);
-            }
         }
 
 
@@ -279,7 +482,7 @@ namespace UnicontaClient.Pages.CustomPage
                 liGenerateOIOUBLClicked.Label = Uniconta.ClientTools.Localization.lookup("SendInvoicebyUBL");
             Dispatcher.BeginInvoke(new Action(() => { OKButton.Focus(); }));
         }
-        private void OKButton_Click(object sender, RoutedEventArgs e)
+        private async void OKButton_Click(object sender, RoutedEventArgs e)
         {
             var str = txtInvNumber.Text;
             if (!string.IsNullOrEmpty(str) && str != "0")
@@ -299,10 +502,30 @@ namespace UnicontaClient.Pages.CustomPage
             ShowInvoice = chkShowInvoice.IsChecked.GetValueOrDefault();
             UpdateInventory = chkUpdateInv.IsChecked.GetValueOrDefault();
             InvoiceQuickPrint = chkPrintInvoice.IsChecked.GetValueOrDefault();
-            GenerateOIOUBLClicked = chkOIOUBL.IsChecked.GetValueOrDefault();
+            GenerateOIOUBLClicked = !isZugferdDebtor && chkOIOUBL.IsChecked.GetValueOrDefault();
             Emails = (string.IsNullOrEmpty(txtEmail.Text) || string.IsNullOrWhiteSpace(txtEmail.Text)) ? null : txtEmail.Text;
             sendOnlyToThisEmail = chkSendOnlyEmail.IsChecked.GetValueOrDefault();
             PostOnlyDelivered = chkPostOnlyDel.IsChecked.GetValueOrDefault();
+
+            if (GenerateOIOUBLClicked && !IsSimulation && _nemhandelEndpointToSave != null && _nemhandelDebtor is UnicontaBaseEntity original)
+            {
+                var modified = StreamingManager.Clone(original);
+                var modifiedDebtor = (DCAccount)modified;
+                modifiedDebtor._InvoiceInXML = true;
+                if (_nemhandelSaveEndpointId)
+                    modifiedDebtor._EndpointId = _nemhandelEndpointToSave;
+
+                OKButton.IsEnabled = false;
+                var err = await _nemhandelApi.Update(original, modified);
+                OKButton.IsEnabled = true;
+                if (err != ErrorCodes.Succes)
+                {
+                    UtilDisplay.ShowErrorCode(err);
+                    return;
+                }
+                _nemhandelEndpointToSave = null;
+            }
+
             SetDialogResult(true);
         }
 
@@ -331,6 +554,11 @@ namespace UnicontaClient.Pages.CustomPage
             chkSendEmail.IsChecked = false;
         }
 
+        private void chkOIOUBL_Checked(object sender, RoutedEventArgs e)
+        {
+            chkSendEmail.IsChecked = false;
+        }
+
         public void HideOutlookOption(bool isHidden)
         {
             if (isHidden)
@@ -353,8 +581,18 @@ namespace UnicontaClient.Pages.CustomPage
             var voucherClient = lookUpEditor.SelectedItem as VouchersClient;
             PhysicalVoucherRef = voucherClient.RowId;
             NotifyPropertyChanged(nameof(PhysicalVoucherRef));
+            if (!string.IsNullOrEmpty(voucherClient.Invoice))
+            {
+                InvoiceNumber = voucherClient.Invoice;
+                NotifyPropertyChanged(nameof(InvoiceNumber));
+            }
+            if (voucherClient.PostingDate != DateTime.MinValue)
+            {
+                GenrateDate = voucherClient.PostingDate;
+                NotifyPropertyChanged(nameof(GenrateDate));
+            }
         }
-        
+
         #endregion
     }
 }

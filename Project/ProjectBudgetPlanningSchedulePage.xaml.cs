@@ -230,7 +230,9 @@ namespace UnicontaClient.Pages.CustomPage
             if (Employee!= null)
                 e.Appointment.ResourceId = Employee._Number;
             var selectedProject = leProject.SelectedItem as ProjectClient;
-            e.Window = new CwProjectBugetPlanning(api, e.Appointment.ResourceId as string, selectedProject);
+            var budgetPlanningDialog = new CwProjectBugetPlanning(api, e.Appointment.ResourceId as string, selectedProject);
+            budgetPlanningDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
+            e.Window = budgetPlanningDialog;
             e.Window.DataContext = new ProjectBugetPlanningVM(e.Appointment, projBudgetPlanScheduler);
         }
             
@@ -310,9 +312,9 @@ namespace UnicontaClient.Pages.CustomPage
         {
             foreach (var rec in Parameters)
             {
-                if (string.Compare(rec.Name, "startupStartDate", StringComparison.CurrentCultureIgnoreCase) == 0)
+                if (string.Equals(rec.Name, "startupStartDate", StringComparison.CurrentCultureIgnoreCase))
                     startupStartDate = DateTime.Parse(rec.Value);
-                if (string.Compare(rec.Name, "startupView", StringComparison.CurrentCultureIgnoreCase) == 0)
+                if (string.Equals(rec.Name, "startupView", StringComparison.CurrentCultureIgnoreCase))
                     startupView = rec.Value;
             }
             base.SetParameter(Parameters);

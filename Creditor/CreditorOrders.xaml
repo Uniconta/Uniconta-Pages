@@ -67,9 +67,12 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrders"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderNumber" AllowThousandMask="false" Width="70"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryDate"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryDateConfirmed" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ErrorOIO" Width="90" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SendTimeOIO" Width="90" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="NoLines" Width="50" ReadOnly="True" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="OrderTotal" Width="80" ReadOnly="True" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Currency" Width="50" ReadOnly="True"  />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="SystemInfo" Width="151" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="TotalQty" Width="80" Visible="False" ReadOnly="True" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ProducedQty" Width="80" Visible="False" ReadOnly="True" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="EndDiscountPct" Width="50"/>
@@ -155,6 +158,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrders"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryContactPerson" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryPhone" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryContactEmail" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ExemptDuty" Visible="False" />
                 </localPage:CreditorOrdersGrid.Columns>
             </localPage:CreditorOrdersGrid>
         </CorasauControls:BusyIndicator>

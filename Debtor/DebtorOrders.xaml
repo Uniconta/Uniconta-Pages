@@ -164,6 +164,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrders"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryContactEmail" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PackagingConsumer" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SplitFromDate" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ExemptDuty" Visible="False" />
                 </localPage:DebtorOrdersGrid.Columns>
                 <localPage:DebtorOrdersGrid.TotalSummary>
                     <localPage:SumColumn FieldName="OrderTotal" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>

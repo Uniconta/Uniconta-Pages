@@ -1,22 +1,23 @@
-using Uniconta.ClientTools.Page;
+using DevExpress.XtraPrinting.Native;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
-using Uniconta.ClientTools.DataModel;
-using UnicontaClient.Models;
-using Uniconta.Common;
+using System.Windows.Controls;
 using Uniconta.API.GeneralLedger;
-using Uniconta.DataModel;
-using Uniconta.ClientTools.Controls;
-using Uniconta.ClientTools.Util;
 using Uniconta.API.Service;
-using Uniconta.Common.Utility;
-using System.Collections;
 using Uniconta.Client.Pages;
+using Uniconta.ClientTools.Controls;
+using Uniconta.ClientTools.DataModel;
+using Uniconta.ClientTools.Page;
+using Uniconta.ClientTools.Util;
+using Uniconta.Common;
+using Uniconta.Common.Utility;
+using Uniconta.DataModel;
+using UnicontaClient.Models;
 using UnicontaClient.Pages.Reports;
 using Localization = Uniconta.ClientTools.Localization;
-using System.Windows.Controls;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -108,6 +109,14 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         AddDockItem(TabControls.PostedTransactions, selectedItem, string.Concat(Uniconta.ClientTools.Localization.lookup("PostedTransactions"), " / ", NumberConvert.ToString(selectedItem._JournalPostedId)));
                     break;
+                case "AddNote":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.UserNotesPage, dgVatVatSettlements.syncEntity);
+                    break;
+                case "AddDoc":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.UserDocsPage, dgVatVatSettlements.syncEntity);
+                    break;
                 case "Upload":
                     if (selectedItem != null && dgVatVatSettlements.SelectedItem == dgVatVatSettlements.VisibleItems[0])
                     {
@@ -178,6 +187,7 @@ namespace UnicontaClient.Pages.CustomPage
             else
                 Month = 12;
             var dialog = new CWCalculateCommission(api, fromdate, fromdate.AddMonths(Month).AddDays(-1));
+            dialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             dialog.SetTitleAndButton(Uniconta.ClientTools.Localization.lookup("Create"), Uniconta.ClientTools.Localization.lookup("OK"));
             dialog.Closed += delegate
             {
@@ -327,6 +337,17 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
 
+            SQLCache vattypes = null;
+            var country = rec._Country != 0 ? rec._Country : api.CompanyEntity._CountryId;
+            if (country != api.CompanyEntity._CountryId)
+            {
+                var q = api.QuerySync<Uniconta.DataModel.GLVatType>(null, new[] { PropValuePair.GenereteWhereElements("Country", NumberConvert.ToString((int)country), CompareOperator.Equal) });
+                if (q != null && q.Length > 0)
+                    vattypes = new SQLCache(q, true);
+            }
+            if (vattypes == null)
+                vattypes = api.GetCache(typeof(Uniconta.DataModel.GLVatType));
+
             var cs = StreamingManagerReuse.Create(rec._Data);
             cs.CompanyId = rec.CompanyId;
             cs.UnpackParm = new VatReportLine.UnpackParm
@@ -341,8 +362,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             var Trans = new List<GLTransClientTotal>(50);
             var total = Generate(lstPeriod, Trans, rec._ToDate, rec.CompanyId, Offset, null);
-            var countryId = api.CompanyEntity._CountryId;
-            if (countryId == CountryCode.Denmark || countryId == CountryCode.Greenland || countryId == CountryCode.FaroeIslands)
+            if (country == CountryCode.Denmark || country == CountryCode.Greenland || country == CountryCode.FaroeIslands)
                 total += Generate(sumPeriod, Trans, rec._ToDate, rec.CompanyId, Offset, null);
 
             // last period
@@ -357,6 +377,7 @@ namespace UnicontaClient.Pages.CustomPage
             else
             {
                 var postingDialog = new CWPostVAT(api, rec._ToDate);
+                postingDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                 postingDialog.DialogTableId = 2000000014;
                 postingDialog.Closed += async delegate
                 {
@@ -433,6 +454,17 @@ namespace UnicontaClient.Pages.CustomPage
 
         async void Upload(GLVatReported rec, string key)
         {
+            SQLCache vattypes = null;
+            var country = rec._Country != 0 ? rec._Country : api.CompanyEntity._CountryId;
+            if (country != api.CompanyEntity._CountryId)
+            {
+                var q = await api.Query<Uniconta.DataModel.GLVatType>(new[] { PropValuePair.GenereteWhereElements("Country", NumberConvert.ToString((int)country), CompareOperator.Equal) });
+                if (q != null && q.Length > 0)
+                    vattypes = new SQLCache(q, true);
+            }
+            if (vattypes == null)
+                vattypes = api.GetCache(typeof(Uniconta.DataModel.GLVatType));
+
             var a = new long[20];
             var Accounts = api.GetCache(typeof(GLAccount));
             var cs = StreamingManagerReuse.Create(rec._Data);
@@ -441,8 +473,9 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 Accounts = Accounts,
                 Vats = api.GetCache(typeof(GLVat)),
-                VatTypes = api.GetCache(typeof(GLVatType))
+                VatTypes = vattypes
             };
+     
             var vatArray = new double[40];
             var OtherTaxName = new string[10];
 
@@ -468,10 +501,9 @@ namespace UnicontaClient.Pages.CustomPage
 
             busyIndicator.IsBusy = false;
             busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LoadingMsg");
-            var countryId = api.CompanyEntity._CountryId;
             if (err != ErrorCodes.Succes)
                 UtilDisplay.ShowErrorCode(err);
-            else if (countryId == CountryCode.Denmark || countryId == CountryCode.Greenland || countryId == CountryCode.FaroeIslands)
+            else if (country == CountryCode.Denmark || country == CountryCode.Greenland || country == CountryCode.FaroeIslands)
             {
                 TextBlock textBlock;
                 var deeplink = string.Format("https://ntse.skat.dk/ntse-front/dk/skat/RSU-Moms?periodStartDate={0}&periodSlutDate={1}", rec._FromDate.ToString("yyyy-MM-dd"), rec._ToDate.ToString("yyyy-MM-dd"));

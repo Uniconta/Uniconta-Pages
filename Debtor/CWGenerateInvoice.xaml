@@ -6,7 +6,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWGenerateInvoice"
            xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"
            xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
            xmlns:ClientToolsControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
-           Height="{StaticResource Height39}" Width="{StaticResource Width39}" KeyDown="ChildWindow_KeyDown" SizeToContent="Height" IsTabStop="True">
+           Height="{StaticResource Height39}" Width="960" KeyDown="ChildWindow_KeyDown" SizeToContent="Height" IsTabStop="True">
     <cw:ChildWindow.Resources>
         <DataTemplate x:Key="PrimaryLableTemplate">
             <TextBlock Text="{Binding }" MaxWidth="120" TextWrapping="Wrap" />
@@ -124,10 +124,13 @@ x:Class="UnicontaClient.Pages.CustomPage.CWGenerateInvoice"
                             </DataTemplate>
                         </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
                         <ClientToolsControls:CorasauLayoutItem FieldName="GenerateOIOUBLClicked" x:Name="liGenerateOIOUBLClicked" LabelTemplate="{StaticResource SecondayLableTemplate}">
-                            <ClientToolsControls:CheckEditor x:Name="chkOIOUBL" IsChecked="{Binding GenerateOIOUBLClicked,Mode=TwoWay}"/>
+                            <ClientToolsControls:CheckEditor x:Name="chkOIOUBL" IsChecked="{Binding GenerateOIOUBLClicked,Mode=TwoWay}" Checked="chkOIOUBL_Checked"/>
                         </ClientToolsControls:CorasauLayoutItem>
                         <ClientToolsControls:CorasauLayoutItem x:Name="liReceiverEndPoint"  Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Receiver}" LabelTemplate="{StaticResource SecondayLableTemplate}" Visibility="Collapsed">
-                            <Label x:Name="lblReceiverEndPoint" VerticalAlignment="Center" HorizontalAlignment="Stretch" />
+                            <StackPanel Orientation="Vertical">
+                                <Label x:Name="lblReceiverEndPoint" VerticalAlignment="Center" HorizontalAlignment="Stretch" />
+                                <Label x:Name="lblReceiverEndPointStatus" VerticalAlignment="Center" Margin="0,2,0,0" />
+                            </StackPanel>
                         </ClientToolsControls:CorasauLayoutItem>
                     </ClientToolsControls:CorasauLayoutGroup>
                 </ClientToolsControls:CorasauLayoutGroup>

@@ -54,6 +54,13 @@ namespace UnicontaClient.Pages.CustomPage
             }
             base.SetParameter(Parameters);
         }
+
+        protected override void OnLayoutLoaded()
+        {
+            base.OnLayoutLoaded();
+            if (api.CompanyEntity.HideCostPrice)
+                MarginRatio.Visible = MarginRatio.ShowInColumnChooser = CostValue.Visible = CostValue.ShowInColumnChooser = Margin.Visible = Margin.ShowInColumnChooser = false;
+        }
         private void Initialize()
         {
             InitializeComponent();
@@ -67,8 +74,6 @@ namespace UnicontaClient.Pages.CustomPage
             txtDateTo.DateTime = Now;
             txtDateFrm.DateTime = Now.AddDays(1 - Now.Day).AddMonths(-2);
             dgAcStatsGrid.ShowTotalSummary();
-            if (api.CompanyEntity.HideCostPrice)
-                MarginRatio.Visible = MarginRatio.ShowInColumnChooser = CostValue.Visible = CostValue.ShowInColumnChooser = DB.Visible = DB.ShowInColumnChooser = false;
         }
 
         void localMenu_OnItemClicked(string ActionType)
@@ -111,7 +116,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             get { return TabControls.DebtorAccountStat; }
         }
-
+        public override bool ShowAllFieldsMenu => false;
         private void Search()
         {
             InitQuery();

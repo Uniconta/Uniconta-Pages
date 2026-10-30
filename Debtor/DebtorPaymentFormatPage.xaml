@@ -24,7 +24,6 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorPaymentFormatPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="BankAccount"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Journal"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="NoneBankDayAction"/>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="AutoPosting"/>
                 </local:DebtorPaymentFormatGrid.Columns>
             </local:DebtorPaymentFormatGrid>
         </CorasauControls:BusyIndicator>

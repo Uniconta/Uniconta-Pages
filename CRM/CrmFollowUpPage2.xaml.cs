@@ -239,12 +239,9 @@ namespace UnicontaClient.Pages.CustomPage
         private void Email_ButtonClicked(object sender)
         {
             var txtEmail = ((CorasauLayoutItem)sender).Content as TextEditor;
-            if (txtEmail == null)
+            if (string.IsNullOrWhiteSpace(txtEmail?.Text))
                 return;
-            var mail = string.Concat("mailto:", txtEmail.Text);
-            System.Diagnostics.Process proc = new System.Diagnostics.Process();
-            proc.StartInfo.FileName = mail;
-            proc.Start();
+            OfficeComponentUtil.SendEmailToOutlook(txtEmail.Text);
         }
 
         private void liZipCode_ButtonClicked(object sender)

@@ -1,6 +1,8 @@
-using UnicontaClient.Pages;
+using DevExpress.Xpf.Core.Native;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,16 +15,16 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Uniconta.API.Service;
+using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
-using System.Collections;
-using Uniconta.Common;
-using UnicontaClient.Models;
-using UnicontaClient.Utilities;
-using Uniconta.Common.Utility;
-using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.Util;
-using Uniconta.API.Service;
+using Uniconta.Common;
+using Uniconta.Common.Utility;
+using UnicontaClient.Models;
+using UnicontaClient.Pages;
+using UnicontaClient.Utilities;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -56,9 +58,9 @@ namespace UnicontaClient.Pages.CustomPage
         BankStatementLineClient SelectedBankStatemenLine;
         bool OffSet, RoundTo100;
         private object[] refreshParams;
-        private List<long> markedlist;
+        private Dictionary<string, List<string>> markedlist;
         int GraceDays;
-        public SettleOpenTransactionPage(UnicontaBaseEntity baseEntity, byte openTransType, UnicontaBaseEntity selectedLine, bool offSet, IEnumerable<string> markedList) : base(null)
+        public SettleOpenTransactionPage(UnicontaBaseEntity baseEntity, byte openTransType, UnicontaBaseEntity selectedLine, bool offSet, Dictionary<string, List<string>> markedList) : base(null)
         {
             InitializeComponent();
             this.DataContext = this;
@@ -80,6 +82,7 @@ namespace UnicontaClient.Pages.CustomPage
             selectedInvoices = new List<string>();
             selectedVouchers = new List<int>();
             selectedRowIds = new List<int>();
+            api.ForcePrimarySQL = true;
             dgOpenTransactionGrid.api = api;
             dgOpenTransactionGrid.UpdateMaster(baseEntity);
             dgOpenTransactionGrid.BusyIndicator = busyIndicator;
@@ -137,7 +140,7 @@ namespace UnicontaClient.Pages.CustomPage
             refreshParams = null;
         }
 
-        private void InitGridView(IEnumerable<string> markedList)
+        private void InitGridView(Dictionary<string, List<string>> markedList)
         {
             var settle = selectedLine?._Settlements ?? SelectedBankStatemenLine?._Settlement;
             if (settle != null)
@@ -176,7 +179,7 @@ namespace UnicontaClient.Pages.CustomPage
                     selectedInvoices.Add(SelectedBankStatemenLine._Invoice);
             }
 
-            markedlist = GetAllReadyMarked(markedList);
+            markedlist = markedList;
 
             if (OpenTransactionType == 1)
                 LoadDebtorTransOpen();
@@ -190,20 +193,29 @@ namespace UnicontaClient.Pages.CustomPage
         async private void LoadDebtorTransOpen()
         {
             var listSource = await api.Query(new DebtorTransOpenClientExtended(), dgOpenTransactionGrid.masterRecords, null);
+
             if (listSource != null)
             {
                 foreach (var item in listSource)
                 {
-                    var Voucher = item.Voucher;
-                    var Invoice = item.Invoice;
                     var InvoiceAN = item.InvoiceAN;
-                    var rowId = item.PrimaryKeyId;
 
-                    item.IsEnabled = !(markedlist != null && (markedlist.Contains(Voucher) || markedlist.Contains(Invoice) || markedlist.Contains(rowId)));
-                    item.IsChecked = (selectedVouchers.Contains(Voucher) || selectedInvoices.Contains(InvoiceAN) || markedlist.Contains(Voucher) || markedlist.Contains(Invoice) || selectedRowIds.Contains(rowId));
+                    var Voucher = item.Voucher.ToString();
+                    var Invoice = item.Invoice.ToString();
+                    var rowId = item.PrimaryKeyId.ToString();
 
-                    if (selectedVouchers.Contains(Voucher))
-                        selectedRowIds.Add(rowId);
+                    if (markedlist == null)
+                        markedlist = new Dictionary<string, List<string>>();
+
+                    var invoiceMarkedList = markedlist.Where(x => x.Key == "Invoice" && x.Value.Contains(Invoice)).ToList();
+                    var voucherMarkedList = markedlist.Where(x => x.Key == "Voucher" && x.Value.Contains(Voucher)).ToList();
+                    var rowIdMarkedList = markedlist.Where(x => x.Key == "rowId" && x.Value.Contains(rowId)).ToList();
+
+                    item.IsEnabled = !(markedlist != null && (invoiceMarkedList.Any() || voucherMarkedList.Any() || rowIdMarkedList.Any()));
+                    item.IsChecked = (selectedVouchers.Contains(Convert.ToInt32(Voucher)) || selectedInvoices.Contains(InvoiceAN) || invoiceMarkedList.Any(x => x.Value.Contains(Invoice)) || voucherMarkedList.Any(x => x.Value.Contains(Voucher)) || rowIdMarkedList.Any(x => x.Value.Contains(Invoice)));
+
+                    if (selectedVouchers.Contains(Convert.ToInt32(Voucher)))
+                        selectedRowIds.Add(Convert.ToInt32(rowId));
 
                     if (item.IsChecked && item.IsEnabled)
                         CheckBoxClicked(item);
@@ -215,20 +227,29 @@ namespace UnicontaClient.Pages.CustomPage
         async private void LoadCreditorTransOpen()
         {
             var listSource = await api.Query(new CreditorTransOpenClientExtended(), dgOpenTransactionGrid.masterRecords, null);
+
             if (listSource != null)
             {
                 foreach (var item in listSource)
                 {
-                    var Voucher = item.Voucher;
-                    var Invoice = item.Invoice;
                     var InvoiceAN = item.InvoiceAN;
-                    var rowId = item.PrimaryKeyId;
 
-                    item.IsEnabled = !(markedlist != null && (markedlist.Contains(Voucher) || markedlist.Contains(Invoice) || markedlist.Contains(rowId)));
-                    item.IsChecked = (selectedVouchers.Contains(Voucher) || selectedInvoices.Contains(InvoiceAN) || markedlist.Contains(Voucher) || markedlist.Contains(Invoice) || selectedRowIds.Contains(rowId));
+                    var Voucher = item.Voucher.ToString();
+                    var Invoice = item.Invoice.ToString();
+                    var rowId = item.PrimaryKeyId.ToString();
 
-                    if (selectedVouchers.Contains(Voucher))
-                        selectedRowIds.Add(rowId);
+                    if(markedlist == null)
+                        markedlist = new Dictionary<string, List<string>>();
+
+                    var invoiceMarkedList = markedlist.Where(x => x.Key == "Invoice" && x.Value.Contains(Invoice)).ToList();
+                    var voucherMarkedList = markedlist.Where(x => x.Key == "Voucher" && x.Value.Contains(Voucher)).ToList();
+                    var rowIdMarkedList = markedlist.Where(x => x.Key == "rowId" && x.Value.Contains(rowId)).ToList();
+
+                    item.IsEnabled = !(markedlist != null && (invoiceMarkedList.Any() || voucherMarkedList.Any() || rowIdMarkedList.Any()));
+                    item.IsChecked = (selectedVouchers.Contains(Convert.ToInt32(Voucher)) || selectedInvoices.Contains(InvoiceAN) || invoiceMarkedList.Any(x => x.Value.Contains(Invoice)) || voucherMarkedList.Any(x => x.Value.Contains(Voucher)) || rowIdMarkedList.Any(x => x.Value.Contains(Invoice)));
+
+                    if (selectedVouchers.Contains(Convert.ToInt32(Voucher)))
+                        selectedRowIds.Add(Convert.ToInt32(rowId));
 
                     if (item.IsChecked && item.IsEnabled)
                         CheckBoxClicked(item);
@@ -317,20 +338,6 @@ namespace UnicontaClient.Pages.CustomPage
                         break;
                 }
             }
-        }
-
-        private List<long> GetAllReadyMarked(IEnumerable<string> marked)
-        {
-            var markedList = new List<long>();
-            if (marked != null && marked.Count() > 0)
-            {
-                foreach (var mark in marked)
-                {
-                    string[] markStr = mark.Split(';');
-                    markedList.AddRange(markStr.Where(p => !string.IsNullOrEmpty(p)).Select(i => NumberConvert.GetOnlyNumbers(i)));
-                }
-            }
-            return markedList;
         }
 
         private void LocalMenu_OnItemClicked(string ActionType)

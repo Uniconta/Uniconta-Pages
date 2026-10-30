@@ -37,7 +37,7 @@ namespace UnicontaClient.Pages.CustomPage
             this.api = api;
             bindTablelist();
         }
-        private void bindTablelist()
+        public static List<TableList> CreateTablelist(CrudAPI api)
         {
             var xlist = new List<TableList>(100);
             var tablestype = Global.Tables; 
@@ -56,7 +56,7 @@ namespace UnicontaClient.Pages.CustomPage
                 else
                     xlist.Add(new TableList(type, type.Name));
             }
-            GetUserTableList(xlist);
+            GetUserTableList(api, xlist);
             xlist.Add(new TableList(typeof(DebtorInvoiceClient), Util.ConcatParenthesis("DebtorInvoiceClient", Uniconta.ClientTools.Localization.lookup("DebtorInvoice"))));
             xlist.Add(new TableList(typeof(CreditorInvoiceClient), Util.ConcatParenthesis("CreditorInvoiceClient", Uniconta.ClientTools.Localization.lookup("CreditorInvoice")) ));
             xlist.Add(new TableList(typeof(DebtorDeliveryNoteClient), Util.ConcatParenthesis("DebtorDeliveryNoteClient", Uniconta.ClientTools.Localization.lookup("Packnotes"))));
@@ -66,9 +66,12 @@ namespace UnicontaClient.Pages.CustomPage
             xlist.Add(new TableList(typeof(InvSerieBatchClient), Util.ConcatParenthesis("InvSerieBatchClient", Uniconta.ClientTools.Localization.lookup("SerialBatchNumbers")) ));
             xlist.Sort(new TableList.Sort());
             xlist.Insert(0, new TableList(null, Uniconta.ClientTools.Localization.lookup("AllDocuments")));
-            dgTables.ItemsSource = xlist;
+            return xlist;
         }
-
+        void bindTablelist()
+        {
+            dgTables.ItemsSource = CreateTablelist(api);
+        }
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
             tables = new List<UnicontaBaseEntity>();
@@ -112,7 +115,7 @@ namespace UnicontaClient.Pages.CustomPage
             SetDialogResult(false);
         }
 
-        private void GetUserTableList(List<TableList> listTypes)
+        static void GetUserTableList(CrudAPI api, List<TableList> listTypes)
         {
             var comp = api.CompanyEntity;
             var userTableHeaders = comp.UserTables;

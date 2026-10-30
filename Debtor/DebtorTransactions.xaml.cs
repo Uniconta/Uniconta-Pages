@@ -346,6 +346,9 @@ namespace UnicontaClient.Pages.CustomPage
 
                     await iprintReport.InitializePrint();
                 }
+
+                if (iprintReport?.Report != null)
+                    iprintReport.AdditionalData = await InvoicePostingPrintGenerator.XmlDataGenerationForGermany(debtorInvoicePrint, crudapi);
             }
             return iprintReport;
         }

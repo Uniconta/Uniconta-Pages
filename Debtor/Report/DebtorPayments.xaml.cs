@@ -300,7 +300,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             var lan = UtilDisplay.GetLanguage(debtorClient, companyClient);
             var msgType = (int)debtorEmailType;
-            if (messageType != msgType || messageLanguage != lan)
+            if (messageType != msgType || messageLanguage != lan || lastMessage == null)
             {
                 messageLanguage = lan;
                 messageType = msgType;
@@ -388,6 +388,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "GenerateJournalLines":
                     if (dgDebtorTranOpenGrid.ItemsSource == null) return;
                     CWImportToLine cwLine = new CWImportToLine(api, CWSetFeeAmount._PrDate);
+                    cwLine.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     cwLine.DialogTableId = 2000000034;
                     cwLine.Closed
                         += async delegate
@@ -401,9 +402,7 @@ namespace UnicontaClient.Pages.CustomPage
                                 NumberSerieAPI numberserieApi = new NumberSerieAPI(posApi);
                                 int nextVoucherNumber = 0;
 
-                                CompanySettingsClient companySettings = new CompanySettingsClient();
-                                await api.Read(companySettings);
-                                string payment = companySettings._PaymentForCollection;
+                                string payment = api.CompanyEntity.Settings._PaymentForCollection;
 
                                 SQLCache journalCache = api.GetCache(typeof(Uniconta.DataModel.GLDailyJournal));
                                 var DJclient = (Uniconta.DataModel.GLDailyJournal)journalCache.Get(cwLine.Journal);
@@ -499,6 +498,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (dgDebtorTranOpenGrid.SelectedItem != null)
                     {
                         var cwSendInvoice = new CWSendInvoice();
+                        cwSendInvoice.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                         cwSendInvoice.DialogTableId = 2000000031;
                         cwSendInvoice.Closed += delegate
                         {
@@ -616,6 +616,7 @@ namespace UnicontaClient.Pages.CustomPage
         void SetFee(bool AddInterest)
         {
             CWSetFeeAmount cwwin = new CWSetFeeAmount(AddInterest);
+            cwwin.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             cwwin.DialogTableId = AddInterest ? 2000000070 : 2000000071;
             cwwin.Closing += delegate
             {

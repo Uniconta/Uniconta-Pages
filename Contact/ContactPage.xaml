@@ -84,6 +84,11 @@ x:Class="UnicontaClient.Pages.CustomPage.ContactPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AccountName" Width="150"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="EAN" Width="80" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ReferenceId" Width="80" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="EndpointId" Width="80" Visible="False">
+                        <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                            <editor:TextEditSettings MaskType="RegEx" Mask="{StaticResource EndPointIdValidationRegx}" />
+                        </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                    </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Interests" Binding="{Binding Path=Interests, Mode=TwoWay, Converter={StaticResource ListToStringConverter}}">
                         <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
                             <editor:ComboBoxEditSettings>

@@ -1,13 +1,22 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Uniconta.API.Service;
+using Uniconta.ClientTools;
+using Uniconta.ClientTools.AI;
+using Uniconta.ClientTools.AI.Prompts;
+using Uniconta.ClientTools.AI.Services.Context;
 using Uniconta.ClientTools.Controls;
+using Uniconta.ClientTools.Controls.AI;
+using Uniconta.ClientTools.Controls.AI.Assistant.Capabilities;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
@@ -15,9 +24,11 @@ using Uniconta.Common;
 using Uniconta.Common.Enums;
 using Uniconta.Common.User;
 using Uniconta.Common.Utility;
+using Uniconta.DataModel;
 using Uniconta.WindowsAPI.ClientTools;
 using UnicontaClient.Models;
 using UnicontaClient.Utilities;
+using static Uniconta.ClientTools.AI.Prompts.PromptDefinition;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -62,7 +73,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             ribbonControl.DisableButtons(new string[] { "AddLine", "CopyRow", "DeleteRow", "UndoDelete", "SaveGrid" });
-           
+
             if (Comp.RoundTo100)
                 CurBalance.HasDecimals = Overdue.HasDecimals = false;
 
@@ -169,7 +180,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "DebtorTran":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.DebtorTransactions, dgDebtorAccountGrid.syncEntity, 
+                        AddDockItem(TabControls.DebtorTransactions, dgDebtorAccountGrid.syncEntity,
                             string.Concat(Uniconta.ClientTools.Localization.lookup("DebtorTransactions"), "/", selectedItem._Account));
                     break;
                 case "OpenTran":
@@ -198,7 +209,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "DebtorOrders":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.DebtorOrders, dgDebtorAccountGrid.syncEntity,string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Orders"), selectedItem._Name));
+                        AddDockItem(TabControls.DebtorOrders, dgDebtorAccountGrid.syncEntity, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Orders"), selectedItem._Name));
                     break;
                 case "FollowUp":
                     if (selectedItem != null)
@@ -346,6 +357,15 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
+        public override List<IAIAssistantCapability> GetAIAssistantCapabilities(bool hasFileAttached)
+        {
+            var retval = base.GetAIAssistantCapabilities(hasFileAttached);
+
+            retval.Add(new DeterminePublicProfileCapability());
+
+            return retval;
+        }
+
         void CopyRecord(DebtorClient selectedItem)
         {
             if (selectedItem == null)
@@ -389,16 +409,18 @@ namespace UnicontaClient.Pages.CustomPage
                 const int Grouping = 20;
                 int cntTotal = debtors.Count();
                 int cntPotential = 0;
-                int cntAll = 0; 
+                int cntAll = 0;
                 int cntRejected = 0;
                 int cntApproved = 0;
                 int cntNotApproved = 0;
-                int cntError = 0;
+                int cntErrorVatNumberFormat = 0;
+                int cntErrorValidationService = 0;
+
                 var lst2 = new List<DebtorClient>();
-                foreach (var debtor in debtors) 
+                foreach (var debtor in debtors)
                 {
                     cntAll++;
-                    if ((debtor._Country == CountryCode.UnitedKingdom && debtor._EORI == null) || (debtor._Country != CountryCode.UnitedKingdom && 
+                    if ((debtor._Country == CountryCode.UnitedKingdom && debtor._EORI == null) || (debtor._Country != CountryCode.UnitedKingdom &&
                         (debtor._LegalIdent == null || !Country2Language.IsEU(debtor._Country) || debtor._Country == api.CompanyEntity._CountryId)))
                         cntRejected++;
                     else
@@ -406,17 +428,18 @@ namespace UnicontaClient.Pages.CustomPage
                         cntPotential++;
                         lst2.Add(debtor);
                     }
-                   
+
                     if (lst2.Count > 0 && ((cntPotential % Grouping) == 0 || cntAll == cntTotal))
                     {
                         busyIndicator.BusyContent = string.Concat(Uniconta.ClientTools.Localization.lookup("Total"), ": ", cntTotal, Environment.NewLine,
                                                                   Uniconta.ClientTools.Localization.lookup("Approved"), ": ", cntApproved, " ...", Environment.NewLine,
                                                                   Uniconta.ClientTools.Localization.lookup("NotApproved"), ": ", cntNotApproved, " ...", Environment.NewLine,
-                                                                  Uniconta.ClientTools.Localization.lookup("Error"), ": ", cntError, " ...", Environment.NewLine,
+                                                                  Uniconta.ClientTools.Localization.lookup("ErrorVatNumberFormat"), ": ", cntErrorVatNumberFormat, " ...", Environment.NewLine,
+                                                                  Uniconta.ClientTools.Localization.lookup("ErrorValidationService"), ": ", cntErrorValidationService, " ...", Environment.NewLine,
                                                                   Uniconta.ClientTools.Localization.lookup("Rejected"), ": ", cntRejected, " ...");
 
                         var viesReportLst = await VIES.CheckVatApprox(lst2, api);
-                        if (viesReportLst == null || viesReportLst.Count == 1 && viesReportLst[0].FaultCode == VIES.UC_FAULTCODE_GENERALERROR)
+                        if (viesReportLst == null || viesReportLst.Count == 1 && viesReportLst[0].FaultCode == VIES.UC_FAULTCODE_GENERALERROR) //TODO:Måske ændre
                         {
                             busyIndicator.IsBusy = false;
                             busyIndicator.BusyContent = previousContent;
@@ -428,7 +451,10 @@ namespace UnicontaClient.Pages.CustomPage
                         {
                             if (x.FaultString != null)
                             {
-                                cntError++;
+                                if (x.NoValidVATNo)
+                                    cntErrorVatNumberFormat++;
+                                else
+                                    cntErrorValidationService++;
                                 continue;
                             }
 
@@ -448,8 +474,10 @@ namespace UnicontaClient.Pages.CustomPage
                 Append(string.Concat(Uniconta.ClientTools.Localization.lookup("Total"), ": ", cntTotal)).AppendLine().
                 Append(string.Concat(Uniconta.ClientTools.Localization.lookup("Approved"), ": ", cntApproved)).AppendLine().
                 Append(string.Concat(Uniconta.ClientTools.Localization.lookup("NotApproved"), ": ", cntNotApproved));
-                if (cntError > 0)
-                    sb.AppendLine().Append(string.Concat(Uniconta.ClientTools.Localization.lookup("Error"), ": ", cntError));
+                if (cntErrorVatNumberFormat > 0)
+                    sb.AppendLine().Append(string.Concat(Uniconta.ClientTools.Localization.lookup("ErrorVatNumberFormat"), ": ", cntErrorVatNumberFormat));
+                if (cntErrorValidationService > 0)
+                    sb.AppendLine().Append(string.Concat(Uniconta.ClientTools.Localization.lookup("ErrorValidationService"), ": ", cntErrorValidationService));
                 if (cntRejected > 0)
                     sb.AppendLine().Append(string.Concat(Uniconta.ClientTools.Localization.lookup("Rejected"), ": ", cntRejected));
 
@@ -468,6 +496,7 @@ namespace UnicontaClient.Pages.CustomPage
             var mandateCache = api.GetCache(typeof(Uniconta.DataModel.DebtorPaymentMandate)) ?? await api.LoadCache(typeof(Uniconta.DataModel.DebtorPaymentMandate));
 
             CWDirectDebit cwwin = new CWDirectDebit(api, string.Format(Uniconta.ClientTools.Localization.lookup("CreateOBJ"), Uniconta.ClientTools.Localization.lookup("Mandates")), true);
+            cwwin.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             cwwin.Closing += delegate
             {
                 if (cwwin.DialogResult == true)
@@ -650,10 +679,9 @@ namespace UnicontaClient.Pages.CustomPage
             var debtorAccount = (sender as TextBlock).Tag as DebtorClient;
             if (debtorAccount != null)
             {
-                var mail = string.Concat("mailto:", debtorAccount._ContactEmail);
-                System.Diagnostics.Process proc = new System.Diagnostics.Process();
-                proc.StartInfo.FileName = mail;
-                proc.Start();
+                if (string.IsNullOrWhiteSpace(debtorAccount._ContactEmail))
+                    return;
+                OfficeComponentUtil.SendEmailToOutlook(debtorAccount._ContactEmail);
             }
         }
 
@@ -676,5 +704,169 @@ namespace UnicontaClient.Pages.CustomPage
             if (cmb != null)
                 cmb.ItemsSource = productsCache.GetKeyList();
         }
+    }
+
+    public sealed class DeterminePublicProfileCapability : AIAssistantCapabilityBase, IAIAssistantCapabilityPrompt, IAIAssistantCapabilityButton
+    {
+        public DeterminePublicProfileCapability()
+            : base(
+                nameof(DeterminePublicProfileCapability),
+                "Search the web",
+                "Researches the selected account using publicly available internet sources. " +
+                "Use this capability when the user asks to find company information, " +
+                "research the debtor, determine its public profile, identify what the company does, " +
+                "or search the web for commercial information. " +
+                "The web search must only start after explicit user confirmation.",
+                weight: 80,
+                "Determine the public profile",
+                "Find information about this account on the web",
+                "Find information about this vendor",
+                "Search the internet for this debtor",
+                "What does this company do?",
+                "Research this company based on internet data")
+        {
+        }
+
+        public Task<AIAssistantCapabilityResult> ExecuteAsync(IAIAssistantCapabilityContext capabilityContext)
+        {
+            var dcAccount =
+                capabilityContext.AssistantConsumer.AIRecordData?.FocussedRow as DCAccount;
+
+            if (dcAccount == null)
+            {
+                return Task.FromResult(
+                    AIAssistantCapabilityResult.Fail(
+                        "No account is currently selected."));
+            }
+
+            var companyName = !string.IsNullOrWhiteSpace(dcAccount._Name) ? dcAccount._Name : dcAccount._Account;
+
+            return Task.FromResult(
+                new AIAssistantCapabilityResult
+                {
+                    Succeeded = true,
+                    Message = $"Do you want to search for public information about '{companyName}'?",
+                    Actions = new[]
+                    {
+                        new AIAssistantCapabilityResult.CapabilityAction
+                        {
+                            Caption = "Yes, search the web",
+                            ExecuteAsync = () => ExecuteWebSearchAsync(capabilityContext,dcAccount)
+                        },
+                        new AIAssistantCapabilityResult.CapabilityAction
+                        {
+                            Caption = Uniconta.ClientTools.Localization.lookup("No"),
+                            ExecuteAsync = () => Task.FromResult(AIAssistantCapabilityResult.Success("The web search was not performed."))
+                        }
+                    }
+                });
+        }
+
+        private async Task<AIAssistantCapabilityResult> ExecuteWebSearchAsync(IAIAssistantCapabilityContext capabilityContext, DCAccount dcAccount)
+        {
+            var prompt = PromptProvider.From(() => PublicProfilePrompt)
+                .Replace("DebtorContext", CreateAccountContext(dcAccount));
+
+            var conversation =
+                capabilityContext.UserRequest.GetConversationContext(prompt);
+
+            var report = await capabilityContext.GPTService.GetResponse<PublicProfileReport>(conversation);
+
+            if (string.IsNullOrWhiteSpace(report?.Report))
+            {
+                return AIAssistantCapabilityResult.Fail("No public company profile could be created.");
+            }
+
+            return AIAssistantCapabilityResult.Success(report?.Report);
+        }
+
+        private static string CreateAccountContext(DCAccount account)
+        {
+            if (account == null)
+                return string.Empty;
+
+            return JsonConvert.SerializeObject(
+                new
+                {
+                    account._Account,
+                    account._Name,
+                    Address = string.Join(
+                        Environment.NewLine,
+                        new[]
+                        {
+                        account._Address1,
+                        account._Address2,
+                        account._Address3
+                        }.Where(x => !string.IsNullOrWhiteSpace(x))),
+                    account._ZipCode,
+                    account._City,
+                    Country = account._Country,
+                    Website = account._Www,
+                    account._Phone
+                },
+                Formatting.Indented,
+                new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore
+                });
+        }
+
+        private static PromptDefinition NewPromptDefinition(string system, string user, bool expectsExplanationInUserLanguage = false)
+        {
+            return PromptDefinition.FromMessages(
+                new[]
+                {
+                new PromptRoleNode
+                {
+                    Role = MessageRole.System,
+                    Content = system
+                },
+                new PromptRoleNode
+                {
+                    Role = MessageRole.User,
+                    Content = user
+                }
+                }, expectsExplanationInUserLanguage);
+        }
+
+        [PromptDefinition(
+            "Capability.DeterminePublicProfileCapability",
+            "Prompt used to research an account and create a public commercial company profile.")]
+        [PromptDefinitionReplacement(
+            "DebtorContext",
+            "The selected account's number, name, address, website, phone number, and other available identifying information.")]
+        public static PromptDefinition PublicProfilePrompt =>
+            NewPromptDefinition(
+                "You are a commercial company research assistant. " +
+                "Research companies using publicly available online sources. " +
+                "Identify the exact legal or commercial entity before creating the report. " +
+                "Prefer the supplied website, registration number, exact address, and other strong identifiers. " +
+                "Never identify a company from its name alone when multiple companies could match. " +
+                "Do not invent facts. " +
+                "Clearly distinguish confirmed information from estimates or uncertain information. " +
+                "Only include URLs that were actually used as evidence. " +
+                "First determine whether the company can be identified reliably. " +
+                "Find the official company website and relevant supporting public sources. " +
+                "Describe what the company sells or does. " +
+                "Identify its industry, business model, products, services, customer segments, and markets served. " +
+                "Estimate company size or revenue only when public evidence reasonably supports it. " +
+                "Include the verified location and coordinates when these can be determined reliably. " +
+                "Generate useful commercial characteristics and search keywords. " +
+                "Avoid personal information unless essential to identifying the company. " +
+                "Add clear warnings when identification is ambiguous, the company appears inactive, " +
+                "information may be outdated, or important information could not be verified. " +
+                "Return a polished, readable commercial company report in Markdown. " +
+                "Use meaningful headings, short paragraphs, bullet lists, and Markdown links. " +
+                "Include an identity-confidence section and finish with a Sources section. " +
+                "Do not return JSON, XML, a schema, or explanatory text outside the report.",
+                "Research the following account and produce a commercial company profile report.\n\n" +
+                "Account context:\n{{DebtorContext}}", expectsExplanationInUserLanguage: true);
+
+        // marked with Web search tool
+        public sealed class PublicProfileReport : IGPTToolWebSearch
+        {
+            public string Report { get; set; }
+        }  
+
     }
 }

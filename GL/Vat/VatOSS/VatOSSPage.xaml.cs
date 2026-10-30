@@ -232,11 +232,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         public List<VatOSSTable> UpdateValues(List<DebtorInvoiceLines> listOfDebInvLines)
         {
-            var listOfResults = new List<VatOSSTable>(listOfDebInvLines.Count);
+            var listOfResults = new List<VatOSSTable>(listOfDebInvLines.Count); 
             string lastVat = null;
             string lastVatName = null;
             GLVat lastGLVat = null;
             DebtorClient debtor = null;
+            bool debtorOk = false;
 
             foreach (var invLine in listOfDebInvLines)
             {
@@ -246,9 +247,10 @@ namespace UnicontaClient.Pages.CustomPage
                 if (debtor?._Account != invLine._DCAccount)
                 {
                     debtor = invLine.Debtor;
-                    if (debtor == null || debtor._Country == api.CompanyEntity._CountryId || !Country2Language.IsEU(debtor._Country))
-                        continue;
+                    debtorOk = debtor != null && debtor._Country != api.CompanyEntity._CountryId && Country2Language.IsEU(debtor._Country);
                 }
+                if (!debtorOk)
+                    continue;
 
                 if (invLine._Vat == null)
                     continue;

@@ -536,7 +536,7 @@ namespace UnicontaClient.Pages.CustomPage
             var accounts = LedgerCache?.GetNotNullArray as GLAccount[];
             if (accounts != null)
             {
-                var act = accounts.Where(ac => string.Compare(ac._Lookup, le.EnteredText, StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
+                var act = accounts.Where(ac => string.Equals(ac._Lookup, le.EnteredText, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
                 if (act != null)
                 {
                     dgGldailyJournalLinesGrid.SetLoadedRow(selectedItem);

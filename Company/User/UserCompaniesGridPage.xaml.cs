@@ -283,5 +283,6 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
             }
         }
+        protected override bool FocusOnLastGrid => false;
     }
 }

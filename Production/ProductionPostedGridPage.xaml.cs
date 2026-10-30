@@ -127,6 +127,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (selectedItem == null)
                 return;
             var deleteDialog = new DeletePostedJournal();
+            deleteDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             deleteDialog.Closed += async delegate
             {
                 if (deleteDialog.DialogResult == true)
@@ -149,6 +150,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var prodOrder = new ProductionOrderClient() { _ProdItem = fromProductionPosted._Item, _ProdQty = fromProductionPosted._Qty };
             var cwProductionOrderLine = new CWProductionOrderLine(prodOrder, api, true, Uniconta.ClientTools.Localization.lookup("ProductionOrder"));
+            cwProductionOrderLine.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             cwProductionOrderLine.DialogTableId = 2000000079;
             cwProductionOrderLine.Closed += async delegate
             {

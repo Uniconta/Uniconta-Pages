@@ -1,20 +1,21 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using Uniconta.API.DebtorCreditor;
 using Uniconta.API.Service;
-using UnicontaClient.Models;
-using UnicontaClient.Utilities;
+using Uniconta.ClientTools.Controls;
+using Uniconta.ClientTools.Controls.AI.Assistant.Capabilities;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
-using System;
-using System.Collections.Generic;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using Uniconta.ClientTools.Controls;
 using Uniconta.Common.Utility;
-using Uniconta.API.DebtorCreditor;
 using Uniconta.DataModel;
-using System.Linq;
+using UnicontaClient.Models;
+using UnicontaClient.Utilities;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -273,6 +274,16 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
             }
         }
+
+        public override List<IAIAssistantCapability> GetAIAssistantCapabilities(bool hasFileAttached)
+        {
+            var retval = base.GetAIAssistantCapabilities(hasFileAttached);
+
+            retval.Add(new DeterminePublicProfileCapability());
+
+            return retval;
+        }
+
         async void CreditorBankDetails(CreditorClient selectedItem)
         {
             if (selectedItem != null)
@@ -480,10 +491,9 @@ namespace UnicontaClient.Pages.CustomPage
             var creditorAccount = (sender as TextBlock).Tag as CreditorClient;
             if (creditorAccount != null)
             {
-                var mail = string.Concat("mailto:", creditorAccount._ContactEmail);
-                System.Diagnostics.Process proc = new System.Diagnostics.Process();
-                proc.StartInfo.FileName = mail;
-                proc.Start();
+                if (string.IsNullOrWhiteSpace(creditorAccount._ContactEmail))
+                    return;
+                OfficeComponentUtil.SendEmailToOutlook(creditorAccount._ContactEmail);
             }
         }
 

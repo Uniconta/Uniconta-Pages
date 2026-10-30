@@ -152,6 +152,11 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorAccount" xmlns="http://schemas.
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim4" FieldName="Dimension4" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim5" FieldName="Dimension5" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="EAN" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="EndpointId" Visible="False">
+                        <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                            <editor:TextEditSettings MaskType="RegEx" Mask="{StaticResource EndPointIdValidationRegx}" />
+                        </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                    </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PriceList" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="LastInvoice" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ContactEmail" Width="150" Visible="False">
@@ -164,6 +169,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorAccount" xmlns="http://schemas.
                             <editor:TextEditSettings MaskType="RegEx" Mask="{StaticResource EmailValidationRegx}" />
                         </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
                     </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:ComboBoxColumnClient x:Name="eDocument" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="EndDiscountPct" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="LineDiscountPct" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeliveryTime" Visible="False" />
@@ -215,6 +221,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorAccount" xmlns="http://schemas.
                             </ControlTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="WIdNo" Visible="False" />
                 </localPage:CreditorAccountGrid.Columns>
                 <localPage:CreditorAccountGrid.TotalSummary>
                     <localPage:SumColumn FieldName="CurBalance" SummaryType="Sum" DisplayFormat="{}{0:N2}" />

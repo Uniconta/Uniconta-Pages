@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -84,6 +85,22 @@ namespace UnicontaISO20022CreditTransfer
             }
         }
 
+        public override string XMLAttributeNS()
+        {
+            if (CredPaymFormat.NewPaymentFormat)
+                return BaseDocument.XMLNS_PAIN009;
+
+            return BaseDocument.XMLNS_PAIN003;
+        }
+
+        public override bool NewPaymentFormat()
+        {
+            if (CredPaymFormat.NewPaymentFormat)
+                return true;
+
+            return false;
+        }
+
         public override string GenerateFileName(int fileID, int companyID)
         {
             switch (companyBankEnum)
@@ -129,9 +146,9 @@ namespace UnicontaISO20022CreditTransfer
                 case CompanyBankENUM.BankData:
                 case CompanyBankENUM.BEC:
                 case CompanyBankENUM.SDC:
-                    return DateTimeOffset.Now.ToString("yyyy-MM-ddTHH:mm:ss.fffzzz");
+                    return DateTimeOffset.Now.ToString("yyyy-MM-ddTHH:mm:ss.fffzzz", CultureInfo.InvariantCulture);
                 case CompanyBankENUM.SEB:
-                    return DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss");
+                    return DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture);
                 default:
                     return DateTimeOffset.Now.ToString("o");
             }
@@ -660,6 +677,14 @@ namespace UnicontaISO20022CreditTransfer
             }
 
             return resultList;
+        }
+
+        public override string InstructionPriority()
+        {
+            if (CredPaymFormat.NewPaymentFormat)
+                return null;
+
+            return BaseDocument.INSTRUCTIONPRIORITY_NORM;
         }
 
         /// <summary>

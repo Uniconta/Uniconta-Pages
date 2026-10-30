@@ -115,7 +115,7 @@ namespace UnicontaClient.Pages.CustomPage
                     type = typeof(EmployeeClient);
                 else
                     type = typeof(ContactClient);
-
+                type = api?.CompanyEntity.GetUserTypeNotNull(type);
                 properties.AddRange(UtilFunctions.GetAllDisplayPropertyNames(type, api.CompanyEntity, false, false));
             }
         }

@@ -44,7 +44,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWTransferBankStatement"
             <ClientToolsControls:CheckEditor  IsChecked="{Binding isMarkLine,Mode=TwoWay}"   x:Name="chkLine" Grid.Row="5" Grid.Column="2" HorizontalAlignment="Left"  Margin="17 0 0 0"  />
             <TextBlock Grid.Row="6" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OnlyLineWithPhysicalVoucher}" VerticalAlignment="Center"  />
             <CorasauControls:CheckEditor x:Name="cbkHasVoucherNo" Grid.Row="6" Grid.Column="2" IsChecked="{Binding HasPhysicalVoucher, Mode=TwoWay}" HorizontalAlignment="Left"  Margin="17 0 0 0" />
-            <TextBlock Grid.Row="7" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LineWithAutoPost}" VerticalAlignment="Center"  />
+            <TextBlock Grid.Row="7" x:Name="txtLineWithAutoPost" VerticalAlignment="Center"  />
             <CorasauControls:CheckEditor x:Name="cbkLineWithAutoPost" Grid.Row="7" Grid.Column="2" IsChecked="{Binding LineWithAutoPost, Mode=TwoWay}" HorizontalAlignment="Left"  Margin="17 0 0 0" />
             <TextBlock Grid.Row="8" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AssignVoucherNumber}" VerticalAlignment="Center"  />
             <CorasauControls:CheckEditor x:Name="cbkAssignVouNo" Grid.Row="8" Grid.Column="2" IsChecked="{Binding AddVoucherNumber, Mode=TwoWay}" HorizontalAlignment="Left"  Margin="17 0 0 0" />

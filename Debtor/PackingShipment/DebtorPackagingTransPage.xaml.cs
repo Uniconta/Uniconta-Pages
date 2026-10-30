@@ -124,6 +124,7 @@ namespace UnicontaClient.Pages.CustomPage
         void AddPackingModel()
         {
             var shipmentDialog = new CWPackingShipmentModel(api);
+            shipmentDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             shipmentDialog.Closing += async delegate
             {
                 if (shipmentDialog.DialogResult == true)

@@ -38,6 +38,9 @@
 		<RibbonItem Action="SendInvoice" LocalizedNameKey="Sendinvoicebyemail" LargeGlyph="SendInvoiceMail_32x32" />
 		<RibbonItem Action="SendAsOutlook" LocalizedNameKey="SendInvoiceInOutLook" LargeGlyph="Posted_Journal_32x32" />
 	</RibbonItem>
+	<RibbonItem LocalizedNameKey="eOrder">
+		<RibbonItem Action="DocSendLog" LocalizedNameKey="Log" ControlName="DocsSendLogGridPage" LargeGlyph="Server_Count_32x32" />
+	</RibbonItem>
 	<RibbonItem>
 		<RibbonItem Action="CreateOrder" LocalizedNameKey="CreateOBJ" Parameter="Order" Glyph="refresh" LargeGlyph="Orders_32x32"/>
 	</RibbonItem>

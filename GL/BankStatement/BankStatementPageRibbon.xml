@@ -35,8 +35,8 @@
 	<RibbonItem Action="ReconciliationReport" LocalizedNameKey="ReconciliationReport" LargeGlyph="Match_Lines_32x32" />
   </RibbonItem>
   <RibbonItem  LocalizedNameKey="BankStatement">
-	<RibbonItem Action="ImportBankStatement" LocalizedNameKey="LoadFile" ControlName="ImportGLDailyJournal"  LargeGlyph="Import_32x32"/>
-	<RibbonItem Action="DeleteStatement" LocalizedNameKey="DeleteOBJ" Parameter="Imported" Glyph="Delete_16x16" LargeGlyph="Delete_32x32" />
+	  <RibbonItem Action="ImportBankStatement" LocalizedNameKey="LoadFile" ControlName="ImportGLDailyJournal"  LargeGlyph="Import_32x32"/>
+	  <RibbonItem Action="DeleteStatement" LocalizedNameKey="DeleteOBJ" Parameter="Imported" Glyph="Delete_16x16" LargeGlyph="Delete_32x32" />
   </RibbonItem>
   <RibbonItem LocalizedNameKey="AutoBanking">
 	  <RibbonItem Action="AiiaRegister" LocalizedNameKey="ConnectToBank" LargeGlyph="Bank_Statement_32x32"/>

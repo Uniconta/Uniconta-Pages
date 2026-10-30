@@ -114,8 +114,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (transOpenMaster != null && settles != null && settles.Count > 0)
             {
-                TransactionAPI transApi = new TransactionAPI(api);
-                var err = await transApi.Settle(transOpenMaster, settles);
+                var err = await new TransactionAPI(api).Settle(transOpenMaster, settles);
                 transOpenMaster = null;
                 settles = null;
                 SetStatusText();
@@ -180,12 +179,11 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (dialog.ConfirmationResult == CWConfirmationBox.ConfirmationResultEnum.Yes)
                 {
-                    TransactionAPI transApi = new TransactionAPI(this.api);
                     var masterAccount = dgCreditorTranOpenGrid.masterRecord as DCAccount;
                     if (masterAccount != null)
                     {
                         busyIndicator.IsBusy = true;
-                        var errorCodes = await transApi.ReOpenAll(masterAccount, true, LeaveAllOpen);
+                        var errorCodes = await new TransactionAPI(this.api).ReOpenAll(masterAccount, true, LeaveAllOpen);
                         busyIndicator.IsBusy = false;
                         UtilDisplay.ShowErrorCode(errorCodes);
                         if (errorCodes == ErrorCodes.Succes)
@@ -203,12 +201,11 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 if (dialog.ConfirmationResult == CWConfirmationBox.ConfirmationResultEnum.Yes)
                 {
-                    TransactionAPI transApi = new TransactionAPI(this.api);
                     var masterAccount = dgCreditorTranOpenGrid.masterRecord as DCAccount;
                     if (masterAccount != null)
                     {
                         busyIndicator.IsBusy = true;
-                        var errorCodes = await transApi.CloseAll(masterAccount);
+                        var errorCodes = await new TransactionAPI(this.api).CloseAll(masterAccount);
                         busyIndicator.IsBusy = false;
                         UtilDisplay.ShowErrorCode(errorCodes);
                     }
@@ -235,8 +232,8 @@ namespace UnicontaClient.Pages.CustomPage
                         openTran.IsSettled = false;
                     }
                 }
-                else if (settles != null && settles.Contains(rec))
-                    settles.Remove(rec);
+                else
+                    settles?.Remove(rec);
             }
             else
             {
@@ -246,7 +243,10 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     if (settles == null)
                         settles = new List<CreditorTransOpenClient>();
-                    settles.Add(rec);
+                    if (rec.AmountOpen <= 0)
+                        settles.Add(rec);
+                    else
+                        settles.Insert(0, rec);
                 }
             }
             SetStatusText();

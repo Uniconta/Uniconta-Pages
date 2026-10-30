@@ -34,6 +34,7 @@ using Uniconta.ClientTools.Util;
 using DevExpress.Xpf.Grid;
 using Uniconta.Common.Utility;
 using Uniconta.API.Service;
+using DevExpress.Office.Utils;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -440,7 +441,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             foreach (var rec in Parameters)
             {
-                if (string.Compare(rec.Name, "Journal", StringComparison.CurrentCultureIgnoreCase) == 0)
+                if (string.Equals(rec.Name, "Journal", StringComparison.CurrentCultureIgnoreCase))
                 {
                     var cache = api.CompanyEntity.GetCache(typeof(Uniconta.DataModel.GLDailyJournal), api);
                     SetJournal((Uniconta.DataModel.GLDailyJournal)cache.Get(rec.Value));
@@ -870,6 +871,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "ExchangeRate":
                     var exchangeDialog = new CWExchangeRate();
+                    exchangeDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     exchangeDialog.Closing += delegate
                     {
                         if (exchangeDialog.DialogResult == true)
@@ -1231,12 +1233,12 @@ namespace UnicontaClient.Pages.CustomPage
             return dgGLDailyJournalLine.SaveData();
         }
 
-        List<string> GetOtherMarked(JournalLineGridClient curlin, string acc, byte accType)
+        Dictionary<string, List<string>> GetOtherMarked(JournalLineGridClient curlin, string acc, byte accType)
         {
             var gridItems = (IEnumerable<JournalLineGridClient>)dgGLDailyJournalLine.ItemsSource;
             if (gridItems == null)
                 return null;
-            List<string> lines = null;
+            Dictionary<string, List<string>> lines = null;
             foreach (var lin in gridItems)
             {
                 if ((lin._Settlements != null || lin._Invoice != null) &&
@@ -1246,11 +1248,35 @@ namespace UnicontaClient.Pages.CustomPage
                     if (!object.ReferenceEquals(lin, curlin))
                     {
                         if (lines == null)
-                            lines = new List<string>();
+                            lines = new Dictionary<string, List<string>>();
+
                         if (lin._Settlements != null)
-                            lines.Add(lin._Settlements);
+                        {
+                            List<string> strValues = new List<string>();
+                            if (lines.TryGetValue(lin.SettleValue, out strValues))
+                            {
+                                strValues.AddRange(lin._Settlements.Split(';').ToList());
+                                lines[lin.SettleValue] = strValues;
+                            }
+                            else
+                            {
+                                lines.Add(lin.SettleValue, lin._Settlements.Split(';').ToList());
+                            }
+                        }
                         else if (lin._Invoice != null)
-                            lines.Add(lin._Invoice);
+                        {
+                            List<string> strValues;
+                            if (lines.TryGetValue(lin.SettleValue, out strValues))
+                            {
+                                strValues.Add(lin._Invoice);
+                                lines[lin.SettleValue] = strValues;
+                            }
+                            else
+                            {
+                                strValues = new List<string>() { lin._Invoice };
+                                lines.Add(lin.SettleValue, strValues);
+                            }
+                        }
                     }
                 }
             }
@@ -2254,7 +2280,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (!string.IsNullOrWhiteSpace(t) && t.Length <= 10 && TextTypes != null && TextTypes.Get(t) == null)
             {
                 foreach (var txt in (IEnumerable<Uniconta.DataModel.GLTransType>)TextTypes.GetNotNullArray)
-                    if (string.Compare(txt._Code, t, StringComparison.CurrentCultureIgnoreCase) == 0)
+                    if (string.Equals(txt._Code, t, StringComparison.CurrentCultureIgnoreCase))
                         return txt;
             }
             return null;
@@ -2279,7 +2305,7 @@ namespace UnicontaClient.Pages.CustomPage
                     found = true;
                     rec._DCPostType = Uniconta.DataModel.DCPostType.Payment;
                 }
-                else if (string.Compare(Uniconta.ClientTools.Localization.lookup("CreditNote"), 0, str, 0, 7, StringComparison.CurrentCultureIgnoreCase) == 0)
+                else if (string.Equals(Uniconta.ClientTools.Localization.lookup("CreditNote"), 0, str, 0, 7, StringComparison.CurrentCultureIgnoreCase))
                 {
                     found = true;
                     rec._DCPostType = Uniconta.DataModel.DCPostType.Creditnote;
@@ -2673,7 +2699,7 @@ namespace UnicontaClient.Pages.CustomPage
             var accounts = LedgerCache?.GetNotNullArray as GLAccount[];
             if (accounts != null)
             {
-                var act = accounts.Where(ac => string.Compare(ac._Lookup, le.EnteredText, StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
+                var act = accounts.Where(ac => string.Equals(ac._Lookup, le.EnteredText, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
                 if (act != null)
                 {
                     dgGLDailyJournalLine.SetLoadedRow(selectedItem);

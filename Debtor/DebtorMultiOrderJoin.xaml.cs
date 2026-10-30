@@ -99,6 +99,7 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
             var allOrderList = ordersToBeJoined.GroupBy(x => x.Account).Select(x => x.First()).ToList();
             EraseYearWindow EraseYearWindowDialog = new EraseYearWindow("", true);
+            EraseYearWindowDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             EraseYearWindowDialog.Closed += async delegate
             {
                 if (EraseYearWindowDialog.DialogResult == true)
@@ -158,6 +159,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (confirmationDialog.ConfirmationResult == CWConfirmationBox.ConfirmationResultEnum.Yes)
                     {
                         EraseYearWindow EraseYearWindowDialog = new EraseYearWindow("", true);
+                        EraseYearWindowDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                         EraseYearWindowDialog.Closed += delegate
                         {
                             if (EraseYearWindowDialog.DialogResult == true)
@@ -177,6 +179,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void JoinAllOrdersToSelectedItem(DebtorOrderClient selectedItem, IEnumerable<DebtorOrderClient> allOrderList)
         {
             EraseYearWindow EraseYearWindowDialog = new EraseYearWindow("", true);
+            EraseYearWindowDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             EraseYearWindowDialog.Closed += async delegate
             {
                 if (EraseYearWindowDialog.DialogResult == true)

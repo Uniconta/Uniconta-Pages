@@ -520,7 +520,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 docType = string.Empty;
                 showSimulation = true;
-                invoiceInXml = debtor != null && debtor.IsPeppolSupported && debtor._einvoice;
+                invoiceInXml = debtor != null && debtor._einvoice;
                 showUpdateInv = false;
                 isOrderOrQuickUpdate = true;
                 dialogId = 2000000085;
@@ -541,14 +541,14 @@ namespace UnicontaClient.Pages.CustomPage
             var accountName = Util.ConcatParenthesis(projInvProp._DCAccount, projInvProp.Name);
             CWGenerateInvoice GenrateInvoiceDialog = new CWGenerateInvoice(showSimulation, docType, false, true, true, showNoEmailMsg: !showSendByMail, debtorName: debtorName,
                 isOrderOrQuickInv: isOrderOrQuickUpdate, isShowUpdateInv: showUpdateInv, isDebtorOrder: true, InvoiceInXML: invoiceInXml, AccountName: accountName);
+            GenrateInvoiceDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             GenrateInvoiceDialog.DialogTableId = dialogId;
             if (projInvProp._InvoiceDate != DateTime.MinValue)
                 GenrateInvoiceDialog.SetInvoiceDate(projInvProp._InvoiceDate);
             var additionalOrdersList = Utility.GetAdditionalOrders(api, projInvProp);
             if (additionalOrdersList != null)
                 GenrateInvoiceDialog.SetAdditionalOrders(additionalOrdersList);
-            if (!api.CompanyEntity._DeactivateSendNemhandel)
-                GenrateInvoiceDialog.SentByEInvoice(api, null, true);
+            GenrateInvoiceDialog.SentByEInvoice(api, null, true);
 
             GenrateInvoiceDialog.ShowAllowCredMax(debtor?._CreditMax != 0);
             GenrateInvoiceDialog.Closed += async delegate

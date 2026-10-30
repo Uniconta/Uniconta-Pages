@@ -357,6 +357,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void SetCurrentBudgetGroup()
         {
             var cwCreateAnchorBjt = new CwCreateAnchorBudget(api);
+            cwCreateAnchorBjt.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             cwCreateAnchorBjt.DialogTableId = 2000000103;
             cwCreateAnchorBjt.Closed += delegate
             {

@@ -31,6 +31,7 @@
     <RibbonItem Action="AllocationAccounts" LocalizedNameKey="AllocAndAccruals" LargeGlyph="Setup-allocation-32x32"/>
 	<RibbonItem Action="SettleTran" LocalizedNameKey="SettleTran" LargeGlyph="Settled_Transaction_32x32"/>
 	<RibbonItem Action="Budget" LocalizedNameKey="Budget" ControlName="GLBudgetLinePage" LargeGlyph="Budget_32x32"/>
+	<RibbonItem Action="WhereUsed" LocalizedNameKey="WhereUsed" Glyph="WhereUsed" LargeGlyph="WhereUsed"/>
     <RibbonItem Module="Attachments" LocalizedNameKey="Attachments" LargeGlyph="Attachments_32x32">
       <RibbonItem Action="AddNote" ShortcutKey="Alt+N" ControlName="UserNotesPage" LocalizedNameKey="Note" Glyph="Note_16x16" />
       <RibbonItem Action="AddDoc" LocalizedNameKey="Document" ControlName="UserDocsPage" Glyph="Document_Attachment_16x16" />
@@ -41,6 +42,8 @@
     <RibbonItem Action="Trans" LocalizedNameKey="Transactions" ControlName="AccountsTransaction" LargeGlyph="Posted_Transaction_32x32" ShortcutKey="CTRL+T" />
     <RibbonItem Action="GLTransSum" LocalizedNameKey="AccountTotals" ControlName="GLTransSumClientPage"  LargeGlyph="Validate_Add_32x32" />
 	<RibbonItem Action="VatOnClient" LocalizedNameKey="VATprDC" ControlName="VatOnClientsReport" LargeGlyph="VAT_32x32"/>
+	<RibbonItem Action="MatchStdAccounts" Module="AccountMatch"  LocalizedNameKey="MatchStdAccounts" Glyph="match_32x32" LargeGlyph="match_32x32" ButtonType="AI"/>
+	<RibbonItem Action="LedgerTrendAnomaly" Module="LedgerTrendAnomalyAnalyze" LocalizedNameKey="AnomalyAnalysis" Glyph="search_16x16" LargeGlyph="search_16x16" ButtonType="AI"/>
   </RibbonItem>
   <RibbonItem TabId="1" TabHeader="EditAll" LocalizedNameKey="Add">
     <RibbonItem Action="EditAll" LocalizedNameKey="EditAll" Glyph="Edit_16x16" LargeGlyph="Edit_32x32"/>

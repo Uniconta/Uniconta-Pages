@@ -105,6 +105,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (confirmationDialog.ConfirmationResult == CWConfirmationBox.ConfirmationResultEnum.Yes)
                     {
                         EraseYearWindow EraseYearWindowDialog = new EraseYearWindow("", true);
+                        EraseYearWindowDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                         EraseYearWindowDialog.Closed += delegate
                         {
                             if (EraseYearWindowDialog.DialogResult == true)
@@ -124,6 +125,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void JoinAllOrdersToSelectedItem(CreditorOrderClient selectedItem, IEnumerable<CreditorOrderClient> allOrderList)
         {
             EraseYearWindow EraseYearWindowDialog = new EraseYearWindow("", true);
+            EraseYearWindowDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             EraseYearWindowDialog.Closed += async delegate
             {
                 if (EraseYearWindowDialog.DialogResult == true)

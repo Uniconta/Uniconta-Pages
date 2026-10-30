@@ -76,6 +76,9 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccountPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="CompanyState" x:Name="liCompanyState">
                         <CorasauControls:ComboBoxEditor SelectedItem="{Binding CompanyState,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="WIdNo">
+                        <CorasauControls:TextEditor Text="{Binding WIdNo ,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
 
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpGroup" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Group}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left"  Width="400">
@@ -164,9 +167,18 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorAccountPage2"
                             <CorasauControls:CheckEditor IsChecked="{Binding EmailDocuments,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="InvoiceInXML" x:Name="liInvoiceInXML">
-                        <CorasauControls:ComboBoxEditor SelectedItem="{Binding InvoiceInXML,Mode=TwoWay}" x:Name="cmbEinvoice"/>
+                        <CorasauControls:ComboBoxEditor SelectedItem="{Binding InvoiceInXML,Mode=TwoWay}" x:Name="cmbEinvoice" EditValueChanged="cmbEinvoice_EditValueChanged"/>
                         </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="EAN" x:Name="liEAN">
+                        <CorasauControls:CorasauLayoutItem FieldName="EndpointId" x:Name="liEndpointId" Style="{StaticResource LayoutItemsstyle}" ButtonClicked="liEndpointId_ButtonClicked" Padding="0">
+                            <CorasauControls:CorasauLayoutItem.ButtonContent>
+                                <TextBlock x:Name="tbEndpointIdStatus" Text="&#x1f310;"/>
+                            </CorasauControls:CorasauLayoutItem.ButtonContent>
+                            <CorasauControls:TextEditor x:Name="txtEndpointId" Text="{Binding EndpointId,Mode=TwoWay}" MaskType="RegEx" Mask="{StaticResource EndPointIdValidationRegx}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="EAN" x:Name="liEAN" Style="{StaticResource LayoutItemsstyle}" ButtonClicked="liEAN_ButtonClicked" Padding="0">
+                            <CorasauControls:CorasauLayoutItem.ButtonContent>
+                                <TextBlock x:Name="tbEanStatus" Text="&#x1f310;"/>
+                            </CorasauControls:CorasauLayoutItem.ButtonContent>
                             <CorasauControls:TextEditor x:Name="txtEAN" Text="{Binding EAN,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="VatNumber" x:Name="liVatNumber">

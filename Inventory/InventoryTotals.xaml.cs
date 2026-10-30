@@ -128,6 +128,10 @@ namespace UnicontaClient.Pages.CustomPage
                 txtDCType.Visibility = Visibility.Collapsed;
                 cmbDCType.Visibility = Visibility.Collapsed;
             }
+
+            if (api.CompanyEntity.HideCostPrice)
+                Margin.Visible = Margin.ShowInColumnChooser = false;
+
             if (!api.CompanyEntity._InvGroups)
                 txtStatisticsGrp.Visibility = cbxStatisticsGrp.Visibility = Visibility.Collapsed;
             Utility.SetupVariants(api, colVariant, VariantName, colVariant1, colVariant2, colVariant3, colVariant4, colVariant5, Variant1Name, Variant2Name, Variant3Name, Variant4Name, Variant5Name);

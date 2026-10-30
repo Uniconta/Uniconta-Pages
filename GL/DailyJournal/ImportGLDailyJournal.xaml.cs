@@ -303,10 +303,7 @@ namespace UnicontaClient.Pages.CustomPage
                         AddDockItem(TabControls.ImportGLDailyJournalPage2, Params, Uniconta.ClientTools.Localization.lookup("BankFormatName"), "Edit_16x16");
                     }
                     break;
-                case "LookupAccounts":
-                    if (selectedbankFormat != null)
-                        AddDockItem(TabControls.BankImportMapping, selectedbankFormat, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Mappings"), selectedbankFormat._Name));
-                    break;
+               
                 case "CopyRow":
                     if (selectedbankFormat == null)
                         return;
@@ -369,6 +366,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void btnAttach_Click(object sender, RoutedEventArgs e)
         {
             CWAttachVouchers attachVouchersDialog = new CWAttachVouchers(api);
+            attachVouchersDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             attachVouchersDialog.Closing += async delegate
             {
                 if (attachVouchersDialog.DialogResult == true)

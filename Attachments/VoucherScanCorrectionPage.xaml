@@ -19,14 +19,15 @@ x:Class="UnicontaClient.Pages.CustomPage.VoucherScanCorrectionPage"
             BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=LoadingMsg}">
             <localPage:VoucherScanCorrectionGrid x:Name="dgVoucherScanCorrection" AutoGenerateColumns="None">
                 <localPage:VoucherScanCorrectionGrid.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Label" Width="150" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Disabled" Width="100" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CorrectedValue" Width="150" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CreditorAccount" Width="150" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CreditorName" Width="150" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentRef" Width="75" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Content" Width="75" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Invoice" Width="150" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DocumentDate" Width="150" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Label" Width="100" />
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CorrectedValue" Width="150" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="UserLogidId" Width="150" />
                 </localPage:VoucherScanCorrectionGrid.Columns>
             </localPage:VoucherScanCorrectionGrid>

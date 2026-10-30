@@ -21,11 +21,11 @@ x:Class="UnicontaClient.Pages.CustomPage.WorkInstallationPage2"
         <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
             <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="grpFirst">
                 <CorasauControls:CorasauLayoutGroup x:Name="grpDescription" View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="350">
-                    <CorasauControls:CorasauLayoutItem x:Name="liDCAccount" FieldName="DCAccount">
-                        <CorasauControls:LookupEditor x:Name="leDCAccount" Text="{Binding DCAccount,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                    <CorasauControls:CorasauLayoutItem x:Name="liDCAccount" FieldName="DCAccount" Visibility="Collapsed">
+                        <CorasauControls:LookupEditor x:Name="leDCAccount" Text="{Binding DCAccount,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Visibility="Collapsed"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem x:Name="liCreditorAccount" FieldName="CreditorAccount" Visibility="Collapsed" >
-                        <CorasauControls:LookupEditor x:Name="leCreditorAccount" Text="{Binding CreditorAccount,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                        <CorasauControls:LookupEditor x:Name="leCreditorAccount" Text="{Binding CreditorAccount,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Visibility="Collapsed"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem x:Name="liCode" FieldName="Code" >
                         <CorasauControls:TextEditor Text="{Binding Code, Mode=TwoWay}" />
@@ -57,8 +57,17 @@ x:Class="UnicontaClient.Pages.CustomPage.WorkInstallationPage2"
                     <CorasauControls:CorasauLayoutItem x:Name="liCompanyRegNo" FieldName="CompanyRegNo" >
                         <CorasauControls:TextEditor x:Name="txtCompanyRegNo" Text="{Binding CompanyRegNo, Mode=TwoWay}" />
                     </CorasauControls:CorasauLayoutItem>
-                    <CorasauControls:CorasauLayoutItem x:Name="liGLN" FieldName="GLN" >
-                        <CorasauControls:TextEditor Text="{Binding GLN, Mode=TwoWay}" />
+                    <CorasauControls:CorasauLayoutItem x:Name="liGLN" FieldName="GLN" Style="{StaticResource LayoutItemsstyle}" ButtonClicked="liGLN_ButtonClicked" Padding="0">
+                        <CorasauControls:CorasauLayoutItem.ButtonContent>
+                            <TextBlock x:Name="tbGlnStatus" Text="&#x1f310;"/>
+                        </CorasauControls:CorasauLayoutItem.ButtonContent>
+                        <CorasauControls:TextEditor x:Name="txtGLN" Text="{Binding GLN, Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem x:Name="liEndpointId" FieldName="EndpointId" Style="{StaticResource LayoutItemsstyle}" ButtonClicked="liEndpointId_ButtonClicked" Padding="0">
+                        <CorasauControls:CorasauLayoutItem.ButtonContent>
+                            <TextBlock x:Name="tbEndpointIdStatus" Text="&#x1f310;"/>
+                        </CorasauControls:CorasauLayoutItem.ButtonContent>
+                        <CorasauControls:TextEditor x:Name="txtEndpointId" Text="{Binding EndpointId, Mode=TwoWay}" MaskType="RegEx" Mask="{StaticResource EndPointIdValidationRegx}" />
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem x:Name="liDeliveryId" FieldName="DeliveryId" >
                         <CorasauControls:TextEditor Text="{Binding DeliveryId, Mode=TwoWay}" />

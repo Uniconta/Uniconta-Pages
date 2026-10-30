@@ -128,6 +128,7 @@ namespace UnicontaClient.Pages.CustomPage
         void CallJoinTwoOrder(DCOrder fromOrder, DCOrder toOrder)
         {
             DeletePostedJournal delDialog = new DeletePostedJournal(true);
+            delDialog.Args = Args; // pass original args
             delDialog.Closed += async delegate
             {
                 if (delDialog.DialogResult == true)

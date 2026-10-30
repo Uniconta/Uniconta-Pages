@@ -1,0 +1,286 @@
+<ClientTools:ChildWindow xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.GL.Anomaly.CWLedgerTrendAnomalyAnalyze"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+        xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+        xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+        Width="700"
+        Height="580"
+        MinWidth="600"
+        MinHeight="420"
+        KeyDown="ChildWindow_KeyDown">
+
+    <Grid x:Name="LayoutRoot"
+          Margin="12"
+          Background="{StaticResource LayoutGridColor}">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <ScrollViewer Grid.Row="0"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+
+            <StackPanel Margin="0,0,8,0">
+
+                <GroupBox Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=Periods}"
+                          Margin="0,0,0,12">
+
+                    <Grid Margin="8">
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Row="0"
+                                   Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=CurrentPeriod}"
+                                   VerticalAlignment="Center"
+                                   TextWrapping="Wrap"
+                                   MaxWidth="190"
+                                   Margin="0,6,12,6"/>
+
+                        <CorasauControls:DateEditor Grid.Row="0"
+                                                    Grid.Column="1"
+                                                    MinWidth="0"
+                                                    Height="28"
+                                                    Margin="0,6,0,6"
+                                                    Tag="AnomalyHelpCurrentPeriod"
+                                                    DateTime="{Binding CurrentPeriodFrom, Mode=TwoWay}"/>
+
+                        <TextBlock Grid.Row="0"
+                                   Grid.Column="2"
+                                   Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=To}"
+                                   VerticalAlignment="Center"
+                                   Margin="10,0"/>
+
+                        <CorasauControls:DateEditor Grid.Row="0"
+                                                    Grid.Column="3"
+                                                    MinWidth="0"
+                                                    Height="28"
+                                                    Margin="0,6,0,6"
+                                                    Tag="AnomalyHelpCurrentPeriod"
+                                                    DateTime="{Binding CurrentPeriodTo, Mode=TwoWay}"/>
+
+                        <TextBlock Grid.Row="1"
+                                   Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=PreviousPeriod}"
+                                   VerticalAlignment="Center"
+                                   TextWrapping="Wrap"
+                                   MaxWidth="190"
+                                   Margin="0,6,12,6"/>
+
+                        <CorasauControls:DateEditor Grid.Row="1"
+                                                    Grid.Column="1"
+                                                    MinWidth="0"
+                                                    Height="28"
+                                                    Margin="0,6,0,6"
+                                                    Tag="AnomalyHelpPreviousPeriod"
+                                                    DateTime="{Binding PreviousPeriodFrom, Mode=TwoWay}"/>
+
+                        <TextBlock Grid.Row="1"
+                                   Grid.Column="2"
+                                   Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=To}"
+                                   VerticalAlignment="Center"
+                                   Margin="10,0"/>
+
+                        <CorasauControls:DateEditor Grid.Row="1"
+                                                    Grid.Column="3"
+                                                    MinWidth="0"
+                                                    Height="28"
+                                                    Margin="0,6,0,6"
+                                                    Tag="AnomalyHelpPreviousPeriod"
+                                                    DateTime="{Binding PreviousPeriodTo, Mode=TwoWay}"/>
+
+                        <TextBlock Grid.Row="2"
+                                   Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=PeriodBeforePrevious}"
+                                   VerticalAlignment="Center"
+                                   TextWrapping="Wrap"
+                                   MaxWidth="190"
+                                   Margin="0,6,12,6"/>
+
+                        <CorasauControls:DateEditor Grid.Row="2"
+                                                    Grid.Column="1"
+                                                    MinWidth="0"
+                                                    Height="28"
+                                                    Margin="0,6,0,6"
+                                                    Tag="AnomalyHelpEarlierPeriod"
+                                                    DateTime="{Binding PeriodBeforePreviousFrom, Mode=TwoWay}"/>
+
+                        <TextBlock Grid.Row="2"
+                                   Grid.Column="2"
+                                   Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=To}"
+                                   VerticalAlignment="Center"
+                                   Margin="10,0"/>
+
+                        <CorasauControls:DateEditor Grid.Row="2"
+                                                    Grid.Column="3"
+                                                    MinWidth="0"
+                                                    Height="28"
+                                                    Margin="0,6,0,6"
+                                                    Tag="AnomalyHelpEarlierPeriod"
+                                                    DateTime="{Binding PeriodBeforePreviousTo, Mode=TwoWay}"/>
+
+                    </Grid>
+                </GroupBox>
+
+                <GroupBox Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=Detection}"
+                          Margin="0,0,0,12">
+
+                    <Grid Margin="8">
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="120"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Row="0"
+                                   Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=MinimumAbsoluteDifference}"
+                                   VerticalAlignment="Center"
+                                   TextWrapping="Wrap"
+                                   Margin="0,6,12,6"/>
+
+                        <editor:SpinEdit Grid.Row="0"
+                                         Grid.Column="1"
+                                         MinWidth="0"
+                                         Height="28"
+                                         Margin="0,6,0,6"
+                                         IsFloatValue="False"
+                                         MaskType="Numeric"
+                                         Mask="n0"
+                                         AllowNullInput="False"
+                                         Tag="AnomalyHelpAbsoluteDifference"
+                                         EditValue="{Binding MinimumAbsoluteDifference,
+                                                             Mode=TwoWay,
+                                                             UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <TextBlock Grid.Row="1"
+                                   Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=MinimumPercentageChange}"
+                                   VerticalAlignment="Center"
+                                   TextWrapping="Wrap"
+                                   Margin="0,6,12,6"/>
+
+                        <editor:SpinEdit Grid.Row="1"
+                                         Grid.Column="1"
+                                         MinWidth="0"
+                                         Height="28"
+                                         Margin="0,6,0,6"
+                                         IsFloatValue="False"
+                                         MaskType="Numeric"
+                                         Mask="n0"
+                                         AllowNullInput="False"
+                                         Tag="AnomalyHelpPercentageChange"
+                                         EditValue="{Binding MinimumPercentageChange, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <TextBlock Grid.Row="2"
+                                   Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=MaximumAnomalies}"
+                                   VerticalAlignment="Center"
+                                   TextWrapping="Wrap"
+                                   Margin="0,6,12,6"/>
+
+                        <editor:SpinEdit Grid.Row="2"
+                                         Grid.Column="1"
+                                         IsFloatValue="False"
+                                         MaskType="Numeric"
+                                         Mask="N0"
+                                         MinValue="1"
+                                         MaxValue="100"
+                                         AllowNullInput="False"
+                                         Height="28"
+                                         Margin="0,6,0,6"
+                                         Tag="AnomalyHelpMaximumAnomalies"
+                                         EditValue="{Binding MaximumAnomalies, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <TextBlock Grid.Row="3"
+                                   Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=MaximumTransactions}"
+                                   VerticalAlignment="Center"
+                                   TextWrapping="Wrap"
+                                   Margin="0,6,12,6"/>
+
+                        <editor:SpinEdit Grid.Row="3"
+                                         Grid.Column="1"
+                                         IsFloatValue="False"
+                                         MaskType="Numeric"
+                                         Mask="N0"
+                                         MinValue="1"
+                                         MaxValue="50"
+                                         AllowNullInput="False"
+                                         Height="28"
+                                         Margin="0,6,0,6"
+                                         Tag="AnomalyHelpMaximumTransactions"
+                                         EditValue="{Binding MaximumTransactionsPerAnomaly, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                    </Grid>
+                </GroupBox>
+
+                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=AnomalyAnalysisPrivacyNotice}"
+                           TextWrapping="Wrap"
+                           Margin="0,0,0,8"/>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="0,8,0,8">
+
+            <Button x:Name="ResetButton" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=Reset}"
+                Tag="AnomalyHelpReset" MinWidth="85" Height="28" Click="ResetButton_Click" Margin="0,0,8,0"/>
+            <Button x:Name="OKButton"
+                    Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=OK}"
+                    Tag="AnomalyHelpAnalyze"
+                    MinWidth="85"
+                    Height="28"
+                    IsDefault="True"
+                    Click="OKButton_Click"
+                    Margin="0,0,8,0"/>
+
+            <Button x:Name="CancelButton"
+                    Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=Cancel}"
+                    Tag="AnomalyHelpCancel"
+                    MinWidth="85"
+                    Height="28"
+                    IsCancel="True"
+                    Click="CancelButton_Click"/>
+
+        </StackPanel>
+
+        <StatusBar Grid.Row="2"
+                   Background="Transparent"
+                   HorizontalContentAlignment="Stretch">
+
+            <StatusBar.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Grid/>
+                </ItemsPanelTemplate>
+            </StatusBar.ItemsPanel>
+
+            <StatusBarItem HorizontalContentAlignment="Stretch">
+                <TextBlock x:Name="HelpStatusText"
+                           Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=AnomalyHelpOverview}"
+                           TextWrapping="Wrap"/>
+            </StatusBarItem>
+
+        </StatusBar>
+
+    </Grid>
+</ClientTools:ChildWindow>

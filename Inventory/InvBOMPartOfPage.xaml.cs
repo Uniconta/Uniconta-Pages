@@ -146,7 +146,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             foreach (var rec in Parameters)
             {
-                if (string.Compare(rec.Name, "Item", StringComparison.CurrentCultureIgnoreCase) == 0)
+                if (string.Equals(rec.Name, "Item", StringComparison.CurrentCultureIgnoreCase))
                 {
                     setItem(rec.Value);
                     string header = string.Concat(Uniconta.ClientTools.Localization.lookup("BOM"), ": ", rec.Value);

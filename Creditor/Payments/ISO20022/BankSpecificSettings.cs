@@ -6,9 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Uniconta.API.DebtorCreditor;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
+using Uniconta.Common.Utility;
 using Uniconta.DataModel;
 using UnicontaClient.Pages;
 using UnicontaClient.Pages.Creditor.Payments;
@@ -318,7 +320,7 @@ namespace UnicontaISO20022CreditTransfer
 
 
         /// <summary>
-        /// Germany and Holland will in a transition phase - use two formats pain.001.001.03 and pain.001.001.09
+        /// There'll be a transition phase - where we'll use two formats pain.001.001.03 and pain.001.001.09
         /// </summary>
         public virtual bool NewPaymentFormat()
         {
@@ -697,12 +699,42 @@ namespace UnicontaISO20022CreditTransfer
         /// </summary>
         public virtual PostalAddress DebtorAddress(Company company, PostalAddress debtorAddress)
         {
-            debtorAddress.AddressLine1 = StandardPaymentFunctions.RegularExpressionReplace(company._Address1, allowedCharactersRegEx, replaceCharactersRegEx);
-            debtorAddress.AddressLine2 = StandardPaymentFunctions.RegularExpressionReplace(company._Address2, allowedCharactersRegEx, replaceCharactersRegEx);
-            debtorAddress.AddressLine3 = StandardPaymentFunctions.RegularExpressionReplace(company._Address3, allowedCharactersRegEx, replaceCharactersRegEx);
+            var adr1 = StandardPaymentFunctions.RegularExpressionReplace(company._Address1, allowedCharactersRegEx, replaceCharactersRegEx);
+            var adr2 = StandardPaymentFunctions.RegularExpressionReplace(company._Address2, allowedCharactersRegEx, replaceCharactersRegEx);
+            var adr3 = StandardPaymentFunctions.RegularExpressionReplace(company._Address3, allowedCharactersRegEx, replaceCharactersRegEx);
+
+            if (NewPaymentFormat())
+            {
+                var zipCity = OIOUBL.GetZipCodeCity(adr3, company._CountryId);
+                if (zipCity == null)
+                {
+                    zipCity = OIOUBL.GetZipCodeCity(adr2, company._CountryId);
+                    if (zipCity != null)
+                        adr2 = null;
+                }
+                else
+                    adr3 = null;
+
+                if (zipCity != null)
+                {
+                    var address = StringBuilderReuse.Create().Append(adr1).Append(adr2 != null ? ", " : null).Append(adr2).Append(adr3 != null ? ", " : null).Append(adr3).ToStringAndRelease();
+                    debtorAddress.StreetName = address;
+                    debtorAddress.ZipCode = zipCity.Item1;
+                    debtorAddress.CityName = zipCity.Item2;
+                    debtorAddress.CountryId = ((CountryISOCode)company._CountryId).ToString();
+                    debtorAddress.Unstructured = false;
+                    return debtorAddress;
+                }
+            }
+
+            debtorAddress.AddressLine1 = adr1;
+            debtorAddress.AddressLine2 = adr2;
+            debtorAddress.AddressLine3 = adr3;
             debtorAddress.CountryId = ((CountryISOCode)company._CountryId).ToString();
 
             debtorAddress.Unstructured = true;
+            debtorAddress.AddressLine2 = adr3 != null ? string.Format("{0} {1}", adr2, adr3) : adr2;
+            debtorAddress.AddressLine3 = null;
 
             return debtorAddress;
         }

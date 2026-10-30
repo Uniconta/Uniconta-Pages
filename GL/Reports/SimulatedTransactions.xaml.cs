@@ -1,24 +1,27 @@
-using UnicontaClient.Models;
-using Uniconta.ClientTools.DataModel;
-using Uniconta.ClientTools.Page;
-using Uniconta.Common;
 using DevExpress.Xpf.Grid;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
-using Uniconta.ClientTools.Controls;
 using Uniconta.API.GeneralLedger;
+using Uniconta.API.System;
+using Uniconta.ClientTools;
+using Uniconta.ClientTools.Controls;
+using Uniconta.ClientTools.Controls.AI.Assistant.Capabilities;
+using Uniconta.ClientTools.DataModel;
+using Uniconta.ClientTools.Page;
+using Uniconta.Common;
 using Uniconta.DataModel;
-using System.Threading.Tasks;
+using UnicontaClient.Models;
+using UnicontaClient.Pages.GL.TransactionOrigin;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -40,7 +43,7 @@ namespace UnicontaClient.Pages.CustomPage
         public object FooterData { get; set; }
     }
 
-    public partial class SimulatedTransactions : GridBasePage
+    public partial class SimulatedTransactions : GridBasePage, IGLPostingSourceTraceConsumer
     {
         public override string NameOfControl { get { return TabControls.SimulatedTransactions; } }
         public SimulatedTransactions(UnicontaBaseEntity[] simulatedTransactions)
@@ -50,11 +53,44 @@ namespace UnicontaClient.Pages.CustomPage
             RemoveMenuItem();
         }
         bool ShowTotal, ShowVoucherTotal;
+        private readonly DCOrder postedOrder;
+        private readonly IEnumerable<DCOrderLine> postedOrderLines;
+        private PostingTraceVoucherContext postingTraceContext;
+
+        /// <summary>
+        /// Creates a simulated transaction view with the transient order and invoice lines which
+        /// produced the simulation. The lines are retained for posting-source tracing.
+        /// </summary>
+        public SimulatedTransactions(UnicontaBaseEntity[] simulatedTransactions, DCOrder postedOrder, IEnumerable<DCOrderLine> postedOrderLines)
+            : base(simulatedTransactions, 0, 0)
+        {
+            this.postedOrder = postedOrder;
+            this.postedOrderLines = postedOrderLines?.Where(line => line != null).ToArray();
+            Initialize(simulatedTransactions);
+            RemoveMenuItem();
+        }
 
         AccountPostingBalance[] balance;
         public SimulatedTransactions(AccountPostingBalance[] balance, UnicontaBaseEntity[] simulatedTransactions)
             : base(simulatedTransactions, 0, 0)
         {
+            Initialize(simulatedTransactions);
+
+            if (balance == null || balance.Length == 0)
+                RemoveMenuItem();
+            else
+                this.balance = balance;
+        }
+
+        /// <summary>
+        /// Creates a simulated transaction view with balance information and the
+        /// transient order and invoice lines which produced the simulation.
+        /// </summary>
+        public SimulatedTransactions(AccountPostingBalance[] balance, UnicontaBaseEntity[] simulatedTransactions, DCOrder postedOrder, IEnumerable<DCOrderLine> postedOrderLines)
+            : base(simulatedTransactions, 0, 0)
+        {
+            this.postedOrder = postedOrder;
+            this.postedOrderLines = postedOrderLines?.Where(line => line != null).ToArray();
             Initialize(simulatedTransactions);
 
             if (balance == null || balance.Length == 0)
@@ -102,11 +138,20 @@ namespace UnicontaClient.Pages.CustomPage
                 dgSimulatedTran.SetSource(lst);
             }
             SetRibbonControl(localMenu, dgSimulatedTran);
+            SetPostingSourceTraceAvailability();
             dgSimulatedTran.BusyIndicator = busyIndicator;
 
             localMenu.OnItemClicked += LocalMenu_OnItemClicked;
             dgSimulatedTran.ShowTotalSummary();
             LedgerCache = this.api.GetCache(typeof(GLAccount));
+        }
+
+        private void SetPostingSourceTraceAvailability()
+        {
+            var ribbon = localMenu.DataContext as RibbonBase;
+            var postingSourceTrace = ribbon?.MenuItems.FirstOrDefault(item => Convert.ToString(item.Tag) == "PostingSourceTrace");
+            if (postingSourceTrace != null)
+                postingSourceTrace.isEditLayout = postedOrder != null || postedOrderLines != null;
         }
 
         void RemoveMenuItem()
@@ -122,11 +167,66 @@ namespace UnicontaClient.Pages.CustomPage
                 case "AccountPostingBalance":
                     ViewAccountPostingBalance();
                     break;
+
+                case "PostingSourceTrace":
+                    ShowPostingSourceTrace();
+                    break;
+
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
+        
+        public override List<IAIAssistantCapability> GetAIAssistantCapabilities(bool hasFileAttached)
+        {
+            var capabilities = base.GetAIAssistantCapabilities(hasFileAttached);
+            capabilities.Add(new OpenTransactionOriginCapability(this));
+            capabilities.Add(new ReviewVoucherCapability(this));
+            return capabilities;
+        }
+
+        public void ShowPostingSourceTrace(GLTransClient selectionOverride = null)
+        {
+            if (postedOrder == null && postedOrderLines == null)
+                return;
+
+            if (selectionOverride != null)
+            {
+                var matchingItem = (dgSimulatedTran.ItemsSource as IEnumerable)
+                    .OfType<GLTransClient>()
+                    .FirstOrDefault(x => x.JourRowId == selectionOverride.JourRowId);
+
+                if (matchingItem != null)
+                    dgSimulatedTran.SelectedItem = matchingItem;
+            }
+
+            AddDockItem(TabControls.GLPostingSourceTrace,
+                        new object[] 
+                        { 
+                            dgSimulatedTran.syncEntity,                             
+                            new GLPostingSourceTraceOpenparms
+                            {
+                                Consumer = this,
+                                SelectionOverride = selectionOverride,
+                                SimulatedOrder = postedOrder,
+                                SimulatedOrderLines = postedOrderLines
+                            }
+                        },
+                        Uniconta.ClientTools.Localization.lookup("PostingSourceTrace"));
+        }
+
+        Task<PostingTraceVoucherContext> IGLPostingSourceTraceConsumer.GetPostingTraceContextAsync(GLTransClient transaction, CrudAPI api)
+        {
+            if (postingTraceContext == null)
+            {
+                var transactions = (dgSimulatedTran.ItemsSource as IEnumerable)?.OfType<GLTransClient>().ToArray();
+                postingTraceContext = new PostingTraceVoucherContext(transactions,
+                    item => InvoicePostingTraceResolver.TracePostingAsync(item, api, postedOrder, postedOrderLines));
+            }
+            return Task.FromResult(postingTraceContext);
+        }
+        GLTransClient IGLPostingSourceTraceConsumer.GetSelectedVoucherTransaction() => dgSimulatedTran.SelectedItem as GLTransClient;
 
         private void ViewAccountPostingBalance()
         {
@@ -220,5 +320,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             return base.GetPrintParameter();
         }
+
+
     }
 }

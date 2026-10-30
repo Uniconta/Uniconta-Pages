@@ -34,6 +34,11 @@
       <RibbonItem Action="AddDoc" LocalizedNameKey="Document" ControlName="UserDocsPage" Glyph="Accounts_Statement_Report_16x16" />
     </RibbonItem>
   </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="ConvertToCrmProspect" LocalizedNameKey="AddToOBJ" Parameter="CRM" LargeGlyph="Employee_32x32" />
+    <RibbonItem Action="CRM" LocalizedNameKey="CRMSource" LargeGlyph="Convert_To_User_32x32" />
+
+  </RibbonItem>
   <RibbonItem TabId="1" LocalizedNameKey="EditAll">
     <RibbonItem Action="EditAll"  LocalizedNameKey="EditAll" Glyph="Edit_16x16" LargeGlyph="Edit_32x32"/>
     <RibbonItem Action="AddLine"  LocalizedNameKey="Add"  Glyph="Add_16x16" LargeGlyph="Add_32x32"/>

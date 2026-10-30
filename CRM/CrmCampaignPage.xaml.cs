@@ -150,6 +150,7 @@ namespace UnicontaClient.Pages.CustomPage
         void DeleteEmailList(CrmCampaignClient campaign)
         {
             EraseYearWindow EraseYearWindowDialog = new EraseYearWindow(campaign.Name, false);
+            EraseYearWindowDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             EraseYearWindowDialog.Closed += async delegate
             {
                 if (EraseYearWindowDialog.DialogResult == true)

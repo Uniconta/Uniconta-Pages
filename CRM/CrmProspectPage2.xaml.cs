@@ -188,7 +188,7 @@ namespace UnicontaClient.Pages.CustomPage
                         if (address != null)
                         {
                             var streetAddress = address.CompleteStreet;
-                            if (string.Compare(ci.life.name, editrow._Name, StringComparison.CurrentCultureIgnoreCase) == 0 && streetAddress == editrow._Address1 &&
+                            if (string.Equals(ci.life.name, editrow._Name, StringComparison.CurrentCultureIgnoreCase) && streetAddress == editrow._Address1 &&
                                 address.zipcode == editrow._ZipCode)
                                 return; // we wil not override since address has not changed
 
@@ -233,12 +233,9 @@ namespace UnicontaClient.Pages.CustomPage
         private void Email_ButtonClicked(object sender)
         {
             var txtEmail = ((CorasauLayoutItem)sender).Content as TextEditor;
-            if (txtEmail == null)
+            if (string.IsNullOrWhiteSpace(txtEmail?.Text))
                 return;
-            var mail = string.Concat("mailto:", txtEmail.Text);
-            System.Diagnostics.Process proc = new System.Diagnostics.Process();
-            proc.StartInfo.FileName = mail;
-            proc.Start();
+            OfficeComponentUtil.SendEmailToOutlook(txtEmail.Text);
         }
 
         private void liZipCode_ButtonClicked(object sender)

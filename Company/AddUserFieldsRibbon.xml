@@ -5,6 +5,7 @@
     <RibbonItem Action="AddRow" LocalizedNameKey="AddOBJ" Parameter="Field" Glyph="Add_16x16" LargeGlyph="Add_32x32"/>
     <RibbonItem Action="EditRow" ShortcutKey="Ctrl+E" LocalizedNameKey="Edit" Glyph="Edit_16x16" LargeGlyph="Edit_32x32"/>
     <RibbonItem Action="CopyUserfields" LocalizedNameKey="CopyUserFields" LargeGlyph="Copy_32x32"/>
+    <RibbonItem Action="CopyToApp" LocalizedNameKey="CopyToOBJ" Parameter="App" LargeGlyph="CopytoApp_32x32"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" Glyph="refresh" LargeGlyph="refresh"/>

@@ -114,7 +114,9 @@ namespace UnicontaClient.Pages.CustomPage
                         genrateAccountingPeriod(selectedItem);
                         if (AccountPeriodslist != null)
                         {
-                            new CWAccountingPeriod(selectedItem, AccountPeriodslist, api).Show();
+                            var accountingPeriodDialog = new CWAccountingPeriod(selectedItem, AccountPeriodslist, api);
+                            accountingPeriodDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
+                            accountingPeriodDialog.Show();
                         }
                     }
                     break;
@@ -131,6 +133,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void RemovePrimo(CompanyFinanceYearClient financialYearClient)
         {
             var removePrimoWindowDialog = new EraseYearWindow(financialYearClient.BalanceName, false);
+            removePrimoWindowDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             removePrimoWindowDialog.Closed += async delegate
             {
                 if (removePrimoWindowDialog.DialogResult == true)
@@ -149,6 +152,7 @@ namespace UnicontaClient.Pages.CustomPage
             var Header = string.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("DeleteTrans"), interval);
 
 			var EraseYearWindowDialog = new EraseYearWindow(Header, false);
+			EraseYearWindowDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
 			EraseYearWindowDialog.Closed += async delegate
             {
                 if (EraseYearWindowDialog.DialogResult == true)
@@ -169,12 +173,14 @@ namespace UnicontaClient.Pages.CustomPage
         private void GeneratePrimo(CompanyFinanceYearClient p)
         {
             CWCreatePrimo dialogPrimo = new CWCreatePrimo(this.api,p);
+            dialogPrimo.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             dialogPrimo.Closed += delegate
             {
                 if (dialogPrimo.DialogResult == true)
                 {
                     var s = string.Format(Uniconta.ClientTools.Localization.lookup("PrimoOnDate"), p._FromDate.ToShortDateString());
                     var EraseYearWindowDialog = new EraseYearWindow(s, true);
+                    EraseYearWindowDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     EraseYearWindowDialog.Closed += delegate
                     {
                         if (EraseYearWindowDialog.DialogResult == true)

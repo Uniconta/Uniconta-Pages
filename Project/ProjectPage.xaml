@@ -144,6 +144,8 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjectPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Completion" Width="60" Visible="False" />
                     <local:ComboBoxColumnClient x:Name="InvoicingMethod" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="SalesPrice" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="LayoutGroup" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="RevenueAccount" Visible="False"/>
                 </local:ProjectGrid.Columns>
                 <local:ProjectGrid.TotalSummary>
                     <local:SumColumn FieldName="Revenue" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>

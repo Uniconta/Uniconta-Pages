@@ -36,7 +36,7 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public double _Total;
         [Display(Name = "Total", ResourceType = typeof(GLTableText))]
-        public double Total { get { return _Total; } set { _Total = value; } }
+        public double Total { get { return _Total; } }
     }
 
     public class DebtorTotalsGrid : CorasauDataGridClient
@@ -144,6 +144,8 @@ namespace UnicontaClient.Pages.CustomPage
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
             ibase = UtilDisplay.GetMenuCommandByName(rb, "EnableChart");
         }
+        
+        public override FrameworkElement AIAdornedElement => busyIndicator;
 
         private void SetShowHideChart(bool _hideChart)
         {
@@ -258,6 +260,7 @@ namespace UnicontaClient.Pages.CustomPage
                     rec._Total = tot;
                 }
             }
+            dgDebtorTotalsGrid.RefreshData();
             dgDebtorTotalsGrid.UpdateTotalSummary();
             /*
             var N = dgDebtorTotalsGrid.VisibleRowCount;

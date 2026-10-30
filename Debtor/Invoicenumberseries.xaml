@@ -7,8 +7,8 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorInvoicenumberseries"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:CientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
-    mc:Ignorable="d">   
-   
+    mc:Ignorable="d">
+
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -52,7 +52,12 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorInvoicenumberseries"
                         <CorasauControls:LookupEditor x:Name="lePaymentForCollection" Text="{Binding PaymentForCollection,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpInventory" ItemLabelsAlignment="Default" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Inventory}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                    <CorasauControls:CorasauLayoutItem FieldName="InvPackagingItem" x:Name="liInvPackagingItem">
+                        <CorasauControls:LookupEditor x:Name="leInvPackagingItem" Text="{Binding InvPackagingItem,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutGroup>
-        </CorasauControls:CorasauLayoutControl>       
+        </CorasauControls:CorasauLayoutControl>
     </Grid>
 </Pages:FormBasePage>

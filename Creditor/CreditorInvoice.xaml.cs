@@ -229,6 +229,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                     {
                         CWOrderFromInvoice cwOrderInvoice = new CWOrderFromInvoice(api, true);
+                        cwOrderInvoice.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                         cwOrderInvoice.DialogTableId = 2000000033;
                         cwOrderInvoice.Closed += async delegate
                         {
@@ -286,6 +287,10 @@ namespace UnicontaClient.Pages.CustomPage
                         ViewVoucher(TabControls.VouchersPage3, selectedItem);
                         busyIndicator.IsBusy = false;
                     }
+                    break;
+                case "DocSendLog":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.DocsSendLogGridPage, dgCrdInvoicesGrid.syncEntity);
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -362,10 +367,7 @@ namespace UnicontaClient.Pages.CustomPage
                 if (iprintReport != null)
                 {
                     var report = iprintReport.Report;
-                    var memoryStream = UnistreamReuse.Create();
-                    report.ExportToPdf(memoryStream);
-                    var control = UtilDisplay.LoadControl(memoryStream.ToArrayAndRelease(), FileextensionsTypes.PDF, false, false, null);
-
+                    var control = MacPageUtil.PreviewReportsOnMac(report);
                     var docNumber = isInvoice ? invClient._InvoiceNumber : invClient._PackNote;
                     var dockName = string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("Preview"), string.Format("{0}: {1}", isInvoice ? Uniconta.ClientTools.Localization.lookup("Invoice") :
                                Uniconta.ClientTools.Localization.lookup("Packnote"), NumberConvert.ToString(docNumber)));
@@ -612,6 +614,13 @@ namespace UnicontaClient.Pages.CustomPage
             }
             if (screenName == TabControls.CreditorInvoicePage2)
                 dgCrdInvoicesGrid.UpdateItemSource(argument);
+        }
+
+        private void HasDocImage_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            var pp = (sender as System.Windows.Controls.Image).Tag as CreditorInvoiceClient;
+            if (pp != null)
+                AddDockItem(TabControls.UserDocsPage, dgCrdInvoicesGrid.syncEntity);
         }
     }
 }

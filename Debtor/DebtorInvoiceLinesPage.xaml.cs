@@ -87,11 +87,11 @@ namespace UnicontaClient.Pages.CustomPage
             string header;
             if (dgInvLines.masterRecord is DCInvoice dCInvoice)
             {
-                header = dCInvoice.__DCType() != 6 ? string.Format("{0}: {1}", Localization.lookup("InvoiceNumber"), dCInvoice._InvoiceNumber) : string.Format("{0}: {1}", Localization.lookup("ProjectOrder"), dCInvoice._OrderNumber);
+                header = dCInvoice.__DCType() != 6 ? string.Concat(Localization.lookup("InvoiceNumber"), ": ", dCInvoice._InvoiceNumber) : string.Concat(Localization.lookup("ProjectOrder"), ": ", dCInvoice._OrderNumber);
             }
             else if (dgInvLines.masterRecord is DCAccount dcAccount)
             {
-                header = string.Format("{0}: {1}", Localization.lookup("InvTransactions"), dcAccount._Account);
+                header = string.Concat(Localization.lookup("InvTransactions"), ": ", dcAccount._Account);
             }
             else
                 return;
@@ -187,6 +187,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem == null)
                         return;
                     var cwChangeVaraints = new CWModifyVariants(api, selectedItem);
+                    cwChangeVaraints.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     cwChangeVaraints.Closing += delegate
                     {
                         if (cwChangeVaraints.DialogResult == true)
@@ -200,6 +201,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem == null)
                         return;
                     var cwchangeStorage = new CWModiyStorage(api);
+                    cwchangeStorage.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     cwchangeStorage.Closing += async delegate
                     {
                         if (cwchangeStorage.DialogResult == true)
@@ -227,7 +229,7 @@ namespace UnicontaClient.Pages.CustomPage
                 case "SeriesBatch":
                     if (selectedItem == null)
                         return;
-                    AddDockItem(TabControls.InvSeriesBatch, selectedItem, string.Format("{0}: {1}", Localization.lookup("SerialBatchNumbers"), selectedItem._Item));
+                    AddDockItem(TabControls.InvSeriesBatch, selectedItem, string.Concat(Localization.lookup("SerialBatchNumbers"), ": ", selectedItem._Item));
                     break;
                 case "AddEditNote":
                     if (selectedItem == null) return;
@@ -264,13 +266,13 @@ namespace UnicontaClient.Pages.CustomPage
                         return;
                     string arg;
                     if (selectedItem._JournalPostedId != 0)
-                        arg = string.Format("{0}={1}", Localization.lookup("JournalPostedId"), selectedItem._JournalPostedId);
+                        arg = string.Concat(Localization.lookup("JournalPostedId"), "=", selectedItem._JournalPostedId);
                     else if (selectedItem._InvoiceNumber != 0)
-                        arg = string.Format("{0}={1}", Localization.lookup("Invoice"), selectedItem._InvoiceNumber);
+                        arg = string.Concat(Localization.lookup("Invoice"), "=", selectedItem._InvoiceNumber);
                     else if (selectedItem._InvJournalPostedId != 0)
                         arg = string.Format("{0} ({1})={2}", Localization.lookup("JournalPostedId"), Localization.lookup("Inventory"), selectedItem._InvJournalPostedId);
                     else
-                        arg = string.Format("{0}={1}", Localization.lookup("Account"), selectedItem.AccountName);
+                        arg = string.Concat(Localization.lookup("Account"), "=", selectedItem.AccountName);
                     string vheader = Util.ConcatParenthesis(Localization.lookup("VoucherTransactions"), arg);
                     AddDockItem(TabControls.AccountsTransaction, dgInvLines.syncEntity, vheader);
                     break;
@@ -279,7 +281,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "ReturnReasonTransactions":
                     if (selectedItem != null)
-                        AddDockItem(TabControls.InvTransReasonReport, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ReturnReason"), selectedItem.InvoiceNumber));
+                        AddDockItem(TabControls.InvTransReasonReport, selectedItem, string.Concat(Uniconta.ClientTools.Localization.lookup("ReturnReason"), ": ", selectedItem.InvoiceNumber));
                     break;
                 default:
                     gridRibbon_BaseActions(ActionType);
@@ -295,7 +297,7 @@ namespace UnicontaClient.Pages.CustomPage
                 UnicontaMessageBox.Show(Localization.lookup("OnlyCreditnotes"), Localization.lookup("Information"), MessageBoxButton.OK);
                 return;
             }
-            var cwchangeCost = new CWChangeCostValue(selectedItem);
+            var cwchangeCost = new CWChangeCostValue(selectedItem);            
             cwchangeCost.Closing += async delegate
             {
                 if (cwchangeCost.DialogResult == true)
@@ -303,7 +305,10 @@ namespace UnicontaClient.Pages.CustomPage
                     var tranApi = new Uniconta.API.Inventory.TransactionsAPI(dataGrid.api);
                     var result = await tranApi.ChangeCostOnInvtrans(selectedItem, cwchangeCost.CostValue, cwchangeCost.PostingDate);
                     if (result == ErrorCodes.Succes)
+                    {
+                        dataGrid.api.ForcePrimarySQL = true;
                         dataGrid.Refresh();
+                    }
                     else
                         UtilDisplay.ShowErrorCode(result);
                 }
@@ -324,7 +329,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (master != null)
             {
-                PropValuePair[] propValuePair = null;
+                PropValuePair[] propValuePair;
                 // we do this to select all lines. also the hidden ones.
                 propValuePair = new PropValuePair[] { PropValuePair.GenereteParameter("ShowAllTrans", typeof(int), "1") };
                 return dgInvLines.Filter(propValuePair);

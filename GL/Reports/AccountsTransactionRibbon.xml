@@ -8,11 +8,12 @@
     <RibbonItem Action="PreviousYear" LocalizedNameKey="PrevYear" LargeGlyph="Login_History_32x32"/>
   </RibbonItem>
   <RibbonItem>
-    <RibbonItem Action="ViewDownloadRow" ShortcutKey="F7" LocalizedNameKey="PhysicalVoucher" Glyph="View_Voucher_32x32" LargeGlyph="View_Voucher_32x32" />
+	<RibbonItem Action="ViewDownloadRow" ShortcutKey="F7" LocalizedNameKey="PhysicalVoucher" Glyph="View_Voucher_32x32" LargeGlyph="View_Voucher_32x32" />
     <RibbonItem Action="VoucherTransactions" ShortcutKey="Alt+T" LocalizedNameKey="VoucherTransactions" Glyph="Voucher_Transactions_32x32" LargeGlyph="Voucher_Transactions_32x32" />
     <RibbonItem Action="AccountsTransaction" LocalizedNameKey="AccountsTransaction" Glyph="Account-statement_32x32" LargeGlyph="Account-statement_32x32" />
     <RibbonItem Action="PostedTransaction" LocalizedNameKey="PostedTransactions" Glyph="Posted_Transaction_32x32" LargeGlyph="Posted_Transaction_32x32" ShortcutKey="Ctrl+T"/>
     <RibbonItem Action="PostedBy" LocalizedNameKey="PostedBy" Glyph="Debtor_Group_Posting_32x32" LargeGlyph="Debtor_Group_Posting_32x32"/>
+    <RibbonItem Action="PostingSourceTrace" Module="TransactionOriginAnalysis" LocalizedNameKey="PostingSourceTrace" Glyph="SourceTrace" LargeGlyph="SourceTrace"/>
   </RibbonItem>
   <RibbonItem>
     <!---If we want to create a new group in same PageTab-->

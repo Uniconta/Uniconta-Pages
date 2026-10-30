@@ -192,6 +192,7 @@ namespace UnicontaClient.Pages.CustomPage
         void PostProjectOrder(DebtorOrderClient order)
         {
             var dialog = new CwPostProjectOrder();
+            dialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             dialog.DialogTableId = 2000000087;
             dialog.Closed += async delegate
             {
@@ -233,6 +234,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             var cwPickingList = new CWGeneratePickingList(true);
+            cwPickingList.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             cwPickingList.DialogTableId = 2000000024;
             cwPickingList.Closed += async delegate
             {
@@ -280,8 +282,7 @@ namespace UnicontaClient.Pages.CustomPage
             GenrateInvoiceDialog.HideOutlookOption(true);
             GenrateInvoiceDialog.SetInvPrintPreview(printPreview);
 
-            if (!api.CompanyEntity._DeactivateSendNemhandel)
-                GenrateInvoiceDialog.SentByEInvoice(api, null, true);
+            GenrateInvoiceDialog.SentByEInvoice(api, null, true);
 
             GenrateInvoiceDialog.ShowAllowCredMax(api.CompanyEntity.AllowSkipCreditMax);
             GenrateInvoiceDialog.Closed += async delegate
@@ -411,13 +412,12 @@ namespace UnicontaClient.Pages.CustomPage
                 api.LoadCache(typeof(Debtor), true);
 
             string debtorName = debtor?.Name ?? dbOrder._DCAccount;
-            bool invoiceInXML = debtor != null && debtor.IsPeppolSupported && debtor._einvoice;
+            bool invoiceInXML = debtor != null && debtor._einvoice;
             bool isOrderOrQuickInv = api.CompanyEntity._CountryId == CountryCode.Germany ? false : true;
             var GenrateInvoiceDialog = new UnicontaClient.Pages.CWGenerateInvoice(true, string.Empty, false, true, true, showNoEmailMsg: !showSendByMail, debtorName: debtorName, isDebtorOrder: true, isOrderOrQuickInv: isOrderOrQuickInv, InvoiceInXML: invoiceInXML);
             GenrateInvoiceDialog.DialogTableId = 2000000013;
 
-            if (!api.CompanyEntity._DeactivateSendNemhandel)
-                GenrateInvoiceDialog.SentByEInvoice(api, UtilCommon.GetEndPoint(dbOrder, debtor, api));
+            GenrateInvoiceDialog.SentByEInvoice(api, UtilCommon.GetEndPoint(dbOrder, debtor, api), debtor: debtor, isOneTimeDebtor: dbOrder._OneTimeDC != null);
 
             GenrateInvoiceDialog.ShowAllowCredMax(api.CompanyEntity.AllowSkipCreditMax);
 

@@ -201,9 +201,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (Cache != null)
             {
                 var debtor = Cache.Get(partner._Account ?? NumberConvert.ToString(selecteditem._Pid + 60000)) as DebtorClient;
-                partner.DebtorPaymentMandateId = debtor?.MandateRef?.MandateId;
-                partner.DebtorBankAccount = debtor?.BankAccount;
-                partner.VATZone = debtor?.VatZone;
+                partner.DebtorAccount = debtor;
             }
 
             partnerInvDetails.Reseller = partner;

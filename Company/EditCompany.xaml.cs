@@ -1,12 +1,4 @@
-using Uniconta.API.System;
-using UnicontaClient.Models;
-using UnicontaClient.Pages.Maintenance;
-using UnicontaClient.Utilities;
-using Uniconta.ClientTools;
-using Uniconta.ClientTools.DataModel;
-using Uniconta.ClientTools.Page;
-using Uniconta.ClientTools.Util;
-using Uniconta.Common;
+using DevExpress.Xpf.Editors;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,23 +6,34 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Markup.Localizer;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
-using System.Threading.Tasks;
-using DevExpress.Xpf.Editors;
+using Uniconta.API.DebtorCreditor;
+using Uniconta.API.Service;
+using Uniconta.API.System;
+using Uniconta.ClientTools;
 using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
-using Uniconta.DataModel;
-using UnicontaClient.Pages;
+using Uniconta.ClientTools.DataModel;
+using Uniconta.ClientTools.Page;
+using Uniconta.ClientTools.Util;
+using Uniconta.Common;
 using Uniconta.Common.User;
+using Uniconta.DataModel;
 using UnicontaClient.Controls.Dialogs;
-using System.Windows.Markup.Localizer;
+using UnicontaClient.Models;
+using UnicontaClient.Pages;
+using UnicontaClient.Pages.Maintenance;
+using UnicontaClient.Utilities;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -84,6 +87,9 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (session.User._Role <= (byte)Uniconta.Common.User.UserRoles.Accountant && api.CompanyEntity._OwnerUid != session.Uid)
                 UtilDisplay.RemoveMenuCommand((RibbonBase)frmRibbon.DataContext, "Delete");
+
+            if (session.User._Role < (int)UserRoles.Admin)
+                UtilDisplay.RemoveMenuCommand((RibbonBase)frmRibbon.DataContext, "EDocumentAdm");
 
             RemoveMenuItem();
             cmbSendAppRemdr.ItemsSource = AppEnums.Weekdays.Values.ToList();
@@ -330,8 +336,14 @@ namespace UnicontaClient.Pages.CustomPage
                 case "AllowedIPAdresses":
                     AddDockItem(TabControls.CompanyIPRestrictionPage, editrow, string.Format("{0}:{1}", Uniconta.ClientTools.Localization.lookup("AllowedIPAdresses"), editrow._Name));
                     break;
-                case "RegisterEdelivery":
+                case "Nemhandel":
                     Nemhandel();
+                    break;
+                case "EDocumentAdm":
+                    EDocumentAdm();
+                    break;
+                case "EDocumentInbound":
+                    EDocumentInbound();
                     break;
                 case "RefreshCache":
                     RefreshCache();
@@ -351,7 +363,7 @@ namespace UnicontaClient.Pages.CustomPage
                 country != CountryCode.FaroeIslands)
             {
                 RibbonBase rb = (RibbonBase)frmRibbon.DataContext;
-                UtilDisplay.RemoveMenuCommand(rb, "RegisterEdelivery");
+                UtilDisplay.RemoveMenuCommand(rb, "Nemhandel");
             }
             if (api.CompanyEntity.NumberOfDimensions == 0)
                 liFullPrimo.Visibility = Visibility.Collapsed;
@@ -399,6 +411,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void DeleteCompany()
         {
             EraseYearWindow EraseYearWindowDialog = new EraseYearWindow(editrow.CompanyName, false);
+            EraseYearWindowDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             EraseYearWindowDialog.Closed += async delegate
             {
                 if (EraseYearWindowDialog.DialogResult == true)
@@ -440,33 +453,40 @@ namespace UnicontaClient.Pages.CustomPage
 
             CWNemhandel cwNemhandel = new CWNemhandel(api);
             cwNemhandel.DialogTableId = 2000000090;
-            cwNemhandel.Closed += async delegate
-            {
-                if (cwNemhandel.DialogResult == true)
-                {
-                    busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
-                    busyIndicator.IsBusy = true;
-                    ErrorCodes result;
-                    if (cwNemhandel.HasChanges)
-                    {
-                        var nhrAPI = new Uniconta.API.DebtorCreditor.NHRAPI(api);
-                        result = await nhrAPI.NHROperation(cwNemhandel.EndPointLst);
-                    }
-                    else
-                    {
-                        result = ErrorCodes.NoChange;
-                    }
-
-                    busyIndicator.IsBusy = false;
-                    UtilDisplay.ShowErrorCode(result);
-                }
-            };
             cwNemhandel.Show();
+        }
+
+        private void EDocumentAdm()
+        {
+            var cwEDocumentAdm = new CWEDocumentParticipantAdm(api);
+            cwEDocumentAdm.Show();
+        }
+
+        private async void EDocumentInbound()
+        {
+            var res = await ValidateEDocument(api);
+            if (res != null)
+            {
+                UnicontaMessageBox.Show(res, Uniconta.ClientTools.Localization.lookup("Warning"));
+                return;
+            }
+
+            new CWEDocumentInboundParticipant(api).Show();
+        }
+
+        private static async Task<string> ValidateEDocument(CrudAPI api, CompanyAddressClient companyAddress = null)
+        {
+            var company = api.CompanyEntity;
+            if (company._Id == null)
+                return Uniconta.ClientTools.Localization.lookup("NotValidVatNo");
+
+            return null;
         }
 
         private void DeleteAllAttachmentsCompany()
         {
             EraseYearWindow EraseYearWindowDialog = new EraseYearWindow(editrow.CompanyName, false);
+            EraseYearWindowDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             EraseYearWindowDialog.Closed += delegate
             {
                 if (EraseYearWindowDialog.DialogResult == true)

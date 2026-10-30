@@ -1,0 +1,23 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+      xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.AppUserLabelPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+      xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage">
+
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <CorasauControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Apps/AppUserLabelPageRibbon.xml" x:Name="localMenu"/>
+        <local:AppUserLabelGridClient x:Name="dgUserLabel" AutoGenerateColumns="None" Grid.Row="1">
+            <local:AppUserLabelGridClient.Columns>
+                <local:CorasauDataGridTemplateColumnClient x:Name="Label" MinWidth="250"/>
+                <local:CorasauDataGridTemplateColumnClient x:Name="Text"  MinWidth="500" />
+                <local:ComboBoxColumnClient x:Name="Language" />
+            </local:AppUserLabelGridClient.Columns>
+        </local:AppUserLabelGridClient>
+    </Grid>
+</Pages:GridBasePage>

@@ -61,7 +61,6 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void InitPage(UnicontaBaseEntity master)
         {
-            this.DataContext = this;
             cache = VoucherCache.HoldGlobalVoucherCache;
             InitializeComponent();
             SetRibbonControl(localMenu, dgAttachedVoucherGrid);
@@ -85,7 +84,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             foreach (var rec in Parameters)
             {
-                if (string.Compare(rec.Name, "PrimaryKeyId", StringComparison.CurrentCultureIgnoreCase) == 0)
+                if (string.Equals(rec.Name, "PrimaryKeyId", StringComparison.CurrentCultureIgnoreCase))
                 {
                     dgAttachedVoucherGrid.FilterString = $"[{rec.Name}] = {rec.Value}";
                     break;

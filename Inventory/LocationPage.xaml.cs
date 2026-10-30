@@ -33,6 +33,33 @@ namespace UnicontaClient.Pages.CustomPage
         UnicontaBaseEntity master;
         public LocationPage(UnicontaBaseEntity sourcedata) : base(sourcedata)
         {
+            Init(sourcedata);
+        }
+
+        public LocationPage(SynchronizeEntity syncEntity) : base(syncEntity, true)
+        {
+            this.syncEntity = syncEntity;
+            Init(syncEntity.Row);
+        }
+
+        protected override void SyncEntityMasterRowChanged(UnicontaBaseEntity args)
+        {
+            dgLocationClientGrid.UpdateMaster(args);
+            master = args;
+            SetHeader();
+            InitQuery();
+        }
+
+        void SetHeader()
+        {
+            var syncMaster = master as InvWarehouseClient;
+            if (master == null)
+                return;
+            SetHeader(string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Location"), syncMaster.Name));
+        }
+
+        void Init(UnicontaBaseEntity sourcedata)
+        {
             InitializeComponent();
             SetRibbonControl(localMenu, dgLocationClientGrid);
             dgLocationClientGrid.api = api;
@@ -40,6 +67,7 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.OnItemClicked += localMenu_OnItemClicked;
             dgLocationClientGrid.UpdateMaster(sourcedata);
             master = sourcedata;
+            SetHeader();
         }
 
         private void localMenu_OnItemClicked(string ActionType)

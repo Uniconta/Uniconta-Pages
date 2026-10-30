@@ -637,7 +637,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 var debtornew = deb.Key;
 
-                if (debtornew == null || debtornew._VIESStatus != VIESStatus.None)
+                if (debtornew == null || debtornew._VIESStatus == Uniconta.DataModel.VIESStatus.Valid || debtornew._VIESStatus == Uniconta.DataModel.VIESStatus.Invalid)
                     continue;
 
                 cnt++;

@@ -83,7 +83,7 @@ namespace UnicontaClient.Pages.CustomPage
             layoutControl = layoutItems;
             cbCountry.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.CountryCode));
             lePersonInCharge.api = lePurchaser.api = lePrStandard.api = leAccount.api = lePayment.api = leVat.api = cmbDim1.api = cmbDim2.api = cmbDim3.api = cmbDim4.api = cmbDim5.api =
-                leGroup.api = leMasterProject.api = lePrType.api = leInstallation.api = lePriceList.api = crudapi;
+                leGroup.api = leMasterProject.api = lePrType.api = leInstallation.api = lePriceList.api = leLayoutGroup.api = leRevenueAccount.api = crudapi;
             Utility.SetDimensions(crudapi, lbldim1, lbldim2, lbldim3, lbldim4, lbldim5, cmbDim1, cmbDim2, cmbDim3, cmbDim4, cmbDim5, usedim);
             if (LoadedRow == null)
             {
@@ -209,10 +209,9 @@ namespace UnicontaClient.Pages.CustomPage
 #if !SILVERLIGHT
         private void Email_ButtonClicked(object sender)
         {
-            var mail = string.Concat("mailto:", txtEmail.Text);
-            System.Diagnostics.Process proc = new System.Diagnostics.Process();
-            proc.StartInfo.FileName = mail;
-            proc.Start();
+            if (string.IsNullOrWhiteSpace(txtEmail.Text))
+                return;
+            OfficeComponentUtil.SendEmailToOutlook(txtEmail.Text);
         }
 
         private void LiZipCode_OnButtonClicked(object sender)
@@ -221,13 +220,14 @@ namespace UnicontaClient.Pages.CustomPage
             Utility.OpenGoogleMap(location);
         }
 #endif
-
+        Debtor lastDebtor;
         private void leAccount_EditValueChanged(object sender, DevExpress.Xpf.Editors.EditValueChangedEventArgs e)
         {
             var debtors = api.GetCache(typeof(Uniconta.DataModel.Debtor));
             var debtor = (Uniconta.DataModel.Debtor)debtors?.Get(Convert.ToString(e.NewValue));
-            if (debtor == null)
+            if (debtor == null || debtor == lastDebtor)
                 return;
+            lastDebtor = debtor;
             if (debtor._Blocked)
             {
                 UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("AccountIsBlocked"), Uniconta.ClientTools.Localization.lookup("Information"));

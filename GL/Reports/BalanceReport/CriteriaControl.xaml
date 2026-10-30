@@ -147,7 +147,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CriteriaControl"
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock x:Name="company" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,25,0"/>
-                        <CorasauControls:ComboBoxEditor x:Name="cbCompany" EditValue="{Binding ForCompany, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" AutoComplete="True" AllowNullInput="True" Grid.Column="1" Width="170"  DisplayMember="Name" />
+                        <CorasauControls:ComboBoxEditor x:Name="cbCompany" EditValue="{Binding ForCompany, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" AutoComplete="True" AllowNullInput="True" Grid.Column="1" Width="170"  DisplayMember="Name" ValidateOnTextInput="False" ImmediatePopup="True"/>
                         <TextBlock x:Name="dim1" Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,25,0"/>
                         <CorasauControls:DimComboBoxEditor x:Name="cbdim1" EditValue="{Binding Dim1,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Grid.Column="1" Grid.Row="2" Width="170" ShowCustomItems="False" ShowClearButton="True">
                             <CorasauControls:DimComboBoxEditor.StyleSettings>

@@ -105,6 +105,11 @@ namespace UnicontaClient.Pages.CustomPage
                     string grpPostingHeader = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("ItemPosting"), selectedItem.Group);
                     AddDockItem(TabControls.CreditorGroupPostingPage, selectedItem, grpPostingHeader);
                     break;
+                case "GroupCurrency":
+                    if (selectedItem == null) return;
+                    string currencyPostingHeader = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("SummaryAccountPerCurrency"), selectedItem.Group);
+                    AddDockItem(TabControls.DCGroupCurrencySummeryPage, selectedItem, currencyPostingHeader);
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;

@@ -71,7 +71,6 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 setShowHideGreen(true);
                 GetUser(null, Convert.ToString(API.CompanyId), DatevDetails.AccessToken);
-                string clientId = UtilDisplay.GetKey("DatevClientId");
                 SetStatusText();
             }
             else

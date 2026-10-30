@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Uniconta.API.DebtorCreditor;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.Common;
 using Uniconta.Common.Utility;
@@ -56,6 +57,23 @@ namespace UnicontaISO20022CreditTransfer
         {
          return string.Empty;
         }
+
+        public override string XMLAttributeNS()
+        {
+            if (CredPaymFormat.NewPaymentFormat)
+                return BaseDocument.XMLNS_PAIN009;
+
+            return BaseDocument.XMLNS_PAIN003;
+        }
+
+        public override bool NewPaymentFormat()
+        {
+            if (CredPaymFormat.NewPaymentFormat)
+                return true;
+
+            return false;
+        }
+
 
         /// <summary>
         /// Country currency - used for calculation of Payment type
@@ -157,6 +175,30 @@ namespace UnicontaISO20022CreditTransfer
             var adr2 = StandardPaymentFunctions.RegularExpressionReplace(company._Address2, allowedCharactersRegEx, replaceCharactersRegEx);
             var adr3 = StandardPaymentFunctions.RegularExpressionReplace(company._Address3, allowedCharactersRegEx, replaceCharactersRegEx);
 
+            if (NewPaymentFormat())
+            {
+                var zipCity = OIOUBL.GetZipCodeCity(adr3, company._CountryId);
+                if (zipCity == null)
+                {
+                    zipCity = OIOUBL.GetZipCodeCity(adr2, company._CountryId);
+                    if (zipCity != null)
+                        adr2 = null;
+                }
+                else
+                    adr3 = null;
+
+                if (zipCity != null)
+                {
+                    var address = StringBuilderReuse.Create().Append(adr1).Append(adr2 != null ? ", " : null).Append(adr2).Append(adr3 != null ? ", " : null).Append(adr3).ToStringAndRelease();
+                    debtorAddress.StreetName = address;
+                    debtorAddress.ZipCode = zipCity.Item1;
+                    debtorAddress.CityName = zipCity.Item2;
+                    debtorAddress.CountryId = ((CountryISOCode)company._CountryId).ToString();
+                    debtorAddress.Unstructured = false;
+                    return debtorAddress;
+                }
+            }
+
             debtorAddress.AddressLine1 = adr1;
             debtorAddress.AddressLine2 = adr2;
             debtorAddress.AddressLine3 = adr3;
@@ -168,7 +210,6 @@ namespace UnicontaISO20022CreditTransfer
 
             return debtorAddress;
         }
-
 
         /// <summary>
         /// LT: Only two Addresslines are accepted
@@ -254,6 +295,9 @@ namespace UnicontaISO20022CreditTransfer
         /// </summary>
         public override string InstructionPriority()
         {
+            if (CredPaymFormat.NewPaymentFormat)
+                return null;
+
             switch (CredPaymFormat.Bank)
             {
                 case ltBank.Standard:

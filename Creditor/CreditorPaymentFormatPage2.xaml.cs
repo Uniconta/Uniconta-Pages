@@ -94,6 +94,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 case ExportFormatType.NETS_Norge:
                     CWNets_NorgePaymentSetup dialogNets_Norg = new CWNets_NorgePaymentSetup(this.api, editrow);
+                    dialogNets_Norg.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     dialogNets_Norg.Closing += delegate
                     {
                         if (dialogNets_Norg.DialogResult == true)
@@ -103,6 +104,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case ExportFormatType.ISO20022_DK:
                     CWISODK_PaymentSetup dialogISODK = new CWISODK_PaymentSetup(this.api, editrow);
+                    dialogISODK.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     dialogISODK.Closing += delegate
                     {
                         if (dialogISODK.DialogResult == true)
@@ -113,6 +115,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 case ExportFormatType.ISO20022_NO:
                     CWISONO_PaymentSetup dialogISONO = new CWISONO_PaymentSetup(this.api, editrow);
+                    dialogISONO.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     dialogISONO.Closing += delegate
                     {
                         if (dialogISONO.DialogResult == true)
@@ -123,6 +126,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 case ExportFormatType.ISO20022_NL:
                     CWISONL_PaymentSetup dialogISONL = new CWISONL_PaymentSetup(this.api, editrow);
+                    dialogISONL.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     dialogISONL.Closing += delegate
                     {
                         if (dialogISONL.DialogResult == true)
@@ -133,6 +137,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 case ExportFormatType.ISO20022_DE:
                     CWISODE_PaymentSetup dialogISODE = new CWISODE_PaymentSetup(this.api, editrow);
+                    dialogISODE.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     dialogISODE.Closing += delegate
                     {
                         if (dialogISODE.DialogResult == true)
@@ -143,6 +148,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 case ExportFormatType.ISO20022_EE:
                     CWISOEE_PaymentSetup dialogISOEE = new CWISOEE_PaymentSetup(this.api, editrow);
+                    dialogISOEE.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     dialogISOEE.Closing += delegate
                     {
                         if (dialogISOEE.DialogResult == true)
@@ -153,6 +159,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                 case ExportFormatType.ISO20022_SE:
                     CWISOSE_PaymentSetup dialogISOSE = new CWISOSE_PaymentSetup(this.api, editrow);
+                    dialogISOSE.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     dialogISOSE.Closing += delegate
                     {
                         if (dialogISOSE.DialogResult == true)
@@ -162,6 +169,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case ExportFormatType.ISO20022_UK:
                     CWISOUK_PaymentSetup dialogISOUK = new CWISOUK_PaymentSetup(this.api, editrow);
+                    dialogISOUK.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     dialogISOUK.Closing += delegate
                     {
                         if (dialogISOUK.DialogResult == true)
@@ -171,6 +179,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case ExportFormatType.ISO20022_LT:
                     CWISOLT_PaymentSetup dialogISOLT = new CWISOLT_PaymentSetup(this.api, editrow);
+                    dialogISOLT.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     dialogISOLT.Closing += delegate
                     {
                         if (dialogISOLT.DialogResult == true)
@@ -180,6 +189,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case ExportFormatType.ISO20022_CH:
                     CWISOCH_PaymentSetup dialogISOCH = new CWISOCH_PaymentSetup(this.api, editrow);
+                    dialogISOCH.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     dialogISOCH.Closing += delegate
                     {
                         if (dialogISOCH.DialogResult == true)

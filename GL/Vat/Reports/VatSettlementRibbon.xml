@@ -19,6 +19,12 @@
     <RibbonItem Action="PostedTransaction" LocalizedNameKey="PostedTransactions" LargeGlyph="Posted_Transaction_32x32" ShortcutKey="Ctrl+T"/>
     <RibbonItem Action="PostedBy" LocalizedNameKey="PostedBy" LargeGlyph="Debtor_Group_Posting_32x32"/>
   </RibbonItem>
+	<RibbonItem>
+		<RibbonItem Module="Attachments" LocalizedNameKey="Attachments" LargeGlyph="Attachments_32x32">
+			<RibbonItem Action="AddNote" ShortcutKey="Alt+N" LocalizedNameKey="Note" ControlName="UserNotesPage" Glyph="Note_16x16" />
+			<RibbonItem Action="AddDoc" LocalizedNameKey="Document" ControlName="UserDocsPage" Glyph="Document_Attachment_16x16" />
+		</RibbonItem>
+	</RibbonItem>
   <RibbonItem>
     <!---If we want to create a new group in same PageTab-->
     <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32">

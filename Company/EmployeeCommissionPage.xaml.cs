@@ -355,6 +355,7 @@ namespace UnicontaClient.Pages.CustomPage
         void CheckItemNumber()
         {
             var calCommission = new CWCalculateCommission(api);
+            calCommission.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             calCommission.Closing += delegate
             {
                 if (calCommission.DialogResult == true)

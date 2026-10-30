@@ -41,9 +41,6 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorPaymentFormatPage2"
                         <CorasauControls:CorasauLayoutItem FieldName="Journal" x:Name="liJournal">
                             <CorasauControls:LookupEditor x:Name="leJournal" Text="{Binding Journal,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="AutoPosting" x:Name="liAutoPosting">
-                            <CorasauControls:CheckEditor IsChecked="{Binding AutoPosting,Mode=TwoWay}"/>
-                        </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="NoneBankDayAction" x:Name="liNoneBankDayAction">
                             <CorasauControls:ComboBoxEditor x:Name="cmbNoneBankDayAction" SelectedItem="{Binding NoneBankDayAction,Mode=TwoWay}"/>
                         </CorasauControls:CorasauLayoutItem>

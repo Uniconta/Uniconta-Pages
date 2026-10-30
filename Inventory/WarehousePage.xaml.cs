@@ -66,12 +66,13 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "Location":
                     if (selectedItem == null) return;
-                    AddDockItem(TabControls.LocationPage, selectedItem, string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("Location"), selectedItem.Warehouse, selectedItem.Name));
+                    AddDockItem(TabControls.LocationPage, dgWarehouseClientGrid.syncEntity, string.Format("{0}:{1},{2}", Uniconta.ClientTools.Localization.lookup("Location"), selectedItem.Warehouse, selectedItem.Name));
                     break;
                 case "JoinWarehouse":
                     if (selectedItem == null)
                         return;
                     var cwJoinTwoWareHouse = new CwJoinTwoWarehouseLocation(api, selectedItem);
+                    cwJoinTwoWareHouse.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     cwJoinTwoWareHouse.Closed += async delegate
                     {
                         if (cwJoinTwoWareHouse.DialogResult == true)
@@ -88,6 +89,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem == null)
                         return;
                     var cwJoinTwoLocation = new CwJoinTwoWarehouseLocation(api, selectedItem,joinWareHouse: false);
+                    cwJoinTwoLocation.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     cwJoinTwoLocation.Closed += async delegate
                     {
                         if (cwJoinTwoLocation.DialogResult == true)

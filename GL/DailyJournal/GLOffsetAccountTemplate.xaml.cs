@@ -25,6 +25,10 @@ namespace UnicontaClient.Pages.CustomPage
         protected override List<string> GridSkipFields { get { return new List<string>() { "AccountName" }; } }
         protected override bool RenderAllColumns { get { return true; } }
         public override bool IsAutoSave { get { return false; } }
+        public override bool AddRowOnPageDown()
+        {
+            return true;
+        }
     }
 
     public partial class GLOffsetAccountTemplate : GridBasePage
@@ -189,7 +193,8 @@ namespace UnicontaClient.Pages.CustomPage
                 this.Project.Visible = this.Project.ShowInColumnChooser = false;
                 this.PrCategory.Visible = this.PrCategory.ShowInColumnChooser = false;
                 this.WorkSpace.Visible = this.WorkSpace.ShowInColumnChooser = false;
-                this.Qty.Visible = this.Qty.ShowInColumnChooser = false;
+                if (!api.CompanyEntity._UseQtyInLedger)
+                    this.Qty.Visible = this.Qty.ShowInColumnChooser = false;
             }
             base.OnLayoutLoaded();
             setDim();
@@ -364,6 +369,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void btnAdd_Click(object sender, RoutedEventArgs e)
         {
             CWAddGLOffsetAccountTemplate childWindow = new CWAddGLOffsetAccountTemplate(null);
+            childWindow.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             childWindow.Closing += async delegate
             {
                 if (childWindow.DialogResult == true)
@@ -388,6 +394,7 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
 
             CWAddGLOffsetAccountTemplate childWindow = new CWAddGLOffsetAccountTemplate(masterRecord.Name);
+            childWindow.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             childWindow.Closing += async delegate
             {
                 if (childWindow.DialogResult == true)
@@ -508,7 +515,7 @@ namespace UnicontaClient.Pages.CustomPage
             var accounts = LedgerCache?.GetNotNullArray as GLAccount[];
             if (accounts != null)
             {
-                var act = accounts.Where(ac => string.Compare(ac._Lookup, le.EnteredText, StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
+                var act = accounts.Where(ac => string.Equals(ac._Lookup, le.EnteredText, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
                 if (act != null)
                 {
                     dgGlOffSetAccountTplt.SetLoadedRow(selectedItem);

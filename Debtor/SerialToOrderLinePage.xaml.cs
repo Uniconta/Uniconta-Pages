@@ -172,6 +172,9 @@ namespace UnicontaClient.Pages.CustomPage
                 case "QtyMarked":
                     ReCalculateTotal();
                     break;
+                case "Qty":
+                    rec._changedQty = rec._Qty;
+                    break;
             }
         }
 
@@ -326,6 +329,7 @@ namespace UnicontaClient.Pages.CustomPage
                     AllRemoved = false;
             }
 
+            api.ForcePrimarySQL = true;
             ErrorCodes err;
             if (dcorderlineMaster._SerieBatch != null && dcorderlineMaster.RowId != 0)
             {
@@ -377,67 +381,79 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
 
             UnicontaBaseEntity orgMaster = null;
-            var dcorderlineMaster = this.dcorderlineMaster;
-
+            var line = this.dcorderlineMaster;
+            bool isTransferOrder = line.__DCType() == 7;
             var _UseSerial = this.invItemMaster._UseSerial;
             List<DCOrderLineSerieBatch> olSerieBatchList = new List<DCOrderLineSerieBatch>();
             foreach (var row in markedList)
             {
                 double qty;
                 if (_UseSerial)
-                    qty = dcorderlineMaster._Qty >= 0 ? 1d : -1d;
+                    qty = line._Qty >= 0 ? 1d : -1d;
                 else if (row._QtyMarked != 0)
                     qty = row._QtyMarked;
+                else if (row._changedQty != 0)
+                    qty = row._changedQty;
                 else
-                    qty = dcorderlineMaster._Qty;
-                if (row._Warehouse != null && (dcorderlineMaster._Warehouse != row._Warehouse || dcorderlineMaster._Location != row._Location))
+                    qty = line._Qty;
+                if (row._Warehouse != null && (row._Warehouse != (isTransferOrder ? line._WarehouseFrom : line._Warehouse) || row._Location != (isTransferOrder ? line._LocationFrom : line._Location)))
                 {
-                    if (orgMaster == null && dcorderlineMaster.RowId != 0)
-                        orgMaster = StreamingManager.Clone((UnicontaBaseEntity)dcorderlineMaster);
-                    if (!dcorderlineMaster.SerieBatchMarked) //Cannot change warehouse/location if SeriesBatch is attached
+                    if (orgMaster == null && line.RowId != 0)
+                        orgMaster = StreamingManager.Clone((UnicontaBaseEntity)line);
+                    if (!line.SerieBatchMarked) //Cannot change warehouse/location if SeriesBatch is attached
                     {
-                        dcorderlineMaster.Warehouse = row._Warehouse;
-                        dcorderlineMaster.Location = row._Location;
+                        if (isTransferOrder)
+                        {
+                            var transferLine = line as InvTransferOrderLineClient;
+                            transferLine.WarehouseFrom = row._Warehouse;
+                            transferLine.LocationFrom = row._Location;
+                        }
+                        else
+                        {
+                            line.Warehouse = row._Warehouse;
+                            line.Location = row._Location;
+                        }
                     }
                     if (markedList.Count == 1)
-                        dcorderlineMaster.SerieBatch = row._Number;
+                        line.SerieBatch = row._Number;
                     else
-                        dcorderlineMaster.SerieBatch = null;
+                        line.SerieBatch = null;
                 }
                 else
                 {
-                    string nr = dcorderlineMaster._SerieBatch, newNr;
+                    string nr = line._SerieBatch, newNr;
                     if (markedList.Count == 1)
                         newNr = row._Number;
                     else
                         newNr = null;
                     if (newNr != nr)
                     {
-                        if (orgMaster == null && dcorderlineMaster.RowId != 0)
-                            orgMaster = StreamingManager.Clone((UnicontaBaseEntity)dcorderlineMaster);
-                        dcorderlineMaster.SerieBatch = newNr;
+                        if (orgMaster == null && line.RowId != 0)
+                            orgMaster = StreamingManager.Clone((UnicontaBaseEntity)line);
+                        line.SerieBatch = newNr;
                     }
                 }
                 var olSerieBatch = new DCOrderLineSerieBatch() { _Qty = qty };
                 olSerieBatch.SetMaster(row);
-                olSerieBatch.SetMaster(dcorderlineMaster as UnicontaBaseEntity);
+                olSerieBatch.SetMaster(line as UnicontaBaseEntity);
                 olSerieBatchList.Add(olSerieBatch);
             }
             ErrorCodes err;
             if (orgMaster != null)
             {
-                dcorderlineMaster.SerieBatchMarked = true;
-                var Updates = new Uniconta.API.System.CrudAPI.UpdatePair() { loaded = orgMaster, modified = (UnicontaBaseEntity)dcorderlineMaster };
+                line.SerieBatchMarked = true;
+                var Updates = new Uniconta.API.System.CrudAPI.UpdatePair() { loaded = orgMaster, modified = (UnicontaBaseEntity)line };
                 err = await api.MultiCrud(olSerieBatchList, new[] { Updates }, null);
             }
             else
                 err = await api.Insert(olSerieBatchList);
 
+            api.ForcePrimarySQL = true;
             if (err != ErrorCodes.Succes)
                 UtilDisplay.ShowErrorCode(err);
             else
             {
-                dcorderlineMaster.SerieBatchMarked = true;
+                line.SerieBatchMarked = true;
                 if (!saveAndExit)
                     InitQuery();
             }
@@ -535,5 +551,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         internal object locationSource;
         public object LocationSource { get { return locationSource; } }
+
+        public double _changedQty;
     }
 }

@@ -36,7 +36,7 @@ namespace UnicontaClient.Pages.CustomPage
             : base(sourceData, true)
         {
             InitializeComponent();
-            cmbProjectOrderVoucherSerie.api = cmbTMJournalVoucherSerie.api= leZeroInvoiceItem.api= api;
+            cmbProjectOrderVoucherSerie.api = cmbTMJournalVoucherSerie.api= leZeroInvoiceItem.api= leProjectCostItem.api= api;
             layoutControl = layoutItems;
 
             layoutItems.DataContext = editrow;

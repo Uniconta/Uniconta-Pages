@@ -111,6 +111,9 @@ namespace UnicontaClient.Pages.CustomPage
                     editrow._Storage = crudapi.CompanyEntity._PurchaseLineStorage;
                     if (Qty != 0d)
                         editrow._ProdQty = Qty;
+                    var item = lin.InvItem;
+                    if (item != null)
+                        TableField.SetUserFieldsFromRecord(item, editrow);
                 }
             }
 
@@ -250,6 +253,7 @@ namespace UnicontaClient.Pages.CustomPage
         void CreateOrderLines(ProductionOrderClient productionOrder)
         {
             CWProductionOrderLine dialog = new CWProductionOrderLine(productionOrder, api, rowId == 0);
+            dialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
 #if !SILVERLIGHT
             dialog.DialogTableId = 2000000077;
 #endif

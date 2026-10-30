@@ -138,6 +138,7 @@ namespace UnicontaClient.Pages.CustomPage
         private void DeleteJournal(GLDailyJournalPostedClient selectedItem)
         {
             var deleteDialog = new DeletePostedJournal();
+            deleteDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             deleteDialog.Closed += async delegate
             {
                 if (deleteDialog.DialogResult == true)

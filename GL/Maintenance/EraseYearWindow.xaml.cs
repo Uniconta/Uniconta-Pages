@@ -64,7 +64,7 @@ namespace UnicontaClient.Pages.CustomPage.Maintenance
         }
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = (string.Compare(txtComment.Text, ConfirmWord, StringComparison.CurrentCultureIgnoreCase) == 0);
+            this.DialogResult = (string.Equals(txtComment.Text, ConfirmWord, StringComparison.CurrentCultureIgnoreCase));
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)

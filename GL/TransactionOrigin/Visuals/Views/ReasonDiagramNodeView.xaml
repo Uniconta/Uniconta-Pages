@@ -1,0 +1,164 @@
+<UserControl xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.GL.TransactionOrigin.Visuals.ReasonDiagramNodeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vis="clr-namespace:UnicontaClient.Pages.CustomPage.GL.TransactionOrigin.Visuals"
+             Width="{Binding Width}"
+             Height="{Binding Height}"
+             Foreground="{StaticResource PostingTraceForegroundBrush}">
+
+    <UserControl.Resources>
+        <vis:NodeKindToColorConverter x:Key="NodeKindToColorConverter" />
+        <vis:ConfidenceToBrushConverter x:Key="ConfidenceToBrushConverter" />
+    </UserControl.Resources>
+
+    <Grid>
+
+        <!-- Accent shadow -->
+        <Border Margin="5,0,0,6"
+                Background="{StaticResource PostingTraceCardBackgroundBrush}"
+                CornerRadius="18"
+                IsHitTestVisible="False">
+            <Border.Effect>
+                <DropShadowEffect
+                    Color="{Binding Kind, Converter={StaticResource NodeKindToColorConverter}}"
+                    BlurRadius="10"
+                    ShadowDepth="8"
+                    Direction="225"
+                    Opacity="0.45" />
+            </Border.Effect>
+        </Border>
+
+        <!-- Card -->
+        <Border Margin="5,0,0,6"
+                Background="{StaticResource PostingTraceCardBackgroundBrush}"
+                BorderBrush="{StaticResource PostingTraceCardBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="18"
+                Padding="22,18,20,16"
+                ToolTip="{Binding ToolTipText}">
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- Title -->
+                <TextBlock Grid.Row="0"
+                           Text="{Binding Title}"
+                           FontWeight="SemiBold"
+                           FontSize="16"
+                           TextWrapping="Wrap" />
+
+                <!-- Subtitle -->
+                <TextBlock Grid.Row="1"
+                           Text="{Binding Subtitle}"
+                           Margin="0,10,0,0"
+                           FontSize="12"
+                           Opacity="0.8"
+                           TextWrapping="Wrap" />
+
+                <!-- Source record button -->
+                <Button Grid.Row="2"
+                        Margin="0,8,0,0"
+                        Padding="10,6"
+                        HorizontalAlignment="Left"
+                        Background="#0D1683D8"
+                        BorderBrush="#661683D8"
+                        BorderThickness="1"
+                        Cursor="Hand"
+                        Click="Source_Click">
+
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="ButtonBorder"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="6"
+                                    Padding="{TemplateBinding Padding}">
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Column="0"
+                                               Text="{Binding SourceRecordInfo}"
+                                               FontSize="12"
+                                               FontWeight="SemiBold"
+                                               Foreground="#1683D8"
+                                               VerticalAlignment="Center"
+                                               TextWrapping="Wrap" />
+
+                                    <!-- Navigation chevron -->
+                                    <TextBlock Grid.Column="1"
+                                               Text="›"
+                                               Margin="10,-2,0,0"
+                                               FontSize="18"
+                                               FontWeight="SemiBold"
+                                               Foreground="#1683D8"
+                                               VerticalAlignment="Center" />
+                                </Grid>
+                            </Border>
+
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="ButtonBorder"
+                                            Property="Background"
+                                            Value="#181683D8" />
+                                    <Setter TargetName="ButtonBorder"
+                                            Property="BorderBrush"
+                                            Value="#991683D8" />
+                                </Trigger>
+
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="ButtonBorder"
+                                            Property="Background"
+                                            Value="#251683D8" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+
+                <!-- Field -->
+                <StackPanel Grid.Row="3"
+            Margin="0,12,0,0"
+            Orientation="Horizontal"
+            Opacity="0.8">
+
+                    <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=Field}"
+                               FontSize="12"
+                               Margin="0,0,8,0"
+                               VerticalAlignment="Center" />
+
+                    <TextBlock Text="{Binding SourceFieldInfo}"
+                               FontSize="12"
+                               FontWeight="Bold"
+                               VerticalAlignment="Center" />
+
+                </StackPanel>
+
+                <!-- Detail -->
+                <TextBlock Grid.Row="4"
+                           Text="{Binding Detail}"
+                           Margin="0,8,0,0"
+                           FontSize="11"
+                           Opacity="0.75"
+                           TextWrapping="Wrap" />
+
+            </Grid>
+        </Border>
+
+        <vis:MoveThumb Style="{StaticResource PostingTraceMoveThumbStyle}" />
+
+        <vis:ResizeThumb Style="{StaticResource PostingTraceResizeThumbStyle}" />
+
+    </Grid>
+</UserControl>

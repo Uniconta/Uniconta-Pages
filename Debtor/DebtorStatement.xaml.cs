@@ -804,6 +804,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (VisibleItems.Count == 1)
             {
                 var cwSendMail = new CWSendInvoice();
+                cwSendMail.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                 cwSendMail.DialogTableId = 2000000030;
                 cwSendMail.Closed += delegate
                 {
@@ -818,6 +819,7 @@ namespace UnicontaClient.Pages.CustomPage
             else
             {
                 CWSendStatementEmail cw = new CWSendStatementEmail();
+                cw.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                 var visibleDebtTranLst = VisibleItems.Cast<DebtorStatementList>();
                 var visibleCount = VisibleItems.Count;
                 cw.DialogTableId = 2000000031;

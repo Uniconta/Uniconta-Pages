@@ -128,6 +128,7 @@ x:Class="UnicontaClient.Pages.CustomPage.ProjInvProposal"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PostingText" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Consumer" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ExemptDuty" Visible="False" />
                 </localPage:ProjInvPropProposalGrid.Columns>
                 <localPage:ProjInvPropProposalGrid.TotalSummary>
                     <localPage:SumColumn FieldName="OrderTotal" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>

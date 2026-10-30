@@ -5,6 +5,8 @@ using Uniconta.Common;
 using Uniconta.DataModel;
 using System;
 using Uniconta.ClientTools.Controls;
+using DevExpress.Xpf.Editors.Helpers;
+using DevExpress.Xpf.Core;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -23,13 +25,18 @@ namespace UnicontaClient.Pages.CustomPage
             : base(sourceData, true)
         {
             InitializeComponent();
-            cmbDebtorVoucherSerie.api = leOneTimeDebtor.api = lePaymentForCollection.api = api;
+            cmbDebtorVoucherSerie.api = leOneTimeDebtor.api = lePaymentForCollection.api = leInvPackagingItem.api = api;
             layoutControl = layoutItems;
 
             layoutItems.DataContext = editrow;
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
         }
-
+        protected override void OnLayoutLoaded()
+        {
+            if (api.CompanyEntity.InvPackaging == false)
+                grpInventory.Visibility = System.Windows.Visibility.Collapsed;
+            base.OnLayoutLoaded();
+        }
         public static CompanyClient getCompany(Company company)
         {
             CompanyClient companyClient = new CompanyClient();

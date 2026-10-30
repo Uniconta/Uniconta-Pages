@@ -259,6 +259,10 @@ namespace UnicontaClient.Pages.CustomPage
                             Uniconta.ClientTools.Localization.lookup("OBJNotValidFormat"),
                             Uniconta.ClientTools.Localization.lookup("CompanyRegNo"));
                     }
+                    else if (debtor._VIESStatus == VIESStatus.ErrorValidationService)
+                    {
+                        message = string.Concat("VIES"," ", Uniconta.ClientTools.Localization.lookup("ServiceTechnicalIssues").ToLower());
+                    }
 
                     if (message != null)
                     {

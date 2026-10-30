@@ -678,6 +678,7 @@ namespace UnicontaClient.Pages.CustomPage
                 await savetask;
 
             CWImportPayment cwwin = new CWImportPayment(api);
+            cwwin.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             cwwin.Closed += async delegate
             {
                 if (cwwin.DialogResult != true)
@@ -881,6 +882,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (doMergePaym)
             {
                 CWMergePayment cwwin = new CWMergePayment(this.api);
+                cwwin.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
 
                 cwwin.Closing += async delegate
                 {
@@ -968,6 +970,7 @@ namespace UnicontaClient.Pages.CustomPage
                 await savetask;
             
             CWValidatePayment cwwin = new CWValidatePayment(api);
+            cwwin.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
 #if MAC
             cwwin.Closed += delegate
 #else

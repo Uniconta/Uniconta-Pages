@@ -75,6 +75,9 @@ namespace UnicontaClient.Pages.CustomPage
             RemoveMenu();
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
             txtStartupTime.Text = App.StartupTime.ToString("g");
+#if MAC
+            liUseNewOutlook.Visibility = Visibility.Collapsed;
+#endif
         }
 
         private void CheckTwoFactorLogin(bool twoFactorLoginUsed)
@@ -111,17 +114,16 @@ namespace UnicontaClient.Pages.CustomPage
             return buildDate.ToString();
 #endif
         }
-
+        public static string GetVersionText()
+        {
+            var version = Assembly.GetEntryAssembly().GetName().Version;
+            return $"{version.Major}.{version.Minor / 100}.{version.Minor % 10}";
+        }
         private void ShowXapBuildDate()
         {
             string buildText = AssemblyBuildDate(this.GetType());
             txtXapBuildDate.Text = buildText;
-#if MAC
-            var version = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
-            txtClientVersion.Text = version.Substring(0, version.LastIndexOf('.'));
-#else
-            txtClientVersion.Text = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
-#endif
+            txtClientVersion.Text = GetVersionText();
             txtAPIVersion.Text = APIVersion.CurrentVersion.ToString();
         }
         private async void savePassword()
@@ -207,12 +209,15 @@ namespace UnicontaClient.Pages.CustomPage
                 case "RemoveTwoFactorLogin":
                     RemoveTwoFactorLogin();
                     break;
+                case "UserAssociate":
+                    AddDockItem(TabControls.UserAssociateGridPage, api.session.User, Uniconta.ClientTools.Localization.lookup("UserAssociate"));
+                    break;
                 default:
                     frmRibbon_BaseActions(ActionType);
                     break;
             }
         }
-        
+
         async void RemoveTwoFactorLogin()
         {
             var userApi = new TwoFactorLogin(api.session);
@@ -232,14 +237,14 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 var cw = new CwSetEmailPassword(employee.FirstOrDefault() as Uniconta.DataModel.Employee);
                 cw.Closing += async delegate
-                 {
-                     if (cw.DialogResult == true)
-                     {
-                         var empApi = new EmployeeAPI(api);
-                         var result = await empApi.SetPasswordOnEmployee(cw.Password);
-                         UtilDisplay.ShowErrorCode(result);
-                     }
-                 };
+                {
+                    if (cw.DialogResult == true)
+                    {
+                        var empApi = new EmployeeAPI(api);
+                        var result = await empApi.SetPasswordOnEmployee(cw.Password);
+                        UtilDisplay.ShowErrorCode(result);
+                    }
+                };
                 cw.Show();
             }
             else
@@ -318,10 +323,9 @@ namespace UnicontaClient.Pages.CustomPage
         }
         private void Email_ButtonClicked(object sender)
         {
-            var mail = string.Concat("mailto:", txtEmail.Text);
-            System.Diagnostics.Process proc = new System.Diagnostics.Process();
-            proc.StartInfo.FileName = mail;
-            proc.Start();
+            if (string.IsNullOrWhiteSpace(txtEmail.Text))
+                return;
+            OfficeComponentUtil.SendEmailToOutlook(txtEmail.Text);
         }
     }
 }

@@ -252,6 +252,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                     {
                         CWOrderFromOrder cwOrderFromOrder = new CWOrderFromOrder(api);
+                        cwOrderFromOrder.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                         cwOrderFromOrder.DialogTableId = 2000000020;
                         cwOrderFromOrder.Closed += async delegate
                         {
@@ -336,10 +337,11 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     break;
                 case "ShowInvoice":
+                case "ShowEInvoice":
                     if (selectedItem != null)
                     {
                         if (Utility.HasControlRights("GenerateInvoice", api.CompanyEntity))
-                            ShowProformaInvoice(selectedItem);
+                            ShowProformaInvoice(selectedItem, ActionType == "ShowEInvoice");
                         else
                             UtilDisplay.ShowControlAccessMsg("GenerateInvoice");
                     }
@@ -349,10 +351,11 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
             }
         }
-        async private void ShowProformaInvoice(DebtorOrderClient order)
+        async private void ShowProformaInvoice(DebtorOrderClient order, bool showEInvoice)
         {
             var invoicePostingResult = SetupInvoicePostingPrintGenerator(order, DateTime.Now, true, true, false, false, 0, false, false, false, null, false);
             invoicePostingResult.SetAllowCreditMax(api.CompanyEntity.AllowSkipCreditMax);
+            invoicePostingResult.ShowEInvoice = showEInvoice;
 
             busyIndicator.IsBusy = true;
             busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");
@@ -376,6 +379,7 @@ namespace UnicontaClient.Pages.CustomPage
         void PostProjectOrder(DebtorOrderClient order)
         {
             var dialog = new CwPostProjectOrder();
+            dialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             dialog.DialogTableId = 2000000087;
             dialog.Closed += async delegate
             {
@@ -572,6 +576,7 @@ namespace UnicontaClient.Pages.CustomPage
             var accountName = Util.ConcatParenthesis(dbOrder._DCAccount, dbOrder.Name);
             CWGenerateInvoice GenrateOfferDialog = new CWGenerateInvoice(false, doctype.ToString(), isShowInvoiceVisible: true, askForEmail: true, showNoEmailMsg: !showSendByMail, debtorName: debtorName,
                 isShowUpdateInv: showUpdateInv, isDebtorOrder: true, AccountName: accountName);
+            GenrateOfferDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
 
             if (doctype == CompanyLayoutType.OrderConfirmation)
                 GenrateOfferDialog.DialogTableId = 2000000009;
@@ -627,6 +632,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             var cwPickingList = new CWGeneratePickingList(accountName, true, true, debtorName, showSendByMail);
+            cwPickingList.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             cwPickingList.DialogTableId = 2000000049;
             cwPickingList.Closed += async delegate
              {
@@ -781,11 +787,12 @@ namespace UnicontaClient.Pages.CustomPage
                 api.LoadCache(typeof(Debtor), true);
 
             string debtorName = debtor?._Name ?? dbOrder._DCAccount;
-            bool invoiceInXML = debtor != null && debtor.IsPeppolSupported && debtor._einvoice;
+            bool invoiceInXML = debtor != null && debtor._einvoice;
 
             var accountName = Util.ConcatParenthesis(dbOrder._DCAccount, dbOrder.Name);
             CWGenerateInvoice GenrateInvoiceDialog = new CWGenerateInvoice(true, string.Empty, false, true, true, showNoEmailMsg: !showSendByMail, debtorName: debtorName, isOrderOrQuickInv: true, isDebtorOrder: true,
                 InvoiceInXML: invoiceInXML, AccountName: accountName);
+            GenrateInvoiceDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             GenrateInvoiceDialog.DialogTableId = 2000000010;
 
             var additionalOrdersList = Utility.GetAdditionalOrders(api, dbOrder);
@@ -804,8 +811,7 @@ namespace UnicontaClient.Pages.CustomPage
                     GenrateInvoiceDialog.SetAdditionalOrders(additionalOrdersList);
             }
 
-            if (!api.CompanyEntity._DeactivateSendNemhandel)
-                GenrateInvoiceDialog.SentByEInvoice(api, UtilCommon.GetEndPoint(dbOrder, debtor, api));
+            GenrateInvoiceDialog.SentByEInvoice(api, UtilCommon.GetEndPoint(dbOrder, debtor, api), debtor: debtor, isOneTimeDebtor: dbOrder._OneTimeDC != null);
 
             GenrateInvoiceDialog.ShowAllowCredMax(debtor?._CreditMax != 0);
             GenrateInvoiceDialog.Closed += async delegate

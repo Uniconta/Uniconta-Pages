@@ -13,6 +13,9 @@
     <RibbonItem Action="GroupPosting" LocalizedNameKey="ItemPosting" Parameter=" " ControlName="DebtorGroupPostingPage" LargeGlyph="Debtor_Group_Posting_32x32" />
   </RibbonItem>
   <RibbonItem>
+    <RibbonItem Action="GroupCurrency" LocalizedNameKey="SummaryAccountPerCurrency" Parameter=" " ControlName="DCGroupCurrencySummeryPage" LargeGlyph="PriceTag_32x32" />
+  </RibbonItem>
+  <RibbonItem>
     <!---If we want to create a new group in same PageTab-->
      <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32">
       <!---If we want Inner menu-->

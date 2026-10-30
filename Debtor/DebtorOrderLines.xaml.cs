@@ -1,24 +1,32 @@
-using Uniconta.API.DebtorCreditor;
-using UnicontaClient.Models;
-using Uniconta.ClientTools;
-using Uniconta.ClientTools.Controls;
-using Uniconta.ClientTools.DataModel;
-using Uniconta.ClientTools.Page;
-using Uniconta.Common;
-using Uniconta.DataModel;
+using DevExpress.Xpf.Grid;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
-using Uniconta.ClientTools.Util;
-using UnicontaClient.Utilities;
-using DevExpress.Xpf.Grid;
-using Uniconta.Common.Utility;
+using Uniconta.API.DebtorCreditor;
 using Uniconta.API.System;
+using Uniconta.ClientTools;
+using Uniconta.ClientTools.AI;
+using Uniconta.ClientTools.AI.Files;
+using Uniconta.ClientTools.AI.Prompts;
+using Uniconta.ClientTools.AI.Services.OpenAI;
+using Uniconta.ClientTools.Controls;
+using Uniconta.ClientTools.Controls.AI.Assistant.Capabilities;
+using Uniconta.ClientTools.Controls.AI.Assistant.DataProviders;
+using Uniconta.ClientTools.DataModel;
+using Uniconta.ClientTools.Page;
+using Uniconta.ClientTools.Util;
+using Uniconta.Common;
+using Uniconta.Common.Utility;
+using Uniconta.DataModel;
+using UnicontaClient.Models;
+using UnicontaClient.Utilities;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -125,6 +133,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         public override bool ClearSelectedItemOnSave { get { return false; } }
+        public override bool ClearSelectedItemOnInsert { get { return false; } }
         public bool allowSave = true;
         public override bool AllowSave { get { return allowSave; } }
     }
@@ -136,6 +145,42 @@ namespace UnicontaClient.Pages.CustomPage
         Uniconta.API.DebtorCreditor.FindPrices PriceLookup;
         Company company;
         double exchangeRate;
+
+        public override FrameworkElement AIAdornedElement => busyIndicator;
+
+        public override List<IAIAssistantCapability> GetAIAssistantCapabilities(bool hasFileAttached)
+        {
+            var capabilities = base.GetAIAssistantCapabilities(hasFileAttached);
+
+            if (Order != null && !dgDebtorOrderLineGrid.Readonly)
+                capabilities.Add(new AddSalesOrderLineAICapability(Order, ResolveInventoryItem, AddSalesOrderLine));
+
+            return capabilities;
+        }
+
+
+        InvItemClient ResolveInventoryItem(string item)=> string.IsNullOrWhiteSpace(item) ? null : items?.Get(item) as InvItemClient;
+
+        AIAssistantCapabilityResult AddSalesOrderLine(InvItemClient item, double quantity, string warehouse)
+        {
+            if (Order == null || dgDebtorOrderLineGrid.Readonly)
+                return AIAssistantCapabilityResult.Fail("The current sales order no longer accepts new lines.");
+            if (!string.IsNullOrWhiteSpace(warehouse) && this.warehouse?.Get(warehouse) == null)
+                return AIAssistantCapabilityResult.Fail("Warehouse '" + warehouse + "' was not found.");
+
+            addingRow = true;
+            var row = dgDebtorOrderLineGrid.AddRow() as DebtorOrderLineClient;
+            if (row == null)
+                return AIAssistantCapabilityResult.Fail("A new sales order line could not be created.");
+
+            row._ExchangeRate = exchangeRate;
+            row.Item = item.Item;
+            row.Qty = quantity;
+            if (!string.IsNullOrWhiteSpace(warehouse))
+                row.Warehouse = warehouse;
+            DataChaged = true;
+            return AIAssistantCapabilityResult.Success(quantity + " × " + item.Item + " was added to sales order " + Order._OrderNumber + ".");
+        }
 
         public override void PageClosing()
         {
@@ -153,7 +198,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             Init(syncEntity.Row);
         }
-        protected override bool FocusOnSecondGrid => false;
+        protected override bool FocusOnLastGrid => false;
         public void Init(UnicontaBaseEntity master)
         {
             InitializeComponent();
@@ -898,6 +943,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                     {
                         CwUsePriceFromBOM cw = new CwUsePriceFromBOM();
+                        cw.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                         cw.DialogTableId = 2000000045;
                         cw.Closing += delegate
                         {
@@ -990,6 +1036,7 @@ namespace UnicontaClient.Pages.CustomPage
                         else
                             transReason = selectedItem._TransReason;
                         var returnDialog = new CWReturnReason(transReason, api);
+                        returnDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                         returnDialog.Closing += delegate
                         {
                             if (returnDialog.DialogResult == true)
@@ -1015,6 +1062,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
             RecalculateAmount();
         }
+        
         private void RecalculateOrderPrices()
         {
             var orderLst = dgDebtorOrderLineGrid.GetVisibleRows();
@@ -1045,6 +1093,7 @@ namespace UnicontaClient.Pages.CustomPage
             api.Read(item);
 
             var dialogOrderSize = new CWOrderSize();
+            dialogOrderSize.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             dialogOrderSize.Closing += delegate
             {
                 if (dialogOrderSize.DialogResult == true)
@@ -1073,10 +1122,11 @@ namespace UnicontaClient.Pages.CustomPage
                 showSendByMail = (!string.IsNullOrEmpty(debtor.InvoiceEmail) || debtor.EmailDocuments);
             string debtorName = debtor?._Name ?? dbOrder._DCAccount;
             bool showUpdateInv = api.CompanyEntity.Storage || (doctype == CompanyLayoutType.Packnote && api.CompanyEntity.Packnote);
-            bool invoiceInXML = debtor != null && debtor.IsPeppolSupported && debtor._einvoice;
+            bool invoiceInXML = debtor != null && debtor._einvoice;
             var accountName = Util.ConcatParenthesis(dbOrder._DCAccount, dbOrder.Name);
             CWGenerateInvoice GenrateOfferDialog = new CWGenerateInvoice(false, doctype.ToString(), isShowInvoiceVisible: true, askForEmail: true, showNoEmailMsg: !showSendByMail, debtorName: debtorName,
                 isShowUpdateInv: showUpdateInv, isDebtorOrder: true, InvoiceInXML: invoiceInXML, AccountName: accountName);
+            GenrateOfferDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             if (doctype == CompanyLayoutType.OrderConfirmation)
                 GenrateOfferDialog.DialogTableId = 2000000007;
             else if (doctype == CompanyLayoutType.Packnote)
@@ -1138,6 +1188,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             var cwPickingList = new CWGeneratePickingList(accountName, true, true, debtorName, showSendByMail);
+            cwPickingList.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             cwPickingList.DialogTableId = 2000000048;
             cwPickingList.Closed += async delegate
             {
@@ -1275,11 +1326,12 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             string debtorName = debtor?._Name ?? dbOrder._DCAccount;
-            bool invoiceInXML = debtor != null && debtor.IsPeppolSupported && debtor._einvoice;
+            bool invoiceInXML = debtor != null && debtor._einvoice;
             bool isOrderOrQuickInv = api.CompanyEntity._CountryId == CountryCode.Germany ? false : true;
 
             var accountName = Util.ConcatParenthesis(dbOrder._DCAccount, dbOrder.Name);
             CWGenerateInvoice GenrateInvoiceDialog = new CWGenerateInvoice(true, string.Empty, false, true, true, showNoEmailMsg: !showSendByMail, debtorName: debtorName, isOrderOrQuickInv: isOrderOrQuickInv, isDebtorOrder: true, InvoiceInXML: invoiceInXML, AccountName: accountName);
+            GenrateInvoiceDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             GenrateInvoiceDialog.DialogTableId = 2000000008;
             if (dbOrder._InvoiceDate != DateTime.MinValue)
                 GenrateInvoiceDialog.SetInvoiceDate(dbOrder._InvoiceDate);
@@ -1287,8 +1339,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (additionalOrdersList != null)
                 GenrateInvoiceDialog.SetAdditionalOrders(additionalOrdersList);
 
-            if (!api.CompanyEntity._DeactivateSendNemhandel)
-                GenrateInvoiceDialog.SentByEInvoice(api, UtilCommon.GetEndPoint(dbOrder, debtor, api));
+            GenrateInvoiceDialog.SentByEInvoice(api, UtilCommon.GetEndPoint(dbOrder, debtor, api), debtor: debtor, isOneTimeDebtor: dbOrder._OneTimeDC != null);
 
             GenrateInvoiceDialog.ShowAllowCredMax(debtor?._CreditMax != 0);
 
@@ -1707,6 +1758,73 @@ namespace UnicontaClient.Pages.CustomPage
                     row.SetCostFromItem(item);
             }
             return false;
+        }
+    }
+
+    public sealed class AddSalesOrderLineAICapability : PromptCapabilityBase<AddSalesOrderLineAICapability.AddSalesOrderLineRequest>
+    {
+        readonly DebtorOrderClient order;
+        readonly Func<string, InvItemClient> resolveItem;
+        readonly Func<InvItemClient, double, string, AIAssistantCapabilityResult> addLine;
+
+        public AddSalesOrderLineAICapability(DebtorOrderClient order, Func<string, InvItemClient> resolveItem,
+            Func<InvItemClient, double, string, AIAssistantCapabilityResult> addLine)
+            : base(nameof(AddSalesOrderLineAICapability), "Add sales order line",
+                  "Adds one inventory item and quantity as a new line to the currently active sales order after explicit user confirmation. Use only when the user asks to add an item to this sales order. Do not use for product information, recommendations, historical purchases, stock availability, posting, or invoicing.",
+                  90, "Add 10 pieces of item 1001 to this order", "Add two of those", "Put 3 more on this sales order")
+        {
+            this.order = order ?? throw new ArgumentNullException(nameof(order));
+            this.resolveItem = resolveItem ?? throw new ArgumentNullException(nameof(resolveItem));
+            this.addLine = addLine ?? throw new ArgumentNullException(nameof(addLine));
+        }
+
+        protected override PromptDefinition GetPromptDefinition() => PromptProvider.From(() => AddSalesOrderLinePrompt);
+
+        [PromptDefinition("Capability.AddSalesOrderLineAICapability", "Prompt used to extract exactly one requested sales-order line.")]
+        public static PromptDefinition AddSalesOrderLinePrompt => NewPromptDefinition(
+            "Extract the single inventory item, positive quantity, and optional warehouse explicitly requested for the current sales order. " +
+            "Use conversational context to resolve references such as 'those', but do not invent an item or quantity. " +
+            "Return only JSON compatible with {\"item\":\"item number\",\"quantity\":number,\"warehouse\":null}.",
+            "Create the proposed sales-order-line parameters from the latest user request.");
+
+        protected override Task<AIAssistantCapabilityResult> ExecuteResponse(IAIAssistantCapabilityContext context, AddSalesOrderLineRequest response)
+        {
+            if (response == null || string.IsNullOrWhiteSpace(response.Item))
+                return Task.FromResult(AIAssistantCapabilityResult.Fail("An inventory item is required."));
+            if (double.IsNaN(response.Quantity) || double.IsInfinity(response.Quantity) || response.Quantity <= 0d)
+                return Task.FromResult(AIAssistantCapabilityResult.Fail("Quantity must be a positive number."));
+
+            var item = resolveItem(response.Item);
+            if (item == null)
+                return Task.FromResult(AIAssistantCapabilityResult.Fail("Inventory item '" + response.Item + "' was not found."));
+
+            var orderNumber = order._OrderNumber.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            var warehouseText = string.IsNullOrWhiteSpace(response.Warehouse) ? string.Empty : " from warehouse " + response.Warehouse;
+            return Task.FromResult(new AIAssistantCapabilityResult
+            {
+                Succeeded = true,
+                Message = "Add " + response.Quantity + " × Item " + item.Item + " – " + item.Name + warehouseText + " to sales order " + orderNumber + "?",
+                Actions = new[]
+                {
+                    new AIAssistantCapabilityResult.CapabilityAction
+                    {
+                        Caption = Uniconta.ClientTools.Localization.lookup("Yes"),
+                        ExecuteAsync = () => Task.FromResult(addLine(item, response.Quantity, response.Warehouse))
+                    },
+                    new AIAssistantCapabilityResult.CapabilityAction
+                    {
+                        Caption = Uniconta.ClientTools.Localization.lookup("No"),
+                        ExecuteAsync = () => Task.FromResult(AIAssistantCapabilityResult.Success("No sales order line was added."))
+                    }
+                }
+            });
+        }
+
+        public sealed class AddSalesOrderLineRequest
+        {
+            public string Item { get; set; }
+            public double Quantity { get; set; }
+            public string Warehouse { get; set; }
         }
     }
 }

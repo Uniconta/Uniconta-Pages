@@ -123,6 +123,7 @@ namespace UnicontaClient.Pages.CustomPage
         void CallJoinTwoWareHouseOrLocation(InvWarehouse fromWareHouse=null, InvWarehouse copyToWareHouse=null, InvLocation fromLocation=null, InvLocation copyToLocation=null)
         {
             DeletePostedJournal delDialog = new DeletePostedJournal(true);
+            delDialog.Args = Args; // pass original args
             delDialog.Closed += delegate
             {
                 if (delDialog.DialogResult == true)

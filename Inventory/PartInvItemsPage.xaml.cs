@@ -410,6 +410,7 @@ namespace UnicontaClient.Pages.CustomPage
             p3 = Math.Round(p3 / stdQty, 2);
 
             var dailog = new CWCalculateSalesPrice(p0, p1, p2, p3, Invitem);
+            dailog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             dailog.Closed += delegate
             {
                 if (dailog.DialogResult == true)

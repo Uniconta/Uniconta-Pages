@@ -28,7 +28,7 @@ namespace UnicontaClient.Pages.CustomPage
     {
         ProjectJournalLineClient editrow;
         SQLCache ProjectCache, JournalCache, payrollCache;
-        CompanySettingsClient companySettings;
+        CompanySettings companySettings;
         bool IsTime;
         public override void OnClosePage(object[] RefreshParams)
         {
@@ -52,17 +52,12 @@ namespace UnicontaClient.Pages.CustomPage
             InitPage(crudApi);
         }
 
-        public override bool BeforeSetUserField(ref CorasauLayoutGroup parentGroup)
-        {
-            return false; 
-        }
-
         CrudAPI crudApi;
         void InitPage(CrudAPI _crudapi)
         {
             InitializeComponent();
             crudApi = _crudapi;
-            companySettings = new CompanySettingsClient();
+            companySettings = crudApi.CompanyEntity.Settings;
             StartLoadCache();
             layoutControl = layoutItems;
             leTask.api= leProject.api = lePayrollCategory.api = lePrCategory.api = leWorkSpace.api = leItem.api = crudApi;
@@ -78,7 +73,6 @@ namespace UnicontaClient.Pages.CustomPage
             JournalCache = crudApi.GetCache(typeof(Uniconta.DataModel.PrJournal)) ?? await crudApi.LoadCache(typeof(Uniconta.DataModel.PrJournal)).ConfigureAwait(false);
             payrollCache = crudApi.GetCache(typeof(Uniconta.DataModel.EmpPayrollCategory)) ?? await crudApi.LoadCache(typeof(Uniconta.DataModel.EmpPayrollCategory)).ConfigureAwait(false);
             lePayrollCategory.cacheFilter = new EmpPayrollFilter(payrollCache, IsTime);
-            await api.Read(companySettings).ConfigureAwait(false);
         }
 
         private void frmRibbon_OnItemClicked(string ActionType)

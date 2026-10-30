@@ -273,6 +273,9 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrdersPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="UpdatingItems" x:Name="liUpdatingItems">
                         <CorasauControls:CheckEditor  IsChecked="{Binding UpdatingItems,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="ExemptDuty" x:Name="liExemptDuty">
+                        <CorasauControls:CheckEditor  IsChecked="{Binding ExemptDuty,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpProject"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Project}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="450" >
                     <CorasauControls:CorasauLayoutItem x:Name="projectItem" FieldName="Project">

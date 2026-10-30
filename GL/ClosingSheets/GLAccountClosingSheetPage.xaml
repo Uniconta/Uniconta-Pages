@@ -95,6 +95,8 @@ x:Class="UnicontaClient.Pages.CustomPage.GLAccountClosingSheetPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Change" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="NewBalance" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="LastPeriod" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Diff" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DiffPct" Width="50" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CalculationExpression" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PageBreak" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Percentage" Visible="False"/>

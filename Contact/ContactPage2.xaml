@@ -39,8 +39,17 @@ x:Class="UnicontaClient.Pages.CustomPage.ContactPage2"
                         <CorasauControls:CorasauLayoutItem FieldName="DCAccount" x:Name="itemDCAccount" Visibility="Collapsed">
                             <CorasauControls:LookupEditor x:Name="lookupDCAccount" GotFocus="lookupDCAccount_GotFocus" Text="{Binding DCAccount,Mode=TwoWay}" HasCustomLookUp="True"  ItemsSource="{Binding AccountSource,Mode=OneWay}" />
                         </CorasauControls:CorasauLayoutItem>
-                        <CorasauControls:CorasauLayoutItem FieldName="EAN" x:Name="liEAN">
-                            <CorasauControls:TextEditor Text="{Binding EAN,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                        <CorasauControls:CorasauLayoutItem FieldName="EAN" x:Name="liEAN" Style="{StaticResource LayoutItemsstyle}" ButtonClicked="liEAN_ButtonClicked" Padding="0">
+                            <CorasauControls:CorasauLayoutItem.ButtonContent>
+                                <TextBlock x:Name="tbEanStatus" Text="&#x1f310;"/>
+                            </CorasauControls:CorasauLayoutItem.ButtonContent>
+                            <CorasauControls:TextEditor x:Name="txtEAN" Text="{Binding EAN,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="EndpointId" x:Name="liEndpointId" Style="{StaticResource LayoutItemsstyle}" ButtonClicked="liEndpointId_ButtonClicked" Padding="0">
+                            <CorasauControls:CorasauLayoutItem.ButtonContent>
+                                <TextBlock x:Name="tbEndpointIdStatus" Text="&#x1f310;"/>
+                            </CorasauControls:CorasauLayoutItem.ButtonContent>
+                            <CorasauControls:TextEditor x:Name="txtEndpointId" Text="{Binding EndpointId,Mode=TwoWay}" MaskType="RegEx" Mask="{StaticResource EndPointIdValidationRegx}"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="ReferenceId" x:Name="liReferenceId">
                             <CorasauControls:TextEditor Text="{Binding ReferenceId,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>

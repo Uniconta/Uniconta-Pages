@@ -600,6 +600,7 @@ namespace UnicontaClient.Pages.CustomPage
                     voucher._Amount = Order.InvoiceAmount;
                     voucher._CreditorAccount = Order._DCAccount;
                     CWAddVouchers addVouvhersDialog = new CWAddVouchers(api, voucher: voucher);
+                    addVouvhersDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                     addVouvhersDialog.Closed += delegate
                     {
                         if (addVouvhersDialog.DialogResult == true)
@@ -720,6 +721,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             CWGenerateInvoice GenrateInvoiceDialog = new CWGenerateInvoice(true, string.Empty, true, true, showNoEmailMsg: !hasEmail);
+            GenrateInvoiceDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
 #if !SILVERLIGHT
             GenrateInvoiceDialog.DialogTableId = 2000000004;
 #endif

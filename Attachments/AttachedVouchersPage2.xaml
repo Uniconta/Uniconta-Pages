@@ -30,6 +30,9 @@ x:Class="UnicontaClient.Pages.CustomPage.AttachedVouchersPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="PostingInstruction" x:Name="liPostingInstruction">
                         <CorasauControls:TextEditor x:Name="txtPostingInstruction" Text="{Binding PostingInstruction,Mode=TwoWay}"  />
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="SWIFT" x:Name="liSwift">
+                        <CorasauControls:TextEditor x:Name="txtSwift" Text="{Binding SWIFT,Mode=TwoWay}"  />
+                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="ViewInFolder" x:Name="liViewInFolder">
                         <CorasauControls:ComboBoxEditor x:Name="cmbViewInFolder" SelectedItem="{Binding ViewInFolder ,Mode=TwoWay}" />
                     </CorasauControls:CorasauLayoutItem>

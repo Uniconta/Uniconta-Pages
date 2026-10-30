@@ -1,6 +1,5 @@
 using DevExpress.Xpf.Grid;
 using DevExpress.Xpf.Grid.Filtering;
-using dk.gov.oiosi.logging;
 using System;
 using System.Collections;
 using System.Collections.Generic;

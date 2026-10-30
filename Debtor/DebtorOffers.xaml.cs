@@ -252,6 +252,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                     {
                         CWOrderFromOrder cwOrderFromOrder = new CWOrderFromOrder(api);
+                        cwOrderFromOrder.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                         cwOrderFromOrder.DialogTableId = 2000000026;
                         cwOrderFromOrder.Closed += async delegate
                         {
@@ -377,28 +378,32 @@ namespace UnicontaClient.Pages.CustomPage
         private void PrintOffer(DebtorOfferClient dbOrder)
         {
             InvoiceAPI Invapi = new InvoiceAPI(api);
-            var debtor = dbOrder.Debtor;
             bool showSendByMail = true;
             string debtorName;
-            if (debtor != null)
+            bool allowCredMax = false;
+
+            if (!string.IsNullOrWhiteSpace(dbOrder._DCAccount))
             {
+                var debtor = dbOrder.Debtor;
                 debtorName = debtor._Name ?? dbOrder._DCAccount;
+                allowCredMax = debtor._CreditMax != 0;
                 showSendByMail = (!string.IsNullOrEmpty(debtor.InvoiceEmail) || debtor.EmailDocuments);
             }
-            else if (dbOrder._Prospect == 0)
+            else if (dbOrder._Prospect != 0)
+            {
+                var prospect = dbOrder.CrmProspect;
+                debtorName = prospect._Name ?? Uniconta.ClientTools.Localization.lookup("Prospect");
+            }
+            else
             {
                 UtilDisplay.ShowErrorCode(ErrorCodes.AccountIsMissing);
                 return;
             }
-            else
-            {
-                debtorName = Uniconta.ClientTools.Localization.lookup("Prospect");
-                showSendByMail = true;
-            }
 
             CWGenerateInvoice GenrateOfferDialog = new CWGenerateInvoice(false, CompanyLayoutType.Offer.ToString(), askForEmail: true, showNoEmailMsg: !showSendByMail, debtorName: debtorName, isDebtorOrder: true);
+            GenrateOfferDialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             GenrateOfferDialog.DialogTableId = 2000000006;
-            GenrateOfferDialog.ShowAllowCredMax(debtor._CreditMax != 0);
+            GenrateOfferDialog.ShowAllowCredMax(allowCredMax);
 
             GenrateOfferDialog.Closed += async delegate
             {
@@ -428,6 +433,7 @@ namespace UnicontaClient.Pages.CustomPage
         void ConvertOfferToOrder(DebtorOfferClient offerclient)
         {
             CwOffertoOrder cwOfferToOrder = new CwOffertoOrder();
+            cwOfferToOrder.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             cwOfferToOrder.DialogTableId = 2000000044;
             cwOfferToOrder.Closed += async delegate
             {

@@ -113,6 +113,7 @@ namespace UnicontaClient.Pages.CustomPage
         void BuildCalender()
         {
             CwBuildCalendar cw = new CwBuildCalendar();
+            cw.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             cw.Closing += delegate
             {
                 if (cw.DialogResult == true)

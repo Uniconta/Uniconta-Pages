@@ -1,0 +1,59 @@
+<Pages:FormBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+         xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.AppDLLPage2"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+        xmlns:ClientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+        xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <UnicontaControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Pages/Apps/Plugin/AppDLLPage2Ribbon.xml" Grid.Row="0"/>
+        <UnicontaControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Vertical" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+            <UnicontaControls:CorasauLayoutGroup View="GroupBox" x:Name="grpDescription" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Description}" Orientation="Vertical" UnicontaControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+
+                <UnicontaControls:CorasauLayoutItem FieldName="Name" x:Name="liName">
+                    <UnicontaControls:TextEditor Text="{Binding Name,Mode=TwoWay}" x:Name="txtName"/>
+                </UnicontaControls:CorasauLayoutItem>
+                <UnicontaControls:CorasauLayoutItem FieldName="Updated" x:Name="liUpdated">
+                    <UnicontaControls:DateEditor  x:Name="dateUpdated" Text="{Binding Updated,Mode=OneWay}" />
+                </UnicontaControls:CorasauLayoutItem>
+
+                <UnicontaControls:CorasauLayoutItem FieldName="DllType" x:Name="liDllType" Visibility="Collapsed">
+                    <UnicontaControls:TextEditor Text="{Binding DllType,Mode=TwoWay}"/>
+                </UnicontaControls:CorasauLayoutItem>
+
+                <UnicontaControls:CorasauLayoutItem FieldName="Disable" x:Name="liDisable">
+                    <UnicontaControls:CheckEditor IsChecked="{Binding Disable, Mode=TwoWay}"  />
+                </UnicontaControls:CorasauLayoutItem>
+
+                <UnicontaControls:CorasauLayoutItem FieldName="Comment">
+                    <UnicontaControls:TextEditor Text="{Binding Comment,Mode=TwoWay}" MaxLength="200"/>
+                </UnicontaControls:CorasauLayoutItem>
+            </UnicontaControls:CorasauLayoutGroup>
+
+            <UnicontaControls:CorasauLayoutGroup View="GroupBox" x:Name="grpDllA" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DLL-1}" Orientation="Vertical" UnicontaControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                <UnicontaControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ValidFromVersion}" x:Name="liVersionDLL1">
+                    <UnicontaControls:IntegerEditor EditValue="{Binding VersionDLL1,Mode=TwoWay}" x:Name="txtVersionDLL1"/>
+                </UnicontaControls:CorasauLayoutItem>
+                <UnicontaControls:CorasauLayoutItem FieldName="DllData" x:Name="liDllA" >
+                    <UnicontaControls:FileBrowseControl x:Name="fileBrowser1"  FileSelected="fileBrowser1_FileSelected"  />
+                </UnicontaControls:CorasauLayoutItem>
+            </UnicontaControls:CorasauLayoutGroup>
+
+            <UnicontaControls:CorasauLayoutGroup View="GroupBox" x:Name="grpDllB" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=DLL-2}" Orientation="Vertical" UnicontaControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                <UnicontaControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ValidFromVersion}" x:Name="liVersionDLL2">
+                    <UnicontaControls:IntegerEditor EditValue="{Binding VersionDLL2,Mode=TwoWay}" x:Name="txtVersionDLL2"/>
+                </UnicontaControls:CorasauLayoutItem>
+                <UnicontaControls:CorasauLayoutItem FieldName="DllData" x:Name="liDllB">
+                    <UnicontaControls:FileBrowseControl x:Name="fileBrowser2" FileSelected="fileBrowser2_FileSelected" />
+                </UnicontaControls:CorasauLayoutItem>
+            </UnicontaControls:CorasauLayoutGroup>
+        </UnicontaControls:CorasauLayoutControl>
+    </Grid>
+</Pages:FormBasePage>

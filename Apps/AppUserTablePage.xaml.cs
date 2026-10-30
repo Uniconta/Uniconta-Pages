@@ -1,0 +1,177 @@
+using UnicontaClient.Models;
+using UnicontaClient.Utilities;
+using Uniconta.ClientTools;
+using Uniconta.ClientTools.DataModel;
+using Uniconta.ClientTools.Page;
+using Uniconta.Common;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using System.Windows.Controls;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
+using System.Windows.Shapes;
+using Uniconta.DataModel;
+using UnicontaClient.Controls.Dialogs;
+using Uniconta.ClientTools.Util;
+using Uniconta.API.Service;
+using Uniconta.API.System;
+
+using UnicontaClient.Pages;
+namespace UnicontaClient.Pages.CustomPage
+{
+    public class AppUserTableGrid : CorasauDataGridClient
+    {
+        public override Type TableType { get { return typeof(AppTableHeaderClient); } }
+
+        //protected override void DataLoaded(UnicontaBaseEntity[] Arr)
+        //{
+        //    var lst = api.CompanyEntity.UserTables;
+        //    if (lst != null && lst.Count < Arr.Length)
+        //    {
+        //        for (int i = 0; i < Arr.Length; i++)
+        //        {
+        //            var tableHeader = (AppTableHeaderClient)Arr[i];
+        //            if (!lst.Any(x => x.RowId == tableHeader.RowId))
+        //                lst.Add(tableHeader);
+        //        }
+        //    }
+        //}
+    }
+
+    public partial class AppUserTablePage : GridBasePage
+    {
+        public AppUserTablePage(BaseAPI API)
+            : base(API, string.Empty)
+        {
+            InitializeComponent();
+            InitPage(null);
+        }
+
+        public AppUserTablePage(UnicontaBaseEntity master)
+           : base(master)
+        {
+            InitializeComponent();
+            InitPage(master);
+        }
+
+        void InitPage(UnicontaBaseEntity master)
+        {
+            if (master == null)
+                master = App.MainPageObj.ActiveApp;
+            SetRibbonControl(localMenu, dgUserTable);
+            dgUserTable.api = api;
+            dgUserTable.BusyIndicator = busyIndicator;
+            dgUserTable.UpdateMaster(master);
+            localMenu.OnItemClicked += localMenu_OnItemClicked;
+        }
+        public override void PageClosing()
+        {
+            base.PageClosing();
+        }
+
+        public override void Utility_Refresh(string screenName, object argument = null)
+        {
+            if (screenName == TabControls.AppUserTablePage2)
+            {
+                object[] argumentParams = (object[])argument;
+                var Row = argumentParams[1] as AppTableHeaderClient;
+                if (Row == null)
+                    return;
+                dgUserTable.UpdateItemSource(argument);
+            }
+        }
+
+        private void localMenu_OnItemClicked(string ActionType)
+        {
+            var selectedItem = dgUserTable.SelectedItem as AppTableHeaderClient;
+            switch (ActionType)
+            {
+                case "AddRow":
+                    AddDockItem(TabControls.AppUserTablePage2, new object[] { api, null }, Uniconta.ClientTools.Localization.lookup("UserTables"), "Add_16x16");
+                    break;
+                case "EditRow":
+                    //if (selectedItem != null && selectedItem._SharedFromCompanyId == 0)
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.AppUserTablePage2, selectedItem, string.Format("{0}:{1}", Localization.lookup("UserTables"), selectedItem.Name));
+                    break;
+                case "Fields":
+                    //if (selectedItem != null && selectedItem._SharedFromCompanyId == 0)
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.AppUserFieldsPage, selectedItem, string.Format("{0}:{1}", Localization.lookup("UserFields"), selectedItem.Name));
+                    break;
+                //case "Data":
+                //    if (selectedItem == null)
+                //        return;
+                //    var tablePrompt = !string.IsNullOrEmpty(selectedItem._Prompt) ? UserFieldControl.LocalizePrompt(selectedItem._Prompt) : selectedItem._Name;
+                //    AddDockItem(TabControls.UserTableData, selectedItem, string.Format("{0}:{1}", Localization.lookup("Data"), tablePrompt));
+                //    break;
+                //case "CalculatedFields":
+                //    if (selectedItem == null)
+                //        return;
+                //    var tablePromp = !string.IsNullOrEmpty(selectedItem._Prompt) ? UserFieldControl.LocalizePrompt(selectedItem._Prompt) : selectedItem._Name;
+                //    if (selectedItem.UserType != null)
+                //    {
+                //        var rec = (TableData)Activator.CreateInstance(selectedItem.UserType);
+                //        rec.SetMaster(api.CompanyEntity);
+                //        AddDockItem(TabControls.TablePropertyPage, rec, string.Format("{0}:{1}", Localization.lookup("CalculatedFields"), tablePromp));
+                //    }
+                //    break;
+                //case "CopyUserTable":
+                //    CWCopyUserFields winUserFields = new CWCopyUserFields(api);
+                //    winUserFields.Closed += async delegate
+                //    {
+                //        if (winUserFields.DialogResult == true)
+                //        {
+                //            await session.OpenCompany(api.CompanyEntity.CompanyId, false);
+                //            InitQuery();
+                //        }
+                //    };
+                //    winUserFields.Show();
+                //    break;
+                //case "BaseClass":
+                //    if (selectedItem != null)
+                //        GenerateClass(selectedItem, true, api);
+                //    break;
+                //case "ClientClass":
+                //    if (selectedItem != null)
+                //        GenerateClass(selectedItem, false, api);
+                //    break;
+                //case "SharedToCompany":
+                //    //if (selectedItem != null && selectedItem._SharedFromCompanyId == 0)
+                //        if (selectedItem != null)
+                //        AddDockItem(TabControls.TableHeaderSharePage, selectedItem, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("SharedToCompany"), selectedItem._Name));
+                //    break;
+                default:
+                    gridRibbon_BaseActions(ActionType);
+                    break;
+            }
+        }
+
+        //async public static void GenerateClass(UnicontaBaseEntity selectedItem, bool isBaseClass, CrudAPI api, string className = null)
+        //{
+        //    var cwGenerateClassType = new CWGenerateClassType();
+        //    cwGenerateClassType.Closing += async delegate
+        //    {
+        //        if (cwGenerateClassType.DialogResult == true)
+        //        {
+        //            ClassGenerator.generateByName = cwGenerateClassType.GenerateByName;
+        //            var properties = await api.Query<TableField>(selectedItem);
+        //            string classCode;
+        //            if (className != null)
+        //                classCode = ClassGenerator.Create(className, properties, isBaseClass);
+        //            else
+        //                classCode = ClassGenerator.Create(selectedItem as TableHeader, properties, api, isBaseClass);
+        //            var cwGenerateClass = new CWGenerateClass(classCode);
+        //            cwGenerateClass.Show();
+        //        }
+        //    };
+        //    cwGenerateClassType.Show();
+        //}
+    }
+}

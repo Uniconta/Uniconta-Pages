@@ -1,0 +1,155 @@
+<Pages:ControlBasePage xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.TilePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+    xmlns:controls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+    xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+    mc:Ignorable="d"
+    d:DesignHeight="450"
+    d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <DataTemplate x:Key="DeleteIconTemplate">
+            <Image Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=delete_32x32}" Width="18" Height="18" Stretch="Uniform" VerticalAlignment="Center"/>
+        </DataTemplate>
+
+        <DataTemplate x:Key="EditIconTemplate">
+            <Image Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Edit_16x16.svg}" Width="18" Height="18" Stretch="Uniform" VerticalAlignment="Center"/>
+        </DataTemplate>
+
+        <Style x:Key="DashboardTabButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Opacity" Value="0.7"/>
+            <Setter Property="Margin" Value="0,0,18,0"/>
+            <Setter Property="Padding" Value="2,0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="Transparent" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Opacity" Value="1"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="ContentControl">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ContentControl">
+                        <Border Background="{StaticResource LightBackgroundComponentBackground}" BorderBrush="{StaticResource LightBackgroundComponentBorder}" BorderThickness="1" CornerRadius="7" Padding="5">
+                            <ContentPresenter/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+
+
+    </UserControl.Resources>
+
+    <ScrollViewer x:Name="tileViewport" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Padding="30,0,17,0" ScrollChanged="TileViewport_ScrollChanged" Background="{StaticResource LightBackground}">
+        <ScrollViewer.Resources>
+            <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource ThinScrollBarStyle}"/>
+        </ScrollViewer.Resources>
+        <Grid Background="{StaticResource LightBackground}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="50"/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" Margin="0,20,0,18">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center">
+                    <TextBlock x:Name="txtGreeting" FontWeight="SemiBold" FontSize="25" Foreground="{StaticResource ForegroundBrush}"/>
+                    <TextBlock x:Name="txtLastUpdated" Margin="0,5,0,0" FontSize="10" Opacity="0.55" Foreground="{StaticResource ForegroundBrush}"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <Button Style="{DynamicResource UnicontaButtonWithGlyph}" x:Name="btnCopyToApp" Click="btnCopyToApp_Click" Visibility="Collapsed" controls:ButtonAppearance.Glyph="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=CopytoApp_32x32}" controls:ButtonAppearance.Variant="Secondary" Margin="10,0,0,0"/>
+                    <Button Style="{DynamicResource UnicontaButtonWithGlyph}" x:Name="btnRefresh" Click="btnRefresh_Click" controls:ButtonAppearance.Glyph="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Refresh_16x16.svg}" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Refresh}" controls:ButtonAppearance.Variant="Primary" Margin="10,0,0,0"/>
+                    <Button Style="{DynamicResource UnicontaButtonWithGlyph}" x:Name="btnEdit" Click="btnEdit_Click" controls:ButtonAppearance.Glyph="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Edit_16x16.svg}" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileEditLayout}" controls:ButtonAppearance.Variant="Primary" Margin="10,0,0,0"/>
+                    <Button Style="{DynamicResource UnicontaButtonWithGlyph}" x:Name="btnAdd" Click="btnAdd_Click" controls:ButtonAppearance.Glyph="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Add_16x16.svg}" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileAddNewTile}" controls:ButtonAppearance.Variant="Secondary" Margin="10,0,0,0"/>
+                </StackPanel>
+            </Grid>
+
+            <StackPanel x:Name="dashboardTabs" Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,8"/>
+
+            <Grid x:Name="tileSurface" Grid.Row="2" ClipToBounds="False" MinHeight="320" Margin="0,15,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <WrapPanel x:Name="tileGroupLabels" Grid.Row="0"/>
+                <local:TileGridPanel x:Name="tilesPanel" Grid.Row="1" Background="Transparent" HorizontalAlignment="Stretch"/>
+
+                <Border x:Name="emptyDashboard" Grid.Row="1" Visibility="Collapsed" Background="{StaticResource LightBackgroundComponentBackground}" BorderBrush="{StaticResource LightBackgroundComponentBorder}" BorderThickness="1" CornerRadius="7" Padding="30">
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="480">
+                        <Image Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Tiles_Dashboard_Top}" Width="32" Height="32" Stretch="Uniform"/>
+                        <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileCreateYourDashboard}" FontSize="24" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,18,0,10" Foreground="{StaticResource ForegroundBrush}"/>
+                        <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileDashboardIntroduction}" TextWrapping="Wrap" TextAlignment="Center" Opacity="0.7" Foreground="{StaticResource ForegroundBrush}"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,22,0,0">
+                            <Button x:Name="btnAddEmptyDashboard" Style="{DynamicResource UnicontaButtonWithGlyph}" Click="btnAdd_Click" Margin="0" controls:ButtonAppearance.Glyph="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Add_16x16.svg}" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileCreateManually}" controls:ButtonAppearance.Variant="Primary"/>
+                            <Button Style="{DynamicResource UnicontaButtonWithGlyph}" x:Name="btnCreateWithAI" Click="btnCreateWithAI_Click" Margin="10,0,0,0" controls:ButtonAppearance.Glyph="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=AIButton.svg}" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileCreateWithUnicontaAI}" controls:ButtonAppearance.Variant="Secondary"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Canvas x:Name="resizeOverlay" Grid.Row="1" IsHitTestVisible="False" Panel.ZIndex="100" ClipToBounds="False">
+                    <Border x:Name="resizeGhost" Visibility="Collapsed" CornerRadius="7" BorderThickness="2" BorderBrush="{StaticResource LightBackgroundComponentBorder}" Background="{StaticResource LightBackgroundComponentBackground}" Opacity="0.72">
+                        <TextBlock x:Name="resizeGhostText" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource ForegroundBrush}"/>
+                    </Border>
+                </Canvas>
+            </Grid>
+
+            <Grid Grid.Row="3" Margin="0,24,0,20">
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Visibility" Value="Visible"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Visibility, ElementName=btnAdd}" Value="Collapsed">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Visibility, ElementName=emptyDashboard}" Value="Visible">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <Border Padding="30,26" Background="{StaticResource LightBackgroundComponentBackground}" CornerRadius="12">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileAddNewTile}" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource ForegroundBrush}" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileAddNewHelp}" FontSize="14" Opacity="0.6" Foreground="{StaticResource ForegroundBrush}" HorizontalAlignment="Center" Margin="0,6,0,16"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Button x:Name="btnAddDashboard" Style="{DynamicResource UnicontaButtonWithGlyph}" Click="btnAdd_Click" Margin="0" controls:ButtonAppearance.Glyph="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Add_16x16.svg}" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileCreateManually}" controls:ButtonAppearance.Variant="Primary"/>
+                            <Button Style="{DynamicResource UnicontaButtonWithGlyph}" x:Name="btnCreateWithAIBottom" Click="btnCreateWithAI_Click" Margin="10,0,0,0" controls:ButtonAppearance.Glyph="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=AIButton.svg}" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileCreateWithUnicontaAI}" controls:ButtonAppearance.Variant="Secondary"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+                <Rectangle Stroke="{StaticResource LightBackgroundComponentBorder}" StrokeThickness="1" StrokeDashArray="5,4" RadiusX="12" RadiusY="12" IsHitTestVisible="False"/>
+            </Grid>
+        </Grid>
+    </ScrollViewer>
+</Pages:ControlBasePage>

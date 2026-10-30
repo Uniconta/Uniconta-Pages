@@ -13,6 +13,7 @@
     <RibbonItem Action="RefreshGrid" ShortcutKey="Ctrl+R" LocalizedNameKey="Refresh" LargeGlyph="refresh"/>
   </RibbonItem>
    <RibbonItem>
+    <RibbonItem Action="PackagingOverview" LocalizedNameKey="Overview" LargeGlyph="Detailed_View_32x32"/>
     <RibbonItem Action="CopyFromItem" LocalizedNameKey="CopyFromOBJ" Parameter="Item" LargeGlyph="Copy_32x32"/>
     <RibbonItem Action="CopyFromBOM" LocalizedNameKey="CopyFromOBJ" Parameter="BOM" LargeGlyph="CopyUserTable_32x32"/>
   </RibbonItem>

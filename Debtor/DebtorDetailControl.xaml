@@ -64,11 +64,23 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorDetailControl"
                     <CorasauControls:CorasauLayoutItem FieldName="Blocked" x:Name="liBlocked">
                         <CorasauControls:CheckEditor x:Name="Blocked" IsChecked="{Binding Blocked}" IsReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="IndustryCode" x:Name="liIndustryCode">
+                        <CorasauControls:LookupEditor x:Name="leIndustryCode" Text="{Binding IndustryCode}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="CompanyState" x:Name="liCompanyState">
+                        <CorasauControls:ComboBoxEditor SelectedItem="{Binding CompanyState}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="WIdNo">
+                        <CorasauControls:TextEditor Text="{Binding WIdNo}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
 
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpGroup" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Group}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left"  Width="400">
                     <CorasauControls:CorasauLayoutItem FieldName="Group" x:Name="liGroup">
                         <CorasauControls:TextEditor  x:Name="grouplookupeditor" Text="{Binding Group}" IsReadOnly="True" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="PaymentFormat" x:Name="liPaymentFormat">
+                        <CorasauControls:LookupEditor x:Name="lePaymtFormat" Text="{Binding PaymentFormat}" IsReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="Payment" x:Name="liPayment">
                         <CorasauControls:TextEditor x:Name="Paymentlookupeditior" Text="{Binding Payment}" IsReadOnly="True" />
@@ -146,6 +158,9 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorDetailControl"
                     <CorasauControls:CorasauLayoutItem FieldName="InvoiceEmail" x:Name="liInvoiceEmail" Style="{StaticResource LayoutItemsstyle}" ButtonClicked="Email_ButtonClicked" ButtonContent="&#x2709;" Padding="0">
                         <CorasauControls:TextEditor Text="{Binding InvoiceEmail}" IsReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="EmailDocuments" x:Name="liEmailDocuments">
+                        <CorasauControls:CheckEditor IsChecked="{Binding EmailDocuments}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="InvoiceInXML" x:Name="liInvoiceInXML">
                         <CorasauControls:TextEditor Text="{Binding InvoiceInXML}" IsReadOnly="True" />
                     </CorasauControls:CorasauLayoutItem>
@@ -157,6 +172,9 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorDetailControl"
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="EORI" x:Name="liEORI">
                         <CorasauControls:TextEditor  x:Name="txtEORI" Text="{Binding EORI}" IsReadOnly="True" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="BalanceMethod" x:Name="liBalanceMethod">
+                        <CorasauControls:ComboBoxEditor SelectedItem="{Binding BalanceMethod}" IsReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="PostingAccount" x:Name="liPostingAccount">
                         <CorasauControls:TextEditor x:Name="lePostingAccount" Text="{Binding PostingAccount}" IsReadOnly="True"/>
@@ -196,8 +214,21 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorDetailControl"
                     <CorasauControls:CorasauLayoutItem FieldName="LastInvoice" x:Name="liLastInvoice">
                         <CorasauControls:DateEditor EditValue="{Binding LastInvoice}" IsReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>
+
+                    <CorasauControls:CorasauLayoutItem FieldName="PaymentFee" x:Name="liPaymentFee">
+                        <CorasauControls:DoubleEditor FieldName="PaymentFee" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
 
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="vatNumberValidationService" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=VatNumberValidationService}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
+                    <CorasauControls:CorasauLayoutItem FieldName="VIESStatus" x:Name="liVIESStatus">
+                        <CorasauControls:TextEditor x:Name="leVIESStatus" IsReadOnly="True" Text="{Binding VIESStatus,Mode=OneWay}" />
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="VIESDate" x:Name="liVIESDate">
+                        <CorasauControls:TextEditor x:Name="dteVIESDate" IsReadOnly="True" Mask="d" MaskType="DateTimeAdvancingCaret" MaskUseAsDisplayFormat="True" Text="{Binding VIESDate,Mode=OneWay}" />
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
+                
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="dAddress" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
                     <CorasauControls:CorasauLayoutItem FieldName="DeliveryName" x:Name="liDeliveryName">
                         <CorasauControls:TextEditor Text="{Binding DeliveryName}" IsReadOnly="True"/>
@@ -220,7 +251,31 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorDetailControl"
                     <CorasauControls:CorasauLayoutItem FieldName="DeliveryCountry" x:Name="liDeliveryCountry">
                         <CorasauControls:TextEditor x:Name="cbDeliveryCountry" Text="{Binding DeliveryCountry}" IsReadOnly="True"/>
                     </CorasauControls:CorasauLayoutItem>
+                    
+                    <CorasauControls:CorasauLayoutItem FieldName="DeliveryId" x:Name="liDeliveryId">
+                        <CorasauControls:TextEditor  Text="{Binding DeliveryId}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DeliveryContactPerson" x:Name="liDeliveryContactPerson">
+                        <CorasauControls:TextEditor  Text="{Binding DeliveryContactPerson}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DeliveryPhone" x:Name="liDeliveryPhone">
+                        <CorasauControls:TextEditor  Text="{Binding DeliveryPhone}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DeliveryContactEmail" x:Name="liDeliveryContactEmail">
+                        <CorasauControls:TextEditor x:Name="txtEmail" Text="{Binding DeliveryContactEmail}" MaskType="RegEx" Mask="{StaticResource EmailValidationRegx}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                </CorasauControls:CorasauLayoutGroup>
 
+                <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="EPRGroup" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ProducerResponsibility}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" Width="400">
+                    <CorasauControls:CorasauLayoutItem FieldName="PackagingConsumer" x:Name="liPackagingConsumer">
+                        <CorasauControls:ComboBoxEditor x:Name="cmbPackagingConsumer" SelectedItem="{Binding PackagingConsumer}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="MicroEnterprise" x:Name="liMicroEnterprise">
+                        <CorasauControls:CheckEditor x:Name="MicroEnterprise" IsChecked="{Binding MicroEnterprise}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="NoPackagingReporting" x:Name="liNoPackagingReporting">
+                        <CorasauControls:CheckEditor x:Name="NoPackagingReporting" IsChecked="{Binding NoPackagingReporting}" IsReadOnly="True"/>
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
 
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="usedim" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Dimension}" Orientation="Vertical" Width="400" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">

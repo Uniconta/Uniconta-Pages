@@ -53,6 +53,7 @@ namespace UnicontaClient.Pages.CustomPage
         List<VatSumOperationReport> sumPeriod, sumPrevPeriod;
         List<VatReportLine> lstPeriod, lstPrevPeriod;
         bool Simulated;
+        int VatCountry;
 
         static DateTime localFromDate, localToDate;
         public VatReport(BaseAPI API) : base(API, string.Empty)
@@ -80,6 +81,7 @@ namespace UnicontaClient.Pages.CustomPage
                 this.master = master;
                 localFromDate = master._FromDate;
                 localToDate = master._ToDate;
+                this.VatCountry = (int)master._Country;
                 if (master._MaxJournalPostedId > 0)
                 {
                     txtDateFrm.IsReadOnly = true;
@@ -87,13 +89,24 @@ namespace UnicontaClient.Pages.CustomPage
                     cmbJournal.IsReadOnly = true;
                     if (master._Data != null)
                     {
+                        SQLCache vattypes = null;
+                        var country = master._Country != 0 ? master._Country : api.CompanyEntity._CountryId;
+                        if (country != api.CompanyEntity._CountryId)
+                        {
+                            var q = api.QuerySync<Uniconta.DataModel.GLVatType>(null, new[] { PropValuePair.GenereteWhereElements("Country", NumberConvert.ToString((int)country), CompareOperator.Equal) });
+                            if (q != null && q.Length > 0)
+                                vattypes = new SQLCache(q, true);
+                        }
+                        if (vattypes == null)
+                            vattypes = api.GetCache(typeof(Uniconta.DataModel.GLVatType));
+
                         var cs = StreamingManagerReuse.Create(master._Data);
                         cs.CompanyId = api.CompanyId;
                         cs.UnpackParm = new VatReportLine.UnpackParm
                         {
                             Accounts = api.GetCache(typeof(GLAccount)),
                             Vats = api.GetCache(typeof(GLVat)),
-                            VatTypes = api.GetCache(typeof(GLVatType))
+                            VatTypes = vattypes
                         };
                         this.lstPeriod = ((VatReportLine[])cs.ToArray(typeof(VatReportLine)))?.ToList();
                         this.sumPeriod = ((VatSumOperationReport[])cs.ToArray(typeof(VatSumOperationReport)))?.ToList();
@@ -116,7 +129,9 @@ namespace UnicontaClient.Pages.CustomPage
             }
             txtDateTo.DateTime = localToDate;
             vatCountry.ItemsSource = Enum.GetValues(typeof(CountryCode));
-            vatCountry.SelectedIndex = api.CompanyEntity._Country;
+            if (this.VatCountry == 0)
+                this.VatCountry = (int)api.CompanyEntity._Country;
+            vatCountry.SelectedIndex = this.VatCountry;
             LoadJournals();
             SetMenuItem();
         }
@@ -216,7 +231,12 @@ namespace UnicontaClient.Pages.CustomPage
                         if (lst == null)
                             return;
                         var array = UnicontaClient.Pages.GL.Reports.VatSpain.calc(lst.ToArray());
+
+                    #if !MAC
                         AddDockItem(TabControls.VatReportSpain, new object[] { api, array }, "Modelo 303", null, closeIfOpened: true);
+                    #else
+                        SpainVatReportForMac(array);
+                    #endif
                         break;
                     }
                 case "VatReportNorway":
@@ -307,7 +327,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                                 if (rdbLastPeriod.IsChecked == true)
                                 {
-                                    var rec = new GLVatReported() { _ToDate = toDate };
+                                    var rec = new GLVatReported() { _ToDate = toDate, _Country = (CountryCode)this.VatCountry };
                                     Task.Run(() => api.Read(rec)).GetAwaiter().GetResult();
                                     if (rec._MaxJournalPostedId != 0)
                                     {
@@ -376,11 +396,12 @@ namespace UnicontaClient.Pages.CustomPage
                 master._FromDate = txtDateFrm.DateTime;
                 master._ToDate = txtDateTo.DateTime;
                 master._Comment = cwTypeConfirmationBox.Comments;
+                master._Country = (CountryCode)this.VatCountry;
                 save();
             }
         }
 
-        void NewVatReport()
+        async void NewVatReport()
         {
             var vatArray1 = new double[40];
             var vatArray2 = new double[40];
@@ -399,8 +420,29 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else
                 rec = new GLVatReported() { _FromDate = txtDateFrm.DateTime, _ToDate = txtDateTo.DateTime };
+
+        #if !MAC
             AddDockItem(TabControls.VATSettlementReport, new object[] { rec, vatArray1, vatArray2, OtherTaxName }, Uniconta.ClientTools.Localization.lookup("VATSettlementReport"), null, closeIfOpened: true);
+        #else
+
+            busyIndicator.IsBusy = true;
+            byte[] pdfBytes = await VatReportDenmarkPdf.OpenAsync(rec, vatArray1, vatArray2, OtherTaxName, api.CompanyEntity._Name, api.CompanyEntity._Id, Language.GetSpecificCulture());
+            busyIndicator.IsBusy = false;
+            var control = UtilDisplay.LoadControl(pdfBytes, FileextensionsTypes.PDF, false, false, null);
+            AddDockItem(TabControls.ShowControlPage, new object[] { control }, Uniconta.ClientTools.Localization.lookup("VATSettlementReport"));
+        #endif
         }
+
+#if MAC
+        async void SpainVatReportForMac(double[] array)
+        {
+            busyIndicator.IsBusy = true;
+            byte[] pdfBytes = await VatReportSpainPdf.OpenAsync(array);
+            busyIndicator.IsBusy = false;
+            var control = UtilDisplay.LoadControl(pdfBytes, FileextensionsTypes.PDF, false, false, null);
+            AddDockItem(TabControls.ShowControlPage, new object[] { control }, "Modelo 303");
+        }
+#endif
 
         async void save()
         {
@@ -418,12 +460,7 @@ namespace UnicontaClient.Pages.CustomPage
             var ret = await api.Insert(master);
             busyIndicator.IsBusy = false;
             if (ret == 0)
-            {
-                var args = new object[2];
-                args[0] = 1;
-                args[1] = master;
-                globalEvents.OnRefresh(NameOfControl, args);
-            }
+                globalEvents.OnRefresh(NameOfControl, new object[2] { 1, master });
             UtilDisplay.ShowErrorCode(ret);
         }
 
@@ -453,8 +490,10 @@ namespace UnicontaClient.Pages.CustomPage
             if (!api.CompanyEntity.HasDecimals)
                 CalculatedVAT.HasDecimals = PostedVAT.HasDecimals = WithoutVAT.HasDecimals = Accumulated.HasDecimals = false;
 
+            if (vatCountry.SelectedIndex > 0)
+                this.VatCountry = vatCountry.SelectedIndex;
             var calc = new VatCalc() { PrevPeriod = PrevPeriod };
-            var res = await calc.LoadVatReport(master, FromDate, ToDate, (CountryCode)Math.Max(0, vatCountry.SelectedIndex), api, Journal);
+            var res = await calc.LoadVatReport(master, FromDate, ToDate, (CountryCode)VatCountry, api, Journal);
             busyIndicator.IsBusy = false;
             if (res != 0)
             {
@@ -522,7 +561,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             public async Task<ErrorCodes> LoadVatReport(GLVatReported VatReported, DateTime FromDate, DateTime ToDate, CountryCode vatCountry, CrudAPI qapi, string Journal)
             {
-                var country = qapi.CompanyEntity._CountryId;
+                var CompCountry = qapi.CompanyEntity._CountryId;
                 var rapi = new ReportAPI(qapi);
 
                 Task<FinancialBalance[]> vatTask;
@@ -533,7 +572,16 @@ namespace UnicontaClient.Pages.CustomPage
 
                 SQLCache accounts = qapi.GetCache(typeof(Uniconta.DataModel.GLAccount)) ?? await qapi.LoadCache(typeof(Uniconta.DataModel.GLAccount));
                 SQLCache vats = qapi.GetCache(typeof(Uniconta.DataModel.GLVat)) ?? await qapi.LoadCache(typeof(Uniconta.DataModel.GLVat));
-                SQLCache vattypes = qapi.GetCache(typeof(Uniconta.DataModel.GLVatType)) ?? await qapi.LoadCache(typeof(Uniconta.DataModel.GLVatType));
+                SQLCache vattypes = null;
+
+                if (vatCountry != CompCountry)
+                {
+                    var q = await qapi.Query<Uniconta.DataModel.GLVatType>(new [] { PropValuePair.GenereteWhereElements("Country", NumberConvert.ToString((int)vatCountry), CompareOperator.Equal) });
+                    if (q != null && q.Length > 0)
+                        vattypes = new SQLCache(q, true);
+                }
+                if (vattypes == null)
+                    vattypes = qapi.GetCache(typeof(Uniconta.DataModel.GLVatType)) ?? await qapi.LoadCache(typeof(Uniconta.DataModel.GLVatType));
 
                 FinancialBalance[] sumVat = await vatTask;
                 if (sumVat == null || accounts == null || vats == null || vattypes == null)
@@ -575,18 +623,23 @@ namespace UnicontaClient.Pages.CustomPage
                     if (Vat == null)
                         continue;
 
-                    var acStr = Account._Account;
-                    v = new VatReportLine();
-                    v.AmountWithVat = sum.Debit;
-                    v._PostedVAT = sum.Credit;
-                    v._BaseVAT = sum.AmountBase;
+                    if (vatCountry != (Vat._VatCountry != 0 ? Vat._VatCountry : CompCountry))
+                        continue;
 
-                    v.AccountNumber = acStr;
-                    v.Account = Account;
-                    v.AccountIsVat = Account._SystemAccount == (byte)SystemAccountTypes.SalesTaxPayable ||
-                        Account._SystemAccount == (byte)SystemAccountTypes.SalesTaxReceiveable ||
-                        Account._SystemAccount == (byte)SystemAccountTypes.ManuallyReceivableVAT ||
-                        Account._SystemAccount == (byte)SystemAccountTypes.ManuallyPayableVAT ? (byte)1 : (byte)0;
+                    var acStr = Account._Account;
+                    v = new VatReportLine
+                    {
+                        AmountWithVat = sum.Debit,
+                        _PostedVAT = sum.Credit,
+                        _BaseVAT = sum.AmountBase,
+
+                        AccountNumber = acStr,
+                        Account = Account,
+                        AccountIsVat = Account._SystemAccount == (byte)SystemAccountTypes.SalesTaxPayable ||
+                            Account._SystemAccount == (byte)SystemAccountTypes.SalesTaxReceiveable ||
+                            Account._SystemAccount == (byte)SystemAccountTypes.ManuallyReceivableVAT ||
+                            Account._SystemAccount == (byte)SystemAccountTypes.ManuallyPayableVAT ? (byte)1 : (byte)0
+                    };
 
                     if (Vat._Account == acStr || Vat._OffsetAccount == acStr)
                     {
@@ -639,12 +692,13 @@ namespace UnicontaClient.Pages.CustomPage
                     v.FromDate = FromDate;
                     v.CalcRate(RoundTo100);
 
-                    var vattp = (GLVatType)vattypes.Get(v._VatOperation);
+                    GLVatType vattp = (GLVatType)vattypes.Get(v._VatOperation);
                     if (vattp != null)
                     {
                         v.VatOpr = vattp;
                         v.BaseVatText = vattp._Name;
                         v._setBaseText = true;
+                        v._VatOperation = vattp._RowNo;
                     }
                     lst.Add(v);
 
@@ -669,7 +723,7 @@ namespace UnicontaClient.Pages.CustomPage
                             Vat = (GLVat)vats.Get(Account._Vat);
                             if (Vat == null)
                                 continue;
-                            if (vatCountry != 0 && vatCountry != (Vat._VatCountry != 0 ? Vat._VatCountry : country))
+                            if (vatCountry != (Vat._VatCountry != 0 ? Vat._VatCountry : CompCountry))
                             {
                                 if (!useMOSEU)
                                     continue;
@@ -769,20 +823,17 @@ namespace UnicontaClient.Pages.CustomPage
                 }
 
                 var removed = new List<VatReportLine>();
-                if (vatCountry != 0)
+                for (i = lst.Count; (--i >= 0);)
                 {
-                    for (i = lst.Count; (--i >= 0);)
+                    v = lst[i];
+                    Vat = (GLVat)vats.Get(v.VatCode);
+                    if (Vat != null)
                     {
-                        v = lst[i];
-                        Vat = (GLVat)vats.Get(v.VatCode);
-                        if (Vat != null)
+                        if (vatCountry != (Vat._VatCountry != 0 ? Vat._VatCountry : CompCountry))
                         {
-                            if (vatCountry != (Vat._VatCountry != 0 ? Vat._VatCountry : country))
-                            {
-                                v.hidden = true;
-                                removed.Add(v);
-                                lst.RemoveAt(i);
-                            }
+                            v.hidden = true;
+                            removed.Add(v);
+                            lst.RemoveAt(i);
                         }
                     }
                 }
@@ -815,13 +866,15 @@ namespace UnicontaClient.Pages.CustomPage
                         {
                             if ((HasOffsetType0 && vDif.VatType == 0) || (HasOffsetType1 && vDif.VatType == 1))
                             {
-                                vDif = new VatReportLine();
-                                vDif.helptext = "import vat";
-                                vDif.Order = (n > 0) ? n : -1;  // header, total, empty
-                                vDif.VatType = (byte)(k % 2);
-                                vDif.AccountIsVat = 1;
-                                vDif.IsOffsetAccount = 1;
-                                vDif.isvatotal = true;
+                                vDif = new VatReportLine
+                                {
+                                    helptext = "import vat",
+                                    Order = (n > 0) ? n : -1,  // header, total, empty
+                                    VatType = (byte)(k % 2),
+                                    AccountIsVat = 1,
+                                    IsOffsetAccount = 1,
+                                    isvatotal = true
+                                };
                                 lst.Add(vDif);
                             }
                         }
@@ -861,7 +914,7 @@ namespace UnicontaClient.Pages.CustomPage
                         v._PostedVAT = Math.Round(d4, decm);
                         d1 = d2 = d3 = d4 = 0d;
 
-                        if (country == CountryCode.Denmark && AmountWithout != 0 && v.AccountIsVat == 1)
+                        if (vatCountry == CountryCode.Denmark && AmountWithout != 0 && v.AccountIsVat == 1)
                         {
                             if (v.IsOffsetAccount == 0)
                             {
@@ -979,7 +1032,7 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         if (c != null && (int)c._VatType == k)
                         {
-                            if (vatCountry != 0 && vatCountry != (c._VatCountry != 0 ? c._VatCountry : country))
+                            if (vatCountry != (c._VatCountry != 0 ? c._VatCountry : CompCountry))
                             {
                                 if (!useMOSEU)
                                     continue;
@@ -1002,7 +1055,7 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                 }
 
-                if (country == CountryCode.Denmark && !this.PrevPeriod)
+                if (CompCountry == CountryCode.Denmark && vatCountry == CountryCode.Denmark && !this.PrevPeriod)
                 {
                     if (AccLst != null)
                         AccLst.Clear();
@@ -1058,11 +1111,11 @@ namespace UnicontaClient.Pages.CustomPage
                 }
 
                 int sumPeriodSize;
-                if (country == CountryCode.Norway)
+                if (CompCountry == CountryCode.Norway)
                     sumPeriodSize = 19; // we need 19 columns for Norway
-                else if (country == CountryCode.Denmark)
+                else if (CompCountry == CountryCode.Denmark)
                     sumPeriodSize = 20;
-                else if (country == CountryCode.Iceland)
+                else if (CompCountry == CountryCode.Iceland)
                     sumPeriodSize = 23; // we need 23 columns for Holland
                 else
                     sumPeriodSize = 0;

@@ -1,0 +1,141 @@
+<Pages:FormBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools" 
+        xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.AppMenuPage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+        mc:Ignorable="d" xmlns:CientTools="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+        xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
+        xmlns:Utils="clr-namespace:Uniconta.ClientTools.Util;assembly=ClientTools"
+        d:DesignHeight="300" d:DesignWidth="400">
+    <UserControl.Resources>
+        <Style TargetType="TreeViewItem">
+            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+            <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+        </Style>
+        <Utils:VisibilityToBoolConverter x:Key="VisibilityConverter"></Utils:VisibilityToBoolConverter>
+    </UserControl.Resources>
+    <CorasauControls:BusyIndicator x:Name="busyIndicator" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+        <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}" >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Pages/Apps/AppMenuRibbon.xml" Grid.Row="0"/>
+            <CorasauControls:CorasauLayoutControl x:Name="layoutItems" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+                <CorasauControls:CorasauLayoutGroup View="GroupBox"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, 
+                    ConverterParameter=UserRibbonMenu}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left" MinWidth="300">
+                    <Grid>
+                        <Grid.ColumnDefinitions >
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="10" />
+                            <ColumnDefinition Width="200"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="10"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ControlName}" 
+                               Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center" />
+
+                        <CorasauControls:ComboBoxEditor x:Name="cmbControlName" SelectedIndexChanged="cmbControlName_SelectedIndexChanged"  Grid.Column="2"
+                                                    MinHeight="25" Width="200" Grid.Row="0" HorizontalAlignment="Left" />
+
+                        <CorasauControls:UnicontaTreeView  Grid.ColumnSpan="3" Grid.Row="2" 
+                        x:Name="ribbonTreeView" x:FieldModifier="private"
+                        ScrollViewer.VerticalScrollBarVisibility="Auto" 
+                        Width="500" Height="400" 
+                        HorizontalAlignment="Left" Margin="5" 
+                        SelectedItemChanged="ribbonTreeView_SelectedItemChanged"  PreviewMouseDown="ribbonTreeView_PreviewMouseDown">
+                            <CorasauControls:UnicontaTreeView.ItemTemplate>
+                                <HierarchicalDataTemplate DataType="{x:Type local:Node}" ItemsSource="{Binding Child}"  >
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="15"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock x:Name="textBlockHeader" 
+                                           Margin="3,0"
+                                           Grid.Column="0" 
+                                           Text="{Binding Text }"  
+                                           Visibility="{Binding IsVisible}" 
+                                           HorizontalAlignment="Left" MinWidth="100" VerticalAlignment="Center"/>
+                                        <Button x:Name="btnAdd" Visibility="{Binding AddEnable}"  Grid.Column="2"  Click="btnAdd_Click"  Height="25" Width="35" Content="&#x002B;" FontSize="14" Margin="5,0,0,0" FontWeight="Bold" HorizontalContentAlignment="Center" />
+                                        <Button Name="btnDelete" Visibility="{Binding DeleteEnable}"  Grid.Column="3"  Height="25" Width="35" Click="btnDelete_Click"  Margin="5,0,0,0" Content="&#x00D7;" FontSize="14" FontWeight="Bold" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
+                                    </Grid>
+                                </HierarchicalDataTemplate>
+                            </CorasauControls:UnicontaTreeView.ItemTemplate>
+                        </CorasauControls:UnicontaTreeView>
+                    </Grid>
+                </CorasauControls:CorasauLayoutGroup >
+                <CorasauControls:CorasauLayoutGroup x:Name="grpUserRibbon" View="GroupBox" 
+                                                    IsEnabled="{Binding ElementName=ribbonTreeView,
+                                                    Path=SelectedItem.DeleteEnable, Converter={StaticResource VisibilityConverter}}" 
+                                                    Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Category}" 
+                                                    Orientation="Vertical" 
+                                                    CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" 
+                                                    HorizontalAlignment="Left" MinWidth="200" VerticalAlignment="Top" >
+                    <Grid>
+                        <Grid.ColumnDefinitions >
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="20" />
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Prompt}" Grid.Column="0" Grid.Row="0"  VerticalAlignment="Center" />
+                        <CorasauControls:TextEditor x:Name="Text" Text="{Binding ElementName=ribbonTreeView, Path=SelectedItem.Text, Mode=TwoWay , UpdateSourceTrigger=PropertyChanged }"  MinWidth="200" MinHeight="25" Grid.Column="2" Grid.Row="0" Margin="0,0,0,2"/>
+
+                        <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ControlType}" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center"/>
+                        <CorasauControls:ComboBoxEditor x:Name="cmbControlType" SelectedIndexChanged="cmbControlType_SelectedIndexChanged"  Text="{Binding ElementName=ribbonTreeView, Path=SelectedItem.ControlName, Mode=TwoWay , UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" MinHeight="25" Grid.Row="1"  Margin="0,2,0,2" />
+
+                        <TextBlock x:Name="lblControl" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Control}" Grid.Column="0" Grid.Row="2"  VerticalAlignment="Center" />
+                        <CorasauControls:TextEditor x:Name="txtControl"  Text="{Binding ElementName=ribbonTreeView, Path=SelectedItem.Control, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" MinWidth="200" MinHeight="25" Grid.Column="2" Grid.Row="2" Margin="0,2,0,2"/>
+                        <CorasauControls:ComboBoxEditor x:Name="cmbControl" 
+                                                        Text="{Binding ElementName=ribbonTreeView, Path=SelectedItem.Control, Mode=TwoWay}" 
+                                                        MinWidth="200" MinHeight="25" Grid.Column="2" Grid.Row="2" Margin="0,2,0,2"  SelectedIndexChanged="cmbControl_SelectedIndexChanged"/>
+                        <CorasauControls:ComboBoxEditor x:Name="cmbPluginName" 
+                                                        Text="{Binding ElementName=ribbonTreeView, Path=SelectedItem.Control, Mode=TwoWay }" 
+                                                        MinWidth="200" MinHeight="25" Grid.Column="2" Grid.Row="2" Margin="0,2,0,2" SelectedIndexChanged="cmbPluginName_SelectedIndexChanged" />
+                        <CorasauControls:ComboBoxEditor x:Name="cmbTableHeader" 
+                                                        Text="{Binding ElementName=ribbonTreeView, Path=SelectedItem.Control, Mode=TwoWay}" 
+                                                        MinWidth="200" MinHeight="25" Grid.Column="2" Grid.Row="2" Margin="0,2,0,2"  SelectedIndexChanged="cmbTableHeader_SelectedIndexChanged"/>
+
+                        <TextBlock x:Name="lblBusinessRule" Text="Business Rule" Grid.Column="0" Grid.Row="3"  VerticalAlignment="Center" Visibility="Collapsed" />
+                        <CorasauControls:ComboBoxEditor x:Name="cmbBusinessRule"
+                                                        EditValue="{Binding ElementName=ribbonTreeView, Path=SelectedItem.Control, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                        DisplayMember="Display"
+                                                        ValueMember="Value"
+                                                        MinWidth="200" MinHeight="25" Grid.Column="2" Grid.Row="3" Margin="0,2,0,2" Visibility="Collapsed" />
+
+                        <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LineNumber}" Grid.Column="0" Grid.Row="4"  VerticalAlignment="Center" />
+                        <CorasauControls:IntegerEditor x:Name="txtLineNumber" Text="{Binding ElementName=ribbonTreeView, Path=SelectedItem.LineNumber,  Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SetMask="False" MinWidth="200" Grid.Column="2" MinHeight="25" Grid.Row="4"  Margin="0,2,0,2"/>
+
+                        <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Argument}" Grid.Column="0" Grid.Row="5"  VerticalAlignment="Center"/>
+                        <CorasauControls:TextEditor x:Name="txtArgument"  Text="{Binding ElementName=ribbonTreeView, Path=SelectedItem.Argument, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" MinWidth="200"  Grid.Column="2" MinHeight="25" Grid.Row="5"  Margin="0,2,0,2"/>
+
+                        <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ShortCut}" Grid.Column="0" Grid.Row="6"  VerticalAlignment="Center"/>
+                        <CorasauControls:TextEditor x:Name="txtShortcutKey"  Text="{Binding ElementName=ribbonTreeView, Path=SelectedItem.ShortcutKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" MinWidth="200"  Grid.Column="2" MinHeight="25" Grid.Row="6"  Margin="0,2,0,2"/>
+                        
+                        <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Disable}" Grid.Column="0" Grid.Row="7"  VerticalAlignment="Center"/>
+                        <CorasauControls:CheckEditor Checked="disable_Checked" Unchecked="disable_Checked" x:Name="disable"  IsChecked="{Binding ElementName=ribbonTreeView, Path=SelectedItem.Disable, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="7"  />
+                    </Grid>
+                </CorasauControls:CorasauLayoutGroup>
+            </CorasauControls:CorasauLayoutControl>
+        </Grid>
+    </CorasauControls:BusyIndicator>
+</Pages:FormBasePage>

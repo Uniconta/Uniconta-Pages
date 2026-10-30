@@ -27,6 +27,7 @@
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="CopyUserTable" LocalizedNameKey="CopyUserTable" LargeGlyph="CopyUserTable_32x32"/>
+    <RibbonItem Action="CopyToApp" LocalizedNameKey="CopyToOBJ" Parameter="App" LargeGlyph="CopytoApp_32x32"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem LocalizedNameKey="GenerateClass" LargeGlyph="Generate_32x32" ShortcutKey="Ctrl+G">

@@ -21,6 +21,9 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorLayoutGroupPage2"
                         <CorasauControls:CorasauLayoutItem FieldName="IsDefault" x:Name="liIsdefault">
                             <CorasauControls:CheckEditor x:Name="chkIsDefault" IsChecked="{Binding IsDefault}" />
                         </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="CompanyAddress" x:Name="liCompanyAddress">
+                            <CorasauControls:LookupEditor x:Name="leCompanyAddress" Text="{Binding CompanyAddress,Mode=TwoWay}"/>
+                        </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
 
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpCompanyDocuments" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CompanyDocuments}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">

@@ -693,6 +693,7 @@ namespace UnicontaClient.Pages.CustomPage
             saveGridLocal();
 
             var dialog = new CwPostProjectOrder();
+            dialog.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             dialog.DialogTableId = 2000000087;
             dialog.Closed += async delegate
             {

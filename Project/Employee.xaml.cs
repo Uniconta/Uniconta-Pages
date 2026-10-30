@@ -298,10 +298,9 @@ namespace UnicontaClient.Pages.CustomPage
             var employeeClient = (sender as TextBlock).Tag as EmployeeClient;
             if (employeeClient != null)
             {
-                var mail = string.Concat("mailto:", employeeClient._Email);
-                System.Diagnostics.Process proc = new System.Diagnostics.Process();
-                proc.StartInfo.FileName = mail;
-                proc.Start();
+                if (string.IsNullOrWhiteSpace(employeeClient._Email))
+                    return;
+                OfficeComponentUtil.SendEmailToOutlook(employeeClient._Email);
             }
         }
 

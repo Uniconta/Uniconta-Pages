@@ -244,8 +244,11 @@ namespace UnicontaClient.Pages.CustomPage
             else if (property.PropertyType == typeof(double))
                 return CreateTemplateforDouble(property.PropertyType);
             else if (property.PropertyType == typeof(int))
+            {
+                if (!string.IsNullOrEmpty(property.EnumName))
+                    return CreateTemplateForAppEnumTypeIndexValue(property.EnumName);
                 return CreateTemplateforInteger(property.PropertyType);
-
+            }
             return base.SelectTemplate(item, container);
         }
 
@@ -285,6 +288,23 @@ namespace UnicontaClient.Pages.CustomPage
             var comboBoxEdit = new FrameworkElementFactory(typeof(ComboBoxEdit));
             comboBoxEdit.Name = "PART_Editor";
             comboBoxEdit.SetValue(ComboBoxEdit.ItemsSourceProperty, appEnumValues.Values);
+            AppEnumTypeTemplate.VisualTree = comboBoxEdit;
+            return AppEnumTypeTemplate;
+        }
+
+        private DataTemplate CreateTemplateForAppEnumTypeIndexValue(string appEnumName)
+        {
+            AppEnumTypeTemplate = new DataTemplate();
+            var appEnum = typeof(AppEnums).GetField(appEnumName);
+            var appEnumValues = (AppEnums)(appEnum.GetValue(null));
+            var appEnumItems = appEnumValues.Values
+                .Select((value, index) => new KeyValuePair<string, string>(index.ToString(), value))
+                .ToList();
+            var comboBoxEdit = new FrameworkElementFactory(typeof(ComboBoxEdit));
+            comboBoxEdit.Name = "PART_Editor";
+            comboBoxEdit.SetValue(ComboBoxEdit.ItemsSourceProperty, appEnumItems);
+            comboBoxEdit.SetValue(ComboBoxEdit.DisplayMemberProperty, "Value");
+            comboBoxEdit.SetValue(ComboBoxEdit.ValueMemberProperty, "Key");
             AppEnumTypeTemplate.VisualTree = comboBoxEdit;
             return AppEnumTypeTemplate;
         }

@@ -161,6 +161,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 emailType = DebtorEmailType.CollectionLetter1;
                 CWCollectionLetter collectionLetterWin = new CWCollectionLetter();
+                collectionLetterWin.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
                 collectionLetterWin.Closed += delegate
                 {
                     if (collectionLetterWin.DialogResult == true)
@@ -174,6 +175,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
 
             var cwSendInvoice = new CWSendInvoice();
+            cwSendInvoice.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
             cwSendInvoice.DialogTableId = 2000000031;
             cwSendInvoice.Closed += delegate
             {

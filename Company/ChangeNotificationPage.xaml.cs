@@ -104,13 +104,18 @@ namespace UnicontaClient.Pages.CustomPage
         private void BindRefTable()
         {
             var referenceTables = new List<string>(100);
-            foreach (Type tabletype in Global.GetStandardRefTables())
-                referenceTables.Add(tabletype.Name);
+            foreach (Type tabletype in Global.GetTables(api.CompanyEntity))
+            {
+                if (typeof(IRowId).IsAssignableFrom(tabletype))
+                    referenceTables.Add(tabletype.Name);
+            }
 
             //UserDefined Tables
             foreach (var userRefTable in Global.GetUserTables(api.CompanyEntity))
-                referenceTables.Add(userRefTable.Name);
-
+            {
+                if (typeof(IRowId).IsAssignableFrom(userRefTable))
+                    referenceTables.Add(userRefTable.Name);
+            }
             referenceTables.Add("InvItemStorage");
             referenceTables.Sort();
             cmbTableTypes.ItemsSource = referenceTables;

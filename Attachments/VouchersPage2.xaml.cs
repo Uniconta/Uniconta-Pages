@@ -299,6 +299,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (ActionType == "Save")
             {
+                MoveFocus();
                 busyIndicator.IsBusy = true;
                 if (!ValidateSave())
                 {
@@ -477,9 +478,11 @@ namespace UnicontaClient.Pages.CustomPage
             vc.PrCategory = leProjectcat.Text;
             vc.WorkSpace = leProjectWorkspace.Text;
             vc._PostingInstruction = txedPostingInstruction.Text;
+            vc.SWIFT = txtSWIFT.Text;
             vc.PaymentMethod = Convert.ToString(cmbPaymentMethod.SelectedItemValue);
             vc.ViewInFolder = Convert.ToString(cmbViewInFolder.SelectedItem);
             vc._PurchaseNumber = GetPurchaseNumber();
+            vc.UserField = voucherClientRow.UserField;
             if (lbldim1.Visibility == Visibility.Visible)
                 vc.Dimension1 = cmbDim1.Text;
             if (lbldim2.Visibility == Visibility.Visible)
