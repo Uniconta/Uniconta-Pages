@@ -40,6 +40,7 @@
   </RibbonItem>
   <RibbonItem LocalizedNameKey="AutoBanking">
 	  <RibbonItem Action="AiiaRegister" LocalizedNameKey="ConnectToBank" LargeGlyph="Bank_Statement_32x32"/>
+	  <RibbonItem Action="IcelandBankConnect" LocalizedNameKey="ConnectToBank" LargeGlyph="Bank_Statement_32x32"/>
 	  <RibbonItem Action="AiiaSync" LocalizedNameKey="Sync" LargeGlyph="Sync_32x32"/>
 	  <RibbonItem Action="BankLog" LocalizedNameKey="Log" LargeGlyph="Server_Count_32x32"/>
 	  <RibbonItem Action="Functions" LocalizedNameKey="Functions" LargeGlyph="Generate_32x32">

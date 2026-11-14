@@ -1,0 +1,32 @@
+<control:ChildWindow  xmlns:control="clr-namespace:Uniconta.ClientTools;assembly=ClientTools" 
+             xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.CWSIEMapSeriesToJournals"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage" 
+             xmlns:corasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+             mc:Ignorable="d" 
+             Height="350" Width="300">
+    <Grid x:Name="LayoutRoot" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <corasauControls:BusyIndicator x:Name="busyIndicator" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <localPage:SIESeriesJournalMapGrid x:Name="dgSeriesJournalMap" ItemsSource="{Binding SeriesJournalsMap}" AutoGenerateColumns="None">
+                <localPage:SIESeriesJournalMapGrid.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Serie"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Journal" AllowEditing="True"/>
+                </localPage:SIESeriesJournalMapGrid.Columns>
+            </localPage:SIESeriesJournalMapGrid>
+        </corasauControls:BusyIndicator>
+        <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="1" Orientation="Horizontal" Margin="0 10 0 0">
+            <Button x:Name="OKButton" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OK}"  IsDefault="True" Click="OKButton_Click" MinWidth="75" Height="23" 
+                    HorizontalAlignment="Right" Margin="0 0 3 0" />
+            <Button x:Name="CancelButton" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Cancel}" IsCancel="True" Click="CancelButton_Click" MinWidth="75"
+                    Height="23" HorizontalAlignment="Right"  Margin="0 0 3 0"/>
+        </StackPanel>
+    </Grid>
+</control:ChildWindow>

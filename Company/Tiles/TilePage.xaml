@@ -63,11 +63,11 @@ x:Class="UnicontaClient.Pages.CustomPage.TilePage"
 
     </UserControl.Resources>
 
-    <ScrollViewer x:Name="tileViewport" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Padding="30,0,17,0" ScrollChanged="TileViewport_ScrollChanged" Background="{StaticResource LightBackground}">
+    <ScrollViewer x:Name="tileViewport" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Padding="30,0,17,0" ScrollChanged="TileViewport_ScrollChanged" Background="{StaticResource TilesPageBackground}">
         <ScrollViewer.Resources>
             <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource ThinScrollBarStyle}"/>
         </ScrollViewer.Resources>
-        <Grid Background="{StaticResource LightBackground}">
+        <Grid Background="{StaticResource TilesPageBackground}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -89,6 +89,8 @@ x:Class="UnicontaClient.Pages.CustomPage.TilePage"
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                     <Button Style="{DynamicResource UnicontaButtonWithGlyph}" x:Name="btnCopyToApp" Click="btnCopyToApp_Click" Visibility="Collapsed" controls:ButtonAppearance.Glyph="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=CopytoApp_32x32}" controls:ButtonAppearance.Variant="Secondary" Margin="10,0,0,0"/>
+                    <Button Style="{DynamicResource UnicontaButtonWithGlyph}" x:Name="btnImport" Click="btnImport_Click" Visibility="Collapsed" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Import}" controls:ButtonAppearance.Variant="Primary" Margin="10,0,0,0"/>
+                    <Button Style="{DynamicResource UnicontaButtonWithGlyph}" x:Name="btnExport" Click="btnExport_Click" Visibility="Collapsed" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Export}" controls:ButtonAppearance.Variant="Primary" Margin="10,0,0,0"/>
                     <Button Style="{DynamicResource UnicontaButtonWithGlyph}" x:Name="btnRefresh" Click="btnRefresh_Click" controls:ButtonAppearance.Glyph="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Refresh_16x16.svg}" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Refresh}" controls:ButtonAppearance.Variant="Primary" Margin="10,0,0,0"/>
                     <Button Style="{DynamicResource UnicontaButtonWithGlyph}" x:Name="btnEdit" Click="btnEdit_Click" controls:ButtonAppearance.Glyph="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Edit_16x16.svg}" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileEditLayout}" controls:ButtonAppearance.Variant="Primary" Margin="10,0,0,0"/>
                     <Button Style="{DynamicResource UnicontaButtonWithGlyph}" x:Name="btnAdd" Click="btnAdd_Click" controls:ButtonAppearance.Glyph="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Add_16x16.svg}" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileAddNewTile}" controls:ButtonAppearance.Variant="Secondary" Margin="10,0,0,0"/>
@@ -98,14 +100,9 @@ x:Class="UnicontaClient.Pages.CustomPage.TilePage"
             <StackPanel x:Name="dashboardTabs" Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,8"/>
 
             <Grid x:Name="tileSurface" Grid.Row="2" ClipToBounds="False" MinHeight="320" Margin="0,15,0,0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <WrapPanel x:Name="tileGroupLabels" Grid.Row="0"/>
-                <local:TileGridPanel x:Name="tilesPanel" Grid.Row="1" Background="Transparent" HorizontalAlignment="Stretch"/>
+                <local:TileGridPanel x:Name="tilesPanel" Background="Transparent" HorizontalAlignment="Stretch"/>
 
-                <Border x:Name="emptyDashboard" Grid.Row="1" Visibility="Collapsed" Background="{StaticResource LightBackgroundComponentBackground}" BorderBrush="{StaticResource LightBackgroundComponentBorder}" BorderThickness="1" CornerRadius="7" Padding="30">
+                <Border x:Name="emptyDashboard" Visibility="Collapsed" Background="{StaticResource LightBackgroundComponentBackground}" BorderBrush="{StaticResource LightBackgroundComponentBorder}" BorderThickness="1" CornerRadius="7" Padding="30">
                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="480">
                         <Image Source="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Tiles_Dashboard_Top}" Width="32" Height="32" Stretch="Uniform"/>
                         <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileCreateYourDashboard}" FontSize="24" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,18,0,10" Foreground="{StaticResource ForegroundBrush}"/>
@@ -117,7 +114,7 @@ x:Class="UnicontaClient.Pages.CustomPage.TilePage"
                     </StackPanel>
                 </Border>
 
-                <Canvas x:Name="resizeOverlay" Grid.Row="1" IsHitTestVisible="False" Panel.ZIndex="100" ClipToBounds="False">
+                <Canvas x:Name="resizeOverlay" IsHitTestVisible="False" Panel.ZIndex="100" ClipToBounds="False">
                     <Border x:Name="resizeGhost" Visibility="Collapsed" CornerRadius="7" BorderThickness="2" BorderBrush="{StaticResource LightBackgroundComponentBorder}" Background="{StaticResource LightBackgroundComponentBackground}" Opacity="0.72">
                         <TextBlock x:Name="resizeGhostText" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource ForegroundBrush}"/>
                     </Border>

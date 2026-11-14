@@ -135,6 +135,10 @@ namespace UnicontaClient.Pages.CustomPage
                 Task.ShowInColumnChooser = Task.Visible = false;
             else
                 Task.ShowInColumnChooser = true;
+            if (!Comp.InvDuty)
+                ExemptDuty.ShowInColumnChooser = ExemptDuty.Visible = false;
+            else
+                ExemptDuty.ShowInColumnChooser = ExemptDuty.Visible = true;
         }
 
         void dgCreditorOrdersGrid_RowDoubleClick()

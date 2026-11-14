@@ -1,0 +1,90 @@
+<cw:ChildWindow xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.CWISO_PaymentSetup"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cw="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:ClientToolsControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+             Width="420" Height="340" KeyDown="ChildWindow_KeyDown" IsTabStop="True" SizeToContent="Height">
+    <cw:ChildWindow.Resources>
+        <DataTemplate x:Key="LabelTemplate">
+            <TextBlock Text="{Binding }" MinWidth="150" MaxWidth="150" TextWrapping="Wrap" />
+        </DataTemplate>
+        <Style x:Key="HelpTextStyle" TargetType="TextBlock">
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="Opacity" Value="0.7" />
+            <Setter Property="Margin" Value="0,0,0,4" />
+        </Style>
+    </cw:ChildWindow.Resources>
+    <Grid x:Name="LayoutRoot" Margin="2" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <ClientToolsControls:CorasauLayoutControl Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <ClientToolsControls:CorasauLayoutGroup x:Name="lgBank" View="GroupBox" GroupBoxDisplayMode="Light" IsCollapsible="False" Orientation="Vertical" HorizontalAlignment="Stretch">
+                <ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/Bank_Statement_32x32.svg, UsePalette=True}" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}" Width="16" Height="16" Stretch="Uniform" />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Bank,Mode=OneWay}" Margin="6,0,0,0" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
+                <ClientToolsControls:CorasauLayoutItem x:Name="liBank" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Bank,Mode=OneWay}" LabelTemplate="{StaticResource LabelTemplate}">
+                    <ClientToolsControls:ComboBoxEditor x:Name="cmbBank" SelectedItem="{Binding Bank,Mode=TwoWay}" SelectedIndexChanged="cmbBank_SelectedIndexChanged" />
+                </ClientToolsControls:CorasauLayoutItem>
+            </ClientToolsControls:CorasauLayoutGroup>
+
+            <ClientToolsControls:CorasauLayoutGroup x:Name="lgFileFormat" View="GroupBox" GroupBoxDisplayMode="Light" IsCollapsible="False" Orientation="Vertical" HorizontalAlignment="Stretch">
+                <ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/group-file_16x16.svg, UsePalette=True}" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}" Width="16" Height="16" Stretch="Uniform" />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FileFormat,Mode=OneWay}" Margin="6,0,0,0" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
+                <ClientToolsControls:CorasauLayoutItem x:Name="liPain03" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=UseOBJ;pain.001.001.03,Mode=OneWay}" LabelTemplate="{StaticResource LabelTemplate}">
+                    <ClientToolsControls:CheckEditor x:Name="cePain03" IsReadOnly="True" Focusable="False" />
+                </ClientToolsControls:CorasauLayoutItem>
+                <ClientToolsControls:CorasauLayoutItem x:Name="liNewPaymentFormat" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=UseOBJ;pain.001.001.09,Mode=OneWay}" LabelTemplate="{StaticResource LabelTemplate}">
+                    <ClientToolsControls:CheckEditor x:Name="ceNewPaymentFormat" IsChecked="{Binding NewPaymentFormat,Mode=TwoWay}" EditValueChanged="ceNewPaymentFormat_EditValueChanged" />
+                </ClientToolsControls:CorasauLayoutItem>
+                <ClientToolsControls:CorasauLayoutItem x:Name="liNewPaymentFormatHelp">
+                    <TextBlock x:Name="txtNewPaymentFormatHelp" Style="{StaticResource HelpTextStyle}" />
+                </ClientToolsControls:CorasauLayoutItem>
+            </ClientToolsControls:CorasauLayoutGroup>
+
+            <ClientToolsControls:CorasauLayoutGroup x:Name="lgProcessing" View="GroupBox" GroupBoxDisplayMode="Light" IsCollapsible="False" Orientation="Vertical" HorizontalAlignment="Stretch">
+                <ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/Settings_32x32.svg, UsePalette=True}" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}" Width="16" Height="16" Stretch="Uniform" />
+                            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Settings,Mode=OneWay}" Margin="6,0,0,0" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ClientToolsControls:CorasauLayoutGroup.HeaderTemplate>
+                <ClientToolsControls:CorasauLayoutItem x:Name="liBatchBooking" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BatchBooking,Mode=OneWay}" LabelTemplate="{StaticResource LabelTemplate}">
+                    <ClientToolsControls:CheckEditor x:Name="ceBatchBooking" IsChecked="{Binding BatchBooking,Mode=TwoWay}" />
+                </ClientToolsControls:CorasauLayoutItem>
+                <ClientToolsControls:CorasauLayoutItem x:Name="liBatchBookingHelp">
+                    <TextBlock x:Name="txtBatchBookingHelp" Style="{StaticResource HelpTextStyle}" />
+                </ClientToolsControls:CorasauLayoutItem>
+                <ClientToolsControls:CorasauLayoutItem x:Name="liTestMarked" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TestMarked,Mode=OneWay}" LabelTemplate="{StaticResource LabelTemplate}">
+                    <ClientToolsControls:CheckEditor x:Name="ceTestMarked" IsChecked="{Binding TestMarked,Mode=TwoWay}" />
+                </ClientToolsControls:CorasauLayoutItem>
+                <ClientToolsControls:CorasauLayoutItem x:Name="liTestMarkedHelp">
+                    <TextBlock x:Name="txtTestMarkedHelp" Style="{StaticResource HelpTextStyle}" />
+                </ClientToolsControls:CorasauLayoutItem>
+            </ClientToolsControls:CorasauLayoutGroup>
+        </ClientToolsControls:CorasauLayoutControl>
+        <StackPanel x:Name="actionButton" HorizontalAlignment="Right" Grid.Row="1" Orientation="Horizontal" Margin="0 10 0 0">
+            <Button x:Name="OKButton" IsDefault="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OK,Mode=OneWay}" Click="OKButton_Click" MinWidth="75"
+                    Height="23" HorizontalAlignment="Right" Margin="0 0 3 0" />
+            <Button x:Name="CancelButton" IsCancel="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Cancel,Mode=OneWay}" Click="CancelButton_Click" MinWidth="75"
+                    Height="23" HorizontalAlignment="Right" />
+        </StackPanel>
+    </Grid>
+</cw:ChildWindow>

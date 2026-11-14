@@ -408,7 +408,7 @@ namespace UnicontaClient.Pages.CustomPage
             dgGLDailyJournalLine.Blocked = masterRecord._Blocked;
             dgGLDailyJournalLine.UpdateMaster(masterRecord);
             if (masterRecord._Journal != null)
-                Layout._SubId = masterRecord._Journal.GetHashCode();  // this way we have the same layout across companies if the journal has the same name.
+                Layout._SubId = Util.GetHashCode(masterRecord._Journal);  // this way we have the same layout across companies if the journal has the same name.
             UseDCVat = masterRecord._UseDCVat;
 
             if (masterRecord._TraceAccount != null || masterRecord._TraceAccount2 != null)

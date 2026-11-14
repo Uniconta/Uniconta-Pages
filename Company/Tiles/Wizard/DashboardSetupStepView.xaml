@@ -8,12 +8,12 @@ x:Class="UnicontaClient.Pages.CustomPage.DashboardSetupStepView"
         <controls:TextEditor Text="{Binding DashboardName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              Style="{DynamicResource TileWizardTextEditorStyle}"/>
         <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileScope}" Style="{DynamicResource TileWizardLabelStyle}"/>
-        <controls:ComboBoxEditor ItemsSource="{Binding ScopeOptions}" DisplayMember="Caption" ValueMember="Value" IsTextEditable="False"
-                                 EditValue="{Binding Scope, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource TileWizardComboBoxStyle}"/>
+        <controls:ComboBoxEditor ItemsSource="{Binding ScopeOptions}" DisplayMember="Caption" ValueMember="Value" IsEditable="False"
+                                 EditValue="{Binding SelectedScope, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource TileWizardComboBoxStyle}"/>
         <StackPanel Visibility="{Binding IsProfile, Converter={StaticResource bool2VisibilityConverter}}">
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Profile}" Style="{DynamicResource TileWizardLabelStyle}"/>
-            <controls:ComboBoxEditor ItemsSource="{Binding Profiles}" DisplayMember="KeyStr" ValueMember="KeyStr" IsTextEditable="False"
-                                     EditValue="{Binding Profile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource TileWizardComboBoxStyle}"/>
+            <controls:ComboBoxEditor ItemsSource="{Binding Profiles}" DisplayMember="Profile" IsEditable="False"
+                                     SelectedItem="{Binding SelectedProfile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource TileWizardComboBoxStyle}"/>
         </StackPanel>
     </StackPanel>
 </UserControl>

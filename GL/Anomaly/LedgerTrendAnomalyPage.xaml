@@ -18,9 +18,11 @@ x:Class="UnicontaClient.Pages.CustomPage.LedgerTrendAnomalyPage"
                 <localPage:LedgerTrendAnomalyGrid.Columns>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AccountNumber" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Account}" Width="90" AllowEditing="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AccountName" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Name}" Width="160" AllowEditing="False"/>
+                    <!--
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PeriodMinus2" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PeriodBeforePrevious}" Width="80" AllowEditing="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="PeriodMinus1" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=PreviousPeriod}" Width="80" AllowEditing="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CurrentPeriod" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CurrentPeriod}" Width="100" AllowEditing="False"/>
+                    -->
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountMinus2" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AmountPeriodMinus2}" Width="100" AllowEditing="False">
                         <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                             <DataTemplate>
@@ -68,13 +70,13 @@ x:Class="UnicontaClient.Pages.CustomPage.LedgerTrendAnomalyPage"
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Reasons" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Reasons}" Width="260" AllowEditing="False">
                         <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
-                            <editor:TextEditSettings TextWrapping="Wrap"/>
+                            <editor:TextEditSettings TextWrapping="Wrap" AcceptsReturn="True"/>
                         </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="TopCurrentPeriodTransactionsText" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TopCurrentTransactions}" Width="320" AllowEditing="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AIExplanation" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AIReason}" Width="320" AllowEditing="False">
                         <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
-                            <editor:TextEditSettings TextWrapping="Wrap"/>
+                            <editor:TextEditSettings TextWrapping="Wrap" AcceptsReturn="True"/>
                         </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="AICertaintyPercentage" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AICertaintyPercentage}" Width="100" AllowEditing="False"/>

@@ -78,7 +78,7 @@ namespace UnicontaClient.Pages.CustomPage
             ProjectCache = company.GetCache(typeof(Uniconta.DataModel.Project));
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
             if (company.RoundTo100)
-                Debit.HasDecimals = Credit.HasDecimals = Amount.HasDecimals = false;
+                Debit.HasDecimals = Credit.HasDecimals = Amount.HasDecimals = EnteredVatAmount.HasDecimals = false;
             else
                 Decimals = 2;
             if (master != null)
@@ -171,8 +171,14 @@ namespace UnicontaClient.Pages.CustomPage
         void SaveGridData()
         {
             var lines = dgGlOffSetAccountTplt.ItemsSource as IEnumerable<GLOffsetAccountLine>;
-            if (lines != null && lines.Count() == 0)
-                lines = null;
+            if (lines != null)
+            {
+                foreach (var lin in lines)
+                    if (lin._Vat == null && lin._EnteredVatAmount != 0d)
+                        lin._EnteredVatAmount = 0d; // posting ignores it without a VAT code
+                if (!lines.Any())
+                    lines = null;
+            }
             if (glDailyJournalLine != null)
             {
                 glDailyJournalLine.SetOffsetAccount(lines);
@@ -196,6 +202,10 @@ namespace UnicontaClient.Pages.CustomPage
                 if (!api.CompanyEntity._UseQtyInLedger)
                     this.Qty.Visible = this.Qty.ShowInColumnChooser = false;
             }
+
+            if (_master == null)
+                this.EnteredVatAmount.Visible = this.EnteredVatAmount.ShowInColumnChooser = false;
+
             base.OnLayoutLoaded();
             setDim();
         }
@@ -283,6 +293,10 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "Project":
                     lookupProjectDim(rec);
+                    break;
+                case "Vat":
+                    if (rec._Vat == null && rec._EnteredVatAmount != 0d)
+                        rec.EnteredVatAmount = 0d;
                     break;
             }
         }

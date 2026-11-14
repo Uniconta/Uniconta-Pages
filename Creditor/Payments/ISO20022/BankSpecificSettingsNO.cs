@@ -346,8 +346,7 @@ namespace UnicontaISO20022CreditTransfer
 
             if (ustrdText != string.Empty)
             {
-                if (ustrdText.Length > maxLines * maxStrLen)
-                    ustrdText = ustrdText.Substring(0, maxLines * maxStrLen);
+                ustrdText = LimitUstrdText(ustrdText, maxLines * maxStrLen, trans);
 
                 resultList = ustrdText.Select((x, i) => i)
                             .Where(i => i % maxStrLen == 0)

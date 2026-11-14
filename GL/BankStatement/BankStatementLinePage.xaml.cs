@@ -1160,6 +1160,7 @@ namespace UnicontaClient.Pages.CustomPage
             var maps = await api.Query<BankImportMap>();
             if (maps == null || maps.Length == 0)
                 return;
+            Array.Sort(maps, new BankImportMap.Sort());
             int cnt = 0;
             foreach (var lin in (IEnumerable<BankStatementLineGridClient>)dgBankStatementLine.GetVisibleRows())
             {
@@ -1183,8 +1184,20 @@ namespace UnicontaClient.Pages.CustomPage
                     for (int m = 0; (m < maps.Length); m++)
                     {
                         var map = maps[m];
+                        if (map._Amount != 0)
+                        {
+                            if (map._GE)
+                            {
+                                if (map._Amount > lin._Amount)
+                                    continue;
+                                if (mapFound != null && mapFound._Amount > map._Amount)
+                                    continue;
+                            }
+                            else if (map._Amount != lin._Amount)
+                                continue;
+                        }
                         var idx = map.FindText(t, i);
-                        if (idx >= 0 && map._Text.Length > maplen)
+                        if (idx >= 0 && map._Text.Length >= maplen)
                         {
                             maplen = map._Text.Length;
                             mapFound = map;

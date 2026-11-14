@@ -115,27 +115,15 @@ namespace UnicontaISO20022CreditTransfer
         public override void AllowedCharactersRegEx(bool internationalPayment = false)
         {
             if (internationalPayment)
-                allowedCharactersRegEx = "[^a-zA-Z0-9 -?:().,'+/]";
-            else
-                allowedCharactersRegEx = "[^a-zA-Z0-9äöüÄÖÜß -?:().,'+/]";
-        }
-
-        /// <summary>
-        /// Replacement characters
-        /// </summary>
-        public override Dictionary<string, string> ReplaceCharactersRegEx()
-        {
-            replaceCharactersRegEx = new Dictionary<string, string>
             {
-                ["Æ"] = "AE",
-                ["Ø"] = "OE",
-                ["Å"] = "AA",
-                ["æ"] = "ae",
-                ["ø"] = "oe",
-                ["å"] = "aa"
-            };
-
-            return replaceCharactersRegEx;
+                allowedCharactersRegEx = "[^a-zA-Z0-9 -?:().,'+/]";
+                replaceCharactersRegEx = TransliterateCharacters; //æøå/äöüß omskrives i stedet for at blive fjernet
+            }
+            else
+            {
+                allowedCharactersRegEx = "[^a-zA-Z0-9äöüÄÖÜß -?:().,'+/]";
+                replaceCharactersRegEx = TransliterateNordicCharacters; //äöüß bevares, æøå omskrives
+            }
         }
 
 
@@ -355,29 +343,8 @@ namespace UnicontaISO20022CreditTransfer
             var adr2 = StandardPaymentFunctions.RegularExpressionReplace(company._Address2, allowedCharactersRegEx, replaceCharactersRegEx);
             var adr3 = StandardPaymentFunctions.RegularExpressionReplace(company._Address3, allowedCharactersRegEx, replaceCharactersRegEx);
 
-            if (NewPaymentFormat())
-            {
-                var zipCity = OIOUBL.GetZipCodeCity(adr3, company._CountryId);
-                if (zipCity == null)
-                {
-                    zipCity = OIOUBL.GetZipCodeCity(adr2, company._CountryId);
-                    if (zipCity != null)
-                        adr2 = null;
-                }
-                else
-                    adr3 = null;
-
-                if (zipCity != null)
-                {
-                    var address = StringBuilderReuse.Create().Append(adr1).Append(adr2 != null ? ", " : null).Append(adr2).Append(adr3 != null ? ", " : null).Append(adr3).ToStringAndRelease();
-                    debtorAddress.StreetName = address;
-                    debtorAddress.ZipCode = zipCity.Item1;
-                    debtorAddress.CityName = zipCity.Item2;
-                    debtorAddress.CountryId = ((CountryISOCode)company._CountryId).ToString();
-                    debtorAddress.Unstructured = false;
-                    return debtorAddress;
-                }
-            }
+            if (StructuredDebtorAddress(company, debtorAddress, adr1, adr2, adr3))
+                return debtorAddress;
 
             debtorAddress.AddressLine1 = adr1;
             debtorAddress.AddressLine2 = adr2;

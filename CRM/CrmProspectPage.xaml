@@ -126,7 +126,8 @@ x:Class="UnicontaClient.Pages.CustomPage.CrmProspectPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Employee" Width="50"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="CompanyRegNo" Width="90"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Group" Width="60"/>
-                    <local:ComboBoxColumnClient x:Name="Currency" Width="50" Visible="False" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Amount" Width="100"/>
+                    <local:ComboBoxColumnClient x:Name="Currency" Width="50" />
                     <local:CorasauDataGridTemplateColumnClient x:Name="DebGroup" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="PriceGroup" Visible="False"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="PriceList" Visible="False"/>

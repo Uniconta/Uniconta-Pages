@@ -8,4 +8,7 @@
 	  <RibbonItem Action="ExpandAll" LocalizedNameKey="ExpandAll" Glyph="expand_32x32" LargeGlyph="expand_32x32"/>
 	  <RibbonItem Action="CollapseAll" LocalizedNameKey="CollapseAll" Glyph="collapse_32x32" LargeGlyph="collapse_32x32"/>
   </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="SearchFeatures" LocalizedNameKey="Search" ButtonType="StringEditor" Glyph="Search_16x16" />
+  </RibbonItem>
 </root>

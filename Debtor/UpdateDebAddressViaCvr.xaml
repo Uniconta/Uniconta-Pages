@@ -24,6 +24,7 @@ x:Class="UnicontaClient.Pages.CustomPage.UpdateDebAddressViaCvr"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="City" Width="50" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="IndustryCode" Width="50" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="CompanyState" Width="50" ReadOnly="True"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VatNumber" Width="80" ReadOnly="True"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DifName" ReadOnly="True" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="NewName" ReadOnly="True" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DifAddress" ReadOnly="True" />
@@ -38,6 +39,10 @@ x:Class="UnicontaClient.Pages.CustomPage.UpdateDebAddressViaCvr"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="NewIndustryCode" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DifCompanyState" ReadOnly="True" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="NewCompanyState"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DifVatNumber" ReadOnly="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NewVatNumber" Width="80"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="DifEInvoice" ReadOnly="True" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="NewInvoiceInXML"/>
                 </localPage:UpdateDebAddressViaCvrGrid.Columns>
             </localPage:UpdateDebAddressViaCvrGrid>
         </UnicontaControls:BusyIndicator>

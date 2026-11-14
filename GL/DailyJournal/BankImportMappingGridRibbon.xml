@@ -6,4 +6,21 @@
     <RibbonItem Action="Delete" ShortcutKey="Shift+DELETE" LocalizedNameKey="DeleteRow" Glyph="Delete_16x16" LargeGlyph="Delete_32x32"/>
     <RibbonItem Action="SaveGrid" ShortcutKey="CTRL+S" LocalizedNameKey="Save" Glyph="save-16x16" LargeGlyph="save-32x32"/>
   </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32">
+      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16" ShortcutKey=""/>
+      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16" ShortcutKey="" />
+      <RibbonItem Action="AddExpressionColumn" LocalizedNameKey="AddOBJ" Parameter="CalculationExpression" Glyph="Accountant_16x16" ShortcutKey="" />
+      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" EnableSeperator="True" Glyph="Edit_16x16" ShortcutKey=""/>
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16" ShortcutKey=""/>
+      <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16" ShortcutKey="CTRL+U"/>
+      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16" ShortcutKey=""/>
+      <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16" ShortcutKey=""/>
+      <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16" ShortcutKey=""/>
+      <RibbonItem Action="FieldSetting" LocalizedNameKey="FieldSetting" Glyph="Setup_16x16" ShortcutKey=""/>
+    </RibbonItem>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="CopyFromAnotherCompany" LocalizedNameKey="CopyFromAnotherCompany" LargeGlyph="CopyUserTable_32x32"/>
+  </RibbonItem>
 </root>

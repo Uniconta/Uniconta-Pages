@@ -179,9 +179,18 @@ namespace UnicontaClient.Pages.CustomPage
 
         async private void ShowInvoice(PartnerInvoiceClient selectedItem)
         {
-            var partnerDetails = await GetInvData(selectedItem);
-            if (partnerDetails != null)
-                AddDockItem(TabControls.InvoiceSubscriptionPage, new object[] { partnerDetails }, string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("InvoiceNumber"), selectedItem._Invoice));
+            var subsApi = new SubscriptionAPI(api);
+            busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LoadingMsg");
+            busyIndicator.IsBusy = true;
+            var invoicePdf = await subsApi.PartnerInvoicePDF(selectedItem);
+            busyIndicator.IsBusy = false;
+            if (invoicePdf != null)
+            {
+                var viewer = new CWDocumentViewer(invoicePdf, FileextensionsTypes.PDF);
+                viewer.Show();
+            }
+            else
+                UtilDisplay.ShowErrorCode(subsApi.LastError);
         }
 
         async Task<PartnerInvDetails> GetInvData(PartnerInvoiceClient selecteditem)

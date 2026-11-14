@@ -59,7 +59,7 @@ x:Class="UnicontaClient.Pages.CustomPage.VatReportIceland"
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="Upplýsingar" FontSize="12" FontWeight="Bold" Grid.Column="0" Grid.Row="0" Margin="3,3,3,3" />
+                        <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Information}" FontSize="12" FontWeight="Bold" Grid.Column="0" Grid.Row="0" Margin="3,3,3,3" />
                         <CorasauControls:TextEditor x:Name="txtSystemInfo" Width="350" Height="80" TextWrapping="Wrap" ShowBorder="False" VerticalContentAlignment="Top" IsReadOnly="true" Grid.Column="0" Grid.Row="1" Margin="0,3,3,3" />
                     </Grid>
                 </Grid>

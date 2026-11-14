@@ -14,31 +14,30 @@ x:Class="UnicontaClient.Pages.CustomPage.ConfigureFunctionalityPage"
         <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
             <CorasauControls:CorasauRibbonControl x:Name="frmRibbon" XMLSourcePath=";component/Pages/Company/ConfigureFunctionalityPageRibbon.xml"/>
 
-            <StackPanel Grid.Row="1" Margin="15,10,15,0" Orientation="Horizontal">
-                <Label Target="{Binding ElementName=featureSearch}"
-                       Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=Search}"/>
-                <TextBox x:Name="featureSearch" Width="320" VerticalContentAlignment="Center"
-                         Text="{Binding Functionality.SearchText, RelativeSource={RelativeSource AncestorType={x:Type local:ConfigureFunctionalityPage}}, UpdateSourceTrigger=PropertyChanged}"/>
-            </StackPanel>
-
-            <ScrollViewer Grid.Row="2" Padding="10" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <ScrollViewer Grid.Row="1" Padding="10" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                 <WrapPanel x:Name="layoutItems" Orientation="Horizontal" HorizontalAlignment="Stretch"
                            DataContext="{Binding Functionality, RelativeSource={RelativeSource AncestorType={x:Type local:ConfigureFunctionalityPage}}}">
-
-                    <local:FunctionalityModuleControl DataContext="{Binding Ledger}" IconSource="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/General_Ledger_16x16.svg, UsePalette=True}"/>
-                    <local:FunctionalityModuleControl DataContext="{Binding Logistics}" IconSource="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/Inventory-New.svg, UsePalette=True}"/>
-                    <local:FunctionalityModuleControl DataContext="{Binding Sales}" IconSource="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/Order_Confirmation_32x32.svg, UsePalette=True}"/>
-                    <local:FunctionalityModuleControl DataContext="{Binding Purchase}" IconSource="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/PurchaseOrder.svg, UsePalette=True}"/>
-                    <local:FunctionalityModuleControl DataContext="{Binding Project}" IconSource="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/ProjectEstimation.svg, UsePalette=True}"/>
-                    <local:FunctionalityModuleControl DataContext="{Binding ProgramModules}" IconSource="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/AppStore.svg, UsePalette=True}"/>
-                    <local:FunctionalityModuleControl DataContext="{Binding Addins}" IconSource="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/Add_32x32.svg, UsePalette=True}"/>
-                    <local:FunctionalityModuleControl DataContext="{Binding AIAgents}" IconSource="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/AI.svg, UsePalette=True}"/>
+                    
+                    <local:FunctionalityModuleControl DataContext="{Binding Basics}" IconSource="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=General_Ledger_16x16}"/>
+                    <local:FunctionalityModuleControl DataContext="{Binding Logistics}" IconSource="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Inventory-New}"/>
+                    <local:FunctionalityModuleControl DataContext="{Binding Sales}" IconSource="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Order_Confirmation_32x32}"/>
+                    <local:FunctionalityModuleControl DataContext="{Binding CRM}" IconSource="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=crm-new}"/>
+                    <local:FunctionalityModuleControl DataContext="{Binding Production}" IconSource="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=production_32x32}"/>
+                    <local:FunctionalityModuleControl DataContext="{Binding FixedAssets}" IconSource="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=gl-new}"/>
+                    <!--
+<local:FunctionalityModuleControl DataContext="{Binding Purchase}" IconSource="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=PurchaseOrder}"/>
+-->
+                    <local:FunctionalityModuleControl DataContext="{Binding Project}" IconSource="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=project-new}"/>
+                    <!--
+<local:FunctionalityModuleControl DataContext="{Binding ProgramModules}" IconSource="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=AppStore}"/>
+-->
+                    <local:FunctionalityModuleControl DataContext="{Binding Addins}" IconSource="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=Add_32x32}"/>
+                    <local:FunctionalityModuleControl DataContext="{Binding AIAgents}" IconSource="{Binding Converter={StaticResource ImageNameToImagesourceConverter}, ConverterParameter=AI}"/>
 
                 </WrapPanel>
             </ScrollViewer>

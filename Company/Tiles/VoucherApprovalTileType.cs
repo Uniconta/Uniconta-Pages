@@ -369,7 +369,7 @@ namespace UnicontaClient.Pages.CustomPage
                                         invoice = result.Invoice;
                                 }
                             }
-                            catch (Exception ex) { Uniconta.ClientTools.InfoLog.Log.Error(ex.Message); }
+                            catch (Exception ex) { Uniconta.ClientTools.Controls.AIErrorResolver.Handle(ex); }
                         }
                         ApplyInvoice(voucher, invoice);
                         if (!string.IsNullOrWhiteSpace(invoice.SupplierName) || !string.IsNullOrWhiteSpace(invoice.SupplierRegistrationNumber))

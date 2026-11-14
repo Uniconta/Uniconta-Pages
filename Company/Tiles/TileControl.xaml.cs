@@ -99,7 +99,6 @@ namespace UnicontaClient.Pages.CustomPage
         UnicontaWebViewer htmlWidget;
         public TileDefinition Definition { get; private set; }
         public FrameworkElement DragHandle { get { return TileDragHandle; } }
-        public List<string> Groups;
         double resizeHorizontalChange;
         double resizeVerticalChange;
         public event EventHandler<TileResizeEventArgs> ResizePreview;
@@ -495,7 +494,7 @@ namespace UnicontaClient.Pages.CustomPage
         void ShowHtmlWidget()
         {
             CloseHtmlWidget();
-            var source = BuildHtmlWidgetUri(Definition.HtmlSource, AppEnums.Theme.Label(BasePage.session.User._Theme));
+            var source = BuildHtmlWidgetUri(Definition.ResolveHtmlSource(Api?.CompanyEntity?._CountryId), AppEnums.Theme.Label(BasePage.session.User._Theme));
 
             htmlWidget = new UnicontaWebViewer(source) { ShowNavigationError = false };
             HtmlWidgetHost.Children.Add(htmlWidget);
@@ -720,7 +719,6 @@ namespace UnicontaClient.Pages.CustomPage
         internal void EditTile()
         {
             var editTile = new CWTileDetails(Api, userMenu);
-            //editTile.Groups = Groups;
             editTile.Closed += (s, args) =>
             {
                 if (editTile.DialogResult == true)

@@ -36,6 +36,9 @@ x:Class="UnicontaClient.Pages.CustomPage.PaymentTermsPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="Weekend2Monday" x:Name="liWeekend2Monday">
                         <CheckBox IsChecked="{Binding Weekend2Monday,Mode=TwoWay}" />
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="AutoClaim" x:Name="liAutoClaim" Visibility="Collapsed">
+                        <CheckBox IsChecked="{Binding AutoClaim,Mode=TwoWay}" />
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
 
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpAccount" Visibility="Collapsed"  Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Accounts}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">

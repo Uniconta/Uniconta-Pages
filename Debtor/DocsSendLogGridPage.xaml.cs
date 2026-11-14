@@ -140,6 +140,13 @@ namespace UnicontaClient.Pages.CustomPage
                 var creditorMaster = masterClient as CreditorClient;
                 SetHeader(string.Format("{0} {1}/{2}", Uniconta.ClientTools.Localization.lookup("Creditor"), Uniconta.ClientTools.Localization.lookup("Log"), creditorMaster.Account));
             }
+            else if (masterClient is DebtorOrderClient)
+            {
+                Account.Visible = false;
+                Name.Visible = false;
+                var debtorOrderMaster = masterClient as DebtorOrderClient;
+                SetHeader(string.Format("{0} {1}/{2}", Uniconta.ClientTools.Localization.lookup("Order"), Uniconta.ClientTools.Localization.lookup("Log"), debtorOrderMaster._OrderNumber));
+            }
             else if (masterClient is CreditorOrderClient)
             {
                 Account.Visible = false;

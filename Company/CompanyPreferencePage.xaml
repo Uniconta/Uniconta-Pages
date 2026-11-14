@@ -171,6 +171,14 @@ x:Class="UnicontaClient.Pages.CustomPage.CompanyPreferencePage"
                         <CorasauControls:CorasauLayoutItem FieldName="DeactivateSendNemhandel">
                             <CorasauControls:CheckEditor IsChecked="{Binding DeactivateSendNemhandel,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
+                        <!-- Iceland: registration for e-invoices through api.uniconta.is -->
+                        <CorasauControls:CorasauLayoutItem x:Name="liIcelandEInvoice" Visibility="Collapsed">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock x:Name="txtIcelandEInvoiceState" VerticalAlignment="Center" MinWidth="100" Margin="0,0,10,0" />
+                                <Button x:Name="btnIcelandEInvoiceRegister" Click="IcelandEInvoiceRegister_Click" MinWidth="75" Margin="0,0,3,0" />
+                                <Button x:Name="btnIcelandEInvoiceUnregister" Click="IcelandEInvoiceUnregister_Click" MinWidth="75" />
+                            </StackPanel>
+                        </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutControl>

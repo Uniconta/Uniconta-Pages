@@ -134,6 +134,8 @@ namespace UnicontaClient.Pages.CustomPage
             vatCountry.SelectedIndex = this.VatCountry;
             LoadJournals();
             SetMenuItem();
+            if (master == null && api.CompanyEntity._CountryId == CountryCode.Iceland)
+                IcelandVatFiling.StartFromRskPeriod(api, txtDateFrm, txtDateTo);
         }
 
         void LoadJournals()
@@ -203,6 +205,9 @@ namespace UnicontaClient.Pages.CustomPage
                 UtilDisplay.RemoveMenuCommand(rb, "Search");
                 UtilDisplay.RemoveMenuCommand(rb, "Save");
             }
+#if MAC
+            UtilDisplay.RemoveMenuCommand(rb, "OLDVatReportDenmark"); //Not implemented on Mac
+#endif
         }
 
         void localMenu_OnItemClicked(string ActionType)
@@ -240,8 +245,26 @@ namespace UnicontaClient.Pages.CustomPage
                         break;
                     }
                 case "VatReportNorway":
-                    if (sum != null)
-                        AddDockItem(TabControls.VatReportNorway, new object[] { sum, fromDate, toDate }, "Mva skattemeldingen", null, closeIfOpened: true);
+
+                    //The return is stored on the saved record of the period on screen. "Last period" would put it on the wrong record
+                    if (rdbLastPeriod.IsChecked == true)
+                    {
+                        UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NorwayVATLastPeriodNotSupported"), Uniconta.ClientTools.Localization.lookup("Warning"));
+                        return;
+                    }
+
+                    var glVatReportedClient = master as GLVatReportedClient;
+                    if (glVatReportedClient == null || glVatReportedClient._MaxJournalPostedId == 0)
+                    {
+                        UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NorwayVATSaveReportFirst"), Uniconta.ClientTools.Localization.lookup("Warning"));
+                        return;
+                    }
+
+                    List<VatReportLine> reportLines = (List<VatReportLine>)dgVatReport.ItemsSource;
+                    if (reportLines == null)
+                        return;
+
+                    AddDockItem(TabControls.VatReportNorway, new object[] { glVatReportedClient, reportLines, fromDate, toDate }, "Mva skattemeldingen", null, closeIfOpened: true);
                     break;
                 case "OLDVatReportDenmark":
                     if (sum != null)
@@ -350,7 +373,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "VatReportIceland":
                     if (sum != null)
-                        AddDockItem(TabControls.VatReportIceland, new object[] { sum, fromDate, toDate }, "VAT statement", null, closeIfOpened: true);
+                        AddDockItem(TabControls.VatReportIceland, new object[] { sum, fromDate, toDate, this }, "VAT statement", null, closeIfOpened: true);
                     break;
                 case "UKVatReturn":
                     string vrn = api.CompanyEntity._Id;
@@ -374,7 +397,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        private void SaveVatReport()
+        internal void SaveVatReport()
         {
             if ((master == null || master._MaxJournalPostedId == 0) && !Simulated)
             {
@@ -399,6 +422,19 @@ namespace UnicontaClient.Pages.CustomPage
                 master._Country = (CountryCode)this.VatCountry;
                 save();
             }
+        }
+
+        /// <summary>Saves the settlement without asking for a comment (the caller has asked); true when it is saved</summary>
+        internal async Task<bool> SaveVatReportNow()
+        {
+            if ((master != null && master._MaxJournalPostedId != 0) || Simulated)
+                return false;
+            if (master == null)
+                master = new GLVatReportedClient();
+            master._FromDate = txtDateFrm.DateTime;
+            master._ToDate = txtDateTo.DateTime;
+            master._Country = (CountryCode)this.VatCountry;
+            return await save() == ErrorCodes.Succes;
         }
 
         async void NewVatReport()
@@ -444,7 +480,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 #endif
 
-        async void save()
+        async Task<ErrorCodes> save()
         {
             busyIndicator.IsBusy = true;
             if (sumPeriod == null)
@@ -462,6 +498,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (ret == 0)
                 globalEvents.OnRefresh(NameOfControl, new object[2] { 1, master });
             UtilDisplay.ShowErrorCode(ret);
+            return ret;
         }
 
         async Task LoadVatReport(bool PrevPeriod = false)
@@ -505,18 +542,19 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 this.sumPeriod = calc.sumPeriod;
                 this.lstPeriod = calc.lst;
-                this.dgVatReport.ItemsSource = calc.lst;
                 rdbVatPeriod.IsChecked = true;
             }
             else
             {
                 this.sumPrevPeriod = calc.sumPeriod;
                 this.lstPrevPeriod = calc.lst;
-                this.dgVatReport.ItemsSource = null;
             }
             if (calc.lst.Count > 0)
                 SetMenuItem();
-            this.dgVatReport.ItemsSource = calc.lst;
+
+            //Show the period the radio buttons say, whichever period was just calculated
+            this.dgVatReport.ItemsSource = null;
+            this.dgVatReport.ItemsSource = rdbLastPeriod.IsChecked == true ? this.lstPrevPeriod : this.lstPeriod;
             this.dgVatReport.Visibility = Visibility.Visible;
 
             periodGrid.Visibility = Visibility.Visible;

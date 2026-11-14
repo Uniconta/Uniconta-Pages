@@ -44,6 +44,9 @@
     <RibbonItem Action="AddDoc" LocalizedNameKey="Document" ControlName="UserDocsPage" Glyph="Accounts_Statement_Report_16x16" ShortcutKey="Ctrl+O" />
     </RibbonItem>
   </RibbonItem>
+  <RibbonItem LocalizedNameKey="eOrder">
+    <RibbonItem Action="DocSendLog" LocalizedNameKey="Log" ControlName="DocsSendLogGridPage" LargeGlyph="Server_Count_32x32" />
+  </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="EditDebtor" LocalizedNameKey="EditOBJ" Parameter="Debtor" LargeGlyph="Employee_32x32"/>
   </RibbonItem>

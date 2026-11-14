@@ -31,7 +31,6 @@ namespace ISO20022CreditTransfer
         private CreditorPaymentFormat credPaymFormat;
         private ExportFormatType exportFormat;
         private string companyCountryId;
-        private bool newPaymentFormat;
         private CrudAPI crudAPI;
         private Company company;
         private bool isCreditAmount;
@@ -125,7 +124,6 @@ namespace ISO20022CreditTransfer
             this.credPaymFormat = credPaymFormat;
 
             CompanyBankEnum = bankSpecific.CompanyBank();
-            newPaymentFormat = bankSpecific.NewPaymentFormat();
         }
 
         static public string UnicontaCountryToISO(CountryCode code)
@@ -188,7 +186,7 @@ namespace ISO20022CreditTransfer
             PaymentCurrency(trans.CurrencyLocalStr, trans._PaymentMethod, trans._PaymentId, trans.SWIFT);
 
             if (glJournalGenerated == false)
-                CreditorAddress(creditor);
+                CreditorAddress(creditor, CreditorPaymentType(trans, bankAccount, creditor));
 
             if (trans.PaymentMethod == null)
                 checkErrors.Add(new CheckError(fieldCannotBeEmpty("PaymentMethod")));
@@ -200,7 +198,7 @@ namespace ISO20022CreditTransfer
 
 
             var countryCode = glJournalGenerated ? (CountryCode)company._Country : creditor._Country;
-            ISOPaymentType(trans.CurrencyLocalStr, bankAccount._IBAN, trans._PaymentMethod, UnicontaCountryToISO(countryCode));
+            ISOPaymentType(trans.CurrencyLocalStr, bankAccount._IBAN, trans._PaymentMethod, CreditorPaymentCountryId(trans) ?? UnicontaCountryToISO(countryCode));
 
             if (!isCreditAmount)
             {
@@ -354,22 +352,52 @@ namespace ISO20022CreditTransfer
         /// <summary>
         /// Validate Creditor address
         /// </summary>
-        private void CreditorAddress(Creditor creditor)
+        private void CreditorAddress(Creditor creditor, ISO20022PaymentTypes paymentType)
         {
-            string countryId = UnicontaCountryToISO(creditor._Country);
-            if (string.IsNullOrEmpty(countryId))
+            if (string.IsNullOrWhiteSpace(creditor._Name))
+                CreditorFieldError("Name", creditor);
+
+            if (creditor._Country == CountryCode.Unknown)
+                CreditorFieldError("Country", creditor);
+
+            //Foreign payments require a structured address with at least city and country
+            if (paymentType != ISO20022PaymentTypes.DOMESTIC && string.IsNullOrWhiteSpace(creditor._City))
+                CreditorFieldError("City", creditor);
+
+            if (CompanyBankEnum == CompanyBankENUM.CreditSuisse && creditor._ZipCode == null)
+                CreditorFieldError("ZipCode", creditor);
+        }
+
+        void CreditorFieldError(string field, Creditor creditor)
+        {
+            var string1 = fieldCannotBeEmpty(field);
+            var string2 = string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("Creditor"), creditor._Account);
+            checkErrors.Add(new CheckError(String.Format("{0}, {1}", string1, string2)));
+        }
+
+        /// <summary>
+        /// Payment type calculated the same way as when the payment file is generated
+        /// </summary>
+        private ISO20022PaymentTypes CreditorPaymentType(UnicontaClient.Pages.CreditorTransPayment trans, BankStatement bankAccount, Creditor creditor)
+        {
+            var iban = string.Empty;
+            var bic = string.Empty;
+            if (trans._PaymentMethod == PaymentTypes.IBAN)
             {
-                var string1 = fieldCannotBeEmpty("Country");
-                var string2 = string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("Creditor"), creditor._Account);
-                checkErrors.Add(new CheckError(String.Format("{0}, {1}", string1, string2)));
+                iban = Regex.Replace(trans._PaymentId ?? string.Empty, "[^\\w\\d]", "");
+                bic = Regex.Replace(trans._SWIFT ?? string.Empty, "[^\\w\\d]", "");
             }
 
-            if ((CompanyBankEnum == CompanyBankENUM.CreditSuisse || newPaymentFormat) && creditor._ZipCode == null)
-            {
-                var string1 = fieldCannotBeEmpty("ZipCode");
-                var string2 = string.Format("{0} {1}", Uniconta.ClientTools.Localization.lookup("Creditor"), creditor._Account);
-                checkErrors.Add(new CheckError(String.Format("{0}, {1}", string1, string2)));
-            }
+            var creditorBankDetailsCountryId = company.CreditorBankApprovement && creditorBank != null ? creditorBank._Country : CountryCode.Unknown;
+            return bankSpecificSettings.ISOPaymentType(trans.CurrencyLocalStr, bankAccount._IBAN, iban, bic, CreditorPaymentCountryId(trans) ?? UnicontaCountryToISO(creditor._Country), companyCountryId, creditorBankDetailsCountryId);
+        }
+
+        /// <summary>
+        /// Bank country of an account number (BBAN) without BIC or FIK - same rule as when the payment file is generated
+        /// </summary>
+        private string CreditorPaymentCountryId(UnicontaClient.Pages.CreditorTransPayment trans)
+        {
+            return bankSpecificSettings.CreditorPaymentCountryId(trans._PaymentMethod, trans._PaymentId, trans._SWIFT);
         }
 
         /// <summary>
@@ -911,11 +939,26 @@ namespace ISO20022CreditTransfer
                 var cleanPaymentId = paymentId == null ? string.Format("<{0}>", Localization.lookup("Missing")) : trans._PaymentMethod == PaymentTypes.IBAN ? paymentId.Replace(" ", "") : Regex.Replace(paymentId, @"[^\d]", "");
                 transPaymentId = transPaymentId != null ? trans._PaymentMethod == PaymentTypes.IBAN ? transPaymentId.Replace(" ", "") : Regex.Replace(transPaymentId, @"[^\d]", "") : null;
 
+                //Compare the account numbers as they are written to the payment file, e.g. 8065-1249395 = 8065-0001249395
+                if (trans._PaymentMethod == PaymentTypes.VendorBankAccount && paymentId != null && transPaymentId != null)
+                {
+                    cleanPaymentId = NormalizeBBAN(cleanPaymentId, swift);
+                    transPaymentId = NormalizeBBAN(transPaymentId, transSwift ?? swift);
+                }
+
                 if (transPaymentId != cleanPaymentId)
                     checkErrors.Add(new CheckError(string.Format(Localization.lookup("NotMatchApprovedOBJ"), paymMethodText, paymentId)));
                 else if (transSwift != null && transSwift != swift)
                     checkErrors.Add(new CheckError(string.Format(Localization.lookup("NotMatchApprovedOBJ"), "SWIFT", swift)));
             }
+        }
+
+        /// <summary>
+        /// Account number (digits only) formatted by the payment format, e.g. padded with leading zeros
+        /// </summary>
+        private string NormalizeBBAN(string bban, string bic)
+        {
+            return bban.Length > 4 ? bankSpecificSettings.CreditorBBAN(bban, bban, bic) : bban;
         }
 
         /// <summary>

@@ -870,7 +870,7 @@ namespace UnicontaClient.Pages.CustomPage
                         busyIndicator.IsBusy = false;
                         gridRibbon_BaseActions("RefreshGrid");
                         busyIndicator.IsBusy = false;
-                        UnicontaMessageBox.Show(UpTextEXTF + " " + UpText, "DATEV", MessageBoxButton.OK);
+                        UnicontaMessageBox.Show(UpTextEXTF + " " + UpText, "DATEV", MessageBoxButton.OK, MessageBoxImage.Information);
                         if (DatevDetails.UCService == 2 || DatevDetails.UCService == 3)
                         {
                             if (old)

@@ -19,6 +19,7 @@ using System.Windows.Shapes;
 using Uniconta.DataModel;
 using Uniconta.ClientTools.Util;
 using Uniconta.API.Service;
+using Uniconta.API.DebtorCreditor;
 using System.Windows;
 using Uniconta.Client.Pages;
 using Uniconta.Common.Utility;
@@ -28,12 +29,7 @@ using System.Globalization;
 using System.Windows.Data;
 using DevExpress.XtraReports.UI;
 using NPOI.SS.Formula.Functions;
-using System.ServiceModel;
 using System.IO;
-using System.Xml.Serialization;
-using System.Xml;
-using RSK.Verktakamidi;
-using GagnaskilKlasar;
 using static DevExpress.Utils.Svg.CommonSvgImages;
 
 using UnicontaClient.Pages;
@@ -244,21 +240,7 @@ namespace UnicontaClient.Pages.CustomPage
             this.baseRibbon?.FilterGrid.Refresh();
         }
 
-        public static Midi CreateContractorTicketIcelandic(
-            long ticketID,
-            CreditorClient contractor,
-            long amount = 0)
-        {
-            return new Midi
-            {
-                id = ticketID,
-                Kennitala = ContractorLegalID(contractor),
-                Verktakagreidsla = amount,
-                VerktakagreidslaSpecified = amount != 0
-            };
-        }
-
-        private static string ContractorLegalID(CreditorClient contractor)
+        static string ContractorLegalID(CreditorClient contractor)
         {
             var ContractorLegalID = "";
             if (contractor.CompanyRegNo != null)
@@ -266,218 +248,154 @@ namespace UnicontaClient.Pages.CustomPage
             else
                 ContractorLegalID = contractor.Account;
             ContractorLegalID = new string(ContractorLegalID.ToCharArray().Where(o => char.IsDigit(o)).ToArray());
-            ContractorLegalID = ContractorLegalID.Replace("IS", "").Replace("-", "");
             return ContractorLegalID;
         }
 
-        public static Midi CreateContractorTicketNotIcelandic(
-            long ticketID,
-            CreditorClient contractor,
-            long amount = 0)
-        {            
-            var cityName = contractor._City;
-            var streetName = contractor.Address;
-            return new Midi
+        // one slip per contractor: the year's payments on the visible transactions, cut to whole krónur
+        static List<IcelandContractorSlip> Slips(IEnumerable<CreditorTransClient> items, out string error, out string errorAccount)
+        {
+            error = null;
+            errorAccount = null;
+            var lst = new List<IcelandContractorSlip>();
+            foreach (var grouping in items.GroupBy(o => o.Creditor))
             {
-                id = ticketID,
-                Kennitala = Contr_Helpers.NON_IS_KENNITALA, // Constant for non-IS contractors
-                Verktakagreidsla = amount,
-                VerktakagreidslaSpecified = amount != 0,
-                ErlendurAdili = new ErlendurAdili
+                var creditor = grouping.Key;
+                if (creditor == null)
+                    continue;
+                var total = grouping.Sum(o => o.Amount);
+                if (total >= 0)
+                    continue;
+                var amount = (long)-total;
+                if (creditor.Country == CountryCode.Iceland)
                 {
-                    Borg = cityName,
-                    Gata = streetName,
-                    Nafn = contractor._Name,
-                    Tin = String.IsNullOrEmpty(contractor._VatNumber) ? "" : contractor._VatNumber,
-                    Land = landcode(contractor)
+                    var kt = ContractorLegalID(creditor);
+                    if (kt.Length != 10)
+                        error = "Ógild kennitala";
+                    else
+                        lst.Add(new IcelandContractorSlip { Kennitala = kt, Amount = amount });
                 }
-            };
-        }
-
-        private static TegLandKodi landcode(CreditorClient contractor)
-        {
-            string countryCodeIso;
-            TegLandKodi landCode;
-            countryCodeIso = ((CountryISOCode)contractor.Country).ToString();
-            Enum.TryParse(countryCodeIso, true, out landCode);
-            return landCode;
-        }
-
-        public XmlElement SerializeToXmlElement<T>(T value)
-        {
-            var emptyNamespaces = new XmlSerializerNamespaces(new[] { XmlQualifiedName.Empty });
-            var serializer = new XmlSerializer(value.GetType());
-            var settings = new XmlWriterSettings();
-            settings.Indent = true;
-            settings.OmitXmlDeclaration = true;
-            XmlDocument el = new XmlDocument();
-
-            using (var stream = new StringWriter())
-            using (var writer = XmlWriter.Create(stream, settings))
-            {
-                serializer.Serialize(writer, value, emptyNamespaces);
-                el.LoadXml(stream.ToString());
-                return el.DocumentElement;
+                else if (creditor.Country == CountryCode.Unknown)
+                    error = "Óþekkt land";
+                else
+                    lst.Add(new IcelandContractorSlip
+                    {
+                        Country = ((CountryISOCode)creditor.Country).ToString(),
+                        Tin = creditor._VatNumber ?? "",
+                        Name = creditor._Name,
+                        Street = creditor.Address,
+                        City = creditor._City,
+                        Amount = amount
+                    });
+                if (error != null)
+                {
+                    errorAccount = creditor.Account;
+                    return null;
+                }
             }
+            return lst;
+        }
+
+        // RSK's schema messages in words
+        static string Readable(string RSKmelding)
+        {
+            if (string.IsNullOrEmpty(RSKmelding))
+                return RSKmelding;
+            if (RSKmelding.Contains("List of possible elements expected: 'Tin Gata'.") || RSKmelding.Contains("The 'Tin' element has an invalid value"))
+                return "Vantar Tax Identification Number (TIN) hjá verktaka";
+            if (RSKmelding.Contains("List of possible elements expected: 'Gata'") || RSKmelding.Contains("The 'Gata' element has an invalid value"))
+                return "Vantar heimilisfang hjá verktaka";
+            if (RSKmelding.Contains("'ErlendurAdili' has invalid child element 'Land'. List of possible elements expected: 'Borg'.") || RSKmelding.Contains("The 'Borg' element has an invalid value"))
+                return "Vantar að tilgreina borg verktaka";
+            if (RSKmelding.Contains("Ekki er hægt að skila sömu sendingu aftur."))
+                return "Búið að skila miða fyrir verktaka";
+            return RSKmelding;
+        }
+
+        static string Message(IcelandContractorSlipsResult r)
+        {
+            var s = Readable(r.Message);
+            if (!string.IsNullOrEmpty(r.Details))
+                s = string.IsNullOrEmpty(s) ? r.Details : string.Concat(s, "\n\n", r.Details);
+            return s;
         }
 
         private void SendButton_OnClick(object sender, RoutedEventArgs e)
         {
-            SetBusy();
-            dgCreditorTransContr.BusyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("Sending");
-            Send(TegAdgerd.Nyskra);
-            if (filterContr != "")
+            Send(IcelandContractorSlipAction.New);
+        }
+
+        // the server checks the slips at RSK, then files them; RSK's receipt goes to the inbox
+        private async void Send(IcelandContractorSlipAction action)
+        {
+            var veflykill = txtVeflykill.EditText;
+            var keys = new Uniconta.API.GeneralLedger.IcelandRskKeysAPI(api);
+            var keyState = await keys.State(); // with a veflykill saved for the company, the server uses it when none is typed
+            var saved = keyState != null && keyState.SlipsSaved;
+            if (string.IsNullOrEmpty(veflykill) && !saved)
             {
+                UnicontaMessageBox.Show("Sláðu inn veflykil", "Verktakamiðar");
+                return;
+            }
+            var items = dgCreditorTransContr.VisibleItems.Cast<CreditorTransClient>().ToList();
+            var slips = Slips(items, out var error, out var errorAccount);
+            if (slips == null)
+            {
+                filterContr = errorAccount;
+                UnicontaMessageBox.Show(error + $" á lykli {errorAccount}", "Verktakamiðar");
                 this.baseRibbon?.SetFilterDefaultFields(DefaultFilters());
                 this.baseRibbon?.FilterGrid.Refresh();
+                return;
             }
+            if (slips.Count == 0)
+            {
+                UnicontaMessageBox.Show("Engir verktakar fundust", "Verktakamiðar");
+                return;
+            }
+
+            SetBusy();
+            dgCreditorTransContr.BusyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("Sending");
+            var capi = new IcelandContractorSlipsAPI(api);
+            var check = await capi.Check(filterYear, action, veflykill, slips);
+            IcelandContractorSlipsResult res = null;
+            if (check != null && check.Err == 0 && check.Valid)
+                res = await capi.File(filterYear, action, veflykill, slips);
             ClearBusy();
-        }
 
-        public Verktakagreidsluskra skra(List<Midi> midisList, TegAdgerd adgerd)
-        {
-            return new Verktakagreidsluskra()
+            if (check == null || (res == null && check.Err == 0 && check.Valid))
             {
-                //Bunkanumer = 444072,
-                //BunkanumerSpecified = true,
-                KennitalaLaunagreidanda = this.api.CompanyEntity._Id,
-                Tekjuar = filterYear.ToString("D4"), //TODO
-                Veflykill = (string)txtVeflykill.EditValue ?? "",
-                Tegund = TegTegund.Beint,
-                //Adgerd = TegAdgerd.Nyskra, //ekki verið að leiðrétta
-                Adgerd = adgerd,
-                TilForskraningar = TegString_J_N.J, //ALLTAF
-                ForritUtgafa = Contr_Helpers.VERSION_ID,
-                Midi = midisList.ToArray(),
-                Samtalningsblad = new Samtalningsblad()
-                {
-                    FjoldiLaunthega = midisList.Count,
-                    FjoldiMida = midisList.Count,
-                    Verktakagreidsla = midisList.Sum(o => o.Verktakagreidsla),
-                    VerktakagreidslaSpecified = true
-                }
-            };
-        }
-
-        private async void Send(TegAdgerd adgerd)
-        {
-            var items = dgCreditorTransContr.VisibleItems.Cast<CreditorTransClient>();
-            var vefLykill = txtVeflykill.EditText;
-            List<Midi> midisList = new List<Midi>();
-            var cli = new ContrClient();
-            var RSKmelding = "";
-
-            try
-            {
-                RSKmelding = CreateTickets(cli, adgerd, items, midisList);
-
-                if (String.IsNullOrEmpty(RSKmelding))
-                {
-                    var resp = cli.Client.Senda(SerializeToXmlElement(skra(midisList, adgerd)));
-
-                    if (!resp.Tokst)
-                    {
-                        var hafnadString = "";
-                        if (resp.Hafnad != null && resp.Hafnad.Length > 0)
-                        {
-                            hafnadString = "\n" + string.Join("\n", resp.Hafnad.Select(o => o.ToString()));
-                        }
-                        UnicontaMessageBox.Show(resp.Villubod + hafnadString + "\n\nAthugasemdir frá RSK:\n" + (resp.Athugasemd ?? "\n") + "\n\n" + string.Join("\n\n", (resp.Athugasemdir ?? new string[] { }).Select(o => o ?? "")), "Villa");
-                    }
-                    else
-                    {
-                        if (!string.IsNullOrWhiteSpace(resp.Athugasemd))
-                        {
-                            UnicontaMessageBox.Show(resp.Athugasemd, "Athugasemd");
-                        }
-
-                        // SUCCESS
-
-
-                        // Verktakamiði er gerður út frá hreyfingayfirliti með tegundirnar reikningur, kreditreikningur, afturköllun, afsláttur, þóknun
-                        // Svo skoðum við hvernig kreditreikningar eru lesnir inn upp m.t.t. VSK
-
-                        //File.WriteAllBytes(@"E:\Verktakamidi.pdf", resp.PDFKvittun);
-
-                        if ((resp.PDFKvittun != null) && (resp.PDFKvittun.Length > 0))
-                        {
-                            VouchersClient voucher = new VouchersClient()
-                            {
-                                VoucherAttachment = resp.PDFKvittun,
-                                Text = $"Skil á verktakamiðum {filterYear:D4}",
-                                _Content = ContentTypes.Documents,
-                                Fileextension = FileextensionsTypes.PDF,
-                                DocumentDate = DateTime.Now,
-                            };
-                            var insertRes = await api.Insert(voucher);
-                            if (insertRes == ErrorCodes.Succes)
-                                UnicontaMessageBox.Show("Kvittun hefur verið vistuð í Stafræn fylgiskjöl (innhólf)", "Aðgerð tókst", MessageBoxButton.OK, MessageBoxImage.Information);
-                        }
-                    }
-                }
-                cli.Dispose();
-                cli = null;
+                UtilDisplay.ShowErrorCode(capi.LastError != 0 ? capi.LastError : ErrorCodes.NoSucces);
+                return;
             }
-            catch
+            if (check.Err != 0 || !check.Valid)
             {
-                cli.Dispose();
-                cli = null;
-                throw;
-            }
-        }
-
-        private string CreateTickets(ContrClient cli, TegAdgerd adgerd, IEnumerable<CreditorTransClient> items, List<Midi> midisList)
-        {
-            string RSKmelding;
-            using (CredtorTransValidation errchk = new CredtorTransValidation(this))
-            {
-                RSKmelding = "";
-                if (dgCreditorTransContr.VisibleItems.Count != 0 && errchk.ValidateCompany(cli, ref RSKmelding, adgerd))
-                {
-                    int ticketNo = 1;
-                    foreach (var grouping in items.GroupBy(o => o.Creditor))
-                    {
-                        var creditor = grouping.Key;
-                        if (grouping.Sum(o => o.Amount) >= 0) continue;
-                        Midi midi = null;
-                        if (creditor.Country == CountryCode.Iceland)
-                        {
-                            if (ContractorLegalID(creditor).Length == 10)
-                                midi = CreateContractorTicketIcelandic(ticketNo, creditor, (long)grouping.Sum(o => -o.Amount));
-                            else
-                                RSKmelding = "Ógild kennitala";
-                        }
-                        else
-                        {
-                            midi = CreateContractorTicketNotIcelandic(ticketNo, creditor,
-                                (long)grouping.Sum(o => -o.Amount));
-                        }
-
-                        if (midi != null && errchk.ValidateContractor(cli, midi, ref RSKmelding, adgerd, dgCreditorTransContr.VisibleItems.Count))
-                        {
-                            midisList.Add(midi);
-                            ticketNo++;
-                        }
-                        else
-                        {
-                            if (!String.IsNullOrEmpty(RSKmelding))
-                            {
-                                filterContr = grouping.Key.Account;
-                                UnicontaMessageBox.Show(RSKmelding + $" á lykli {filterContr}", "Verktakamiðar");
-                                break;
-                            }
-                        }
-                    }
-                }
+                if (check.Err != 0 && string.IsNullOrEmpty(check.Message))
+                    UtilDisplay.ShowErrorCode(check.Err);
                 else
-                {
-                    if (dgCreditorTransContr.VisibleItems.Count == 0)
-                        throw new Exception("Engir verktakar fundust");
-                    else
-                        throw new Exception(RSKmelding);
-                }
+                    UnicontaMessageBox.Show(Message(check), "Villa");
+                return;
             }
-            return RSKmelding;
+            if (res.Err != 0 || !res.Valid)
+            {
+                if (string.IsNullOrEmpty(res.Message))
+                    UtilDisplay.ShowErrorCode(res.Err != 0 ? res.Err : ErrorCodes.NoSucces);
+                else
+                    UnicontaMessageBox.Show(Message(res), "Villa");
+                return;
+            }
+            if (!string.IsNullOrWhiteSpace(res.Message) || !string.IsNullOrEmpty(res.Details))
+                UnicontaMessageBox.Show(Message(res), "Athugasemd");
+            if (res.VoucherRowId != 0)
+                UnicontaMessageBox.Show("Kvittun hefur verið vistuð í Stafræn fylgiskjöl (innhólf)", "Aðgerð tókst", MessageBoxButton.OK, MessageBoxImage.Information);
+            else
+                UnicontaMessageBox.Show($"Verktakamiðum skilað, bunki {res.BatchNumber}", "Aðgerð tókst", MessageBoxButton.OK, MessageBoxImage.Information);
+            if (!saved && !string.IsNullOrEmpty(veflykill) && UnicontaMessageBox.Show(
+                    "Vista veflykil Gagnaskila fyrir fyrirtækið? Hann er geymdur dulkóðaður á þjóninum, og þá þarf ekki að slá hann inn næst.",
+                    "Verktakamiðar", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            {
+                var s = await keys.Save(Uniconta.API.GeneralLedger.IcelandRskKeyKind.Slips, veflykill);
+                if (s == null || s.Err != ErrorCodes.Succes)
+                    UnicontaMessageBox.Show(s?.Message ?? "Veflykillinn var ekki vistaður", "Verktakamiðar");
+            }
         }
     } //...class CreditorTransactionsContr
 
@@ -505,118 +423,4 @@ namespace UnicontaClient.Pages.CustomPage
         }
     }
 
-//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    public class CredtorTransValidation : IDisposable
-    {
-        private List<Comment> Athugasemdir = new List<Comment>();
-        private List<Midi> dummymidisList = new List<Midi>();
-        private CreditorTransactionsContr creditorTransContr;
-
-        public void Dispose()
-        {
-            Athugasemdir = null;
-            dummymidisList = null;
-        }
-
-        public CredtorTransValidation(CreditorTransactionsContr creditorTransactionsContr)
-        {
-            this.creditorTransContr = creditorTransactionsContr;
-        }
-
-        // This dummyticket is to validate the company.
-        private Midi dummymidi()
-        {
-            return new Midi()
-            {
-                id = 1,
-                Kennitala = Contr_Helpers.NON_IS_KENNITALA,
-                Verktakagreidsla = 1,
-                VerktakagreidslaSpecified = 1 != 0
-            };
-        }
-
-        public bool ValidateCompany(ContrClient cli, ref string RSKmelding, TegAdgerd adgerd)
-        {
-            dummymidisList.Add(dummymidi());
-            var dummyskra = creditorTransContr.skra(dummymidisList, adgerd);
-            var resp = GetValidation(cli, out RSKmelding, dummyskra);
-            dummyskra = null;
-            return resp.Tokst;
-        }
-
-        public bool ValidateContractor(ContrClient cli, Midi midi, ref string RSKmelding, TegAdgerd adgerd, int filteredTickets)
-        {
-            RSKmelding = "";
-            bool tomur = dummymidisList?.Any() != true;
-            if (!tomur)
-                dummymidisList.Clear();
-            if (midi!=null)
-                dummymidisList.Add(midi);
-
-            var dummyskra = creditorTransContr.skra(dummymidisList, adgerd);
-
-            var resp = GetValidation(cli, out RSKmelding, dummyskra);
-            dummyskra = null;
-
-            // Hér þarf að túlka ýmsar meldingar frá RSK yfir í eitthvað manneskjulegra.
-            if (!String.IsNullOrEmpty(RSKmelding) || (resp.Hafnad != null && resp.Hafnad.Length > 0))
-            {
-                if (!String.IsNullOrEmpty(RSKmelding))
-                {
-                    if (RSKmelding.Contains("List of possible elements expected: 'Tin Gata'.") ||
-                            RSKmelding.Contains("The 'Tin' element has an invalid value"))
-                    {
-                        RSKmelding = "Vantar Tax Identification Number (TIN) hjá verktaka";
-                    }
-                    else if (RSKmelding.Contains("List of possible elements expected: 'Gata'") ||
-                            RSKmelding.Contains("The 'Gata' element has an invalid value"))
-                    {
-                        RSKmelding = "Vantar heimilisfang hjá verktaka";
-                    }
-                    else if (RSKmelding.Contains("'ErlendurAdili' has invalid child element 'Land'. List of possible elements expected: 'Borg'.") ||
-                            RSKmelding.Contains("The 'Borg' element has an invalid value"))
-                    {
-                        RSKmelding = "Vantar að tilgreina borg verktaka";
-                    }
-                    else if (RSKmelding.Contains("Ekki er hægt að skila sömu sendingu aftur."))
-                    {
-                        RSKmelding = "";
-                        if (filteredTickets == 1)
-                        {
-                            RSKmelding = "Búið að skila miða fyrir verktaka";                            
-                        }
-                        resp.Tokst = false;
-                    }
-                }
-
-                if (resp.Hafnad != null && resp.Hafnad.Length > 0)
-                {
-                    RSKmelding = "\n" + string.Join("\n", resp.Hafnad.Select(o => o.ToString()));
-                }
-            }
-            else if (midi.Kennitala == Contr_Helpers.NON_IS_KENNITALA && String.IsNullOrEmpty(RSKmelding))
-            {
-                if ((CountryCode)midi.ErlendurAdili?.Land == CountryCode.Unknown)
-                {
-                    RSKmelding = "Óþekkt land";
-                    resp.Tokst = false;
-                }
-            }
-            return resp.Tokst;
-        }
-
-        private StadfestaKlasi GetValidation(ContrClient cli, out string RSKmelding, Verktakagreidsluskra dummyskra)
-        {
-            var resp = cli.Client.Villuprofa(creditorTransContr.SerializeToXmlElement(dummyskra));
-            RSKmelding = resp.Villubod;
-            return resp;
-        }
-    } //...class CredtorTransValidation
-
-//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    public static class Contr_Helpers
-    {
-        public static string NON_IS_KENNITALA = "9999999999";
-        public static string VERSION_ID = "Uniconta V1";
-    }
 }

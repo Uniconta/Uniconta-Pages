@@ -359,6 +359,10 @@ namespace UnicontaClient.Pages.CustomPage
                 PurchaseAccount.Visible = PurchaseAccount.ShowInColumnChooser = false;
             else
                 PurchaseAccount.ShowInColumnChooser = true;
+            if (!company.InvDuty)
+                ExemptDuty.ShowInColumnChooser = ExemptDuty.Visible = false;
+            else
+                ExemptDuty.ShowInColumnChooser = ExemptDuty.Visible = true;
             SetVariantColumns();
 
             layOutInvItemStorage.Visibility = OnHandScreenInOrder ? Visibility.Visible : Visibility.Collapsed;
@@ -880,11 +884,12 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     break;
                 case "ShowInvoice":
+                case "ShowEInvoice":
                 case "CreateInvoice":
                     if (Order != null)
                     {
                         if (Utility.HasControlRights("GenerateInvoice", api.CompanyEntity))
-                            GenerateInvoice(Order, ActionType == "ShowInvoice" ? true : false);
+                            GenerateInvoice(Order, ActionType == "ShowInvoice" || ActionType == "ShowEInvoice", ActionType == "ShowEInvoice");
                         else
                             UtilDisplay.ShowControlAccessMsg("GenerateInvoice");
                     }
@@ -1284,7 +1289,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        private void GenerateInvoice(DebtorOrderClient dbOrder, bool showProformaInvoice)
+        private void GenerateInvoice(DebtorOrderClient dbOrder, bool showProformaInvoice, bool showEInvoice = false)
         {
             api.AllowBackgroundCrud = false;
             var savetask = saveGridLocal();
@@ -1321,7 +1326,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (showProformaInvoice)
             {
-                ShowProformaInvoice(dbOrder, savetask);
+                ShowProformaInvoice(dbOrder, savetask, showEInvoice);
                 return;
             }
 
@@ -1393,7 +1398,7 @@ namespace UnicontaClient.Pages.CustomPage
             GenrateInvoiceDialog.Show();
         }
 
-        async private void ShowProformaInvoice(DebtorOrderClient order, Task<ErrorCodes> savetask)
+        async private void ShowProformaInvoice(DebtorOrderClient order, Task<ErrorCodes> savetask, bool showEInvoice)
         {
             if (savetask != null)
             {
@@ -1407,6 +1412,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             var invoicePostingResult = SetupInvoicePostingPrintGenerator(order, DateTime.Now, true, true, false, false, 0, false, false, false, null, false);
             invoicePostingResult.SetAllowCreditMax(api.CompanyEntity.AllowSkipCreditMax);
+            invoicePostingResult.ShowEInvoice = showEInvoice;
 
             busyIndicator.IsBusy = true;
             busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");

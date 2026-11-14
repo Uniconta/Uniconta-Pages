@@ -1,36 +1,23 @@
-<Pages:GridBasePage  xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
-        xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+                    xmlns:UC="clr-namespace:UnicontaClient.Pages.CustomPage;assembly=UnicontaPages"
+                    xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
 x:Class="UnicontaClient.Pages.CustomPage.VatReportNorway"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"
-        xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
-
+                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools" 
+                    xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+                    xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage">   
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        
+
         <CorasauControls:CorasauRibbonControl x:Name="localMenu" XMLSourcePath=";component/Pages/GL/Vat/Reports/VatReportNorwayRibbon.xml"/>
-        <Grid Grid.Row="1" Margin="5" x:Name="gridHeaderParamMain">
+        <Grid Grid.Row="1" Margin="5">
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-
-            <Grid Grid.Column="0" Margin="5" x:Name="gridHeaderParam01">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
@@ -38,53 +25,132 @@ x:Class="UnicontaClient.Pages.CustomPage.VatReportNorway"
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Period}" FontSize="12" FontWeight="Bold" Grid.Column="0" Grid.Row="0" Margin="3,3,3,3"/>
-            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Login}" FontSize="12" FontWeight="Bold" Grid.Column="1" Grid.Row="0" Margin="3,3,3,3"/>
-            <TextBlock Text="Authentication/Signing" FontSize="12" FontWeight="Bold" Grid.Column="3" Grid.Row="0" Margin="3,3,3,3"/>
-
-            <CorasauControls:DateEditor x:Name="txtFromDate"  IsReadOnly="true" Grid.Column="0" Grid.Row="1" Margin="0,3,3,3"/>
-            <CorasauControls:DateEditor x:Name="txtToDate"  IsReadOnly="true" Grid.Column="0" Grid.Row="2" Margin="0,3,3,3"/>
-
-            <TextBlock Text="Altinn SystemID" Grid.Column="1" Grid.Row="1" Margin="3,3,3,3"/>
-            <CorasauControls:TextEditor x:Name="txtAltinnSystemID" Width="150" IsReadOnly="false" Grid.Column="2" Grid.Row="1" Margin="0,3,3,3"/>
-            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Password}" Grid.Column="1" Grid.Row="2" Margin="3,3,3,3"/>
-            <CorasauControls:PasswordBoxEditor x:Name="txtAltinnSystemPassword"  PasswordChar="*" Width="150" IsReadOnly="false" Grid.Column="2" Grid.Row="2" Margin="0,3,3,3"/>
-            <TextBlock Text="Test" Grid.Column="0" Grid.Row="3" Margin="3,3,3,3"/>
-            <CorasauControls:CheckEditor x:Name="ceAltinnTest" IsChecked="True" IsReadOnly="false" Grid.Column="1" Grid.Row="3" Margin="0,3,3,3"/>
-            <TextBlock Text="Bruker-Id" Grid.Column="3" Grid.Row="1" Margin="3,3,3,3"/>
-            <CorasauControls:TextEditor x:Name="txtUserSSN" Width="150" IsReadOnly="false" Grid.Column="4" Grid.Row="1" Margin="0,3,3,3"/>
-            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Password}" Grid.Column="3" Grid.Row="2" Margin="3,3,3,3"/>
-            <CorasauControls:PasswordBoxEditor x:Name="txtUserSSNPassword" PasswordChar="*" Width="150" IsReadOnly="false" Grid.Column="4" Grid.Row="2" Margin="0,3,3,3"/>
-            <TextBlock Text="SMS Pin kode" Grid.Column="5" Grid.Row="1" Margin="3,3,3,3"/>
-            <CorasauControls:TextEditor x:Name="txtSMSPinCode" Width="150" IsReadOnly="false" Grid.Column="6" Grid.Row="1" Margin="0,3,3,3"/>
-            <TextBlock Text="Altinn kode" Grid.Column="5" Grid.Row="2" Margin="3,3,3,3"/>
-            <CorasauControls:TextEditor x:Name="txtAltinnPinCode" Width="150" IsReadOnly="false" Grid.Column="6" Grid.Row="2" Margin="0,3,3,3"/>
-        </Grid>
- 
-            <Grid Grid.Column="1" Margin="5" x:Name="gridHeaderParam02">
+            <Grid Grid.Column="0" Margin="5">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Text="SystemInfo" FontSize="12" FontWeight="Bold" Grid.Column="0" Grid.Row="0" Margin="3,3,3,3"/>
-                <CorasauControls:TextEditor x:Name="txtSystemInfo" Width="350" Height="80" TextWrapping="Wrap" VerticalContentAlignment="Top" IsReadOnly="true" Grid.Column="0" Grid.Row="1" Margin="0,3,3,3"/>
+                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Period}" FontSize="12" FontWeight="Bold" Grid.Column="0" Grid.Row="0" Margin="3,3,3,3"/>
+
+                <CorasauControls:DateEditor x:Name="txtFromDate" IsReadOnly="true" Grid.Column="0" Grid.Row="1" Margin="0,3,3,3"/>
+                <CorasauControls:DateEditor x:Name="txtToDate" IsReadOnly="true" Grid.Column="0" Grid.Row="2" Margin="0,3,3,3"/>
+
+                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Test}" Grid.Column="0" Grid.Row="3" Margin="3,3,3,3"/>
+                <CorasauControls:CheckEditor x:Name="ceTest" EditValueChanged="ceTest_EditValueChanged" IsReadOnly="false" Grid.Column="0" Grid.Row="3" HorizontalAlignment="Right" Margin="0,3,3,3"/>
+
+                <!-- Which environment Validate and Send talk to: production (red) or Skatteetaten's test environment (green) -->
+                <TextBlock x:Name="txtEnvironment" FontWeight="Bold" Grid.Column="0" Grid.Row="4" Margin="3,3,3,3"/>
+            </Grid>
+
+            <Grid Grid.Column="1" Margin="5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=NorwayVATDeclarationType}" FontSize="12" FontWeight="Bold" Grid.Column="0" Grid.Row="0" Margin="3,3,3,3"/>
+                <CorasauControls:ComboBoxEditor x:Name="cmbDeclarationType" DisplayMember="Value" ValueMember="Key" Width="250" Grid.Column="0" Grid.Row="1" Margin="0,3,3,3"/>
+
+                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=NorwayVATSubmissionType}" FontSize="12" FontWeight="Bold" Grid.Column="0" Grid.Row="2" Margin="3,3,3,3"/>
+                <CorasauControls:ComboBoxEditor x:Name="cmbSubmissionType" DisplayMember="Value" ValueMember="Key" Width="250" Grid.Column="0" Grid.Row="3" Margin="0,3,3,3"/>
+            </Grid>
+
+            <Grid Grid.Column="2" Margin="5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=NorwayVATComment}" FontSize="12" FontWeight="Bold" Grid.Column="0" Grid.Row="0" Margin="3,3,3,3"/>
+                <CorasauControls:ComboBoxEditor x:Name="cmbCommentType" DisplayMember="Value" ValueMember="Key" EditValueChanged="cmbCommentType_EditValueChanged" Width="250" Grid.Column="0" Grid.Row="1" Margin="0,3,3,3"/>
+                <CorasauControls:ComboBoxEditor x:Name="cmbCommentOption" Visibility="Hidden" Width="250" Height="25" Grid.Column="0" Grid.Row="2" Margin="0,3,3,3"/>
+                <CorasauControls:TextEditor x:Name="txtComment" Visibility="Hidden" Width="250" Height="50" TextWrapping="Wrap" VerticalContentAlignment="Top" Grid.Column="0" Grid.Row="2" Margin="0,3,3,3"/>
+            </Grid>
+
+            <Grid Grid.Column="3" Margin="5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SystemInfo}" FontSize="12" FontWeight="Bold" Grid.Column="0" Grid.Row="0" Margin="3,3,3,3"/>
+                <CorasauControls:TextEditor x:Name="txtSystemInfo" Width="600" Height="120" TextWrapping="Wrap" VerticalContentAlignment="Top" IsReadOnly="true"
+                                            ScrollViewer.VerticalScrollBarVisibility="Auto" Grid.Column="0" Grid.Row="1" Margin="0,3,3,3"/>
+            </Grid>
+
+            <Grid Grid.Column="4" Margin="5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=RequestId}" FontSize="12" FontWeight="Bold" Grid.Column="0" Grid.Row="0" Margin="3,3,3,3"/>
+                <CorasauControls:TextEditor x:Name="txtRequestId" Width="250" Height="25" TextWrapping="Wrap" VerticalContentAlignment="Top" IsReadOnly="true" Grid.Column="0" Grid.Row="1" Margin="0,3,3,3"/>
             </Grid>
         </Grid>
 
         <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="2" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
-            <localPage:VatReportNorwayGrid x:Name="dgVatReportNorway" AutoGenerateColumns="None">
-                <localPage:VatReportNorwayGrid.Columns>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Line" Width="90"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" Width="500"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AmountBase"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Amount" />
-                </localPage:VatReportNorwayGrid.Columns>
-            </localPage:VatReportNorwayGrid>
+            <local:VatReportNorwayGrid x:Name="dgVatReportNorway" AutoGenerateColumns="None">
+                <local:VatReportNorwayGrid.Columns>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="LineNo" Width="60"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Account" Width="120"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AccountName" Width="300" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VAT" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="VATType" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="StandardVAT" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Rate" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="BaseAmount" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PostedVAT" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ReportingBaseAmount" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ReportingPostedVAT" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Specification" AllowEditing="True">
+                        <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                            <CorasauControls:ComboBoxEditSettingsCustom x:Name="cmbSpecification" DisplayMember="Value" ValueMember="Key"></CorasauControls:ComboBoxEditSettingsCustom>
+                        </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Comment" AllowEditing="True"/>
+                    <!-- Items are set per row in ShownEditor: only remarks Skatteetaten accepts for the line's code, side and sign -->
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="PredefinedComment" AllowEditing="True" Width="160">
+                        <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                            <CorasauControls:ComboBoxEditSettingsCustom x:Name="cmbPredefinedLineComment"></CorasauControls:ComboBoxEditSettingsCustom>
+                        </localPage:CorasauDataGridTemplateColumnClient.EditSettings>
+                    </localPage:CorasauDataGridTemplateColumnClient>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Check" Width="300"/>
+                </local:VatReportNorwayGrid.Columns>
+                <local:VatReportNorwayGrid.TotalSummary>
+                    <localPage:SumColumn FieldName="Account" SummaryType="Count" />
+                    <localPage:SumColumn FieldName="BaseAmount" SummaryType="Sum" />
+                    <localPage:SumColumn FieldName="PostedVAT" SummaryType="Sum" />
+                    <localPage:SumColumn FieldName="ReportingBaseAmount" SummaryType="Sum" />
+                    <localPage:SumColumn FieldName="ReportingPostedVAT" SummaryType="Sum" />
+                </local:VatReportNorwayGrid.TotalSummary>
+            </local:VatReportNorwayGrid>
         </CorasauControls:BusyIndicator>
     </Grid>
 </Pages:GridBasePage>

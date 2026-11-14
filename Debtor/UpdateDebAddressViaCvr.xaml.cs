@@ -51,8 +51,8 @@ namespace UnicontaClient.Pages.CustomPage
         UnicontaBaseEntity[] records;
         bool isSearch;
 
-        static bool? updName, updAddress, updIndustryCode, updCompanyState;
-        ItemBase iUpdName, iUpdAddress, iUpdIndustryCode, iUpdCompanyState;
+        static bool? updName, updAddress, updIndustryCode, updCompanyState, updVat, updEInvoice;
+        ItemBase iUpdName, iUpdAddress, iUpdIndustryCode, iUpdCompanyState, iUpdVat, iUpdEInvoice;
 
 
         public UpdateDebAddressViaCvr(BaseAPI API) : base(API, string.Empty)
@@ -93,6 +93,10 @@ namespace UnicontaClient.Pages.CustomPage
             updAddress = updAddress ?? true;
             updIndustryCode = updIndustryCode ?? true;
             updCompanyState = updCompanyState ?? true;
+            // Only the Icelandic registry gives a VAT number and e-invoice capability worth taking over by default
+            var iceland = api.CompanyEntity._CountryId == CountryCode.Iceland;
+            updVat = updVat ?? iceland;
+            updEInvoice = updEInvoice ?? iceland;
 
             SetFieldsVisibility();
             IndustryCodes = api.GetCache(typeof(IndustryCode));
@@ -136,6 +140,14 @@ namespace UnicontaClient.Pages.CustomPage
                     updCompanyState = IsChecked;
                     iUpdCompanyState.IsChecked = updCompanyState.GetValueOrDefault();
                     break;
+                case "UpdVat":
+                    updVat = IsChecked;
+                    iUpdVat.IsChecked = updVat.GetValueOrDefault();
+                    break;
+                case "UpdEInvoice":
+                    updEInvoice = IsChecked;
+                    iUpdEInvoice.IsChecked = updEInvoice.GetValueOrDefault();
+                    break;
             }
             SetFieldsVisibility();
         }
@@ -168,6 +180,15 @@ namespace UnicontaClient.Pages.CustomPage
             NewCompanyState.Visible = updCompanyState.GetValueOrDefault();
             CompanyState.Visible = updCompanyState.GetValueOrDefault();
             DifCompanyState.Visible = updCompanyState.GetValueOrDefault();
+
+            if (iUpdVat != null)
+                iUpdVat.IsChecked = updVat.GetValueOrDefault();
+            VatNumber.Visible = NewVatNumber.Visible = DifVatNumber.Visible = updVat.GetValueOrDefault();
+            // prospects have no e-invoice flag
+            var eInvoice = updEInvoice.GetValueOrDefault() && dgUpdateDebtorAddress.DCtype != 2;
+            if (iUpdEInvoice != null)
+                iUpdEInvoice.IsChecked = updEInvoice.GetValueOrDefault();
+            NewInvoiceInXML.Visible = DifEInvoice.Visible = eInvoice;
         }
 
 
@@ -178,6 +199,8 @@ namespace UnicontaClient.Pages.CustomPage
             iUpdAddress = UtilDisplay.GetMenuCommandByName(rb, "UpdAddress");
             iUpdIndustryCode = UtilDisplay.GetMenuCommandByName(rb, "UpdIndustryCode");
             iUpdCompanyState = UtilDisplay.GetMenuCommandByName(rb, "UpdCompanyState");
+            iUpdVat = UtilDisplay.GetMenuCommandByName(rb, "UpdVat");
+            iUpdEInvoice = UtilDisplay.GetMenuCommandByName(rb, "UpdEInvoice");
         }
 
         public override void SetParameter(IEnumerable<ValuePair> Parameters)
@@ -204,6 +227,7 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                 }
             }
+            SetFieldsVisibility();
             base.SetParameter(Parameters);
         }
 
@@ -244,6 +268,40 @@ namespace UnicontaClient.Pages.CustomPage
             return string.Equals(s1, s2, StringComparison.CurrentCultureIgnoreCase);
         }
 
+        static string Key(CountryCode country, string cvr) { return string.Concat(NumberConvert.ToString((int)country), ":", cvr); }
+
+        const int LookupChunk = 100;
+
+        // All lookups up front, LookupChunk accounts per server call. If the server cannot (an older server), that chunk is looked up account by account.
+        async Task<Dictionary<string, CompanyInfo>> FetchCompanies(IEnumerable<KeyValuePair<CountryCode, string>> accounts)
+        {
+            var wanted = accounts.Distinct().ToList();
+            var found = new Dictionary<string, CompanyInfo>(wanted.Count);
+            var uapi = new Uniconta.API.System.UtilityAPI(api);
+            for (int start = 0; start < wanted.Count; start += LookupChunk)
+            {
+                busyIndicator.BusyContent = string.Concat(Uniconta.ClientTools.Localization.lookup("Loading"), " ", NumberConvert.ToString(start), " / ", NumberConvert.ToString(wanted.Count));
+                var chunk = wanted.GetRange(start, Math.Min(LookupChunk, wanted.Count - start));
+                var answer = await uapi.LookupCVRBatch(chunk);
+                if (answer != null && answer.Length != chunk.Count)
+                    answer = null;
+                for (int i = 0; i < chunk.Count; i++)
+                {
+                    CompanyInfo ci = null;
+                    if (answer != null)
+                        ci = answer[i];
+                    else
+                    {
+                        try { ci = await CVR.CheckCountry(chunk[i].Value, chunk[i].Key); }
+                        catch { }
+                    }
+                    if (ci != null)
+                        found[Key(chunk[i].Key, chunk[i].Value)] = ci;
+                }
+            }
+            return found;
+        }
+
         async void LoadDebtorList()
         {
             DebtorClient[] debtors;
@@ -262,23 +320,15 @@ namespace UnicontaClient.Pages.CustomPage
             int counterFound = 0;
             int cntTotal = 0;
             var newDebList = new List<DebtorClientLocal>();
+            debtors = debtors.Where(d => d._LegalIdent != null && d._LegalIdent.Length >= 5 && (!isSearch || debtorsSelected.Any(s => s._Account == d._Account))).ToArray();
+            busyIndicator.IsBusy = true;
+            var companies = await FetchCompanies(debtors.Select(d => new KeyValuePair<CountryCode, string>(d._Country, d._LegalIdent)));
             foreach (var debtor in debtors)
             {
                 var cvr = debtor._LegalIdent;
-                if (cvr == null || cvr.Length < 5)
-                    continue;
-
-                if (isSearch && !debtorsSelected.Any(s => s._Account == debtor._Account))
-                    continue;
-
                 cntTotal++;
-                busyIndicator.IsBusy = true;
-                CompanyInfo ci = null;
-                try
-                {
-                    ci = await CVR.CheckCountry(cvr, debtor._Country);
-                }
-                catch { }
+                CompanyInfo ci;
+                companies.TryGetValue(Key(debtor._Country, cvr), out ci);
 
                 if (!string.IsNullOrWhiteSpace(ci?.life?.name))
                 {
@@ -298,12 +348,18 @@ namespace UnicontaClient.Pages.CustomPage
                     var difCity = address.cityname != null && !Equal(address.cityname, debtor._City);
                     var difIndustryCode = code != null && !Equal(ciIndustryCode, debtor._IndustryCode);
                     var difCompanyState = ci.companystatus != null && ci.companystatus.StatusCode() != debtor._StateOfCompany;
+                    var difVat = updVat.GetValueOrDefault() && ci.vat != null && !Equal(ci.vat, debtor._VatNumber);
+                    var difEInvoice = updEInvoice.GetValueOrDefault() && ci.EInvoice != null && (ci.EInvoice.Value ? !debtor._einvoice : debtor._InvoiceInXML);
 
-                    if (!difName && !difAddress && !difZipCode && !difCity && !difIndustryCode && !difCompanyState)
+                    if (!difName && !difAddress && !difZipCode && !difCity && !difIndustryCode && !difCompanyState && !difVat && !difEInvoice)
                         continue;
 
                     var newDebtor = new DebtorClientLocal();
                     StreamingManager.Copy(debtor, newDebtor);
+                    newDebtor.NewVatNumber = ci.vat;
+                    newDebtor.NewInvoiceInXML = ci.EInvoice.GetValueOrDefault();
+                    newDebtor.DifVatNumber = difVat;
+                    newDebtor.DifEInvoice = difEInvoice;
 
                     newDebtor.NewAddress = streetAddress?.Substring(0, Math.Min(60, streetAddress.Length));
                     newDebtor.NewAddress2 = address.street2;
@@ -360,24 +416,16 @@ namespace UnicontaClient.Pages.CustomPage
             int counterFound = 0;
             int cntTotal = 0;
             var newCredList = new List<CreditorClientLocal>();
+            creditors = creditors.Where(c => c._LegalIdent != null && c._LegalIdent.Length >= 5 && (!isSearch || creditorsSelected.Any(s => s._Account == c._Account))).ToArray();
+            busyIndicator.IsBusy = true;
+            var companies = await FetchCompanies(creditors.Select(c => new KeyValuePair<CountryCode, string>(c._Country, c._LegalIdent)));
 
             foreach (var creditor in creditors)
             {
                 var cvr = creditor._LegalIdent;
-                if (cvr == null || cvr.Length < 5)
-                    continue;
-
-                if (isSearch && !creditorsSelected.Any(s => s._Account == creditor._Account))
-                    continue;
-
                 cntTotal++;
-                busyIndicator.IsBusy = true;
-                CompanyInfo ci = null;
-                try
-                {
-                    ci = await CVR.CheckCountry(cvr, creditor._Country);
-                }
-                catch { }
+                CompanyInfo ci;
+                companies.TryGetValue(Key(creditor._Country, cvr), out ci);
                 if (!string.IsNullOrWhiteSpace(ci?.life?.name))
                 {
                     counterFound++;
@@ -395,12 +443,18 @@ namespace UnicontaClient.Pages.CustomPage
                     var difCity = address.cityname != null && !Equal(address.cityname, creditor._City);
                     var difIndustryCode = code != null && !Equal(ci.industrycode?.code, creditor._IndustryCode);
                     var difCompanyState = ci.companystatus != null && ci.companystatus.StatusCode() != creditor._StateOfCompany;
+                    var difVat = updVat.GetValueOrDefault() && ci.vat != null && !Equal(ci.vat, creditor._VatNumber);
+                    var difEInvoice = updEInvoice.GetValueOrDefault() && ci.EInvoice != null && (ci.EInvoice.Value ? !creditor._einvoice : creditor._InvoiceInXML);
 
-                    if (!difName && !difAddress && !difZipCode && !difCity && !difIndustryCode && !difCompanyState)
+                    if (!difName && !difAddress && !difZipCode && !difCity && !difIndustryCode && !difCompanyState && !difVat && !difEInvoice)
                         continue;
 
                     var newCreditor = new CreditorClientLocal();
                     StreamingManager.Copy(creditor, newCreditor);
+                    newCreditor.NewVatNumber = ci.vat;
+                    newCreditor.NewInvoiceInXML = ci.EInvoice.GetValueOrDefault();
+                    newCreditor.DifVatNumber = difVat;
+                    newCreditor.DifEInvoice = difEInvoice;
 
                     newCreditor.NewAddress = streetAddress;
                     newCreditor.NewAddress2 = address.street2;
@@ -456,22 +510,14 @@ namespace UnicontaClient.Pages.CustomPage
             int counterFound = 0;
             int cntTotal = 0;
             var newProsList = new List<CrmProspectClientLocal>();
+            prospects = prospects.Where(p => p._LegalIdent != null && p._LegalIdent.Length >= 5 && (!isSearch || prospectsSelected.Any(s => s._RowId == p._RowId))).ToArray();
+            busyIndicator.IsBusy = true;
+            var companies = await FetchCompanies(prospects.Select(p => new KeyValuePair<CountryCode, string>(p._Country, p._LegalIdent)));
             foreach (var prospect in prospects)
             {
                 var cvr = prospect._LegalIdent;
-                if (cvr == null || cvr.Length < 5)
-                    continue;
-
-                if (isSearch && !prospectsSelected.Any(s => s._RowId == prospect._RowId))
-                    continue;
-
-                busyIndicator.IsBusy = true;
-                CompanyInfo ci = null;
-                try
-                {
-                    ci = await CVR.CheckCountry(cvr, prospect._Country);
-                }
-                catch { }
+                CompanyInfo ci;
+                companies.TryGetValue(Key(prospect._Country, cvr), out ci);
                 if (!string.IsNullOrWhiteSpace(ci?.life?.name))
                 {
                     counterFound++;
@@ -489,12 +535,15 @@ namespace UnicontaClient.Pages.CustomPage
                     var difCity = address.cityname != null && !Equal(address.cityname, prospect._City);
                     var difIndustryCode = code != null && !Equal(ci.industrycode?.code, prospect._IndustryCode);
                     var difCompanyState = ci.companystatus != null && ci.companystatus.StatusCode() != prospect._StateOfCompany;
+                    var difVat = updVat.GetValueOrDefault() && ci.vat != null && !Equal(ci.vat, prospect._VatNumber);
 
-                    if (!difName && !difAddress && !difZipCode && !difCity && !difIndustryCode && !difCompanyState)
+                    if (!difName && !difAddress && !difZipCode && !difCity && !difIndustryCode && !difCompanyState && !difVat)
                         continue;
 
                     var newProspect = new CrmProspectClientLocal();
                     StreamingManager.Copy(prospect, newProspect);
+                    newProspect.NewVatNumber = ci.vat;
+                    newProspect.DifVatNumber = difVat;
 
                     newProspect.NewAddress = streetAddress;
                     newProspect.NewAddress2 = address.street2;
@@ -566,8 +615,10 @@ namespace UnicontaClient.Pages.CustomPage
                 var doUpdateAddress = updAddress.GetValueOrDefault() && (item.DifAddress || item.DifAddress2 || item.DifZipCode || item.DifCity);
                 var doUpdateIndustryCode = updIndustryCode.GetValueOrDefault() && item.DifIndustryCode;
                 var doUpdateCompanyState = updCompanyState.GetValueOrDefault() && item.DifCompanyState;
+                var doUpdateVat = updVat.GetValueOrDefault() && item.DifVatNumber;
+                var doUpdateEInvoice = updEInvoice.GetValueOrDefault() && item.DifEInvoice;
 
-                if (!doUpdateName && !doUpdateAddress && !doUpdateIndustryCode && !doUpdateCompanyState)
+                if (!doUpdateName && !doUpdateAddress && !doUpdateIndustryCode && !doUpdateCompanyState && !doUpdateVat && !doUpdateEInvoice)
                     continue;
 
                 lst1[i] = StreamingManager.Clone(item) as DebtorClientLocal;
@@ -587,6 +638,12 @@ namespace UnicontaClient.Pages.CustomPage
                 
                 if (doUpdateCompanyState)
                     item.CompanyState = item.NewCompanyState;
+
+                if (doUpdateVat)
+                    item._VatNumber = item.NewVatNumber;
+
+                if (doUpdateEInvoice)
+                    item._InvoiceInXML = item.NewInvoiceInXML;
                 
                 lst2[i] = item;
                 i++;
@@ -612,8 +669,10 @@ namespace UnicontaClient.Pages.CustomPage
                 var doUpdateAddress = updAddress.GetValueOrDefault() && (item.DifAddress || item.DifAddress2 || item.DifZipCode || item.DifCity);
                 var doUpdateIndustryCode = updIndustryCode.GetValueOrDefault() && item.DifIndustryCode;
                 var doUpdateCompanyState = updCompanyState.GetValueOrDefault() && item.DifCompanyState;
+                var doUpdateVat = updVat.GetValueOrDefault() && item.DifVatNumber;
+                var doUpdateEInvoice = updEInvoice.GetValueOrDefault() && item.DifEInvoice;
 
-                if (!doUpdateName && !doUpdateAddress && !doUpdateIndustryCode && !doUpdateCompanyState)
+                if (!doUpdateName && !doUpdateAddress && !doUpdateIndustryCode && !doUpdateCompanyState && !doUpdateVat && !doUpdateEInvoice)
                     continue;
 
                 lst1[i] = StreamingManager.Clone(item) as CreditorClientLocal;
@@ -633,6 +692,12 @@ namespace UnicontaClient.Pages.CustomPage
                
                 if (doUpdateCompanyState)
                     item.CompanyState = item.NewCompanyState;
+
+                if (doUpdateVat)
+                    item._VatNumber = item.NewVatNumber;
+
+                if (doUpdateEInvoice)
+                    item._InvoiceInXML = item.NewInvoiceInXML;
 
                 lst2[i] = item;
                 i++;
@@ -658,8 +723,9 @@ namespace UnicontaClient.Pages.CustomPage
                 var doUpdateAddress = updAddress.GetValueOrDefault() && (item.DifAddress || item.DifAddress2 || item.DifZipCode || item.DifCity);
                 var doUpdateIndustryCode = updIndustryCode.GetValueOrDefault() && item.DifIndustryCode;
                 var doUpdateCompanyState = updCompanyState.GetValueOrDefault() && item.DifCompanyState;
+                var doUpdateVat = updVat.GetValueOrDefault() && item.DifVatNumber;
 
-                if (!doUpdateName && !doUpdateAddress && !doUpdateIndustryCode && !doUpdateCompanyState)
+                if (!doUpdateName && !doUpdateAddress && !doUpdateIndustryCode && !doUpdateCompanyState && !doUpdateVat)
                     continue;
 
                 lst1[i] = StreamingManager.Clone(item) as CrmProspectClientLocal;
@@ -679,6 +745,9 @@ namespace UnicontaClient.Pages.CustomPage
 
                 if (doUpdateCompanyState)
                     item.CompanyState = item.NewCompanyState;
+
+                if (doUpdateVat)
+                    item._VatNumber = item.NewVatNumber;
                 
                 lst2[i] = item;
                 i++;
@@ -781,6 +850,24 @@ namespace UnicontaClient.Pages.CustomPage
 
         [Display(Name = "DifCompanyState", ResourceType = typeof(DCAccountText))]
         public bool DifCompanyState { get { return _difCompanyState; } set { _difCompanyState = value; NotifyPropertyChanged("DifCompanyState"); } }
+
+        string _vatNumber;
+        bool _difVatNumber;
+
+        [StringLength(20)]
+        [Display(Name = "NewVatNumber", ResourceType = typeof(DCAccountText))]
+        public string NewVatNumber { get { return _vatNumber; } set { _vatNumber = value; NotifyPropertyChanged("NewVatNumber"); } }
+
+        [Display(Name = "DifVatNumber", ResourceType = typeof(DCAccountText))]
+        public bool DifVatNumber { get { return _difVatNumber; } set { _difVatNumber = value; NotifyPropertyChanged("DifVatNumber"); } }
+
+        bool _newInvoiceInXML, _difEInvoice;
+
+        [Display(Name = "NewInvoiceInXML", ResourceType = typeof(DCAccountText))]
+        public bool NewInvoiceInXML { get { return _newInvoiceInXML; } set { _newInvoiceInXML = value; NotifyPropertyChanged("NewInvoiceInXML"); } }
+
+        [Display(Name = "DifEInvoice", ResourceType = typeof(DCAccountText))]
+        public bool DifEInvoice { get { return _difEInvoice; } set { _difEInvoice = value; NotifyPropertyChanged("DifEInvoice"); } }
     }
 
     public class CreditorClientLocal : CreditorClient
@@ -834,6 +921,24 @@ namespace UnicontaClient.Pages.CustomPage
 
         [Display(Name = "DifCompanyState", ResourceType = typeof(DCAccountText))]
         public bool DifCompanyState { get { return _difCompanyState; } set { _difCompanyState = value; NotifyPropertyChanged("DifCompanyState"); } }
+
+        string _vatNumber;
+        bool _difVatNumber;
+
+        [StringLength(20)]
+        [Display(Name = "NewVatNumber", ResourceType = typeof(DCAccountText))]
+        public string NewVatNumber { get { return _vatNumber; } set { _vatNumber = value; NotifyPropertyChanged("NewVatNumber"); } }
+
+        [Display(Name = "DifVatNumber", ResourceType = typeof(DCAccountText))]
+        public bool DifVatNumber { get { return _difVatNumber; } set { _difVatNumber = value; NotifyPropertyChanged("DifVatNumber"); } }
+
+        bool _newInvoiceInXML, _difEInvoice;
+
+        [Display(Name = "NewInvoiceInXML", ResourceType = typeof(DCAccountText))]
+        public bool NewInvoiceInXML { get { return _newInvoiceInXML; } set { _newInvoiceInXML = value; NotifyPropertyChanged("NewInvoiceInXML"); } }
+
+        [Display(Name = "DifEInvoice", ResourceType = typeof(DCAccountText))]
+        public bool DifEInvoice { get { return _difEInvoice; } set { _difEInvoice = value; NotifyPropertyChanged("DifEInvoice"); } }
     }
 
     public class CrmProspectClientLocal : CrmProspectClient
@@ -888,6 +993,16 @@ namespace UnicontaClient.Pages.CustomPage
 
         [Display(Name = "DifCompanyState", ResourceType = typeof(DCAccountText))]
         public bool DifCompanyState { get { return _difCompanyState; } set { _difCompanyState = value; NotifyPropertyChanged("DifCompanyState"); } }
+
+        string _vatNumber;
+        bool _difVatNumber;
+
+        [StringLength(20)]
+        [Display(Name = "NewVatNumber", ResourceType = typeof(DCAccountText))]
+        public string NewVatNumber { get { return _vatNumber; } set { _vatNumber = value; NotifyPropertyChanged("NewVatNumber"); } }
+
+        [Display(Name = "DifVatNumber", ResourceType = typeof(DCAccountText))]
+        public bool DifVatNumber { get { return _difVatNumber; } set { _difVatNumber = value; NotifyPropertyChanged("DifVatNumber"); } }
     }
 }
 

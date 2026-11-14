@@ -179,25 +179,55 @@ namespace UnicontaClient.Pages.CustomPage
             : string.Format(Uniconta.ClientTools.Localization.lookup("EditOBJ"), Uniconta.ClientTools.Localization.lookup("Dashboard"));
 
         internal CrudAPI Api { get; }
-        public string DashboardName { get => dashboardName; set { if (SetProperty(ref dashboardName, value)) InvalidateCompletion(); } }
+        public string DashboardName
+        {
+            get => dashboardName;
+            set
+            {
+                if (!SetProperty(ref dashboardName, value)) return;
+                OnPropertyChanged(nameof(Summary));
+                InvalidateCompletion();
+            }
+        }
         public TileScope Scope
         {
             get => scope;
             set
             {
                 if (!SetProperty(ref scope, value)) return;
+                OnPropertyChanged(nameof(SelectedScope));
                 OnPropertyChanged(nameof(IsProfile));
+                OnPropertyChanged(nameof(Summary));
                 InvalidateCompletion();
             }
         }
-        public string Profile { get => profile; set { if (SetProperty(ref profile, value)) InvalidateCompletion(); } }
+        // Editors can clear their selection while a step's view is created or removed.
+        // Keep those transient values out of the saved setup.
+        public TileScope? SelectedScope { get => Scope; set { if (value.HasValue) Scope = value.Value; } }
+        public UserProfileClient SelectedProfile
+        {
+            get => Profiles.FirstOrDefault(item => item.Profile == Profile);
+            set { if (value != null) Profile = value.Profile; }
+        }
+        public string Profile
+        {
+            get => profile;
+            set
+            {
+                if (!SetProperty(ref profile, value)) return;
+                OnPropertyChanged(nameof(SelectedProfile));
+                OnPropertyChanged(nameof(Summary));
+                InvalidateCompletion();
+            }
+        }
         public IReadOnlyList<UserProfileClient> Profiles { get; private set; } = Array.Empty<UserProfileClient>();
         public bool IsProfile => Scope == TileScope.Profile;
         public IEnumerable<TileChoice<TileScope>> ScopeOptions => TileDashboardAccess.GetScopes(Api)
             .Select(value => new TileChoice<TileScope>(value, value.DisplayName()));
         public override bool CanContinue => !string.IsNullOrWhiteSpace(DashboardName)
             && TileDashboardAccess.GetScopes(Api).Contains(Scope)
-            && (!IsProfile || Profiles.Any(item => item.KeyStr == Profile));
+            && (!IsProfile || Profiles.Any(item => item.Profile == Profile));
+
         public string Summary => Uniconta.ClientTools.Localization.lookup("Name") + ": " + DashboardName?.Trim() + "\n" +
             Uniconta.ClientTools.Localization.lookup("TileScope") + ": " + Scope.DisplayName() +
             (IsProfile ? "\n" + Uniconta.ClientTools.Localization.lookup("Profile") + ": " + Profile : "");
@@ -206,6 +236,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             Profiles = await TileDashboardAccess.LoadProfilesAsync(Api);
             OnPropertyChanged(nameof(Profiles));
+            OnPropertyChanged(nameof(SelectedProfile));
             OnPropertyChanged(nameof(CanContinue));
         }
 
@@ -218,7 +249,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (ValidationMessage == null && IsProfile)
             {
                 var profiles = await TileDashboardAccess.LoadProfilesAsync(Api);
-                if (string.IsNullOrWhiteSpace(Profile) || !profiles.Any(item => item.KeyStr == Profile))
+                if (string.IsNullOrWhiteSpace(Profile) || !profiles.Any(item => item.Profile == Profile))
                     ValidationMessage = Uniconta.ClientTools.Localization.lookup("TileSelectAProfile");
             }
             return ValidationMessage == null;
@@ -239,6 +270,8 @@ namespace UnicontaClient.Pages.CustomPage
             ValidationMessage = Setup.ValidationMessage;
             return valid;
         }
+
+        public override bool CanContinue => base.CanContinue;
     }
 
     internal static class TileDashboardAccess

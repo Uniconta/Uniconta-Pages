@@ -1,3 +1,4 @@
+using DevExpress.Xpf.Grid;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -65,6 +66,7 @@ namespace UnicontaClient.Pages.CustomPage
             this.accounts = accounts == null ? new List<GLAccountClient>() : accounts.Where(a => a != null).ToList();
 
             InitializeComponent();
+            ((TableView)dgResults.View).RowStyle = System.Windows.Application.Current.Resources["GridRowControlCustomHeightStyle"] as Style;
             localMenu.dataGrid = dgResults;
             SetRibbonControl(localMenu, dgResults);
 

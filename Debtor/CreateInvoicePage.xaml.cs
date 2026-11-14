@@ -199,7 +199,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     Order.DeliveryCity = city[0];
                     var add1 = city[1];
-                    if (!string.IsNullOrEmpty(add1))
+                    if (!string.IsNullOrEmpty(add1) && string.IsNullOrWhiteSpace(Order.DeliveryAddress1))
                         Order.DeliveryAddress1 = add1;
                     var zip = city[2];
                     if (!string.IsNullOrEmpty(zip))

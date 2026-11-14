@@ -64,8 +64,6 @@ namespace UnicontaClient.Pages.CustomPage
             cbCountry.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.CountryCode));
             cbCurrentERP.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.ERPSystem));
             cbCompanyType.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.CompanyType));
-            cbComingFrom.ItemsSource = Enum.GetValues(typeof(Uniconta.Common.ContactFrom));
-            cbCloseReason.ItemsSource = Enum.GetValues(typeof(Uniconta.DataModel.CloseReasonType));
             var Comp = crudapi.CompanyEntity;
             if (LoadedRow == null)
             {
@@ -88,9 +86,11 @@ namespace UnicontaClient.Pages.CustomPage
                 this.liResellerName.Visibility = Visibility.Collapsed;
                 AssignedByUniconta.IsReadOnly = true;
             }
+            if (user._Role <= (byte)Uniconta.Common.User.UserRoles.Reseller)
+                liJourneyId.Visibility = Visibility.Collapsed;
             cmbProbablity.ItemsSource = new int[] { 10, 25, 40, 60, 90 };
         }
-         
+
         private void frmRibbon_OnItemClicked(string ActionType)
         {
             frmRibbon_BaseActions(ActionType);
@@ -119,7 +119,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     editrow.City = city[0];
                     var add1 = city[1];
-                    if (!string.IsNullOrEmpty(add1))
+                    if (!string.IsNullOrEmpty(add1) && string.IsNullOrWhiteSpace(editrow.Address1))
                         editrow.Address1 = add1;
                     var zip = city[2];
                     if (!string.IsNullOrEmpty(zip))

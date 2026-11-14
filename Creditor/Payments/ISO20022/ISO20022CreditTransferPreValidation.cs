@@ -31,7 +31,6 @@ namespace ISO20022CreditTransfer
         private bool SWIFTok;
         private bool IBANok;
         private bool formatTypeISO;
-        private bool newPaymentFormat;
         List<PreCheckError> preCheckErrors = new List<PreCheckError>();
         #endregion
 
@@ -104,7 +103,6 @@ namespace ISO20022CreditTransfer
             this.credPaymFormat = credPaymFormat;
 
             companyBankEnum = bankSpecific.CompanyBank();
-            newPaymentFormat = bankSpecific.NewPaymentFormat();
         }
 
         /// <summary>
@@ -143,7 +141,7 @@ namespace ISO20022CreditTransfer
                         PreCheckErrors.Add(new PreCheckError(string.Format("Payment format '{0}' is not available for GL Journal generated payments", credPaymFormat._ExportFormat))); //TODO:Opret label
 
                     CompanyBankName(paymentformat);
-                    if (newPaymentFormat)
+                    if (formatTypeISO || paymentformat == ExportFormatType.ISO20022_EE)
                         CompanyAddress(company);
 
                     CustomerIdentificationId(bankAccount._BankCompanyId, paymentformat); //Field Bank "Kunde-Id"
@@ -165,15 +163,17 @@ namespace ISO20022CreditTransfer
         }
 
 
+        /// <summary>
+        /// Company address must be structured - postal code and city in Address 2 or Address 3
+        /// </summary>
         private void CompanyAddress(Company company)
         {
-            var zipCity = OIOUBL.GetZipCodeCity(company._Address3, company._CountryId);
-            if (zipCity == null)
-                zipCity = OIOUBL.GetZipCodeCity(company._Address2, company._CountryId);
+            if (company._CountryId == CountryCode.Unknown)
+                preCheckErrors.Add(new PreCheckError(String.Format("{0} : {1}", Uniconta.ClientTools.Localization.lookup("FieldCannotBeEmpty"), Uniconta.ClientTools.Localization.lookup("Country"))));
 
-            if (zipCity == null)
-                preCheckErrors.Add(new PreCheckError("Company address need to be structured (zipcode in adresse2 or addres3)"));
-
+            int lineNo;
+            if (StandardPaymentFunctions.CompanyZipCodeCity(company._Address2, company._Address3, company._CountryId, out lineNo) == null)
+                preCheckErrors.Add(new PreCheckError(Uniconta.ClientTools.Localization.lookup("CompanyAddressZipCity")));
         }
 
         /// <summary>
@@ -331,7 +331,7 @@ namespace ISO20022CreditTransfer
                     case CompanyBankENUM.BEC:
                     case CompanyBankENUM.SDC:
                         if (string.IsNullOrEmpty(bankIdentificationId))
-                            preCheckErrors.Add(new PreCheckError("Feltet 'Identifikation af aftalen' (Bankafstemning) skal udfyldes"));
+                            preCheckErrors.Add(new PreCheckError("Feltet 'Identifikation af aftalen' (Bankafstemning) skal udfyldes med CVR-nummer"));
                         break;
                 }
             }

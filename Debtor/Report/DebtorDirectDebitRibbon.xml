@@ -59,5 +59,7 @@
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="FileArchive" LocalizedNameKey="ShowOBJ" Parameter="FileArchive" LargeGlyph="Pack_Note_32x32" />
+    <RibbonItem Action="IcelandSendClaims" LocalizedNameKey="SendClaimsOnline" LargeGlyph="Export_32x32" />
+    <RibbonItem Action="IcelandClaims" LocalizedNameKey="ClaimsRegister" LargeGlyph="Pack_Note_32x32" />
   </RibbonItem>
 </root>

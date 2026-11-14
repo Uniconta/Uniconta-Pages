@@ -73,6 +73,7 @@ namespace ISO20022CreditTransfer
 
             List<PreCheckError> preCheckErrors = new List<PreCheckError>();
             List<CheckError> checkErrors = new List<CheckError>();
+            List<string> adviceTruncated = new List<string>();
 
             var credCache = company.GetCache(typeof(Creditor));
             var credBankCache = company.GetCache(typeof(CreditorPaymentAccount));
@@ -159,8 +160,10 @@ namespace ISO20022CreditTransfer
                         creditorBankDetailsCountryId = creditorBank._Country;
                 }
 
-                rec.internationalPayment = bankSpecific.InternationalPayment(bankAccount._IBAN, IBANnumber, BICnumber, UnicontaCountryToISO(company, creditor._Country), doc.CompanyCountryId);
-                rec.ISOPaymentType = bankSpecific.ISOPaymentType(currency, bankAccount._IBAN, IBANnumber, BICnumber, UnicontaCountryToISO(company, creditor._Country), doc.CompanyCountryId, creditorBankDetailsCountryId).ToString();
+                var creditorCountryId = bankSpecific.CreditorPaymentCountryId(rec._PaymentMethod, rec._PaymentId, rec._SWIFT) ?? UnicontaCountryToISO(company, creditor._Country);
+
+                rec.internationalPayment = bankSpecific.InternationalPayment(bankAccount._IBAN, IBANnumber, BICnumber, creditorCountryId, doc.CompanyCountryId);
+                rec.ISOPaymentType = bankSpecific.ISOPaymentType(currency, bankAccount._IBAN, IBANnumber, BICnumber, creditorCountryId, doc.CompanyCountryId, creditorBankDetailsCountryId).ToString();
             }
             //Update ISO PaymentType <<
 
@@ -188,11 +191,6 @@ namespace ISO20022CreditTransfer
                 currency = string.IsNullOrEmpty(currency) ? doc.CompanyCcy : currency;
 
                 doc.EndToEndId = bankSpecific.EndtoendId(rec.PaymentEndToEndId);
-
-                if (doMergePayment && rec.MergePaymId != UnicontaClient.Pages.Creditor.Payments.StandardPaymentFunctions.MERGEID_SINGLEPAYMENT)
-                    doc.PaymentInfoId = bankSpecific.PaymentInfoId(doc.NumberSeqPaymentFileId, doc.RequestedExecutionDate, rec._PaymentMethod, rec.Currency, true);
-                else
-                    doc.PaymentInfoId = bankSpecific.PaymentInfoId(doc.NumberSeqPaymentFileId, doc.RequestedExecutionDate, rec._PaymentMethod, rec.Currency);
 
                 doc.PaymentMethod = BaseDocument.PAYMENTMETHOD_TRF;
 
@@ -234,6 +232,8 @@ namespace ISO20022CreditTransfer
 
                         if (creditorBIC.Length > 6 && creditorBankDetailsCountryId == CountryCode.Unknown)
                             credBankCountryId = creditorBIC.Substring(4, 2);
+                        else if (creditorBIC.Length == 0)
+                            credBankCountryId = bankSpecific.CreditorBBANCountryId(rec._PaymentId);
 
                         break;
 
@@ -272,12 +272,20 @@ namespace ISO20022CreditTransfer
                         break;
                 }
 
+                if (credBankCountryId == null)
+                    credBankCountryId = bankSpecific.CreditorPaymentCountryId(rec._PaymentMethod, rec._PaymentId, rec._SWIFT); //FIK is always paid to a Danish account
+
                 credBankCountryId = creditorBankDetailsCountryId != CountryCode.Unknown ? UnicontaCountryToISO(company, creditorBankDetailsCountryId) : credBankCountryId ?? UnicontaCountryToISO(company, creditor._Country);
 
 
                 doc.CurrencyCode = currency;
                 doc.PaymentAmount = rec.PaymentAmount;
                 doc.ISOPaymentType = bankSpecific.ISOPaymentType(currency, bankAccount._IBAN, isPaymentTypeIBAN ? creditorAcc : string.Empty, creditorBIC, credBankCountryId, doc.CompanyCountryId, creditorBankDetailsCountryId);
+
+                //PmtInf id is set after the payment type is known - the payment type is part of the id
+                var mergedPmtInf = doMergePayment && rec.MergePaymId != UnicontaClient.Pages.Creditor.Payments.StandardPaymentFunctions.MERGEID_SINGLEPAYMENT;
+                doc.PaymentInfoId = bankSpecific.PaymentInfoId(doc.NumberSeqPaymentFileId, doc.RequestedExecutionDate, rec._PaymentMethod, rec.Currency, doc.ISOPaymentType, mergedPmtInf);
+
                 doc.ExtServiceCode = bankSpecific.ExtServiceCode(doc.ISOPaymentType);
                 doc.ExtServicePrtry = bankSpecific.ExtServicePrtry(doc.ISOPaymentType, creditorBIC);
                 doc.ExternalLocalInstrument = bankSpecific.ExternalLocalInstrument(currency, doc.RequestedExecutionDate, rec._PaymentMethod, doc.ISOPaymentType);
@@ -295,7 +303,32 @@ namespace ISO20022CreditTransfer
 
                 string remittanceInfo = bankSpecific.RemittanceInfo(externalAdvText, doc.ISOPaymentType, rec._PaymentMethod);
 
+                var mergedPayment = rec.invoiceNumbers != null && rec.MergePaymId != UnicontaClient.Pages.Creditor.Payments.StandardPaymentFunctions.MERGEID_SINGLEPAYMENT;
+
+                //Merged payment: short advice is cut at a whole invoice number
+                if (mergedPayment && !string.IsNullOrEmpty(remittanceInfo) && remittanceInfo.Length < externalAdvText.Length)
+                {
+                    int shortOmitted;
+                    var shortAdvText = UnicontaClient.Pages.Creditor.Payments.StandardPaymentFunctions.TruncateInvoiceList(externalAdvText, remittanceInfo.Length, out shortOmitted);
+                    if (shortAdvText != null)
+                        remittanceInfo = bankSpecific.RemittanceInfo(shortAdvText, doc.ISOPaymentType, rec._PaymentMethod);
+                }
+
+                rec.adviceInvoicesOmitted = 0;
                 List<string> unstructuredPaymInfoList = bankSpecific.Ustrd(externalAdvText, doc.ISOPaymentType, rec, credPaymFormat._ExtendedText);
+
+                if (mergedPayment && rec.adviceInvoicesOmitted > 0)
+                {
+                    var invoiceCount = rec.invoiceNumbers.ToString().Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Length;
+                    adviceTruncated.Add(string.Format(Uniconta.ClientTools.Localization.lookup("AdviceInvoicesOmitted"), creditor._Account, creditor._Name, rec.adviceInvoicesOmitted, invoiceCount));
+                }
+
+                //Nordea DK: Purp/Prtry (kort advis) og RmtInf/Ustrd må ikke kombineres
+                if (doc.CompanyBank == CompanyBankENUM.Nordea_DK && doc.ISOPaymentType == ISO20022PaymentTypes.DOMESTIC && unstructuredPaymInfoList?.Count > 0)
+                    remittanceInfo = null;
+
+                if (bankSpecific.ShortAdviceDiscontinued(doc.ISOPaymentType, rec))
+                    remittanceInfo = null;
 
                 if (!paymentInfoIdLst.Contains(doc.PaymentInfoId))
                 {
@@ -325,7 +358,7 @@ namespace ISO20022CreditTransfer
 
             XmlDocument creditTransferDoc = doc.CreateXmlDocument();
             
-            return new XMLDocumentGenerateResult(creditTransferDoc, (preCheckErrors.Count > 0 || checkErrors.Count > 0), doc, checkErrors, generatedFileName);
+            return new XMLDocumentGenerateResult(creditTransferDoc, (preCheckErrors.Count > 0 || checkErrors.Count > 0), doc, checkErrors, generatedFileName, adviceTruncated);
         }
     }
 }

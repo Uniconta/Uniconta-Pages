@@ -72,13 +72,8 @@ namespace UnicontaClient.Pages.CustomPage
 
     public sealed class TilePlacementStepViewModel : TileDetailsStepViewModel
     {
-        public TilePlacementStepViewModel(TileDataViewModel data) : base(data, Uniconta.ClientTools.Localization.lookup("TileChooseWhereItBelongs"), Uniconta.ClientTools.Localization.lookup("TileSetTheScopeDashboardGroupAndNavigation"), Uniconta.ClientTools.Localization.lookup("TilePlacement")) { }
+        public TilePlacementStepViewModel(TileDataViewModel data) : base(data, Uniconta.ClientTools.Localization.lookup("TileChooseWhereItBelongs"), string.Join(", ", Uniconta.ClientTools.Localization.lookup("TileScope"), Uniconta.ClientTools.Localization.lookup("Dashboard"), Uniconta.ClientTools.Localization.lookup("TileGoTo")), Uniconta.ClientTools.Localization.lookup("TilePlacement")) { }
         public override Task EnterAsync(CancellationToken cancellationToken) => Data.LoadProfilesAsync(cancellationToken);
-        public override Task LeaveAsync(CancellationToken cancellationToken)
-        {
-            Data.CommitPlacement();
-            return Task.CompletedTask;
-        }
     }
 
     public sealed class TileReviewStepViewModel : TileDetailsStepViewModel

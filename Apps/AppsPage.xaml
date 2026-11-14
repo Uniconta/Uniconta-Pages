@@ -16,9 +16,9 @@ x:Class="UnicontaClient.Pages.CustomPage.AppsPage"
                                        BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
             <localPage:AppsGrid x:Name="dgGrid" AutoGenerateColumns="None">
                 <localPage:AppsGrid.Columns>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AppId"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Name"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Comment"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="AppId" Width="80"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Name" Width="200"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Comment" Width="200"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="URL" AllowEditing="False" Width="200">
                         <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                             <ControlTemplate>
@@ -31,9 +31,10 @@ x:Class="UnicontaClient.Pages.CustomPage.AppsPage"
                             </ControlTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="MainVersion"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="MinorVersion"/>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Pid"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="MainVersion" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="MinorVersion" Visible="False"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Uid" Width="80"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="Pid" Width="80"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Open"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="InTest"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Blocked"/>

@@ -1,0 +1,94 @@
+<Pages:GridBasePage xmlns:UC="clr-namespace:UnicontaClient.Pages.CustomPage;assembly=UnicontaPages"
+            xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.SIEImportPage"
+            xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"  
+            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+            xmlns:localPage="clr-namespace:UnicontaClient.Pages.CustomPage"
+            xmlns:ClientToolsControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+            xmlns:editorSettings="http://schemas.devexpress.com/winfx/2008/xaml/editors" 
+            xmlns:dxdo="http://schemas.devexpress.com/winfx/2008/xaml/docking" 
+            xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid">
+    <Grid>
+        <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <CorasauControls:CorasauRibbonControl x:Name="localMenu" XMLSourcePath=";component/Pages/GL/Reports/SIESwedenImportExport/SIEImportPageRibbon.xml"/>
+            <CorasauControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+                <dxdo:DockLayoutManager>
+                    <dxdo:LayoutGroup>
+                        <dxdo:LayoutGroup ItemWidth="2*">
+                            <dxdo:LayoutPanel Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Transactions}">
+                                <localPage:SIEJournalLineGrid x:Name="dgGLJournalLines" AutoGenerateColumns="None" SelectionMode="None">
+                                    <localPage:SIEJournalLineGrid.Columns>
+                                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="100"/>
+                                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Account" Width="100"/>
+                                        <localPage:CorasauDataGridTemplateColumnClient x:Name="DisplayAccountName" Width="200"/>
+                                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Amount"/>
+                                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Voucher" Width="80"/>
+                                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Text" Width="170"/>
+                                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Note" Width="170"/>
+                                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Qty" Width="80"/>
+                                        <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim1" Width="70" FieldName="Dimension1" ShowInColumnChooser="False"/>
+                                        <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim2" Width="70" FieldName="Dimension2" ShowInColumnChooser="False"/>
+                                        <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim3" Width="70" FieldName="Dimension3" ShowInColumnChooser="False"/>
+                                        <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim4" Width="70" FieldName="Dimension4" ShowInColumnChooser="False"/>
+                                        <localPage:CorasauDataGridTemplateColumnClient x:Name="cldim5" Width="70" FieldName="Dimension5" ShowInColumnChooser="False"/>
+                                        <localPage:CorasauDataGridTemplateColumnClient x:Name="LineNumber" Visible="False" SortOrder="Ascending"/>
+                                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Vat" AllowEditing="True"/>
+                                    </localPage:SIEJournalLineGrid.Columns>
+                                    <localPage:SIEJournalLineGrid.TotalSummary>
+                                        <localPage:SumColumn FieldName="Date" SummaryType="Count"/>
+                                        <localPage:SumColumn FieldName="Amount" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                                        <localPage:SumColumn FieldName="Qty" SummaryType="Sum" DisplayFormat="{}{0:N2}"/>
+                                    </localPage:SIEJournalLineGrid.TotalSummary>
+                                </localPage:SIEJournalLineGrid>
+                            </dxdo:LayoutPanel>
+                        </dxdo:LayoutGroup>
+                        <dxdo:LayoutGroup Orientation="Vertical" ItemWidth="*">
+                            <dxdo:LayoutPanel Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Chartofaccount}">
+                                <localPage:SIEGLAccountGrid x:Name="dgGLAccounts" AutoGenerateColumns="None" SelectionMode="None">
+                                    <localPage:SIEGLAccountGrid.Columns>
+                                        <localPage:CorasauDataGridTemplateColumnClient FieldName="Account"/>
+                                        <localPage:CorasauDataGridTemplateColumnClient FieldName="Name"/>
+                                        <localPage:CorasauDataGridTemplateColumnClient FieldName="ExistingName"/>
+                                        <localPage:CorasauDataGridTemplateColumnClient FieldName="AccountType" />
+                                        <localPage:CorasauDataGridTemplateColumnClient FieldName="SRU"/>
+                                        <localPage:CorasauDataGridTemplateColumnClient FieldName="IsNew"/>
+                                    </localPage:SIEGLAccountGrid.Columns>
+                                    <localPage:SIEGLAccountGrid.TotalSummary>
+                                        <localPage:SumColumn FieldName="Account" SummaryType="Count"/>
+                                    </localPage:SIEGLAccountGrid.TotalSummary>
+                                    <localPage:SIEGLAccountGrid.SortInfo>
+                                        <dxg:GridSortInfo FieldName="IsNew" SortOrder="Descending"/>
+                                        <dxg:GridSortInfo FieldName="Account" SortOrder="Descending"/>
+                                    </localPage:SIEGLAccountGrid.SortInfo>
+                                </localPage:SIEGLAccountGrid>
+                            </dxdo:LayoutPanel>
+                            <dxdo:LayoutPanel Caption="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Dimensions}">
+                                <localPage:SIEDimensionValueGrid x:Name="dgGLDimensions" AutoGenerateColumns="None" SelectionMode="None">
+                                    <localPage:SIEDimensionValueGrid.Columns>
+                                        <localPage:CorasauDataGridTemplateColumnClient FieldName="Dimension" SortOrder="Descending"/>
+                                        <localPage:CorasauDataGridTemplateColumnClient FieldName="Name"/>
+                                        <localPage:CorasauDataGridTemplateColumnClient FieldName="DimType"/>
+                                        <localPage:CorasauDataGridTemplateColumnClient FieldName="IsNew"/>
+                                    </localPage:SIEDimensionValueGrid.Columns>
+                                    <localPage:SIEDimensionValueGrid.TotalSummary>
+                                        <localPage:SumColumn FieldName="Dimension" SummaryType="Count"/>
+                                    </localPage:SIEDimensionValueGrid.TotalSummary>
+                                    <localPage:SIEDimensionValueGrid.SortInfo>
+                                        <dxg:GridSortInfo FieldName="IsNew" SortOrder="Descending"/>
+                                        <dxg:GridSortInfo FieldName="Dimension" SortOrder="Descending"/>
+                                    </localPage:SIEDimensionValueGrid.SortInfo>
+                                </localPage:SIEDimensionValueGrid>
+                            </dxdo:LayoutPanel>
+                        </dxdo:LayoutGroup>
+                    </dxdo:LayoutGroup>
+                </dxdo:DockLayoutManager>
+            </CorasauControls:BusyIndicator>
+        </Grid>
+    </Grid>
+</Pages:GridBasePage>

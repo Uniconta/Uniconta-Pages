@@ -160,6 +160,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorOrderLines"
                                 <localPage:CorasauDataGridForeignKeyColumnClient x:Name="Task" Width="80" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="IsMarked" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="IgnoreBlocked" Width="50" Visible="False" />
+                                <localPage:CorasauDataGridTemplateColumnClient x:Name="ExemptDuty" Width="50" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="DeleteLine" Width="50" Visible="False" />
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Width="70" Visible="False"/>
                                 <localPage:CorasauDataGridTemplateColumnClient x:Name="Week" Width="50" Visible="False" />

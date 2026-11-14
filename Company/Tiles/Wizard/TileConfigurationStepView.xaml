@@ -21,9 +21,27 @@ x:Class="UnicontaClient.Pages.CustomPage.TileConfigurationStepView"
         </StackPanel>
         <StackPanel Visibility="{Binding Data.ShowHtml, Converter={StaticResource bool2VisibilityConverter}}">
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileWidgetURL}" Style="{DynamicResource TileWizardLabelStyle}"/>
-            <controls:TextEditor Text="{Binding Data.HtmlSource, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                 Style="{DynamicResource TileWizardTextEditorStyle}" AutomationProperties.Name="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileWidgetURL}"
-                                 ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileWidgetUrlHelp}"/>
+            <TextBlock Text="Select a country for each URL. The entry with no country is the default." TextWrapping="Wrap" Margin="0,0,0,8"/>
+            <ItemsControl ItemsSource="{Binding Data.HtmlSources}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="170"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <controls:ComboBoxEditor ItemsSource="{Binding Countries}" DisplayMember="Caption"
+                                SelectedItem="{Binding Country, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                AutomationProperties.Name="Country code" Margin="0,0,8,0"/>
+                            <controls:TextEditor Grid.Column="1" Text="{Binding Url, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                Style="{DynamicResource TileWizardTextEditorStyle}" AutomationProperties.Name="Widget URL"/>
+                            <Button Grid.Column="2" Content="Remove" Command="{Binding RemoveCommand}" Margin="8,0,0,0"/>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <Button Content="Add URL" Command="{Binding Data.AddHtmlSourceCommand}" HorizontalAlignment="Left"/>
         </StackPanel>
         <StackPanel Visibility="{Binding Data.ShowAggregate, Converter={StaticResource bool2VisibilityConverter}}">
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileAggregate}" Style="{DynamicResource TileWizardLabelStyle}"/>

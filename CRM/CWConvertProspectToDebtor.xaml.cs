@@ -33,6 +33,12 @@ namespace UnicontaClient.Pages.CustomPage
         {
             crudApi = api;
             crmProspect = crmProspectClient;
+            if (api.CompanyEntity._CountryId == Uniconta.Common.CountryCode.Iceland)
+            {
+                var kt = new string((crmProspectClient._LegalIdent ?? string.Empty).Where(char.IsDigit).ToArray());
+                if (kt.Length == 10 && api.GetCache(typeof(Uniconta.DataModel.Debtor))?.Get(kt) == null)
+                    AccountNumber = kt;
+            }
             this.DataContext = this;
             InitializeComponent();
             grouplookupeditor.api = crudApi;

@@ -214,6 +214,10 @@ namespace UnicontaClient.Pages.CustomPage
             }
             if (Comp.InvPackaging)
                 Consumer.Visible = Consumer.ShowInColumnChooser = false;
+            if (!Comp.InvDuty)
+                ExemptDuty.ShowInColumnChooser = ExemptDuty.Visible = false;
+            else
+                ExemptDuty.ShowInColumnChooser = ExemptDuty.Visible = true;
         }
         void dgProjInvProposalGrid_RowDoubleClick()
         {

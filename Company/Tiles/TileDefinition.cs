@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -11,9 +12,23 @@ using Uniconta.Common;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
+    public sealed class TileHtmlSource
+    {
+        public CountryCode? CountryCode { get; set; }
+        public string Url { get; set; }
+    }
+
     public sealed class TileDefinition
     {
-        public const int CurrentVersion = 12;
+        public const int CurrentVersion = 13;
+        // UserMenu.Args is limited to 1,000 characters by the server and database.
+        const int MaximumArgsLength = 1000;
+        static readonly JsonSerializerSettings StorageSettings = new JsonSerializerSettings
+        {
+            NullValueHandling = NullValueHandling.Ignore,
+            DefaultValueHandling = DefaultValueHandling.Ignore,
+            TypeNameHandling = TypeNameHandling.None
+        };
 
         public int Version { get; set; } = CurrentVersion;
         public int TableId { get; set; }
@@ -26,7 +41,16 @@ namespace UnicontaClient.Pages.CustomPage
         public string Group { get; set; }
         public string Filter { get; set; }
         public string NavigationTarget { get; set; }
+        // Retained for definitions saved before country-specific URLs were introduced.
         public string HtmlSource { get; set; }
+        public List<TileHtmlSource> HtmlSources { get; set; } = new List<TileHtmlSource>();
+
+        public string ResolveHtmlSource(CountryCode? country)
+        {
+            if (HtmlSources == null || HtmlSources.Count == 0) return HtmlSource;
+            return HtmlSources.FirstOrDefault(source => source != null && source.CountryCode.HasValue && source.CountryCode == country)?.Url
+                ?? HtmlSources.FirstOrDefault(source => source != null && !source.CountryCode.HasValue)?.Url;
+        }
         /*[JsonIgnore]*/ public TileVisualization Visualization { get; set; } = TileVisualization.Number;
         /*[JsonIgnore]*/ public TileAggregate Aggregate { get; set; } = TileAggregate.Count;
         /*[JsonIgnore]*/ public bool IsDashboardDefinition { get; set; }
@@ -45,6 +69,17 @@ namespace UnicontaClient.Pages.CustomPage
         public int? GridColumn { get; set; }
         public int? GridRow { get; set; }
 
+        internal void NormalizeNewDashboard()
+        {
+            if (IsDashboardDefinition || !string.IsNullOrWhiteSpace(DashboardTab))
+                return;
+
+            // An omitted dashboard always means the current user's My Dashboard.
+            DashboardTab = null;
+            Scope = TileScope.User;
+            Profile = null;
+        }
+
         public void Validate()
         {
             if (Scope == TileScope.Profile && string.IsNullOrWhiteSpace(Profile))
@@ -58,10 +93,21 @@ namespace UnicontaClient.Pages.CustomPage
             }
             if (!IsCustomTile && Visualization == TileVisualization.HtmlWidget)
             {
-                Uri source;
-                if (!Uri.TryCreate(HtmlSource, UriKind.Absolute, out source) ||
-                    (source.Scheme != Uri.UriSchemeHttp && source.Scheme != Uri.UriSchemeHttps))
-                    throw new ArgumentException(Uniconta.ClientTools.Localization.lookup("TileAnAbsoluteHTTPOrHTTPSWidgetURLIs"), nameof(HtmlSource));
+                var sources = HtmlSources != null && HtmlSources.Count > 0
+                    ? HtmlSources : new List<TileHtmlSource> { new TileHtmlSource { Url = HtmlSource } };
+                if (sources.Any(source => source == null) || sources.Count(source => !source.CountryCode.HasValue) != 1)
+                    throw new ArgumentException("Specify exactly one default widget URL with no country.", nameof(HtmlSources));
+                if (sources.GroupBy(source => source.CountryCode).Any(group => group.Count() > 1))
+                    throw new ArgumentException("Specify only one widget URL per country.", nameof(HtmlSources));
+                foreach (var entry in sources)
+                {
+                    Uri source;
+                    if (entry.CountryCode.HasValue && (entry.CountryCode == CountryCode.Unknown || !Enum.IsDefined(typeof(CountryCode), entry.CountryCode.Value)))
+                        throw new ArgumentException("Select a valid country or leave it blank for the default URL.", nameof(HtmlSources));
+                    if (!Uri.TryCreate(entry.Url, UriKind.Absolute, out source) ||
+                        (source.Scheme != Uri.UriSchemeHttp && source.Scheme != Uri.UriSchemeHttps))
+                        throw new ArgumentException(Uniconta.ClientTools.Localization.lookup("TileAnAbsoluteHTTPOrHTTPSWidgetURLIs"), nameof(HtmlSources));
+                }
             }
             else if (!IsCustomTile && TableId <= 0 && string.IsNullOrWhiteSpace(SourceName))
                 throw new ArgumentException(Uniconta.ClientTools.Localization.lookup("TileATableIsRequired"), nameof(TableId));
@@ -116,13 +162,15 @@ namespace UnicontaClient.Pages.CustomPage
 
             definition = definition ?? new TileDefinition();
             definition.Version = CurrentVersion;
-            definition.TableId = menu._TableId;
+            // Older menu records may only have the table ID in their JSON arguments.
+            if (menu._TableId != 0)
+                definition.TableId = menu._TableId;
             definition.Title = menu._Prompt ?? definition.Title;
             definition.Group = menu._RibbonMenu ?? definition.Group;
             definition.Filter = menu._Filter ?? definition.Filter;
             definition.NavigationTarget = menu._Control ?? definition.NavigationTarget;
             definition.Order = menu._LineNumber;
-            definition.Scope = !string.IsNullOrWhiteSpace(menu._Profile) ? TileScope.Profile : menu.RowId == 0 || menu._Uid != 0 ? TileScope.User : TileScope.Company;
+            definition.Scope = !string.IsNullOrWhiteSpace(menu._Profile) ? TileScope.Profile : menu._Uid != 0 || (menu.RowId == 0 && !menu._IsCompanyTile) ? TileScope.User : TileScope.Company;
             definition.Profile = menu._Profile;
             /*
             definition.Visualization = menu.TileVisualization;
@@ -138,6 +186,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         internal void ApplyTo(UserMenuClient menu)
         {
+            // Omit empty/default properties so the built-in widget URLs fit in Args.
+            // Check before mutating the record: the server would truncate oversized JSON.
+            var args = JsonConvert.SerializeObject(this, Formatting.None, StorageSettings);
+            if (args.Length > MaximumArgsLength)
+                throw new ArgumentException("The tile configuration is too large to save (maximum 1,000 characters). Reduce its fields, filters or widget URLs.");
+
             menu._Profile = Scope == TileScope.Profile ? Profile?.Trim() : null;
             menu._IsUserTile = Scope == TileScope.User;
             menu._IsCompanyTile = Scope != TileScope.User;
@@ -154,7 +208,7 @@ namespace UnicontaClient.Pages.CustomPage
             menu.IsDashboardDefinition = IsDashboardDefinition;
             */
 
-            menu._Args = JsonConvert.SerializeObject(this, Formatting.None);
+            menu._Args = args;
         }
     }
 
@@ -162,6 +216,13 @@ namespace UnicontaClient.Pages.CustomPage
     {
         internal static bool SupportsLocalAggregation(Type tableType) => tableType != null && typeof(IdKey).IsAssignableFrom(tableType);
         internal static TileVisualization[] GetVisualizations(Type tableType) => SupportsLocalAggregation(tableType)? Enum.GetValues(typeof(TileVisualization)).Cast<TileVisualization>().ToArray() : new[] { TileVisualization.Number, TileVisualization.HtmlWidget };
+
+        // Visibility affects selection only; existing tiles still use the supported values above.
+        internal static TileVisualization[] GetVisibleVisualizations(Type tableType)
+            => GetVisualizations(tableType)
+                .Where(value => (Attribute.GetCustomAttribute(typeof(TileVisualization).GetField(value.ToString()), typeof(BrowsableAttribute))
+                    as BrowsableAttribute)?.Browsable != false)
+                .ToArray();
 
         internal static TileAggregate[] GetAggregates(Type tableType)
         {

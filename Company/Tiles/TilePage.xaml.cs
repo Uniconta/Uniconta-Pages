@@ -1,4 +1,6 @@
 using System;
+using System.IO;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -28,15 +30,16 @@ namespace UnicontaClient.Pages.CustomPage
         List<UserMenuClient> tiles;
         readonly TileLayoutService tileLayout = new TileLayoutService();
         readonly Dictionary<UserMenuClient, TileHost> hosts = new Dictionary<UserMenuClient, TileHost>();
+        readonly List<System.Windows.Controls.Button> dashboardDropTargets = new List<System.Windows.Controls.Button>();
         ResizeSession resize;
         DragSession drag;
         bool savingPlacement, editMode, pageClosing;
         Task reloadTilesTask;
         bool reloadTilesRequested;
+        readonly HashSet<UserMenuClient> defaultTiles = new HashSet<UserMenuClient>();
         DashboardKey selectedDashboard = new DashboardKey(TileScope.Company, null);
         readonly DashboardSelectionState dashboardSelection;
 
-        public static List<string> Groups;
         public string LastUpdated { get; private set; }
 
         // Hook for company dashboard permissions; implement the permission check here.
@@ -52,16 +55,13 @@ namespace UnicontaClient.Pages.CustomPage
             Loaded += TilePage_Loaded;
             IsVisibleChanged += TilePage_IsVisibleChanged;
             txtGreeting.Text = GetGreeting(api.session.User._Name);
-            Groups = new List<string>();
 
             dashboardSelection = new DashboardSelectionState("TilePage.ActiveDashboard_" + api.session.User.Uid);
             LastValue.Unpack(api.CompanyEntity, dashboardSelection);
             selectedDashboard = new DashboardKey(dashboardSelection.Scope, dashboardSelection.Name, dashboardSelection.Profile);
 
             tiles = (UserMenuItems.GetTiles(api.CompanyEntity) ?? Enumerable.Empty<UserMenuClient>())
-                                  .OrderBy(t => string.IsNullOrWhiteSpace(t.RibbonMenu))
-                                  .ThenBy(t => t.RibbonMenu)
-                                  .ThenBy(t => t._LineNumber)
+                                  .OrderBy(t => t._LineNumber)
                                   .ToList();
 
             PreviewKeyDown += TilePage_PreviewKeyDown;
@@ -79,7 +79,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void TilePage_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            btnCopyToApp.Visibility = Utility.GetCurrentApp() != null ? Visibility.Visible : Visibility.Collapsed;
+            UpdateTileCreationAvailability();
             if (IsVisible && IsLoaded) _ = ReloadTilesAsync();
             else if (!IsVisible) CancelInteractions();
         }
@@ -99,12 +99,12 @@ namespace UnicontaClient.Pages.CustomPage
             do
             {
                 reloadTilesRequested = false;
-                //await UserMenuItems.Load(api);
+                await UserMenuItems.Load(api);
 
                 if (pageClosing || savingPlacement) return;
                 tiles = (UserMenuItems.GetTiles(api.CompanyEntity) ?? new List<UserMenuClient>())
-                    .OrderBy(tile => string.IsNullOrWhiteSpace(tile.RibbonMenu))
-                    .ThenBy(tile => tile.RibbonMenu).ThenBy(tile => tile._LineNumber).ToList();
+                    .OrderBy(tile => tile._LineNumber).ToList();
+                LoadDefaultTilesIfEmpty();
                 RebuildTiles();
                 UpdateLastUpdated();
             } while (reloadTilesRequested);
@@ -146,10 +146,8 @@ namespace UnicontaClient.Pages.CustomPage
             tiles?.RemoveAll(tile => !UserMenuItems.IsTileVisible(tile, api.CompanyEntity));
             RebuildDashboardTabs();
             tilesPanel.Children.Clear();
-            tileGroupLabels.Children.Clear();
             tilesPanel.IsEditing = editMode;
             hosts.Clear();
-            Groups.Clear();
 
             if (tiles == null)
                 return;
@@ -158,24 +156,8 @@ namespace UnicontaClient.Pages.CustomPage
                 .Where(t => DashboardKey.From(t).Equals(selectedDashboard)).ToList();
             emptyDashboard.Visibility = dashboardTiles.Count == 0 && !editMode ? Visibility.Visible : Visibility.Collapsed;
 
-            foreach (var groupItems in dashboardTiles.OrderBy(t => string.IsNullOrWhiteSpace(t.RibbonMenu))
-                .ThenBy(t => t.RibbonMenu).ThenBy(t => t._LineNumber)
-                .GroupBy(t => string.IsNullOrWhiteSpace(t.RibbonMenu) ? string.Empty : t.RibbonMenu))
-            {
-                var label = string.IsNullOrEmpty(groupItems.Key) ? Uniconta.ClientTools.Localization.lookup("Other") : groupItems.Key;
-                Groups.Add(label);
-                // Group labels remain a legend; inserting them in the grid would break page-wide coordinates.
-                tileGroupLabels.Children.Add(new TextBlock
-                {
-                    Text = label,
-                    FontWeight = FontWeights.SemiBold,
-                    FontSize = 14,
-                    Foreground = (System.Windows.Media.Brush)FindResource("ForegroundBrush"),
-                    Margin = new Thickness(0, 12, TileLayoutService.HorizontalGap, 8)
-                });
-                foreach (var menu in groupItems)
-                    AddTile(tilesPanel, menu);
-            }
+            foreach (var menu in dashboardTiles.OrderBy(t => t._LineNumber))
+                AddTile(tilesPanel, menu);
         }
 
         private void RebuildDashboardTabs()
@@ -196,6 +178,7 @@ namespace UnicontaClient.Pages.CustomPage
             UpdateTileCreationAvailability();
 
             dashboardTabs.Children.Clear();
+            dashboardDropTargets.Clear();
             foreach (var dashboard in dashboards)
             {
                 var button = new System.Windows.Controls.Button
@@ -208,6 +191,7 @@ namespace UnicontaClient.Pages.CustomPage
                     BorderThickness = dashboard.Equals(selectedDashboard) ? new Thickness(0, 0, 0, 2) : new Thickness(0)
                 };
                 button.Click += DashboardTab_Click;
+                dashboardDropTargets.Add(button);
 
                 if (editMode && !string.IsNullOrWhiteSpace(dashboard.Name))
                 {
@@ -254,12 +238,15 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void UpdateTileCreationAvailability()
         {
+            btnImport.Visibility = btnExport.Visibility = editMode ? Visibility.Visible : Visibility.Collapsed;
+            btnEdit.IsEnabled = !savingPlacement && (editMode || CanAddTilesToDashboard(selectedDashboard));
+            btnImport.IsEnabled = !savingPlacement && CanAddTilesToDashboard(selectedDashboard);
+            btnExport.IsEnabled = !savingPlacement;
             btnCopyToApp.Visibility = Utility.GetCurrentApp() != null ? Visibility.Visible : Visibility.Collapsed;
-            var canAdd = CanAddTilesToDashboard(selectedDashboard);
-            btnAdd.Visibility = btnAddEmptyDashboard.Visibility = btnAddDashboard.Visibility = canAdd ? Visibility.Visible : Visibility.Collapsed;
-            btnCreateWithAI.Visibility = btnCreateWithAIBottom.Visibility = canAdd && !GPTServiceFactory.HideAIControls ? Visibility.Visible : Visibility.Collapsed;
-            btnAdd.IsEnabled = btnAddEmptyDashboard.IsEnabled = btnAddDashboard.IsEnabled =
-                btnCreateWithAI.IsEnabled = btnCreateWithAIBottom.IsEnabled = canAdd && !savingPlacement;
+            // new tiles default to My Dashboard, regardless of the active tab.
+            btnAdd.Visibility = btnAddEmptyDashboard.Visibility = btnAddDashboard.Visibility = Visibility.Visible;
+            btnCreateWithAI.Visibility = btnCreateWithAIBottom.Visibility = !GPTServiceFactory.HideAIControls ? Visibility.Visible : Visibility.Collapsed;
+            btnAdd.IsEnabled = btnAddEmptyDashboard.IsEnabled = btnAddDashboard.IsEnabled = btnCreateWithAI.IsEnabled = btnCreateWithAIBottom.IsEnabled = !savingPlacement;
         }
 
         private List<DashboardKey> GetDashboards()
@@ -287,7 +274,10 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (savingPlacement)
                 return;
-            selectedDashboard = (DashboardKey)((System.Windows.Controls.Button)sender).Tag;
+            var dashboard = (DashboardKey)((System.Windows.Controls.Button)sender).Tag;
+            if (editMode && !CanAddTilesToDashboard(dashboard))
+                btnEdit_Click(btnEdit, new RoutedEventArgs());
+            selectedDashboard = dashboard;
             RebuildTiles();
         }
 
@@ -366,7 +356,6 @@ namespace UnicontaClient.Pages.CustomPage
             };
 
             control.IsDeleteMode = editMode;
-            control.Groups = Groups;
 
             var host = new TileHost { Content = control, Tag = menu, Focusable = true };
             var definition = control.Definition;
@@ -402,11 +391,24 @@ namespace UnicontaClient.Pages.CustomPage
                 var session = drag;
                 UpdateDrag(e.GetPosition(tilesPanel));
                 var commit = ReferenceEquals(drag, session) && session.IsDragging && session.IsValid;
+                var destination = session.DashboardTarget == null ? (DashboardKey?)null : (DashboardKey)session.DashboardTarget.Tag;
                 CancelDrag();
                 if (commit)
-                    await SavePlacementAsync(host, session.Candidate);
+                {
+                    if (destination.HasValue)
+                        await MoveTileAsync(menu, destination.Value);
+                    else
+                        await SavePlacementAsync(host, session.Candidate);
+                }
             };
             host.LostMouseCapture += (s, e) => { if (drag != null && drag.Host == host && Mouse.Captured != host) CancelDrag(); };
+            host.QueryCursor += (s, e) =>
+            {
+                if (!CanOpenTile(menu, e.OriginalSource as DependencyObject))
+                    return;
+                e.Cursor = System.Windows.Input.Cursors.Hand;
+                e.Handled = true;
+            };
             host.MouseLeftButtonUp += (s, e) =>
             {
                 if (editMode || savingPlacement || resize != null || IsInteractiveElement(e.OriginalSource as DependencyObject))
@@ -422,6 +424,9 @@ namespace UnicontaClient.Pages.CustomPage
                Uniconta.ClientTools.Plugin.TileTypeCache.Resolve(definition.TileTypeId) == null)
                 _ = ReloadPluginTileAfterDelayAsync(menu, host, control);
         }
+        private bool CanOpenTile(UserMenuClient menu, DependencyObject source)
+            => !editMode && !savingPlacement && resize == null 
+            && !string.IsNullOrWhiteSpace(menu.Control) && !IsInteractiveElement(source);
 
         private const int PluginTileReloadDelaySeconds = 3;
         private async Task ReloadPluginTileAfterDelayAsync(UserMenuClient menu, TileHost host, TileControl control)
@@ -501,7 +506,6 @@ namespace UnicontaClient.Pages.CustomPage
             definition.DashboardTab = destination.Name;
             definition.Order = tiles.Where(t => !TileDefinition.FromUserMenu(t).IsDashboardDefinition)
                 .Where(t => DashboardKey.From(t).Equals(destination))
-                .Where(t => string.Equals(t.RibbonMenu ?? "", menu.RibbonMenu ?? "", StringComparison.OrdinalIgnoreCase))
                 .Select(t => t._LineNumber)
                 .DefaultIfEmpty()
                 .Max() + 1;
@@ -572,14 +576,49 @@ namespace UnicontaClient.Pages.CustomPage
                 Math.Abs(pointer.Y - drag.Start.Y) < SystemParameters.MinimumVerticalDragDistance)
                 return;
             drag.IsDragging = true;
+            // Mouse capture keeps events on the tile, so hit-test the tabs explicitly.
+            var hit = dashboardTabs.InputHitTest(tilesPanel.TranslatePoint(pointer, dashboardTabs)) as DependencyObject;
+            while (hit != null && !(hit is System.Windows.Controls.Button) && hit != dashboardTabs)
+                hit = VisualTreeHelper.GetParent(hit);
+            var target = hit as System.Windows.Controls.Button;
+            if (!dashboardDropTargets.Contains(target))
+                target = null;
+            SetDashboardDragTarget(target);
+            if (target != null)
+            {
+                var destination = (DashboardKey)target.Tag;
+                drag.IsValid = !destination.Equals(selectedDashboard) && CanAddTilesToDashboard(destination);
+                if (drag.IsValid)
+                {
+                    target.Opacity = 1;
+                    target.BorderThickness = new Thickness(0, 0, 0, 2);
+                }
+                HideResizeVisual();
+                return;
+            }
             drag.Candidate = tileLayout.SnapPosition(pointer.X - drag.Offset.X, pointer.Y - drag.Offset.Y,
                 new TileGridSize(drag.Original.ColumnSpan, drag.Original.RowSpan), drag.Columns);
             drag.IsValid = tileLayout.CanPlace(tilesPanel.CurrentPlan, drag.Host, drag.Candidate, drag.Columns);
             ShowPlacementPreview(drag.Candidate, drag.IsValid);
         }
 
+        private void SetDashboardDragTarget(System.Windows.Controls.Button target)
+        {
+            if (drag.DashboardTarget == target)
+                return;
+            if (drag.DashboardTarget != null)
+            {
+                drag.DashboardTarget.ClearValue(UIElement.OpacityProperty);
+                drag.DashboardTarget.BorderThickness = ((DashboardKey)drag.DashboardTarget.Tag).Equals(selectedDashboard)
+                    ? new Thickness(0, 0, 0, 2) : new Thickness(0);
+            }
+            drag.DashboardTarget = target;
+        }
+
         private void CancelDrag()
         {
+            if (drag != null)
+                SetDashboardDragTarget(null);
             var session = drag;
             drag = null;
             if (session != null && Mouse.Captured == session.Host)
@@ -800,7 +839,6 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (!savingPlacement)
                 UserMenuItems.Load(api);
-            Groups = null;
 
             base.PageClosing();
         }
@@ -816,11 +854,11 @@ namespace UnicontaClient.Pages.CustomPage
 
         void btnAdd_Click(object sender, RoutedEventArgs e)
         {
-            if (savingPlacement || !CanAddTilesToDashboard(selectedDashboard))
+            if (savingPlacement || pageClosing)
                 return;
             CancelInteractions();
 
-            var dialog = new CWTileDetails(api, new UserMenuClient(), selectedDashboard.Scope, selectedDashboard.Name, selectedDashboard.Profile);
+            var dialog = new CWTileDetails(api, new UserMenuClient());
 
             dialog.Closing += delegate
             {
@@ -830,7 +868,7 @@ namespace UnicontaClient.Pages.CustomPage
                     if (dialog.userMenu._LineNumber == 0)
                     {
                         dialog.userMenu._LineNumber = tiles
-                            .Where(t => DashboardKey.From(t).Equals(selectedDashboard) && string.Equals(t.RibbonMenu ?? "", dialog.userMenu.RibbonMenu ?? "", StringComparison.OrdinalIgnoreCase))
+                            .Where(t => DashboardKey.From(t).Equals(selectedDashboard))
                             .Select(t => t._LineNumber)
                             .DefaultIfEmpty()
                             .Max() + 1;
@@ -885,12 +923,40 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        void btnEdit_Click(object sender, RoutedEventArgs e)
+        async void btnEdit_Click(object sender, RoutedEventArgs e)
         {
-            if (savingPlacement)
+            if (savingPlacement || pageClosing || reloadTilesTask != null)
                 return;
             CancelInteractions();
             
+            if (!editMode && !CanAddTilesToDashboard(selectedDashboard))
+                return;
+            var defaultsToSave = defaultTiles.Where(tile => tiles.Contains(tile) && CanAddTilesToDashboard(DashboardKey.From(tile))).ToList();
+            if (!editMode && defaultsToSave.Count != 0)
+            {
+                savingPlacement = true;
+                UpdateTileCreationAvailability();
+                try
+                {
+                    var result = await api.Insert(defaultsToSave);
+                    if (result != ErrorCodes.Succes)
+                    {
+                        UtilDisplay.ShowErrorCode(result);
+                        return;
+                    }
+                    foreach (var tile in defaultsToSave)
+                    {
+                        TileCRUDController.UpdateTileCache(api.CompanyEntity, tile);
+                        defaultTiles.Remove(tile);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"), MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+                finally { savingPlacement = false; UpdateTileCreationAvailability(); }
+            }
             editMode = !editMode;
             btnEdit.Content = editMode ? Uniconta.ClientTools.Localization.lookup("Save") : Uniconta.ClientTools.Localization.lookup("TileEditLayout");
             ButtonAppearance.SetGlyph(btnEdit, GlyphHelper.GetGlyph(editMode ? "save-32x32.svg" : "Edit_16x16.svg"));
@@ -903,11 +969,129 @@ namespace UnicontaClient.Pages.CustomPage
             RebuildDashboardTabs();
         }
 
+        static List<TileDefinition> ReadTileDefinitions(string json)
+        {
+            var definitions = JsonConvert.DeserializeObject<List<TileDefinition>>(json,
+                new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.None });
+            if (definitions == null || definitions.Any(definition => definition == null))
+                throw new JsonSerializationException("Expected an array of tile definitions.");
+            foreach (var definition in definitions)
+            {
+                if (definition.Version > TileDefinition.CurrentVersion)
+                    throw new JsonSerializationException("This tile format requires a newer application version.");
+                definition.Validate();
+            }
+            return definitions;
+        }
+
+        void LoadDefaultTilesIfEmpty()
+        {
+            defaultTiles.Clear();
+            LoadDefaultTilesIfEmpty(TileScope.Company, "DefaultTiles_Company.json");
+            LoadDefaultTilesIfEmpty(TileScope.User, "DefaultTiles_User.json");
+        }
+
+        void LoadDefaultTilesIfEmpty(TileScope scope, string resourceName)
+        {
+            // Check stored records as well, so hidden/disabled tiles do not trigger defaults.
+            var storedTiles = api.CompanyEntity.userMenuDefs;
+            bool hasStoredTiles = storedTiles?.Any(menu => menu._IsTile &&
+                (scope == TileScope.Company
+                    ? menu._IsCompanyTile && string.IsNullOrWhiteSpace(menu._Profile)
+                    : menu._Uid == api.session.User.Uid && !menu._IsCompanyTile)) == true;
+            if (hasStoredTiles || tiles.Any(tile => TileDefinition.FromUserMenu(tile).Scope == scope))
+                return;
+
+            using (var stream = typeof(TilePage).Assembly.GetManifestResourceStream("UnicontaClient." + resourceName))
+            {
+                if (stream == null)
+                    throw new InvalidOperationException("Default tile resource is missing: " + resourceName);
+                using (var reader = new StreamReader(stream))
+                {
+                    foreach (var definition in ReadTileDefinitions(reader.ReadToEnd()))
+                    {
+                        definition.Scope = scope;
+                        definition.Profile = null;
+                        var menu = new UserMenuClient();
+                        menu.CompanyId = api.CompanyId;
+                        definition.ApplyTo(menu);
+                        menu._Uid = scope == TileScope.User ? api.session.User.Uid : 0;
+                        tiles.Add(menu);
+                        defaultTiles.Add(menu);
+                    }
+                }
+            }
+        }
+
+        void btnExport_Click(object sender, RoutedEventArgs e)
+        {
+            if (!editMode || savingPlacement || pageClosing) return;
+            var dialog = new Microsoft.Win32.SaveFileDialog { Filter = "JSON files (*.json)|*.json", DefaultExt = ".json", FileName = "Dashboard.json" };
+            if (dialog.ShowDialog() != true) return;
+            try
+            {
+                File.WriteAllText(dialog.FileName, JsonConvert.SerializeObject(
+                    tiles.Where(tile => DashboardKey.From(tile).Equals(selectedDashboard)).Select(TileDefinition.FromUserMenu), Formatting.Indented));
+            }
+            catch (Exception ex)
+            {
+                UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"), MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        async void btnImport_Click(object sender, RoutedEventArgs e)
+        {
+            if (!editMode || savingPlacement || pageClosing || !CanAddTilesToDashboard(selectedDashboard)) return;
+            var dialog = new Microsoft.Win32.OpenFileDialog { Filter = "JSON files (*.json)|*.json", DefaultExt = ".json" };
+            if (dialog.ShowDialog() != true) return;
+            CancelInteractions();
+            savingPlacement = true;
+            UpdateTileCreationAvailability();
+            try
+            {
+                var definitions = ReadTileDefinitions(File.ReadAllText(dialog.FileName));
+                var imported = new List<UserMenuClient>();
+                foreach (var definition in definitions)
+                {
+                    // Import adds tiles to the selected dashboard; never copies record IDs or ownership.
+                    if (definition.IsDashboardDefinition) continue;
+                    definition.Scope = selectedDashboard.Scope;
+                    definition.Profile = selectedDashboard.Profile;
+                    definition.DashboardTab = selectedDashboard.Name;
+                    definition.Validate();
+                    if (definition.IsCustomTile) TileMetadataService.ResolveStandaloneTileType(definition.TileTypeId);
+                    var rowType = definition.IsCustomTile || definition.Visualization == TileVisualization.HtmlWidget ? null : string.IsNullOrWhiteSpace(definition.SourceName)
+                        ? UtilDisplay.GetTypeFromTableId(api.CompanyEntity, definition.TableId)
+                        : TileDataSource.Create(api, definition).DataType;
+                    TileTableCapabilities.Validate(rowType, definition);
+                    var menu = new UserMenuClient();
+                    definition.ApplyTo(menu);
+                    menu._Uid = definition.Scope == TileScope.User ? api.session.User.Uid : 0;
+                    imported.Add(menu);
+                }
+                if (imported.Count == 0) return;
+                var result = await api.Insert(imported);
+                if (result != ErrorCodes.Succes) { UtilDisplay.ShowErrorCode(result); return; }
+                foreach (var menu in imported) TileCRUDController.UpdateTileCache(api.CompanyEntity, menu);
+                tiles.AddRange(imported);
+            }
+            catch (Exception ex)
+            {
+                UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"), MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                savingPlacement = false;
+                RebuildTiles();
+                UpdateLastUpdated();
+            }
+        }
+
         async void btnRefreshTiles_Click(object sender, RoutedEventArgs e) => await ReloadTilesAsync();
 
         void btnCreateWithAI_Click(object sender, RoutedEventArgs e)
         {
-            if (!CanAddTilesToDashboard(selectedDashboard))
+            if (savingPlacement || pageClosing)
                 return;
             if(App.MainPageObj.assistantHost is AIAssistantHost assistantHost)
             {
@@ -923,8 +1107,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override List<IAIAssistantCapability> GetAIAssistantCapabilities(bool attached)
         {
             var value = base.GetAIAssistantCapabilities(attached);
-            if (CanAddTilesToDashboard(selectedDashboard))
-                value.Add(new AddTileAICapability(this));
+            value.Add(new AddTileAICapability(this));
             value.Add(new RemoveTileAICapability(this));
             value.Add(new ResizeTileAICapability(this));
             return value;
@@ -956,18 +1139,18 @@ namespace UnicontaClient.Pages.CustomPage
 
         internal async Task<ErrorCodes> AddTileAsync(TileDefinition definition)
         {
-            if (savingPlacement || pageClosing || !CanAddTilesToDashboard(selectedDashboard))
+            definition.NormalizeNewDashboard();
+            var destination = new DashboardKey(definition.Scope, definition.DashboardTab, definition.Profile);
+            if (savingPlacement || pageClosing || !CanAddTilesToDashboard(destination))
                 return ErrorCodes.NoChange;
             CancelInteractions();
-            definition.Scope = selectedDashboard.Scope;
-            definition.Profile = selectedDashboard.Profile;
-            definition.DashboardTab = selectedDashboard.Name;
 
             var r = await new TileCRUDController(api).SaveAsync(definition);
 
             if (r.Item1 == ErrorCodes.Succes)
             {
                 tiles.Add(r.Item2);
+                selectedDashboard = DashboardKey.From(r.Item2);
                 RebuildTiles();
             }
 
@@ -1017,6 +1200,7 @@ namespace UnicontaClient.Pages.CustomPage
         sealed class DragSession
         {
             public TileHost Host;
+            public System.Windows.Controls.Button DashboardTarget;
             public int Columns;
             public System.Windows.Point Start, Offset;
             public TileGridRect Original, Candidate;
@@ -1301,14 +1485,17 @@ namespace UnicontaClient.Pages.CustomPage
             if (definition == null)
                 throw new ArgumentNullException(nameof(definition));
 
+            if (existing == null || existing.RowId == 0)
+                definition.NormalizeNewDashboard();
             definition.Validate();
 
             if (definition.IsCustomTile)
                 TileMetadataService.ResolveStandaloneTileType(definition.TileTypeId);
 
-            var rowType = definition.IsCustomTile ? null : string.IsNullOrWhiteSpace(definition.SourceName) ? 
-                                                           Uniconta.ClientTools.Util.UtilDisplay.GetTypeFromTableId(api.CompanyEntity, definition.TableId) : 
-                                                           TileDataSource.Create(api, definition).DataType;
+            var rowType = definition.IsCustomTile || definition.IsDashboardDefinition || definition.Visualization == TileVisualization.HtmlWidget
+                ? null : string.IsNullOrWhiteSpace(definition.SourceName)
+                    ? UtilDisplay.GetTypeFromTableId(api.CompanyEntity, definition.TableId)
+                    : TileDataSource.Create(api, definition).DataType;
 
             TileTableCapabilities.Validate(rowType, definition);
 
@@ -1360,7 +1547,8 @@ namespace UnicontaClient.Pages.CustomPage
         internal static void UpdateTileCache(Company company, UserMenuClient menu, bool deleted = false)
         {
             // GetTiles returns copies; update the company cache as well as the page's row.
-            if (company.userMenuDefs == null) return;
+            if (company.userMenuDefs == null)
+                company.userMenuDefs = new List<UserMenu>();
 
             var updated = company.userMenuDefs.Where(item => item.RowId != menu.RowId).ToList();
             if (!deleted)

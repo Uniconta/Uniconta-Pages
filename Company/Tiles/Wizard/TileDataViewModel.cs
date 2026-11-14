@@ -73,13 +73,12 @@ namespace UnicontaClient.Pages.CustomPage
             : wizard.CurrentStep is TileConfigurationStepViewModel ? 1
             : wizard.CurrentStep is TileTypeStepViewModel ? 0 : -1;
         string summary, headingStatus, lastSuggestedConfiguration;
-        bool addingGroup;
 
         internal TileDataViewModel(CrudAPI api, TileCRUDController service, UserMenuClient original,
             UserMenuClient working, TileDefinition definition)
             : this(definition, TileMetadataService.GetTileTypeOptions(typeof(IdKey)),
                 new TileMetadataService(api).GetDataSources(), new TileMetadataService(api).GetFields,
-                UserControlProperties.ControlList.Keys, TilePage.Groups ?? new List<string>())
+                UserControlProperties.ControlList.Keys)
         {
             this.api = api ?? throw new ArgumentNullException(nameof(api));
             this.service = service ?? throw new ArgumentNullException(nameof(service));
@@ -90,7 +89,6 @@ namespace UnicontaClient.Pages.CustomPage
                 EditFilters();
                 return Task.CompletedTask;
             }), () => wizard != null && !wizard.IsBusy && ShowData && SelectedSource?.Type != null);
-            AddGroupCommand = new DevExpress.Mvvm.DelegateCommand(() => IsAddingGroup = true, () => wizard != null && CanEditStep(2));
             SuggestHeadingCommand = new DevExpress.Mvvm.AsyncCommand(() => wizard.RunOperationAsync(SuggestHeadingAsync, true),
                 () => wizard != null && !wizard.IsBusy);
             DeleteCommand = new DevExpress.Mvvm.AsyncCommand(DeleteAsync, () => IsExisting && wizard != null && !wizard.IsBusy);
@@ -99,9 +97,22 @@ namespace UnicontaClient.Pages.CustomPage
         internal TileDataViewModel(TileDefinition definition, IReadOnlyList<TileTypeMetadata> tileTypes,
             IReadOnlyList<TileDataSourceMetadata> dataSources,
             Func<TileDataSourceMetadata, IReadOnlyList<TileFieldMetadata>> getFields,
-            IEnumerable<string> navigationTargets, IEnumerable<string> groups)
+            IEnumerable<string> navigationTargets)
         {
             draft = definition ?? throw new ArgumentNullException(nameof(definition));
+            if (draft.HtmlSources == null) draft.HtmlSources = new List<TileHtmlSource>();
+            if (draft.HtmlSources.Count == 0)
+                draft.HtmlSources.Add(new TileHtmlSource { Url = draft.HtmlSource });
+            draft.HtmlSource = null;
+            HtmlSources = new ObservableCollection<TileHtmlSourceViewModel>(draft.HtmlSources.Select(CreateHtmlSource));
+            AddHtmlSourceCommand = new DevExpress.Mvvm.DelegateCommand(() =>
+            {
+                if (!CanEditStep(1)) return;
+                var source = new TileHtmlSource();
+                draft.HtmlSources.Add(source);
+                HtmlSources.Add(CreateHtmlSource(source));
+                NotifyEdit(1, nameof(HtmlSources));
+            });
             this.getFields = getFields ?? throw new ArgumentNullException(nameof(getFields));
             var types = tileTypes.ToList();
             if (draft.IsCustomTile && !types.Any(t => t.Id == draft.TileTypeId))
@@ -122,8 +133,6 @@ namespace UnicontaClient.Pages.CustomPage
             LoadParameters();
             RefreshSources(true);
             RefreshFields(false);
-            Groups = new ObservableCollection<string>(new[] { string.Empty }.Concat(groups).Distinct());
-            if (!string.IsNullOrWhiteSpace(draft.Group) && !Groups.Contains(draft.Group)) Groups.Add(draft.Group);
             NavigationTargets = navigationTargets.Concat(new[] { draft.NavigationTarget })
                 .Where(value => !string.IsNullOrWhiteSpace(value)).Concat(new[] { string.Empty }).Distinct().OrderBy(value => value).ToArray();
         }
@@ -139,7 +148,6 @@ namespace UnicontaClient.Pages.CustomPage
         public IReadOnlyList<string> NumericFields => numericFields;
         public IReadOnlyList<string> GroupFields => groupFields;
         public ObservableCollection<TileValueFieldViewModel> ValueFields => valueFields;
-        public ObservableCollection<string> Groups { get; }
         public IReadOnlyList<string> NavigationTargets { get; }
         public TileScope[] Scopes => TileDashboardAccess.GetScopes(api);
         public IReadOnlyList<UserProfileClient> Profiles { get; private set; } = Array.Empty<UserProfileClient>();
@@ -149,7 +157,6 @@ namespace UnicontaClient.Pages.CustomPage
         public string Summary { get => summary; private set => SetProperty(ref summary, value); }
         public string HeadingStatus { get => headingStatus; private set => SetProperty(ref headingStatus, value); }
         public string SelectionSummary => Uniconta.ClientTools.Localization.lookup("TileType") + ": " + SelectedTileType?.Caption + (ShowData && SelectedSource != null ? " · " + SelectedSource.Caption : "");
-        public bool IsAddingGroup { get => addingGroup; private set => SetProperty(ref addingGroup, value); }
         public bool ShowSize => draft.IsCustomTile;
         public bool ShowHtml => !ShowSize && Visualization == TileVisualization.HtmlWidget;
         public bool ShowData => !ShowSize && !ShowHtml;
@@ -239,7 +246,16 @@ namespace UnicontaClient.Pages.CustomPage
         public string ChartGroup { get => draft.ChartGroup; set { if (CanEditStep(1) && value != null && draft.ChartGroup != value) { draft.ChartGroup = value; NotifyEdit(1, nameof(ChartGroup)); } } }
         public string Value2Field { get => draft.Value2Field; set { if (CanEditStep(1) && value != null && draft.Value2Field != value) { draft.Value2Field = value; NotifyEdit(1, nameof(Value2Field)); } } }
         public string WeightField { get => draft.WeightField; set { if (CanEditStep(1) && value != null && draft.WeightField != value) { draft.WeightField = value; NotifyEdit(1, nameof(WeightField)); } } }
-        public string HtmlSource { get => draft.HtmlSource; set { if (CanEditStep(1) && draft.HtmlSource != value) { draft.HtmlSource = value; NotifyEdit(1, nameof(HtmlSource)); } } }
+        public ObservableCollection<TileHtmlSourceViewModel> HtmlSources { get; }
+        public System.Windows.Input.ICommand AddHtmlSourceCommand { get; }
+        TileHtmlSourceViewModel CreateHtmlSource(TileHtmlSource source) => new TileHtmlSourceViewModel(source,
+            () => CanEditStep(1), () => NotifyEdit(1, nameof(HtmlSources)), () =>
+            {
+                if (!CanEditStep(1)) return;
+                draft.HtmlSources.Remove(source);
+                HtmlSources.Remove(HtmlSources.First(row => ReferenceEquals(row.Source, source)));
+                NotifyEdit(1, nameof(HtmlSources));
+            });
         public int ColumnSpan { get => draft.ColumnSpan; set { if (CanEditStep(1) && draft.ColumnSpan != value) { draft.ColumnSpan = value; NotifyEdit(1, nameof(ColumnSpan)); } } }
         public int RowSpan { get => draft.RowSpan; set { if (CanEditStep(1) && draft.RowSpan != value) { draft.RowSpan = value; NotifyEdit(1, nameof(RowSpan)); } } }
         public TileScope Scope
@@ -259,22 +275,6 @@ namespace UnicontaClient.Pages.CustomPage
         // A cleared combo-box binding must not coerce null into the enum's default value.
         public TileScope? SelectedScope { get => draft.Scope; set { if (value.HasValue) Scope = value.Value; } }
         public string DashboardTab { get => draft.DashboardTab; set { if (CanEditStep(2) && value != null && draft.DashboardTab != value) { draft.DashboardTab = value; NotifyEdit(2, nameof(DashboardTab)); } } }
-        public string Group
-        {
-            get => draft.Group;
-            set
-            {
-                if (!CanEditStep(2) || value == null || draft.Group == value) return;
-                draft.Group = value;
-                NotifyEdit(2, nameof(Group));
-                if (!IsAddingGroup) OnPropertyChanged(nameof(SelectedGroup));
-            }
-        }
-        public string SelectedGroup
-        {
-            get => Groups.Contains(Group ?? string.Empty) ? Group ?? string.Empty : null;
-            set { if (!IsAddingGroup && value != null) Group = value; }
-        }
         public string NavigationTarget { get => draft.NavigationTarget; set { if (CanEditStep(2) && value != null && draft.NavigationTarget != value) { draft.NavigationTarget = value; NotifyEdit(2, nameof(NavigationTarget)); } } }
         public string Title { get => draft.Title; set { if (CanEditStep(3)) SetTitle(value); } }
 
@@ -285,15 +285,8 @@ namespace UnicontaClient.Pages.CustomPage
             NotifyEdit(3, nameof(Title));
         }
 
-        internal void CommitPlacement()
-        {
-            if (!string.IsNullOrWhiteSpace(draft.Group) && !Groups.Contains(draft.Group)) Groups.Add(draft.Group);
-            IsAddingGroup = false;
-            OnPropertyChanged(nameof(SelectedGroup));
-        }
         public string FilterSummary => string.IsNullOrWhiteSpace(draft.Filter) ? Uniconta.ClientTools.Localization.lookup("TileNoFilter") : Uniconta.ClientTools.Localization.lookup("TileFilterConfigured");
         public DevExpress.Mvvm.AsyncCommand EditFiltersCommand { get; }
-        public DevExpress.Mvvm.DelegateCommand AddGroupCommand { get; }
         public DevExpress.Mvvm.AsyncCommand SuggestHeadingCommand { get; }
         public DevExpress.Mvvm.AsyncCommand DeleteCommand { get; }
         internal event Action<int> Edited;
@@ -324,8 +317,8 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 new[] { nameof(SelectedTileType) },
                 new[] { nameof(SelectedSource), nameof(Aggregate), nameof(SingleValue), nameof(GroupBy), nameof(ChartGroup),
-                    nameof(Value2Field), nameof(WeightField), nameof(HtmlSource), nameof(ColumnSpan), nameof(RowSpan) },
-                new[] { nameof(SelectedScope), nameof(DashboardTab), nameof(SelectedGroup), nameof(Group), nameof(NavigationTarget) },
+                    nameof(Value2Field), nameof(WeightField), nameof(HtmlSources), nameof(ColumnSpan), nameof(RowSpan) },
+                new[] { nameof(SelectedScope), nameof(DashboardTab), nameof(NavigationTarget) },
                 new[] { nameof(Title) }
             };
             refreshingMetadata = true;
@@ -340,7 +333,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void RefreshCommands()
         {
-            EditFiltersCommand?.RaiseCanExecuteChanged(); AddGroupCommand?.RaiseCanExecuteChanged();
+            EditFiltersCommand?.RaiseCanExecuteChanged();
             SuggestHeadingCommand?.RaiseCanExecuteChanged(); DeleteCommand?.RaiseCanExecuteChanged();
         }
 
@@ -440,7 +433,8 @@ namespace UnicontaClient.Pages.CustomPage
         {
             draft.Title = string.IsNullOrWhiteSpace(draft.Title) ? null : draft.Title.Trim();
             draft.DashboardTab = string.IsNullOrWhiteSpace(draft.DashboardTab) ? null : draft.DashboardTab.Trim();
-            draft.HtmlSource = draft.HtmlSource?.Trim();
+            foreach (var source in draft.HtmlSources) source.Url = source.Url?.Trim();
+            draft.HtmlSource = draft.HtmlSources.FirstOrDefault(source => !source.CountryCode.HasValue)?.Url;
             if (!ShowChartGroup) draft.ChartGroup = null;
             if (!ShowSize && !Visualization.SupportsMultipleValues())
                 draft.ValueColumns = (draft.ValueColumns ?? new List<string>()).Take(1).ToList();
@@ -453,6 +447,15 @@ namespace UnicontaClient.Pages.CustomPage
 
         void ValidateDraft(bool validateParameters = true)
         {
+            if (!IsExisting)
+            {
+                draft.NormalizeNewDashboard();
+                OnPropertyChanged(nameof(Scope));
+                OnPropertyChanged(nameof(SelectedScope));
+                OnPropertyChanged(nameof(IsProfile));
+                OnPropertyChanged(nameof(Profile));
+                OnPropertyChanged(nameof(DashboardTab));
+            }
             if (api != null && !Scopes.Contains(Scope))
                 throw new ArgumentException(Uniconta.ClientTools.Localization.lookup("NoRights"));
             if (api != null && IsProfile && !Profiles.Any(item => item.KeyStr == Profile))
@@ -531,7 +534,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         string BuildHeadingConfiguration()
         {
-            if (ShowSize) return JsonConvert.SerializeObject(new { TileType = SelectedTileType.Caption, Parameters = HasParameters ? string.Join(", ", Parameters.Select(p => p.Caption + ": " + p.Value)) : null, Columns = ColumnSpan, Rows = RowSpan, Scope = Scope.ToString(), Profile = IsProfile ? Profile : null, Group });
+            if (ShowSize) return JsonConvert.SerializeObject(new { TileType = SelectedTileType.Caption, Parameters = HasParameters ? string.Join(", ", Parameters.Select(p => p.Caption + ": " + p.Value)) : null, Columns = ColumnSpan, Rows = RowSpan, Scope = Scope.ToString(), Profile = IsProfile ? Profile : null });
             return JsonConvert.SerializeObject(new
             {
                 DataSource = ShowHtml ? null : SelectedSource?.Caption,
@@ -541,7 +544,7 @@ namespace UnicontaClient.Pages.CustomPage
                 GroupByField = ShowGrouping ? GroupBy : null, SeriesByField = ShowChartGroup ? ChartGroup : null,
                 Value2Field = ShowValue2 ? Value2Field : null, WeightField = ShowWeight ? WeightField : null,
                 Filters = string.Join("; ", (GetSavedFilters(draft.Filter) ?? new Filter[0]).Select(f => f.name + ": " + f.value)),
-                WidgetUrl = ShowHtml ? HtmlSource : null, Scope = Scope.ToString(), Profile = IsProfile ? Profile : null, Group, DashboardTab,
+                WidgetUrl = ShowHtml ? string.Join("; ", draft.HtmlSources.Select(source => (source.CountryCode?.ToString() ?? "Default") + ": " + source.Url)) : null, Scope = Scope.ToString(), Profile = IsProfile ? Profile : null, DashboardTab,
                 GoTo = ShowData ? NavigationTarget : null
             });
         }
@@ -576,7 +579,6 @@ namespace UnicontaClient.Pages.CustomPage
                 case "WeightField": return Uniconta.ClientTools.Localization.lookup("TileBubbleWeight");
                 case "Filters": return Uniconta.ClientTools.Localization.lookup("Filter");
                 case "WidgetUrl": return Uniconta.ClientTools.Localization.lookup("TileWidgetURL");
-                case "Group": return Uniconta.ClientTools.Localization.lookup("Group");
                 case "DashboardTab": return Uniconta.ClientTools.Localization.lookup("Dashboard");
                 case "GoTo": return Uniconta.ClientTools.Localization.lookup("TileGoTo");
                 default: return name;
@@ -621,11 +623,37 @@ namespace UnicontaClient.Pages.CustomPage
                 HeadingStatus = Uniconta.ClientTools.Localization.lookup("TileYouCanEditTheTitleOrLeaveIt");
             }
             catch (OperationCanceledException) when (token.IsCancellationRequested) { HeadingStatus = Uniconta.ClientTools.Localization.lookup("TileTitleSuggestionCancelled"); throw; }
-            catch (Exception ex)
+            catch (Exception ex) when (!Uniconta.ClientTools.Controls.AIErrorResolver.RawInformation)
             {
-                Uniconta.ClientTools.InfoLog.Log.Warning("Tile heading suggestion unavailable: " + ex.Message);
+                Uniconta.ClientTools.InfoLog.Log.Warning("Tile heading suggestion unavailable: " + Uniconta.ClientTools.Controls.AIErrorResolver.Resolve(ex));
                 HeadingStatus = Uniconta.ClientTools.Localization.lookup("TileTitleSuggestionUnavailableEnterATitleOrLeave");
             }
+        }
+    }
+
+    public sealed class TileHtmlSourceViewModel : NotifyPropertyChangedViewModel
+    {
+        readonly Func<bool> canEdit;
+        readonly Action changed;
+        internal TileHtmlSource Source { get; }
+        public IReadOnlyList<TileChoice<CountryCode?>> Countries { get; } = new[] { new TileChoice<CountryCode?>(null, "Default (no country)") }
+            .Concat(Enum.GetValues(typeof(CountryCode)).Cast<CountryCode>().Where(country => country != CountryCode.Unknown)
+                .Select(country => new TileChoice<CountryCode?>(country, ((CountryISOCode)(int)country).ToString() + " - " + country.ToString()))).ToArray();
+        internal TileHtmlSourceViewModel(TileHtmlSource source, Func<bool> canEdit, Action changed, Action remove)
+        {
+            Source = source; this.canEdit = canEdit; this.changed = changed;
+            RemoveCommand = new DevExpress.Mvvm.DelegateCommand(remove);
+        }
+        public System.Windows.Input.ICommand RemoveCommand { get; }
+        public TileChoice<CountryCode?> Country
+        {
+            get => Countries.FirstOrDefault(country => country.Value == Source.CountryCode);
+            set { if (canEdit() && value != null && Source.CountryCode != value.Value) { Source.CountryCode = value.Value; OnPropertyChanged(nameof(Country)); changed(); } }
+        }
+        public string Url
+        {
+            get => Source.Url;
+            set { if (canEdit() && Source.Url != value) { Source.Url = value; OnPropertyChanged(nameof(Url)); changed(); } }
         }
     }
 

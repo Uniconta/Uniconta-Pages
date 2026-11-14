@@ -27,7 +27,6 @@ namespace UnicontaClient.Pages.CustomPage.GL.Anomaly
         private DateTime periodBeforePreviousFrom;
         private DateTime periodBeforePreviousTo;
 
-        private bool suppressPeriodChange;
 
         public event PropertyChangedEventHandler PropertyChanged;
         public event Action<LedgerTrendAnomalyParameters> ParametersAccepted;
@@ -84,18 +83,6 @@ namespace UnicontaClient.Pages.CustomPage.GL.Anomaly
                 if (currentPeriodFrom == value)
                     return;
 
-                if (!suppressPeriodChange &&
-                    parameters != null &&
-                    currentPeriodFrom != DateTime.MinValue)
-                {
-                    SyncPeriodValuesToParameters();
-
-                    parameters.ChangeCurrentPeriodFrom(value);
-
-                    ApplyPeriodValues(parameters);
-                    return;
-                }
-
                 currentPeriodFrom = value;
                 NotifyPropertyChanged(nameof(CurrentPeriodFrom));
             }
@@ -110,18 +97,6 @@ namespace UnicontaClient.Pages.CustomPage.GL.Anomaly
 
                 if (currentPeriodTo == value)
                     return;
-
-                if (!suppressPeriodChange &&
-                    parameters != null &&
-                    currentPeriodTo != DateTime.MinValue)
-                {
-                    SyncPeriodValuesToParameters();
-
-                    parameters.ChangeCurrentPeriodTo(value);
-
-                    ApplyPeriodValues(parameters);
-                    return;
-                }
 
                 currentPeriodTo = value;
                 NotifyPropertyChanged(nameof(CurrentPeriodTo));
@@ -222,32 +197,30 @@ namespace UnicontaClient.Pages.CustomPage.GL.Anomaly
 
         private void ApplyPeriodValues(LedgerTrendAnomalyParameters source)
         {
-            suppressPeriodChange = true;
+            CurrentPeriodFrom = source.CurrentPeriodFrom;
+            CurrentPeriodTo = source.CurrentPeriodTo;
+            PreviousPeriodFrom = source.PreviousPeriodFrom;
+            PreviousPeriodTo = source.PreviousPeriodTo;
+            PeriodBeforePreviousFrom = source.PeriodBeforePreviousFrom;
+            PeriodBeforePreviousTo = source.PeriodBeforePreviousTo;
+        }
 
-            try
-            {
-                CurrentPeriodFrom =
-                    source.CurrentPeriodFrom;
+        private void PreviousMonthButton_Click(object sender, RoutedEventArgs e)
+        {
+            MovePeriods(-1);
+        }
 
-                CurrentPeriodTo =
-                    source.CurrentPeriodTo;
+        private void NextMonthButton_Click(object sender, RoutedEventArgs e)
+        {
+            MovePeriods(1);
+        }
 
-                PreviousPeriodFrom =
-                    source.PreviousPeriodFrom;
-
-                PreviousPeriodTo =
-                    source.PreviousPeriodTo;
-
-                PeriodBeforePreviousFrom =
-                    source.PeriodBeforePreviousFrom;
-
-                PeriodBeforePreviousTo =
-                    source.PeriodBeforePreviousTo;
-            }
-            finally
-            {
-                suppressPeriodChange = false;
-            }
+        private void MovePeriods(int months)
+        {
+            Keyboard.ClearFocus();
+            SyncPeriodValuesToParameters();
+            parameters.MovePeriods(months);
+            ApplyPeriodValues(parameters);
         }
 
         private void SyncPeriodValuesToParameters()

@@ -7,14 +7,9 @@ namespace UnicontaClient.Pages.CustomPage
 {
     public partial class FunctionalityModuleControl : System.Windows.Controls.UserControl
     {
-        public static readonly DependencyProperty IconSourceProperty = DependencyProperty.Register(
-            nameof(IconSource), typeof(ImageSource), typeof(FunctionalityModuleControl));
+        public static readonly DependencyProperty IconSourceProperty = DependencyProperty.Register(nameof(IconSource), typeof(ImageSource), typeof(FunctionalityModuleControl));
 
-        public ImageSource IconSource
-        {
-            get { return (ImageSource)GetValue(IconSourceProperty); }
-            set { SetValue(IconSourceProperty, value); }
-        }
+        public ImageSource IconSource{ get { return (ImageSource)GetValue(IconSourceProperty); } set { SetValue(IconSourceProperty, value); } }
 
         public FunctionalityModuleControl()
         {

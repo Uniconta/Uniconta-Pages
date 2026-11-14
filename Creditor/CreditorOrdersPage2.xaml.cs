@@ -183,7 +183,7 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         editrow.DeliveryCity = city[0];
                         var add1 = city[1];
-                        if (!string.IsNullOrEmpty(add1))
+                        if (!string.IsNullOrEmpty(add1) && string.IsNullOrWhiteSpace(editrow.DeliveryAddress1))
                             editrow.DeliveryAddress1 = add1;
                         var zip = city[2];
                         if (!string.IsNullOrEmpty(zip) && editrow.DeliveryZipCode != zip)
@@ -254,6 +254,8 @@ namespace UnicontaClient.Pages.CustomPage
             }
             if (!Comp.CreditorPrice)
                 priceListLayoutItem.Visibility = Visibility.Collapsed;
+            if (!Comp.InvDuty)
+                liExemptDuty.Visibility = Visibility.Collapsed;
         }
 
         public override bool BeforeSetUserField(ref CorasauLayoutGroup parentGroup)

@@ -536,7 +536,7 @@ namespace UnicontaClient.Pages.CustomPage.GL.StandardAccountMatch
             }
             catch (Exception ex)
             {
-                Uniconta.ClientTools.InfoLog.Log.Error(ex);
+                Uniconta.ClientTools.Controls.AIErrorResolver.Handle(ex);
                 SetStatus(Localization.lookup("GLMatchStdReady"));
             }
             finally

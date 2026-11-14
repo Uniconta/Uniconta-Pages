@@ -47,21 +47,30 @@ namespace UnicontaClient.Pages.CustomPage
 
         [ForeignKeyAttribute(ForeignKeyTable = typeof(Uniconta.DataModel.GLOffsetAccountTemplate))]
         public string AccountTemplate { get; set; }
+        public double Amount { get; set; }
+        [AppEnumAttribute(EnumName = "EqualGE")]
+        public string AmountCriteria
+        {
+            get; set;
+        }
         public CWAddBankImportMapping(CrudAPI api, BankStatementLineClient bankStatement)
         {
             this.api = api;
-            this.DataContext = this;
             InitializeComponent();
             this.Title = Uniconta.ClientTools.Localization.lookup("AutomaticAccountSelection");
+            txtAmountCriteria.Text = BankImportFormatClientText.AmountCriteria;
             this.Loaded += CW_Loaded;
             chkEqual.IsChecked = chkContains.IsChecked = ckkStartWith.IsChecked = true;
             txtAccountType.Text = bankStatement.AccountType;
             txtAccount.Text = bankStatement._Account;
             txtText.Text = bankStatement._Text;
+            Amount = bankStatement._Amount;
+            txtAmount.Text = Amount.ToString();
             leCharge.api = api;
             leAccountTemplate.api = api;
             leVat.api = api;
             BindDimension();
+            this.DataContext = this;
         }
 
         void BindDimension()
@@ -163,7 +172,9 @@ namespace UnicontaClient.Pages.CustomPage
                 _Dim5 = leDim5.Text,
                 _Charge = Charge,
                 _Vat = Vat,
-                _RequireVoucher = chkRequireVoucher.IsChecked.GetValueOrDefault()
+                _RequireVoucher = chkRequireVoucher.IsChecked.GetValueOrDefault(),
+                _Amount = Amount,
+                _GE = (AppEnums.EqualGE.IndexOf(AmountCriteria) == 1)
             };
             var err = await api.Insert(bankImportMap);
             if (err != ErrorCodes.Succes)

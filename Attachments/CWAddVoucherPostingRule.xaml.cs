@@ -57,14 +57,24 @@ namespace UnicontaClient.Pages.CustomPage
 
         [ForeignKeyAttribute(ForeignKeyTable = typeof(GLDimType5))]
         public string Dimension5 { get; set; }
+
+        public double Amount { get; set; }
+        
+        [AppEnumAttribute(EnumName = "EqualGE")]
+        public string AmountCriteria
+        {
+            get;  set;
+        }
+
+
         VouchersClient voucher;
         public CWAddVoucherPostingRule(CrudAPI api, VouchersClient voucher)
         {
             this.api = api;
-            this.DataContext = this;
             this.voucher = voucher;
             InitializeComponent();
             this.Title = Uniconta.ClientTools.Localization.lookup("AutomaticAccountSelection");
+            txtAmountCriteria.Text = BankImportFormatClientText.AmountCriteria;
             this.Loaded += CW_Loaded;
             chkEqual.IsChecked = chkContains.IsChecked = ckkStartWith.IsChecked = true;
             txtText.Text = voucher._Text;
@@ -73,8 +83,10 @@ namespace UnicontaClient.Pages.CustomPage
             Approver2 = leApprover2.Text = voucher._Approver2;
             Account = leAccount.Text = voucher._CostAccount;
             OffsetAccount = leOffsetAccount.Text = voucher._PayAccount;
+            Amount = voucher._Amount;
             leCreditor.api = leApprover1.api = leApprover2.api = leVat.api = leAccount.api = leOffsetAccount.api = api;
             BindDimension();
+            this.DataContext = this;
         }
 
         void BindDimension()
@@ -176,7 +188,9 @@ namespace UnicontaClient.Pages.CustomPage
                 _Approver2 = Approver2,
                 _Vat = Vat,
                 _Account = leAccount.Text,
-                _OffsetAccount = leOffsetAccount.Text
+                _OffsetAccount = leOffsetAccount.Text,
+                _Amount = Amount,
+                _GE = (AppEnums.EqualGE.IndexOf(AmountCriteria) == 1)
             };
             bankImportMap.SetMaster(voucher);
             var err = await api.Insert(bankImportMap);

@@ -113,6 +113,7 @@ namespace UnicontaClient.Pages.CustomPage
   
             GetMergeUnMergePaymMenuItem();
             GetExpandAndCollapseMenuItem();
+            RemoveIcelandClaimsMenu();
             ribbonControl.DisableButtons("ExpandGroups");
             ribbonControl.DisableButtons("CollapseGroups");
 
@@ -310,7 +311,8 @@ namespace UnicontaClient.Pages.CustomPage
                     AddDockItem(TabControls.DebtorPaymentFileReport, null, Uniconta.ClientTools.Localization.lookup("FileArchive"));
                     break;
                default:
-                    gridRibbon_BaseActions(ActionType);
+                    if (!IcelandClaimsAction(ActionType))
+                        gridRibbon_BaseActions(ActionType);
                     break;
             }
         }

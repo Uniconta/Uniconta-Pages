@@ -44,6 +44,7 @@
   <RibbonItem LocalizedNameKey="Print">
     <RibbonItem LocalizedNameKey="GenerateInvoice" Action="CreateInvoice" LargeGlyph="Generate_32x32" ShortcutKey="Ctrl+M"/>
     <RibbonItem Action="ShowInvoice" LocalizedNameKey="ShowInvoice"  LargeGlyph="Show_Invoice_32x32" ShortcutKey="F7"/>
+    <RibbonItem Action="ShowEInvoice" LocalizedNameKey="ShowOBJ" Parameter="einvoice" LargeGlyph="Show_Invoice_32x32"/>
   </RibbonItem>
   <RibbonItem>
     <RibbonItem Action="InsertSubTotal" LocalizedNameKey="InsertSubTotal" Parameter="Line" Glyph="Add_16x16" LargeGlyph="Add_32x32"/>

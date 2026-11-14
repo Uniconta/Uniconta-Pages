@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Uniconta.API.Service;
 using Uniconta.ClientTools;
 using Uniconta.ClientTools.DataModel;
@@ -12,6 +13,8 @@ using Uniconta.DataModel;
 using UnicontaClient.Models;
 using UnicontaClient.Utilities;
 using static Uniconta.DataModel.TableField;
+using DevExpress.Xpf.Grid;
+using Uniconta.ClientTools.Controls;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -19,6 +22,32 @@ namespace UnicontaClient.Pages.CustomPage
     public class TableFieldGrid : CorasauDataGridClient
     {
         public override Type TableType { get { return typeof(TableFieldsClient); } }
+
+        protected override void DataLoaded(UnicontaBaseEntity[] Arr)
+        {
+            base.DataLoaded(Arr);
+            checkIfNameConflicts(Arr as TableFieldsClient[]);
+        }
+
+        void checkIfNameConflicts(TableFieldsClient[] Arr)
+        {
+            var names = Arr?.Select(f => f.Name).ToArray();
+            var master = this.masterRecord;
+            if (master != null)
+            {
+                var clientType = Global.GetClientTableType($"{master.GetType().Name}Client");
+                var type = clientType ?? master.GetType();
+                var props = type.GetProperties();
+                foreach (var name in names)
+                {
+                    if (props.Any(p => string.Equals(p.Name, name, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        UnicontaMessageBox.Show($"{Uniconta.ClientTools.Localization.lookup("PropertyExistsMsg")}: {name}", Uniconta.ClientTools.Localization.lookup("Warning"));
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     public partial class AddUserFields : GridBasePage
@@ -47,7 +76,6 @@ namespace UnicontaClient.Pages.CustomPage
             dgUserField.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
         }
-
         public override void SetParameter(IEnumerable<ValuePair> Parameters)
         {
             foreach (var rec in Parameters)

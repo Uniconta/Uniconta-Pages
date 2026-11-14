@@ -245,10 +245,10 @@ namespace UnicontaClient.Pages.CustomPage.GL.Anomaly
                 {
                     throw;
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (!Uniconta.ClientTools.Controls.AIErrorResolver.RawInformation)
                 {
                     // One provider failure must not prevent explanations for the remaining accounts.
-                    Uniconta.ClientTools.InfoLog.Log.Warning($"AI explanation for account '{result.AccountNumber}' failed: {ex.Message}");
+                    Uniconta.ClientTools.InfoLog.Log.Warning($"AI explanation for account '{result.AccountNumber}' failed: {Uniconta.ClientTools.Controls.AIErrorResolver.Resolve(ex)}");
                 }
                 Report(progress, 80 + ((i + 1) * 15) / results.Count,
                     string.Format(Localization.lookup("AnomalyReceivedAccountExplanation"), result.AccountNumber), results);
@@ -518,79 +518,23 @@ namespace UnicontaClient.Pages.CustomPage.GL.Anomaly
             MaximumTransactionsPerAnomaly = 10;
         }
 
-        /// <summary>
-        /// Changes the start of the current period and shifts all periods by the
-        /// same calendar offset.
-        ///
-        /// Example:
-        ///
-        /// Current:          01-09-2026 - 30-09-2026
-        /// Previous:         01-08-2026 - 31-08-2026
-        /// Before previous:  01-07-2026 - 31-07-2026
-        ///
-        /// ChangeCurrentPeriodFrom(01-09-2025) results in:
-        ///
-        /// Current:          01-09-2025 - 30-09-2025
-        /// Previous:         01-08-2025 - 31-08-2025
-        /// Before previous:  01-07-2025 - 31-07-2025
-        /// </summary>
-        public void ChangeCurrentPeriodFrom(DateTime newFrom)
+        public void MovePeriods(int months)
         {
-            newFrom = newFrom.Date;
-
-            if (CurrentPeriodFrom.Date == newFrom)
-                return;
-
-            ShiftAllPeriods(CurrentPeriodFrom.Date, newFrom);
+            CurrentPeriodFrom = CurrentPeriodFrom.AddMonths(months);
+            CurrentPeriodTo = MovePeriodEnd(CurrentPeriodTo, months);
+            PreviousPeriodFrom = PreviousPeriodFrom.AddMonths(months);
+            PreviousPeriodTo = MovePeriodEnd(PreviousPeriodTo, months);
+            PeriodBeforePreviousFrom = PeriodBeforePreviousFrom.AddMonths(months);
+            PeriodBeforePreviousTo = MovePeriodEnd(PeriodBeforePreviousTo, months);
         }
 
-        public void ChangeCurrentPeriodTo(DateTime newTo)
+        private static DateTime MovePeriodEnd(DateTime date, int months)
         {
-            newTo = newTo.Date;
-
-            if (CurrentPeriodTo.Date == newTo)
-                return;
-
-            ShiftAllPeriods(CurrentPeriodTo.Date, newTo);
-        }
-
-        private void ShiftAllPeriods(DateTime oldAnchor, DateTime newAnchor)
-        {
-            int months;
-
-            if (TryGetMonthShift(oldAnchor, newAnchor, out months))
-            {
-                PeriodBeforePreviousFrom = PeriodBeforePreviousFrom.AddMonths(months);
-                PeriodBeforePreviousTo = PeriodBeforePreviousTo.AddMonths(months);
-
-                PreviousPeriodFrom = PreviousPeriodFrom.AddMonths(months);
-                PreviousPeriodTo = PreviousPeriodTo.AddMonths(months);
-
-                CurrentPeriodFrom = CurrentPeriodFrom.AddMonths(months);
-                CurrentPeriodTo = CurrentPeriodTo.AddMonths(months);
-
-                return;
-            }
-
-            var days = (newAnchor - oldAnchor).Days;
-
-            PeriodBeforePreviousFrom = PeriodBeforePreviousFrom.AddDays(days);
-            PeriodBeforePreviousTo = PeriodBeforePreviousTo.AddDays(days);
-
-            PreviousPeriodFrom = PreviousPeriodFrom.AddDays(days);
-            PreviousPeriodTo = PreviousPeriodTo.AddDays(days);
-
-            CurrentPeriodFrom = CurrentPeriodFrom.AddDays(days);
-            CurrentPeriodTo = CurrentPeriodTo.AddDays(days);
-        }
-
-        private static bool TryGetMonthShift(DateTime oldDate, DateTime newDate, out int months)
-        {
-            months =
-                ((newDate.Year - oldDate.Year) * 12) +
-                (newDate.Month - oldDate.Month);
-
-            return oldDate.AddMonths(months) == newDate;
+            var shifted = date.AddMonths(months);
+            // Keep full calendar months contiguous, including February.
+            return date.Day == DateTime.DaysInMonth(date.Year, date.Month)
+                ? new DateTime(shifted.Year, shifted.Month, DateTime.DaysInMonth(shifted.Year, shifted.Month))
+                : shifted;
         }
 
         private bool HasValidValues()

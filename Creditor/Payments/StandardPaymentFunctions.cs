@@ -67,7 +67,116 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
                 return false;
             }
         }
-            
+
+        /// <summary>
+        /// Foreign payments in the old Danish bank formats - the banks phase them out from November 2026 (ISO 20022 required)
+        /// </summary>
+        public static bool ForeignPaymentInOldFormat(ExportFormatType exportFormat, IEnumerable<CreditorTransPayment> paymentList)
+        {
+            if (!OldDanishFormat(exportFormat))
+                return false;
+
+            // Bankdata, SDC and BEC always create IBAN payments as foreign transfers in the old formats - also to a Danish IBAN
+            var ibanIsForeign = exportFormat == ExportFormatType.BankData || exportFormat == ExportFormatType.SDC || exportFormat == ExportFormatType.BEC_CSV;
+
+            foreach (var rec in paymentList)
+            {
+                if (rec._PaymentMethod != PaymentTypes.IBAN && rec._PaymentMethod != PaymentTypes.VendorBankAccount)
+                    continue;
+
+                if (ibanIsForeign && rec._PaymentMethod == PaymentTypes.IBAN)
+                    return true;
+
+                var countryId = AccountCountryId(rec);
+                if (countryId != string.Empty && countryId != "DK")
+                    return true;
+            }
+
+            return false;
+        }
+
+        static readonly DateTime OldFormatDomesticDiscontinuedDate = new DateTime(2027, 3, 1);
+
+        /// <summary>
+        /// Domestic account transfers in the old Danish bank formats - the banks phase them out in spring 2027 (Bankdata 31-03-2027, STEP2 DKK/NPC Q2 2027)
+        /// </summary>
+        public static bool DomesticPaymentInOldFormat(ExportFormatType exportFormat, IEnumerable<CreditorTransPayment> paymentList)
+        {
+            if (!OldDanishFormat(exportFormat))
+                return false;
+
+            foreach (var rec in paymentList)
+            {
+                if (rec._PaymentMethod != PaymentTypes.IBAN && rec._PaymentMethod != PaymentTypes.VendorBankAccount)
+                    continue;
+
+                var countryId = AccountCountryId(rec);
+                if ((countryId == string.Empty || countryId == "DK") && rec._PaymentDate >= OldFormatDomesticDiscontinuedDate)
+                    return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Merged payment advice ending with a comma separated invoice list: cut at the last whole invoice number and add " +N" (number of omitted invoices).
+        /// Returns null if no invoice fits.
+        /// </summary>
+        public static string TruncateInvoiceList(string text, int maxLength, out int omitted)
+        {
+            omitted = 0;
+            if (text == null || text.Length <= maxLength)
+                return text;
+
+            for (int pos = text.LastIndexOf(',', Math.Min(maxLength, text.Length - 1)); pos > 0; pos = text.LastIndexOf(',', pos - 1))
+            {
+                int count = 0;
+                for (int i = pos; i < text.Length; i++)
+                    if (text[i] == ',')
+                        count++;
+
+                var suffix = string.Concat(" +", count.ToString());
+                if (pos + suffix.Length <= maxLength)
+                {
+                    omitted = count;
+                    return string.Concat(text.Substring(0, pos), suffix);
+                }
+            }
+
+            return null;
+        }
+
+        static bool OldDanishFormat(ExportFormatType exportFormat)
+        {
+            switch (exportFormat)
+            {
+                case ExportFormatType.Nordea_CSV:
+                case ExportFormatType.DanskeBank_CSV:
+                case ExportFormatType.BankData:
+                case ExportFormatType.SDC:
+                case ExportFormatType.BEC_CSV:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// Country of the creditor account - from IBAN, otherwise from BIC
+        /// </summary>
+        static string AccountCountryId(CreditorTransPayment rec)
+        {
+            if (rec._PaymentMethod == PaymentTypes.IBAN)
+            {
+                var iban = Regex.Replace(rec._PaymentId ?? string.Empty, "[^\\w\\d]", "");
+                if (iban.Length >= 2)
+                    return iban.Substring(0, 2).ToUpper();
+            }
+
+            var swift = Regex.Replace(rec._SWIFT ?? string.Empty, "[^\\w\\d]", "");
+            return swift.Length >= 6 ? swift.Substring(4, 2).ToUpper() : string.Empty;
+        }
+
         private static Tuple<string, string, string> MessageLabel(CountryCode country)
         {
             string label_Acc, label_Inv, label_Ref;
@@ -257,6 +366,90 @@ namespace UnicontaClient.Pages.CustomPage.Creditor.Payments
             result = regex.Replace(result, "");
 
             return result.Trim();
+        }
+
+        const string UKPostCode = @"[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}";
+
+        /// <summary>
+        /// Postal code pattern per country - null if the postal code format is unknown
+        /// </summary>
+        static string ZipCodeCityPattern(CountryCode country)
+        {
+            switch (country)
+            {
+                case CountryCode.Denmark:
+                case CountryCode.Greenland:
+                case CountryCode.Norway:
+                case CountryCode.Switzerland:
+                case CountryCode.Austria: return @"^(?:[A-Z]{2}-)?(?<zip>\d{4})\s*(?<city>[^\d\s].*)$";
+                case CountryCode.FaroeIslands:
+                case CountryCode.Iceland: return @"^(?:[A-Z]{2}-)?(?<zip>\d{3})\s*(?<city>[^\d\s].*)$";
+                case CountryCode.Sweden: return @"^(?:[A-Z]{2}-)?(?<zip>\d{3}\s?\d{2})\s*(?<city>[^\d\s].*)$";
+                case CountryCode.Finland:
+                case CountryCode.Germany:
+                case CountryCode.Estonia:
+                case CountryCode.Lithuania: return @"^(?:[A-Z]{2}-)?(?<zip>\d{5})\s*(?<city>[^\d\s].*)$";
+                case CountryCode.Netherlands: return @"^(?:[A-Z]{2}-)?(?<zip>\d{4}\s?[A-Z]{2})\s+(?<city>.+)$";
+                case CountryCode.UnitedKingdom: return @"^(?<zip>" + UKPostCode + @")\s+(?<city>.+)$|^(?<city>.+?)[,\s]+(?<zip>" + UKPostCode + ")$";
+                default: return null;
+            }
+        }
+
+        /// <summary>
+        /// Postal code and city from an address line like "8000 Aarhus C", "1234 AB Amsterdam" or "London SW1A 1AA".
+        /// Returns null if the line doesn't match the postal code format of the country.
+        /// </summary>
+        public static Tuple<string, string> GetZipCodeCity(string adr, CountryCode country)
+        {
+            var pattern = ZipCodeCityPattern(country);
+            if (pattern == null || string.IsNullOrWhiteSpace(adr))
+                return null;
+
+            var match = Regex.Match(adr.Trim(), pattern, RegexOptions.IgnoreCase);
+            if (!match.Success)
+                return null;
+
+            var city = Regex.Replace(match.Groups["city"].Value, "[,;]", "").Trim();
+            if (city.Length == 0)
+                return null;
+
+            return new Tuple<string, string>(match.Groups["zip"].Value.Trim(), city);
+        }
+
+        /// <summary>
+        /// Postal code and city of the company, which must be in Address 3 or Address 2.
+        /// For countries with an unknown postal code format the last filled line is used as city (without postal code).
+        /// lineNo returns the line used (3 or 2)
+        /// </summary>
+        public static Tuple<string, string> CompanyZipCodeCity(string adr2, string adr3, CountryCode country, out int lineNo)
+        {
+            lineNo = 0;
+            if (ZipCodeCityPattern(country) == null)
+            {
+                if (!string.IsNullOrWhiteSpace(adr3))
+                {
+                    lineNo = 3;
+                    return new Tuple<string, string>(null, adr3.Trim());
+                }
+                if (!string.IsNullOrWhiteSpace(adr2))
+                {
+                    lineNo = 2;
+                    return new Tuple<string, string>(null, adr2.Trim());
+                }
+                return null;
+            }
+
+            var zipCity = GetZipCodeCity(adr3, country);
+            if (zipCity != null)
+            {
+                lineNo = 3;
+                return zipCity;
+            }
+
+            zipCity = GetZipCodeCity(adr2, country);
+            if (zipCity != null)
+                lineNo = 2;
+            return zipCity;
         }
 
         public static void ParseOcr(string ocr, out string fiCreditor, out string fiMask, bool isGIRO04 = false)

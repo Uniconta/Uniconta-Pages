@@ -28,6 +28,7 @@ using UnicontaClient.Controls;
 using UnicontaClient.Controls.Dialogs;
 using UnicontaClient.Models;
 using UnicontaClient.Pages.Attachments;
+using UnicontaClient.Pages.GL.ChartOfAccount.Reports;
 using UnicontaClient.Utilities;
 using Localization = Uniconta.ClientTools.Localization;
 
@@ -808,11 +809,16 @@ namespace UnicontaClient.Pages.CustomPage
                                 if (selectedItem == null)
                                     return;
                                 OnlyApproved = false;
-                                selectedItem.InJournal = true;
                                 lst = new VouchersClient[] { selectedItem };
                             }
                             else
                                 lst = dgVoucherGrid.GetVisibleRows() as IEnumerable<VouchersClient>;
+
+                            if (ReviewVoucherWarnings(lst, journals) == null)
+                                return;
+
+                            if (journals.OnlyCurrentRecord)
+                                selectedItem.InJournal = true;
 
                             if (object.ReferenceEquals(lst, dgVoucherGrid.ItemsSource))
                             {
@@ -886,8 +892,6 @@ namespace UnicontaClient.Pages.CustomPage
                                 UtilDisplay.ShowErrorCode(errorCode);
                                 return;
                             }
-                            busyIndicator.IsBusy = true;
-
                             var postingApi = new PostingAPI(api);
                             postingApi.WorkSpace = cwjournal.Workspace;
                             IEnumerable<VouchersClient> lst;
@@ -900,6 +904,10 @@ namespace UnicontaClient.Pages.CustomPage
                             }
                             else
                                 lst = dgVoucherGrid.GetVisibleRows() as IEnumerable<VouchersClient>;
+                            if (ReviewVoucherWarnings(lst, cwjournal) == null)
+                                return;
+
+                            busyIndicator.IsBusy = true;
                             PostingResult postingResult;
                             if (object.ReferenceEquals(lst, dgVoucherGrid.ItemsSource))
                             {
@@ -965,7 +973,23 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                     {
                         var determineCostAccount = new CWAIDetermineCostAccount(api, selectedItem);
-                        determineCostAccount.Show();
+                        determineCostAccount.AccountSelected += account =>
+                        {
+                            if (selectedItem.CostAccount == account)
+                                return;
+
+                            dgVoucherGrid.SetLoadedRow(selectedItem);
+                            selectedItem.CostAccount = account;
+                            dgVoucherGrid.SetModifiedRow(selectedItem);
+                        };
+                        determineCostAccount.AccountClicked += account =>
+                        {
+                            if(api.GetCache(typeof(Uniconta.DataModel.GLAccount))?.Get(account) is Uniconta.DataModel.GLAccount glAccount)
+                            {
+                                AddDockItem(TabControls.AccountsTransaction, glAccount, Util.ConcatParenthesis(Localization.lookup("AccountsTransaction"), glAccount._Name));
+                            }
+                        };
+                        determineCostAccount.ShowNonDialog();
                     }
                     break;
                 case "DocumentScanUpload":
@@ -1067,8 +1091,8 @@ namespace UnicontaClient.Pages.CustomPage
                 case "ViewCorrectScannedData":
                     AddDockItem(TabControls.VoucherScanCorrectionPage, null, true, Localization.lookup("ViewCorrectScannedData"), "View_16x16");
                     break;
-                case "VoucherScannerLog":
-                    AddDockItem(TabControls.VoucherScannerLogPage, null, true, Localization.lookup("VoucherScannerLog"), "View_16x16");
+                case "VoucherLog":
+                    OpenVoucherLog(null);
                     break;
                 case "VoucherScanSettings":
                     OpenVoucherScanSettings();
@@ -1091,12 +1115,53 @@ namespace UnicontaClient.Pages.CustomPage
                 case "ApplyPostingRules":
                     ApplyPostingRules();
                     break;
+                case "Posting":
+                    PostJournal();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
         }
-
+        private void PostJournal()
+        {
+            var postingDialog = new CWPosting(new GLDailyJournalClient(), api.CompanyEntity.Name, null)
+            {
+                DialogTableId = 2000000014,
+            };
+            postingDialog.Closed += async delegate
+            {
+                if (postingDialog.DialogResult == true)
+                {
+                    var comment = postingDialog.comments;
+                    var simulate = postingDialog.IsSimulation;
+                    busyIndicator.IsBusy = true;
+                    var postingApi = new PostingAPI(api);
+                    var postingResult = await postingApi.AutoPostFromDocument(comment, simulate, new GLTransClientTotal());
+                    busyIndicator.IsBusy = false;
+                    if (postingResult == null)
+                        return;
+                    if (postingResult.Err != ErrorCodes.Succes)
+                        UtilDisplay.ShowErrorCode(postingResult.Err);
+                    else if (postingResult.SimulatedTrans != null && postingResult.SimulatedTrans.Length > 0)
+                    {
+                        AddDockItem(TabControls.SimulatedTransactions, new object[] { postingResult.AccountBalance, postingResult.SimulatedTrans }, Uniconta.ClientTools.Localization.lookup("SimulatedTransactions"), null, true);
+                    }
+                    else
+                    {
+                        // everything was posted fine
+                        string msg;
+                        if (postingResult.JournalPostedlId != 0)
+                            msg = string.Format("{0} {1}={2}", Uniconta.ClientTools.Localization.lookup("JournalHasBeenPosted"), Uniconta.ClientTools.Localization.lookup("JournalPostedId"), NumberConvert.ToString(postingResult.JournalPostedlId));
+                        else
+                            msg = Uniconta.ClientTools.Localization.lookup("JournalHasBeenPosted");
+                        UnicontaMessageBox.Show(msg, Uniconta.ClientTools.Localization.lookup("Message"));
+                        gridRibbon_BaseActions("RefreshGrid");
+                    }
+                }
+            };
+            postingDialog.Show();
+        }
         async void CreditorCacheReload(bool Refresh)
         {
             if (Refresh)
@@ -1285,6 +1350,9 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 var errorCode = await tsk;  // make sure save is completed.
                 if (errorCode != ErrorCodes.Succes)
+                    return;
+
+                if (ReviewVoucherWarnings(new[] { voucherClient }) == null)
                     return;
 
                 isPurchaseUpdated = voucherClient.Fileextension != FileextensionsTypes.XML && voucherClient.PurchaseNumber != 0;
@@ -1747,7 +1815,13 @@ namespace UnicontaClient.Pages.CustomPage
 
         public override void Utility_Refresh(string screenName, object argument = null)
         {
-            if (screenName == TabControls.VouchersPage2 || screenName == TabControls.GLOffsetAccountTemplate)
+            if (screenName == TabControls.VoucherLogPage)
+            {
+                var vouchers = (dgVoucherGrid.ItemsSource as IEnumerable)?.OfType<VouchersClient>();
+                if (UpdateVoucherLogStatus(vouchers, argument as VouchersClient, api.CompanyId))
+                    dgVoucherGrid.RefreshData();
+            }
+            else if (screenName == TabControls.VouchersPage2 || screenName == TabControls.GLOffsetAccountTemplate)
             {
                 dgVoucherGrid.UpdateItemSource(argument);
                 Save(false);
@@ -1762,8 +1836,23 @@ namespace UnicontaClient.Pages.CustomPage
                 gridRibbon_BaseActions("RefreshGrid");
         }
 
+        internal static bool UpdateVoucherLogStatus(IEnumerable<VouchersClient> vouchers, VouchersClient updatedVoucher, int companyId)
+        {
+            if (vouchers == null || updatedVoucher == null || updatedVoucher.CompanyId != companyId)
+                return false;
+            foreach (var voucher in vouchers.Where(row => row.RowId == updatedVoucher.RowId))
+            {
+                // Copy only the log fields, preserving unsaved edits on the inbox row.
+                voucher.ErrorMessage = updatedVoucher.ErrorMessage;
+                voucher.Status = updatedVoucher.Status;
+            }
+            return true;
+        }
+
         protected override void OnLayoutLoaded()
         {
+            StatusIndicator.Fixed = FixedStyle.Left;
+            StatusIndicator.VisibleIndex = 0;
             Utility.SetDimensionsGrid(api, clDim1, clDim2, clDim3, clDim4, clDim5);
 
             if (!api.CompanyEntity.Project)
@@ -1771,6 +1860,7 @@ namespace UnicontaClient.Pages.CustomPage
                     WorkSpace.ShowInColumnChooser = WorkSpace.Visible = false;
 
             base.OnLayoutLoaded();
+            StatusIndicator.Header = Localization.lookup("Status");
         }
 
         private void Offeset_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -1845,6 +1935,7 @@ namespace UnicontaClient.Pages.CustomPage
             var maps = await api.Query<BankImportMap>(new Document());
             if (maps == null || maps.Length == 0)
                 return;
+            Array.Sort(maps, new BankImportMap.Sort());
             int cnt = 0;
             foreach (var document in (IEnumerable<VouchersClient>)dgVoucherGrid.GetVisibleRows())
             {
@@ -1876,13 +1967,37 @@ namespace UnicontaClient.Pages.CustomPage
                             {
                                 if (mapFound != null && mapFound._Creditor != null)
                                     continue;
+                                if (map._Amount != 0)
+                                {
+                                    if (map._GE)
+                                    {
+                                        if (map._Amount > document._Amount)
+                                            continue;
+                                        if (mapFound != null && mapFound._Amount > map._Amount)
+                                            continue;
+                                    }
+                                    else if (map._Amount != document._Amount)
+                                        continue;
+                                }
                                 maplen = 1;
                                 mapFound = map;
                                 continue;
                             }
                         }
+                        if (map._Amount != 0)
+                        {
+                            if (map._GE)
+                            {
+                                if (map._Amount > document._Amount)
+                                    continue;
+                                if (mapFound != null && mapFound._Amount > map._Amount)
+                                    continue;
+                            }
+                            else if (map._Amount != document._Amount)
+                                continue;
+                        }
                         var idx = map.FindText(t, i);
-                        if (idx >= 0 && map._Text.Length > maplen)
+                        if (idx >= 0 && map._Text.Length >= maplen)
                         {
                             maplen = map._Text.Length;
                             mapFound = map;
@@ -1953,7 +2068,10 @@ namespace UnicontaClient.Pages.CustomPage
         private async void DocumentScanUpload()
         {
             if (IsSending)
+            {
                 UnicontaMessageBox.Show(Localization.lookup("UpdateInBackground"), Localization.lookup("Information"), MessageBoxButton.OK);
+                return;
+            }
 
             var lst = ((IEnumerable<VouchersClient>)dgVoucherGrid.GetVisibleRows())
                 .Where(s => s._SentToScanner == false && s._Fileextension <= FileextensionsTypes.PDF)
@@ -1965,12 +2083,35 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
             }
 
-            if (UnicontaMessageBox.Show(string.Concat(Localization.lookup("Upload"), " (", NumberConvert.ToString(lst.Count), " ", Localization.lookup("Vouchers"), ") ?"), Localization.lookup("Information"), MessageBoxButton.YesNo) != MessageBoxResult.Yes)
-                return;
-
             try
             {
                 IsSending = true;
+                // Read separate objects so the user's rescan selection and unsaved edits survive.
+                var current = lst.Where(v => v.RowId > 0).Select(v => v.RowId).Distinct()
+                    .Select(id => new VouchersClient { RowId = id }).ToList();
+                if (current.Count > 0)
+                {
+                    var readError = await api.Read(current);
+                    if (readError != ErrorCodes.Succes)
+                    {
+                        UtilDisplay.ShowErrorCode(readError);
+                        return;
+                    }
+                }
+                lst = SelectScanUploadDocuments(lst, current, out var skippedIds);
+                if (skippedIds.Length > 0)
+                {
+                    var messages = skippedIds.Select(id => string.Format(
+                        Localization.lookup("ScanDocumentSkippedProcessing"), NumberConvert.ToString(id))).ToArray();
+                    new CWErrorBox(messages) { Title = Localization.lookup("ClaimsSkipped"), Width = 650, Height = 400 }
+                        .ShowDialog();
+                }
+                if (lst.Count == 0)
+                    return;
+
+                if (UnicontaMessageBox.Show(string.Concat(Localization.lookup("Upload"), " (", NumberConvert.ToString(lst.Count), " ", Localization.lookup("Vouchers"), ") ?"), Localization.lookup("Information"), MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+                    return;
+
                 Save();
 
                 var documentApi = new DocumentAPI(api);
@@ -1988,6 +2129,74 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 IsSending = false;
             }
+        }
+
+        internal static List<VouchersClient> SelectScanUploadDocuments(IEnumerable<VouchersClient> candidates,
+            IEnumerable<VouchersClient> currentDocuments, out int[] skippedIds)
+        {
+            var selected = candidates.Where(v => v != null && !v._SentToScanner &&
+                v._Fileextension <= FileextensionsTypes.PDF).ToList();
+            var processingIds = new HashSet<int>(currentDocuments.Where(v => v != null && v.RowId > 0 && v._ScanDoc)
+                .Select(v => v.RowId));
+            skippedIds = selected.Where(v => processingIds.Contains(v.RowId)).Select(v => v.RowId)
+                .Distinct().OrderBy(id => id).ToArray();
+            return selected.Where(v => !processingIds.Contains(v.RowId)).ToList();
+        }
+
+        private void OpenVoucherLog(VouchersClient voucher)
+        {
+            var title = Localization.lookup("Log");
+            if (voucher != null)
+                title = string.Concat(title, ": ", voucher.PrimaryKeyId);
+            AddDockItem(TabControls.VoucherLogPage, voucher == null ? null : new object[] { api, voucher },
+                true, title, "View_16x16");
+        }
+
+        private void VoucherStatus_Click(object sender, RoutedEventArgs e)
+        {
+            var voucher = (sender as FrameworkElement)?.Tag as VouchersClient;
+            if (VoucherLogPage.HasMessage(voucher))
+                OpenVoucherLog(voucher);
+            e.Handled = true;
+        }
+
+        // A null result means that the user cancelled the action.
+        private Dictionary<int, Tuple<int, string>> ReviewVoucherWarnings(
+            IEnumerable<VouchersClient> candidates, CWJournal journal = null)
+        {
+            var onlyApproved = journal != null && journal.OnlyApproved && !journal.OnlyCurrentRecord;
+            var onlyAutoPost = journal != null && journal.LineWithAutoPost &&
+                object.ReferenceEquals(candidates, dgVoucherGrid.ItemsSource);
+            return ReviewVoucherWarnings(candidates, ConfirmVoucherWarnings, journal != null, onlyApproved, onlyAutoPost);
+        }
+
+        internal static Dictionary<int, Tuple<int, string>> ReviewVoucherWarnings(
+            IEnumerable<VouchersClient> candidates, Func<string[], bool> confirm,
+            bool journal = false, bool onlyApproved = false, bool onlyAutoPost = false)
+        {
+            var warnings = (candidates ?? Enumerable.Empty<VouchersClient>())
+                .Where(doc => doc != null && doc._Status >= DocumentStatus.Warning &&
+                    (!journal || (!doc._OnHold && !doc._InJournal)) &&
+                    (!onlyApproved || (doc._Approved && (doc._Approver2 == null || doc._Approved2))) &&
+                    (!onlyAutoPost || doc._AutoPost))
+                .GroupBy(doc => doc.RowId).Select(group => group.First()).ToArray();
+            var reviewedWarnings = warnings.ToDictionary(doc => doc.RowId,
+                doc => Tuple.Create((int)doc._Status, doc.ErrorMessage));
+
+            return confirm(FormatVoucherWarnings(warnings)) ? reviewedWarnings : null;
+        }
+
+        private static string[] FormatVoucherWarnings(IEnumerable<VouchersClient> vouchers) =>
+            vouchers.Select(doc => string.Concat(Localization.lookup("Voucher"), " ", doc.PrimaryKeyId,
+                " (", doc.Status, ")", Environment.NewLine, doc.ErrorMessage)).ToArray();
+
+        private bool ConfirmVoucherWarnings(string[] messages)
+        {
+            if (messages.Length == 0)
+                return true;
+
+            var dialog = new CWErrorBox(messages) { Title = Localization.lookup("Warning"), Width = 650, Height = 400 };
+            return dialog.ShowDialog() == true;
         }
 
         private void PrimaryKeyId_PreviewMouseDown(object sender, MouseButtonEventArgs e)

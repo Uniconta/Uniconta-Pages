@@ -95,10 +95,12 @@ x:Class="UnicontaClient.Pages.CustomPage.TileControl"
                         FontSize="16"
                         Content="⋮"/>
 
-                <TextBlock Grid.Row="0"
-                           Text="{Binding TableName, Mode=TwoWay}"
+                <TextBlock x:Name="TileTitle"
+                           Grid.Row="0"
+                           Text="{Binding Header, Mode=TwoWay}"
                            TextWrapping="Wrap"
                            FontSize="14"
+                           FontWeight="Bold"
                            VerticalAlignment="Top"
                            HorizontalAlignment="Left"
                            Foreground="{StaticResource ForegroundBrush}"/>
@@ -254,12 +256,10 @@ x:Class="UnicontaClient.Pages.CustomPage.TileControl"
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock x:Name="TileTitle"
-                               Grid.Column="0"
-                               Text="{Binding Header, Mode=TwoWay}"
+                    <TextBlock Grid.Column="0"
+                               Text="{Binding TableName, Mode=TwoWay}"
                                TextWrapping="Wrap"
                                FontSize="12"
-                               FontWeight="SemiBold"
                                VerticalAlignment="Top"
                                LineHeight="16"
                                MaxHeight="36"

@@ -191,7 +191,7 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         editrow.City = city[0];
                         var add1 = city[1];
-                        if (!string.IsNullOrEmpty(add1))
+                        if (!string.IsNullOrEmpty(add1) && string.IsNullOrWhiteSpace(editrow.WorkAddress1))
                             editrow.WorkAddress1 = add1;
                         var zip = city[2];
                         if (!string.IsNullOrEmpty(zip))

@@ -1,6 +1,4 @@
-using UnicontaClient.Controls;
-using UnicontaClient.Models;
-using UnicontaClient.Pages;
+using DevExpress.Xpf.Docking;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +20,10 @@ using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.Common;
 using Uniconta.DataModel;
-using DevExpress.Xpf.Docking;
+using Uniconta.Reports.Utilities;
+using UnicontaClient.Controls;
+using UnicontaClient.Models;
+using UnicontaClient.Pages;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -276,6 +277,13 @@ namespace UnicontaClient.Pages.CustomPage
                         }
                         else
                             UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("CompanyDeleted"), Uniconta.ClientTools.Localization.lookup("Warning"), MessageBoxButton.OK);
+                    }
+                    break;
+                case "SetAsDefault":
+                    if (selectedItem != null && selectedItem.CompanyId != BasePage.session.User._DefaultCompany)
+                    {
+                        BasePage.session.SetDefaultCompany(selectedItem.CompanyId);
+                        UnicontaMessageBox.Show($"{Uniconta.ClientTools.Localization.lookup("DefaultCompany")}: {selectedItem.Name}", Uniconta.ClientTools.Localization.lookup("Information"), MessageBoxButton.OK);
                     }
                     break;
                 default:

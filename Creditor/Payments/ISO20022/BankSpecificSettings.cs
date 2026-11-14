@@ -112,14 +112,46 @@ namespace UnicontaISO20022CreditTransfer
         public virtual void AllowedCharactersRegEx(bool internationalPayment = false)
         {
             allowedCharactersRegEx = "[^a-zA-Z0-9 -?:().,'+/]";
+            replaceCharactersRegEx = TransliterateCharacters; //æøå/äöüß omskrives i stedet for at blive fjernet
         }
 
         /// <summary>
-        /// Replacement characters
+        /// German characters are transliterated instead of being removed by allowedCharactersRegEx
+        /// </summary>
+        protected static readonly Dictionary<string, string> TransliterateGermanCharacters = new Dictionary<string, string>
+        {
+            ["Ä"] = "AE",
+            ["Ö"] = "OE",
+            ["Ü"] = "UE",
+            ["ä"] = "ae",
+            ["ö"] = "oe",
+            ["ü"] = "ue",
+            ["ß"] = "ss"
+        };
+
+        /// <summary>
+        /// Nordic characters are transliterated instead of being removed by allowedCharactersRegEx
+        /// </summary>
+        protected static readonly Dictionary<string, string> TransliterateNordicCharacters = new Dictionary<string, string>
+        {
+            ["Æ"] = "AE",
+            ["Ø"] = "OE",
+            ["Å"] = "AA",
+            ["æ"] = "ae",
+            ["ø"] = "oe",
+            ["å"] = "aa"
+        };
+
+        /// <summary>
+        /// Nordic/German characters are transliterated instead of being removed by allowedCharactersRegEx
+        /// </summary>
+        protected static readonly Dictionary<string, string> TransliterateCharacters = TransliterateGermanCharacters.Concat(TransliterateNordicCharacters).ToDictionary(x => x.Key, x => x.Value);
+
+        /// <summary>
+        /// Replacement characters - set by AllowedCharactersRegEx
         /// </summary>
         public virtual Dictionary<string, string> ReplaceCharactersRegEx()
         {
-            replaceCharactersRegEx = null;
             return replaceCharactersRegEx;
         }
 
@@ -381,9 +413,10 @@ namespace UnicontaISO20022CreditTransfer
         /// <summary>
         /// Merged payments
         /// </summary>
-        public virtual string PaymentInfoId(int fileSeqNumber, DateTime executionDate, PaymentTypes paymentMethod, Currencies? currency, bool merged = false)
+        public virtual string PaymentInfoId(int fileSeqNumber, DateTime executionDate, PaymentTypes paymentMethod, Currencies? currency, ISO20022PaymentTypes isoPaymentType, bool merged = false)
         {
-            var result = string.Format("{0}{1}{2}{3}{4}", merged ? 1 : 0, currency.HasValue ? (int)currency : 0, (int)paymentMethod, fileSeqNumber.ToString().PadLeft(6, '0'), executionDate.ToString("ddMMyy"));
+            //Payment type is part of the id - domestic, SEPA and cross-border payments must not share a PmtInf (PmtTpInf differs)
+            var result = string.Format("{0}{1}{2}{3}{4}{5}", merged ? 1 : 0, (int)isoPaymentType, currency.HasValue ? (int)currency : 0, (int)paymentMethod, fileSeqNumber.ToString().PadLeft(6, '0'), executionDate.ToString("ddMMyy"));
 
             return StandardPaymentFunctions.RegularExpressionReplace(result, allowedCharactersRegEx, replaceCharactersRegEx);
         }
@@ -599,6 +632,41 @@ namespace UnicontaISO20022CreditTransfer
         }
 
         /// <summary>
+        /// Bank country of a creditor account number (BBAN) without BIC - null if it can't be determined from the account number
+        /// </summary>
+        public virtual string CreditorBBANCountryId(string recBBAN)
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// Bank country of a creditor paid with an inpayment form (FIK) - null if not given by the payment method
+        /// </summary>
+        public virtual string CreditorFIKCountryId()
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// Bank country given by the payment method and account (BBAN without BIC or FIK) - null if it can't be determined
+        /// </summary>
+        public string CreditorPaymentCountryId(PaymentTypes paymentMethod, string paymentId, string swift)
+        {
+            switch (paymentMethod)
+            {
+                case PaymentTypes.VendorBankAccount:
+                    return string.IsNullOrWhiteSpace(swift) ? CreditorBBANCountryId(paymentId) : null;
+                case PaymentTypes.PaymentMethod3: //FIK71
+                case PaymentTypes.PaymentMethod4: //FIK73
+                case PaymentTypes.PaymentMethod5: //FIK75
+                case PaymentTypes.PaymentMethod6: //FIK04
+                    return CreditorFIKCountryId();
+                default:
+                    return null;
+            }
+        }
+
+        /// <summary>
         /// Number (IBAN) - identifier used internationally by financial institutions to uniquely identify the account of a customer. 
         /// </summary>
         public virtual string CreditorIBAN(String recIBAN, String credIBAN, CountryCode companyCountryId, CountryCode credCountryId)
@@ -703,29 +771,8 @@ namespace UnicontaISO20022CreditTransfer
             var adr2 = StandardPaymentFunctions.RegularExpressionReplace(company._Address2, allowedCharactersRegEx, replaceCharactersRegEx);
             var adr3 = StandardPaymentFunctions.RegularExpressionReplace(company._Address3, allowedCharactersRegEx, replaceCharactersRegEx);
 
-            if (NewPaymentFormat())
-            {
-                var zipCity = OIOUBL.GetZipCodeCity(adr3, company._CountryId);
-                if (zipCity == null)
-                {
-                    zipCity = OIOUBL.GetZipCodeCity(adr2, company._CountryId);
-                    if (zipCity != null)
-                        adr2 = null;
-                }
-                else
-                    adr3 = null;
-
-                if (zipCity != null)
-                {
-                    var address = StringBuilderReuse.Create().Append(adr1).Append(adr2 != null ? ", " : null).Append(adr2).Append(adr3 != null ? ", " : null).Append(adr3).ToStringAndRelease();
-                    debtorAddress.StreetName = address;
-                    debtorAddress.ZipCode = zipCity.Item1;
-                    debtorAddress.CityName = zipCity.Item2;
-                    debtorAddress.CountryId = ((CountryISOCode)company._CountryId).ToString();
-                    debtorAddress.Unstructured = false;
-                    return debtorAddress;
-                }
-            }
+            if (StructuredDebtorAddress(company, debtorAddress, adr1, adr2, adr3))
+                return debtorAddress;
 
             debtorAddress.AddressLine1 = adr1;
             debtorAddress.AddressLine2 = adr2;
@@ -760,12 +807,10 @@ namespace UnicontaISO20022CreditTransfer
             var zipCode = StandardPaymentFunctions.RegularExpressionReplace(creditor._ZipCode, allowedCharactersRegEx, replaceCharactersRegEx);
             var city = StandardPaymentFunctions.RegularExpressionReplace(creditor._City, allowedCharactersRegEx, replaceCharactersRegEx);
 
-            if (creditor._ZipCode != null && !unstructured)
-            {
-                creditorAddress.ZipCode = zipCode;
-                creditorAddress.CityName =city;
-                creditorAddress.StreetName = adr1;
-            }
+            if (!string.IsNullOrEmpty(city) && !unstructured)
+                StructuredCreditorAddress(creditorAddress, adr1, adr2, adr3, zipCode, city);
+            else if (paymentType == ISO20022PaymentTypes.DOMESTIC && !unstructured)
+                creditorAddress.Unstructured = true; //Address is optional for domestic payments, but unstructured address lines are not allowed - only country is sent
             else
             {
                 creditorAddress.AddressLine1 = adr1;
@@ -777,6 +822,79 @@ namespace UnicontaISO20022CreditTransfer
             creditorAddress.CountryId = creditor._Country == CountryCode.Unknown ? companyCountryId : ((CountryISOCode)creditor._Country).ToString();
 
             return creditorAddress;
+        }
+
+        const int MaxStreetNameLength = 70;
+
+        /// <summary>
+        /// Address lines joined to one street name (max 70 characters)
+        /// </summary>
+        static string JoinStreetName(string adr1, string adr2, string adr3)
+        {
+            var strB = StringBuilderReuse.Create();
+            foreach (var adr in new[] { adr1, adr2, adr3 })
+            {
+                if (string.IsNullOrWhiteSpace(adr))
+                    continue;
+                if (strB.Length > 0)
+                    strB.Append(", ");
+                strB.Append(adr.Trim());
+            }
+            var result = strB.ToStringAndRelease();
+            if (result.Length > MaxStreetNameLength)
+                result = result.Substring(0, MaxStreetNameLength).Trim();
+            return result.Length > 0 ? result : null;
+        }
+
+        /// <summary>
+        /// Structured company address - postal code and city must be in Address 3 or Address 2
+        /// </summary>
+        protected bool StructuredDebtorAddress(Company company, PostalAddress debtorAddress, string adr1, string adr2, string adr3)
+        {
+            int lineNo;
+            var zipCity = StandardPaymentFunctions.CompanyZipCodeCity(adr2, adr3, company._CountryId, out lineNo);
+            if (zipCity == null)
+                return false;
+
+            if (lineNo == 3)
+                adr3 = null;
+            else
+                adr2 = null;
+
+            debtorAddress.StreetName = JoinStreetName(adr1, adr2, adr3);
+            debtorAddress.ZipCode = zipCity.Item1;
+            debtorAddress.CityName = zipCity.Item2;
+            debtorAddress.CountryId = ((CountryISOCode)company._CountryId).ToString();
+            debtorAddress.Unstructured = false;
+            return true;
+        }
+
+        /// <summary>
+        /// Address line which only repeats postal code and/or city
+        /// </summary>
+        static bool IsZipCityLine(string adr, string zipCode, string city)
+        {
+            var line = Regex.Replace(adr, @"[\s,;]+", " ").Trim();
+            return string.Equals(line, city, StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(line, zipCode, StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(line, string.Concat(zipCode, " ", city), StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(line, string.Concat(city, " ", zipCode), StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Structured creditor address. Address 1-3 are joined to the street name, lines repeating postal code/city are skipped
+        /// </summary>
+        protected void StructuredCreditorAddress(PostalAddress creditorAddress, string adr1, string adr2, string adr3, string zipCode, string city)
+        {
+            if (adr2 != null && IsZipCityLine(adr2, zipCode, city))
+                adr2 = null;
+            if (adr3 != null && IsZipCityLine(adr3, zipCode, city))
+                adr3 = null;
+
+            creditorAddress.StreetName = JoinStreetName(adr1, adr2, adr3);
+            creditorAddress.ZipCode = string.IsNullOrEmpty(zipCode) ? null : zipCode;
+            creditorAddress.CityName = city;
+            creditorAddress.Unstructured = false;
         }
 
 
@@ -897,6 +1015,36 @@ namespace UnicontaISO20022CreditTransfer
         }
 
         /// <summary>
+        /// Short advice (RemittanceInfo) is no longer supported by the clearing
+        /// </summary>
+        public virtual bool ShortAdviceDiscontinued(ISO20022PaymentTypes ISOPaymType, CreditorTransPayment trans)
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// Limit Ustrd text. Merged payments are cut at a whole invoice number and the number of omitted invoices is registered on the payment
+        /// </summary>
+        protected string LimitUstrdText(string ustrdText, int maxLength, CreditorTransPayment trans)
+        {
+            if (ustrdText.Length <= maxLength)
+                return ustrdText;
+
+            if (trans.invoiceNumbers != null && trans.MergePaymId != StandardPaymentFunctions.MERGEID_SINGLEPAYMENT)
+            {
+                int omitted;
+                var text = StandardPaymentFunctions.TruncateInvoiceList(ustrdText, maxLength, out omitted);
+                if (text != null)
+                {
+                    trans.adviceInvoicesOmitted = omitted;
+                    return text;
+                }
+            }
+
+            return ustrdText.Substring(0, maxLength);
+        }
+
+        /// <summary>
         /// Unstructured Remittance Information
         /// </summary>
         public virtual List<string> Ustrd(string externalAdvText, ISO20022PaymentTypes ISOPaymType, CreditorTransPayment trans, bool extendedText)
@@ -909,8 +1057,7 @@ namespace UnicontaISO20022CreditTransfer
 
             if (ustrdText != string.Empty)
             {
-                if (ustrdText.Length > maxLines * maxStrLen)
-                    ustrdText = ustrdText.Substring(0, maxLines*maxStrLen);
+                ustrdText = LimitUstrdText(ustrdText, maxLines * maxStrLen, trans);
 
                 resultList = ustrdText.Select((x, i) => i)
                             .Where(i => i % maxStrLen == 0)

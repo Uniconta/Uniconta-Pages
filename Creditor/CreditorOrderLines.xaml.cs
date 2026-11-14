@@ -254,6 +254,10 @@ namespace UnicontaClient.Pages.CustomPage
                 Task.Visible = Task.ShowInColumnChooser = false;
             else
                 Task.ShowInColumnChooser = true;
+            if (!company.InvDuty)
+                ExemptDuty.ShowInColumnChooser = ExemptDuty.Visible = false;
+            else
+                ExemptDuty.ShowInColumnChooser = ExemptDuty.Visible = true;
             if (!company.UnitConversion)
                 UnitGroup.Visible = UnitGroup.ShowInColumnChooser = false;
             layOutInvItemStorage.Visibility = OnHandScreenInOrder ? Visibility.Visible : Visibility.Collapsed;

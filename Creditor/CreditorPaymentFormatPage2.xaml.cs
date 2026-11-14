@@ -103,99 +103,22 @@ namespace UnicontaClient.Pages.CustomPage
                     dialogNets_Norg.Show();
                     break;
                 case ExportFormatType.ISO20022_DK:
-                    CWISODK_PaymentSetup dialogISODK = new CWISODK_PaymentSetup(this.api, editrow);
-                    dialogISODK.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
-                    dialogISODK.Closing += delegate
-                    {
-                        if (dialogISODK.DialogResult == true)
-                            StreamingManager.Copy(dialogISODK.paymentFormatISODK, editrow);
-                    };
-                    dialogISODK.Show();
-                    break;
-
                 case ExportFormatType.ISO20022_NO:
-                    CWISONO_PaymentSetup dialogISONO = new CWISONO_PaymentSetup(this.api, editrow);
-                    dialogISONO.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
-                    dialogISONO.Closing += delegate
-                    {
-                        if (dialogISONO.DialogResult == true)
-                            StreamingManager.Copy(dialogISONO.paymentFormatISONO, editrow);
-                    };
-                    dialogISONO.Show();
-                    break;
-
-                case ExportFormatType.ISO20022_NL:
-                    CWISONL_PaymentSetup dialogISONL = new CWISONL_PaymentSetup(this.api, editrow);
-                    dialogISONL.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
-                    dialogISONL.Closing += delegate
-                    {
-                        if (dialogISONL.DialogResult == true)
-                            StreamingManager.Copy(dialogISONL.paymentFormatISONL, editrow);
-                    };
-                    dialogISONL.Show();
-                    break;
-
-                case ExportFormatType.ISO20022_DE:
-                    CWISODE_PaymentSetup dialogISODE = new CWISODE_PaymentSetup(this.api, editrow);
-                    dialogISODE.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
-                    dialogISODE.Closing += delegate
-                    {
-                        if (dialogISODE.DialogResult == true)
-                            StreamingManager.Copy(dialogISODE.paymentFormatISODE, editrow);
-                    };
-                    dialogISODE.Show();
-                    break;
-
-                case ExportFormatType.ISO20022_EE:
-                    CWISOEE_PaymentSetup dialogISOEE = new CWISOEE_PaymentSetup(this.api, editrow);
-                    dialogISOEE.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
-                    dialogISOEE.Closing += delegate
-                    {
-                        if (dialogISOEE.DialogResult == true)
-                            StreamingManager.Copy(dialogISOEE.paymentFormatISOEE, editrow);
-                    };
-                    dialogISOEE.Show();
-                    break;
-
                 case ExportFormatType.ISO20022_SE:
-                    CWISOSE_PaymentSetup dialogISOSE = new CWISOSE_PaymentSetup(this.api, editrow);
-                    dialogISOSE.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
-                    dialogISOSE.Closing += delegate
-                    {
-                        if (dialogISOSE.DialogResult == true)
-                            StreamingManager.Copy(dialogISOSE.paymentFormatISOSE, editrow);
-                    };
-                    dialogISOSE.Show();
-                    break;
+                case ExportFormatType.ISO20022_NL:
+                case ExportFormatType.ISO20022_DE:
+                case ExportFormatType.ISO20022_EE:
                 case ExportFormatType.ISO20022_UK:
-                    CWISOUK_PaymentSetup dialogISOUK = new CWISOUK_PaymentSetup(this.api, editrow);
-                    dialogISOUK.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
-                    dialogISOUK.Closing += delegate
-                    {
-                        if (dialogISOUK.DialogResult == true)
-                            StreamingManager.Copy(dialogISOUK.paymentFormatISOUK, editrow);
-                    };
-                    dialogISOUK.Show();
-                    break;
                 case ExportFormatType.ISO20022_LT:
-                    CWISOLT_PaymentSetup dialogISOLT = new CWISOLT_PaymentSetup(this.api, editrow);
-                    dialogISOLT.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
-                    dialogISOLT.Closing += delegate
-                    {
-                        if (dialogISOLT.DialogResult == true)
-                            StreamingManager.Copy(dialogISOLT.paymentFormatISOLT, editrow);
-                    };
-                    dialogISOLT.Show();
-                    break;
                 case ExportFormatType.ISO20022_CH:
-                    CWISOCH_PaymentSetup dialogISOCH = new CWISOCH_PaymentSetup(this.api, editrow);
-                    dialogISOCH.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
-                    dialogISOCH.Closing += delegate
+                    CWISO_PaymentSetup dialogISO = new CWISO_PaymentSetup(this.api, editrow);
+                    dialogISO.Args = new Uniconta.ClientTools.ChildWindowCallerArgs(this, api);
+                    dialogISO.Closing += delegate
                     {
-                        if (dialogISOCH.DialogResult == true)
-                            StreamingManager.Copy(dialogISOCH.paymentFormatISOCH, editrow);
+                        if (dialogISO.DialogResult == true)
+                            StreamingManager.Copy(dialogISO.paymentFormatISO, editrow);
                     };
-                    dialogISOCH.Show();
+                    dialogISO.Show();
                     break;
                 default:
                     UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("NoOptions"), Uniconta.ClientTools.Localization.lookup("Information"));

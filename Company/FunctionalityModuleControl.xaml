@@ -4,98 +4,107 @@ x:Class="UnicontaClient.Pages.CustomPage.FunctionalityModuleControl"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
     x:Name="ModuleControl" Visibility="{Binding Visibility}">
-    <Border Width="240" Margin="5" Padding="16" Background="Transparent"
-            BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"
-            BorderThickness="1" CornerRadius="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+    <Border Style="{StaticResource FunctionalityModuleCardStyle}">
         <StackPanel>
-            <Grid MinHeight="65" Margin="0,0,0,16">
+            <Grid Style="{StaticResource FunctionalityModuleHeaderStyle}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="44"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Border Width="36" Height="36" CornerRadius="18" Background="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" Opacity="0.16" VerticalAlignment="Top"/>
-                <Image Width="22" Height="22" VerticalAlignment="Top" Margin="7" Source="{Binding IconSource, ElementName=ModuleControl}"/>
+                <Border Style="{StaticResource FunctionalityModuleIconBackgroundStyle}"/>
+                <Image Style="{StaticResource FunctionalityModuleIconStyle}"
+                       Source="{Binding IconSource, ElementName=ModuleControl}"/>
                 <StackPanel Grid.Column="1">
-                    <TextBlock FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" TextWrapping="Wrap"
-
-                               Text="{Binding Title}"/>
-                    <TextBlock FontSize="11" TextWrapping="Wrap" Margin="0,5,0,0" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"
-                               Text="{Binding Description}"/>
+                    <TextBlock Style="{StaticResource FunctionalityModuleModuleTitleStyle}" Text="{Binding Title}"/>
+                    <TextBlock Style="{StaticResource FunctionalityModuleModuleDescriptionStyle}" Text="{Binding Description}"/>
                 </StackPanel>
             </Grid>
-            <Expander IsExpanded="{Binding AreFeaturesExpanded, Mode=TwoWay}" HorizontalAlignment="Stretch">
-                    <Expander.Header>
-                        <TextBlock FontWeight="SemiBold" Text="{Binding FeaturesTitle}"/>
-                    </Expander.Header>
-                    <Expander.ContextMenu>
-                        <ContextMenu>
-                            <MenuItem Header="Expand all" Click="ExpandAll_Click"/>
-                            <MenuItem Header="Collapse all" Click="CollapseAll_Click"/>
-                        </ContextMenu>
-                    </Expander.ContextMenu>
+            <ItemsControl ItemsSource="{Binding FeatureGroups}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Expander Style="{StaticResource FunctionalityModuleFeaturesExpanderStyle}" Visibility="{Binding Visibility}" IsExpanded="{Binding IsExpanded, Mode=TwoWay}">
+                            <Expander.Header>
+                                <TextBlock Style="{StaticResource FunctionalityModuleFeaturesTitleStyle}"
+                               Text="{Binding Title}"/>
+                            </Expander.Header>
 
-                <StackPanel>
-                        <ItemsControl ItemsSource="{Binding VisibleFeatures}" Margin="0,10,0,0">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid Margin="0,0,0,11" Visibility="{Binding Visibility}">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="24"/>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
-                                        <CorasauControls:CheckEditor VerticalAlignment="Top"
-                                                                     IsChecked="{Binding IsEnabled, Mode=TwoWay}"
-                                                                     IsEnabled="{Binding CanEdit}"/>
+                            <Expander.ContextMenu>
+                                <ContextMenu Style="{StaticResource FunctionalityModuleContextMenuStyle}">
+                                    <MenuItem Style="{StaticResource FunctionalityModuleMenuItemStyle}"
+                                  Header="Expand all"
+                                  Click="ExpandAll_Click"/>
+                                    <MenuItem Style="{StaticResource FunctionalityModuleMenuItemStyle}"
+                                  Header="Collapse all"
+                                  Click="CollapseAll_Click"/>
+                                </ContextMenu>
+                            </Expander.ContextMenu>
 
-                                        <Expander Grid.Column="1"
-                                                  HorizontalAlignment="Stretch"
-                                                  IsExpanded="{Binding IsDescriptionExpanded, Mode=TwoWay}">
-                                            <Expander.Header>
-                                                <TextBlock FontWeight="SemiBold"
-                                                           TextWrapping="Wrap"
-                                                           Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
-                                                           Text="{Binding Title}"/>
-                                            </Expander.Header>
+                            <ItemsControl Style="{StaticResource FunctionalityModuleFeatureListStyle}"
+                                          ItemsSource="{Binding VisibleFeatures}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Style="{StaticResource FunctionalityModuleFeatureRowStyle}"
+                                              Visibility="{Binding Visibility}">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="24"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
 
-                                            <TextBlock FontSize="11"
-                                                       TextWrapping="Wrap"
-                                                       Margin="0,3,0,0"
-                                                       Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"
-                                                       Text="{Binding Description}"/>
-                                        </Expander>
-                                    </Grid>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                                            <CorasauControls:CheckEditor
+                                                VerticalAlignment="Top"
+                                                IsChecked="{Binding IsEnabled, Mode=TwoWay}"
+                                                IsEnabled="{Binding CanEdit}">
+                                                <CorasauControls:CheckEditor.Style>
+                                                    <Style TargetType="CorasauControls:CheckEditor"
+                                                           BasedOn="{StaticResource FunctionalityModuleFeatureCheckEditorStyle}">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsComboBox}" Value="True">
+                                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </CorasauControls:CheckEditor.Style>
+                                            </CorasauControls:CheckEditor>
 
-                        <ItemsControl ItemsSource="{Binding VisibleOptions}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel Margin="0,0,0,11">
-                                        <Expander HorizontalAlignment="Stretch"
-                                                  IsExpanded="{Binding IsDescriptionExpanded, Mode=TwoWay}">
-                                            <Expander.Header>
-                                                <TextBlock FontWeight="SemiBold"
-                                                           TextWrapping="Wrap"
-                                                           Text="{Binding Title}"/>
-                                            </Expander.Header>
+                                            <Expander Grid.Column="1"
+                                                      Style="{StaticResource FunctionalityModuleFeatureExpanderStyle}"
+                                                      IsExpanded="{Binding IsDescriptionExpanded, Mode=TwoWay}">
+                                                <Expander.Header>
+                                                    <TextBlock Style="{StaticResource FunctionalityModuleFeatureTitleStyle}"
+                                                               Text="{Binding Title}"/>
+                                                </Expander.Header>
+                                                <TextBlock Style="{StaticResource FunctionalityModuleFeatureDescriptionStyle}"
+                                                           Text="{Binding Description}"/>
+                                            </Expander>
 
-                                            <TextBlock FontSize="11"
-                                                       TextWrapping="Wrap"
-                                                       Margin="0,3,0,0"
-                                                       Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"
-                                                       Text="{Binding Description}"/>
-                                        </Expander>
-
-                                        <CorasauControls:ComboBoxEditor Margin="0,5,0,0"
-                                                                        ItemsSource="{Binding Items}"
-                                                                        SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}"/>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </StackPanel>
-                </Expander>
+                                            <CorasauControls:ComboBoxEditor Grid.Row="1" Grid.Column="1"
+                                                ItemsSource="{Binding Items}"
+                                                SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}"
+                                                IsEnabled="{Binding CanEdit}">
+                                                <CorasauControls:ComboBoxEditor.Style>
+                                                    <Style TargetType="CorasauControls:ComboBoxEditor"
+                                                           BasedOn="{StaticResource FunctionalityModuleFeatureComboBoxEditorStyle}">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsComboBox}" Value="True">
+                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </CorasauControls:ComboBoxEditor.Style>
+                                            </CorasauControls:ComboBoxEditor>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Expander>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </StackPanel>
     </Border>
 </UserControl>

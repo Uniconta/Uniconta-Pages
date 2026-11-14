@@ -24,18 +24,5 @@ x:Class="UnicontaClient.Pages.CustomPage.TilePlacementStepView"
                                      Style="{DynamicResource TileWizardComboBoxStyle}" AutomationProperties.Name="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileGoTo}"
                                      ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileNavigationHelp}"/>
         </StackPanel>
-        <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Group}" Style="{DynamicResource TileWizardLabelStyle}"/>
-        <DockPanel>
-            <Button Content="+" Command="{Binding Data.AddGroupCommand}" DockPanel.Dock="Right" Width="32" MinWidth="0" Height="32" Padding="4" Margin="8,0,0,0"
-                    Style="{DynamicResource PrimaryButtonStyle}" ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileGroupHelp}"/>
-            <controls:ComboBoxEditor IsEditable="True" ItemsSource="{Binding Data.Groups}" SelectedItem="{Binding Data.SelectedGroup, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                     IsReadOnly="{Binding Data.IsAddingGroup}"
-                                     Style="{DynamicResource TileWizardComboBoxStyle}" AutomationProperties.Name="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Group}"
-                                     ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileExistingGroupHelp}"/>
-        </DockPanel>
-        <controls:TextEditor Text="{Binding Data.Group, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,8,0,0"
-                             Visibility="{Binding Data.IsAddingGroup, Converter={StaticResource bool2VisibilityConverter}}"
-                             Style="{DynamicResource TileWizardTextEditorStyle}" AutomationProperties.Name="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileNewGroup}"
-                             ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileNewGroupHelp}"/>
     </StackPanel>
 </UserControl>

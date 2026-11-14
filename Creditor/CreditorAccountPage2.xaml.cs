@@ -336,7 +336,7 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         editrow.City = city[0];
                         var add1 = city[1];
-                        if (!string.IsNullOrEmpty(add1))
+                        if (!string.IsNullOrEmpty(add1) && string.IsNullOrWhiteSpace(editrow.Address1))
                             editrow.Address1 = add1;
                         var zip = city[2];
                         if (!string.IsNullOrEmpty(zip) && editrow.ZipCode != zip)
@@ -359,7 +359,7 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         editrow.DeliveryCity = city[0];
                         var add1 = city[1];
-                        if (!string.IsNullOrEmpty(add1))
+                        if (!string.IsNullOrEmpty(add1) && string.IsNullOrWhiteSpace(editrow.DeliveryAddress1))
                             editrow.DeliveryAddress1 = add1;
                         var zip = city[2];
                         if (!string.IsNullOrEmpty(zip) && editrow.DeliveryZipCode != zip)
@@ -432,6 +432,12 @@ namespace UnicontaClient.Pages.CustomPage
                     if (!string.IsNullOrWhiteSpace(ci?.life?.name))
                     {
                         cvrFound = true;
+                        if (api.CompanyEntity._CountryId == CountryCode.Iceland && string.IsNullOrEmpty(editrow._Account))
+                        {
+                            var kt = new string(cvr.Where(char.IsDigit).ToArray());
+                            if (kt.Length == 10 && creditorCache?.Get(kt) == null)
+                                editrow.Account = kt;
+                        }
                         editrow.IndustryCode = ci.industrycode?.code;
                         var address = ci.address;
                         if (address != null)

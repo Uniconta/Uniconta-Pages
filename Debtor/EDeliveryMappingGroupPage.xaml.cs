@@ -33,6 +33,14 @@ namespace UnicontaClient.Pages.CustomPage
         public override bool IsAutoSave => false;
 
         internal UnicontaBaseEntity AddGroupRow() => AddRow(null, ((ItemsSource as IList)?.Count ?? 0) - 1);
+
+        // Outside Denmark invoices go out as Peppol BIS (the Iceland send applies PEPPOL_30 groups only)
+        public override void SetDefaultValues(UnicontaBaseEntity dataEntity, int selectedIndex)
+        {
+            var newRow = dataEntity as eDeliveryMappingGroupClient;
+            if (newRow != null && api.CompanyEntity._CountryId != CountryCode.Denmark)
+                newRow._DocVersion = Uniconta.DataModel.eDeliveryDocumentVersion.PEPPOL_30;
+        }
     }
 
     public partial class EDeliveryMappingGroupPage : GridBasePage

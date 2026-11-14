@@ -110,9 +110,9 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorEmailSetupPage2"
                                 </Button.Content>
                             </Button>
                             <Border VerticalAlignment="Stretch" Margin="5 0 0 0" Width="1" HorizontalAlignment="Center" BorderBrush="{StaticResource WindowHeaderBorderBrush}" BorderThickness="1" Background="{StaticResource WindowHeaderGradient}"  />
-                            <Button Margin="5 0 0 0" Click="InsertMobilePay_ButtonClicked" ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=InsertMobilePayLink}">
+                            <Button Margin="5 0 0 0" Click="InsertMobilePay_ButtonClicked"  ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=InsertMobilePayLink}">
                                 <Button.Content>
-                                    <Image Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/MobilePayIcon_16x16.svg, UsePalette=True}" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}" Width="16" Height="16" HorizontalAlignment="Left"/>
+                                    <Image Source="{dx:SvgImageSource Uri=/UnicontaPages;component/Assets/img/MobilePayIcon_16x16.svg, UsePalette=True}" dx:WpfSvgPalette.Palette="{StaticResource SVGIconPallete}" HorizontalAlignment="Left"/>
                                 </Button.Content>
                             </Button>
                         </StackPanel>

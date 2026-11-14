@@ -161,6 +161,10 @@ namespace UnicontaClient.Pages.CustomPage
                 Task.ShowInColumnChooser = Task.Visible = false;
             else
                 Task.ShowInColumnChooser = Task.Visible = true;
+            if (!Comp.InvDuty)
+                ExemptDuty.ShowInColumnChooser = ExemptDuty.Visible = false;
+            else
+                ExemptDuty.ShowInColumnChooser = ExemptDuty.Visible = true;
             if (Comp.HideCostPrice)
             {
                 Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
@@ -335,6 +339,10 @@ namespace UnicontaClient.Pages.CustomPage
                         header = string.Format("{0}: {1}", Uniconta.ClientTools.Localization.lookup("Packaging"), selectedItem._OrderNumber);
                         AddDockItem(TabControls.DebtorPackingShipmentPage, selectedItem, header);
                     }
+                    break;
+                case "DocSendLog":
+                    if (selectedItem != null)
+                        AddDockItem(TabControls.DocsSendLogGridPage, dgDebtorOrdersGrid.syncEntity);
                     break;
                 case "ShowInvoice":
                 case "ShowEInvoice":

@@ -23,4 +23,8 @@
 			<RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16" ShortcutKey=""/>
 		</RibbonItem>
 	</RibbonItem>
+	<RibbonItem>
+		<RibbonItem Action="DistributeHours" LocalizedNameKey="DistributeOBJ" Parameter="Hours" Glyph="Distributor_16x16" LargeGlyph="Distributor_16x16"/>
+		<RibbonItem Action="CopyToRestOfPeriod" LocalizedNameKey="CopyToRestOfPeriod" Glyph="Copy_16x16" LargeGlyph="Copy_32x32"/>
+	</RibbonItem>
 </root>

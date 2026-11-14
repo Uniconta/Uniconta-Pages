@@ -1,0 +1,66 @@
+<cw:ChildWindow
+    xmlns:cw="clr-namespace:Uniconta.ClientTools;assembly=ClientTools"
+        xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.CWIcelandBankConnect"
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+           xmlns:ClientToolsControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+           xmlns:CorasauControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools"
+           Width="500" KeyDown="ChildWindow_KeyDown" SizeToContent="Height">
+    <Grid x:Name="LayoutRoot" Margin="2" Background="{StaticResource LayoutGridColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <ClientToolsControls:CorasauLayoutControl Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <ClientToolsControls:CorasauLayoutGroup View="GroupBox" GroupBoxDisplayMode="Light" Orientation="Vertical" IsCollapsible="False" HorizontalAlignment="Stretch">
+                <ClientToolsControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FinancialInstitution}">
+                    <CorasauControls:ComboBoxEditor x:Name="cmbBank" Height="25" HorizontalAlignment="Stretch"/>
+                </ClientToolsControls:CorasauLayoutItem>
+                <ClientToolsControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoginId}">
+                    <CorasauControls:TextEditor x:Name="txtLoginId" Height="25" HorizontalAlignment="Stretch"/>
+                </ClientToolsControls:CorasauLayoutItem>
+                <ClientToolsControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Password}">
+                    <CorasauControls:PasswordBoxEditor x:Name="txtPassword" Height="25" HorizontalAlignment="Stretch"/>
+                </ClientToolsControls:CorasauLayoutItem>
+                <ClientToolsControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=BankAccount}">
+                    <CorasauControls:TextEditor x:Name="txtBankAccountNo" Height="25" HorizontalAlignment="Stretch"/>
+                </ClientToolsControls:CorasauLayoutItem>
+                <ClientToolsControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Status}" LabelVerticalAlignment="Top">
+                    <TextBlock x:Name="txtStatus" TextWrapping="Wrap" HorizontalAlignment="Stretch"/>
+                </ClientToolsControls:CorasauLayoutItem>
+            </ClientToolsControls:CorasauLayoutGroup>
+            <ClientToolsControls:CorasauLayoutGroup x:Name="lgAccount" Visibility="Collapsed" View="GroupBox" GroupBoxDisplayMode="Light" Orientation="Vertical" IsCollapsible="False" HorizontalAlignment="Stretch">
+                <ClientToolsControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Name}">
+                    <TextBlock x:Name="txtAccountName" TextWrapping="Wrap" HorizontalAlignment="Stretch"/>
+                </ClientToolsControls:CorasauLayoutItem>
+                <ClientToolsControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=IBAN}">
+                    <TextBlock x:Name="txtIban" HorizontalAlignment="Stretch"/>
+                </ClientToolsControls:CorasauLayoutItem>
+                <ClientToolsControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Currency}">
+                    <TextBlock x:Name="txtAccountCurrency" HorizontalAlignment="Stretch"/>
+                </ClientToolsControls:CorasauLayoutItem>
+                <ClientToolsControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Owner}">
+                    <TextBlock x:Name="txtOwner" HorizontalAlignment="Stretch"/>
+                </ClientToolsControls:CorasauLayoutItem>
+                <ClientToolsControls:CorasauLayoutItem x:Name="liAccountCheck" LabelVerticalAlignment="Top">
+                    <TextBlock x:Name="txtAccountCheck" TextWrapping="Wrap" HorizontalAlignment="Stretch"/>
+                </ClientToolsControls:CorasauLayoutItem>
+            </ClientToolsControls:CorasauLayoutGroup>
+            <ClientToolsControls:CorasauLayoutGroup x:Name="lgFetch" View="GroupBox" GroupBoxDisplayMode="Light" Orientation="Vertical" IsCollapsible="False" HorizontalAlignment="Stretch">
+                <ClientToolsControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=FromDate}">
+                    <CorasauControls:DateEditor x:Name="dteFrom"/>
+                </ClientToolsControls:CorasauLayoutItem>
+                <ClientToolsControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ToDate}">
+                    <CorasauControls:DateEditor x:Name="dteTo"/>
+                </ClientToolsControls:CorasauLayoutItem>
+            </ClientToolsControls:CorasauLayoutGroup>
+        </ClientToolsControls:CorasauLayoutControl>
+        <StackPanel HorizontalAlignment="Center" Grid.Row="1" Orientation="Horizontal" Margin="0 10 0 10">
+            <Button x:Name="ConnectButton" IsDefault="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=ConnectToBank}" Click="ConnectButton_Click" MinWidth="75" Height="23" Margin="0 0 3 0"/>
+            <Button x:Name="FetchButton" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=RetrieveBankTrans}" Click="FetchButton_Click" MinWidth="75" Height="23" Margin="0 0 3 0"/>
+            <Button x:Name="DisconnectButton" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=UnregisterBank}" Click="DisconnectButton_Click" MinWidth="75" Height="23" Margin="0 0 3 0"/>
+            <Button x:Name="CloseButton" IsCancel="True" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Close}" Click="CloseButton_Click" MinWidth="75" Height="23"/>
+        </StackPanel>
+    </Grid>
+</cw:ChildWindow>

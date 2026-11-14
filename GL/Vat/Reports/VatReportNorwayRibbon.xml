@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
-    <RibbonItem Action="TransferToAltinn" LocalizedNameKey="Overfør til Altinn" LargeGlyph="Add_Menu_32x32"/>
-  </RibbonItem>
-  <RibbonItem>
-    <RibbonItem Action="GetSMSPinCode" LocalizedNameKey="SMS Pin kode" LargeGlyph="Add_Menu_32x32"/>
-    <RibbonItem Action="GetAltinnCode" LocalizedNameKey="Altinn kode" LargeGlyph="Add_Menu_32x32"/>    
-  </RibbonItem>
-  <RibbonItem>
-    <RibbonItem Action="AltinnMvaReport" LocalizedNameKey="Rapport" LargeGlyph="Add_Menu_32x32"/>
+    <RibbonItem Action="Validate" LocalizedNameKey="Validate" LargeGlyph="Validate_32x32"/>
+    <RibbonItem Action="Send" LocalizedNameKey="Send" LargeGlyph="Export_32x32"/>
+    <RibbonItem Action="Feedback" LocalizedNameKey="Feedback" LargeGlyph="Import_32x32"/>
+    <RibbonItem Action="TransferToJournal" LocalizedNameKey="GenerateJournalLines" LargeGlyph="Journal_Lines_32x32"/>
+    <RibbonItem Action="SignOut" LocalizedNameKey="Logout" LargeGlyph="User_32x32"/>
   </RibbonItem>
   <RibbonItem>
     <!---If we want to create a new group in same PageTab-->
@@ -16,8 +13,8 @@
       <!---If we want Inner menu-->
       <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
       <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16" ShortcutKey="" />
-			<RibbonItem Action="AddExpressionColumn" LocalizedNameKey="AddOBJ" Parameter="CalculationExpression" Glyph="Accountant_16x16" ShortcutKey="" />
-      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" EnableSeperator="True" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
+      <RibbonItem Action="AddExpressionColumn" LocalizedNameKey="AddOBJ" Parameter="CalculationExpression" Glyph="Accountant_16x16" ShortcutKey="" />
+      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
       <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16" ShortcutKey=""/>
       <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16" ShortcutKey="Ctrl+U"/>
       <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16" LargeGlyph="ExportLayout_16x16" ShortcutKey=""/>

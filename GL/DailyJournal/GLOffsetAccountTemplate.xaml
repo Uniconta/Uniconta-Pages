@@ -76,7 +76,7 @@ x:Class="UnicontaClient.Pages.CustomPage.GLOffsetAccountTemplate"
                             </DataTemplate>
                         </local:CorasauDataGridForeignKeyColumnClient.CellTemplate>
                     </local:CorasauDataGridForeignKeyColumnClient>
-
+                    <local:CorasauDataGridTemplateColumnClient x:Name="EnteredVatAmount" Width="80"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Invoice" Width="100"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Project" Width="80"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="PrCategory" Width="80"/>

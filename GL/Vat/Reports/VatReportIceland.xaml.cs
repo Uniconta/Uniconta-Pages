@@ -2,15 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.ServiceModel.Security;
 using System.Threading.Tasks;
 using System.Windows;
-using RSK;
 using Uniconta.API.System;
 using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
-using RSK.Vsk;
 using Uniconta.Common;
 using Uniconta.DataModel;
 using Localization = Uniconta.ClientTools.Localization;
@@ -62,8 +59,13 @@ namespace UnicontaClient.Pages.CustomPage
             get { return "VatReportIceland"; }
         }
 
-        public VatReportIceland(List<VatSumOperationReport> VatSumOperationLst, DateTime fromDate, DateTime toDate) : base(null)
+        readonly VatReport owner; // the VAT report it was opened from, which saves the settlement
+
+        public VatReportIceland(List<VatSumOperationReport> VatSumOperationLst, DateTime fromDate, DateTime toDate) : this(VatSumOperationLst, fromDate, toDate, null) { }
+
+        public VatReportIceland(List<VatSumOperationReport> VatSumOperationLst, DateTime fromDate, DateTime toDate, VatReport owner) : base(null)
         {
+            this.owner = owner;
             this.VatSumOperationLst = VatSumOperationLst;
             this.FromDate = fromDate;
             this.ToDate = toDate;
@@ -81,25 +83,25 @@ namespace UnicontaClient.Pages.CustomPage
                 switch (rec._Line)
                 {
                     case 1:
-                        s = "Skattskyld velta efra þrep";
+                        s = Uniconta.ClientTools.Localization.lookup("IcelandVatTaxableHigh");
                         break;
                     case 2:
-                        s = "Skattskyld velta neðra þrep?";
+                        s = Uniconta.ClientTools.Localization.lookup("IcelandVatTaxableLow");
                         break;
                     case 3:
-                        s = "Undanþegin velta (12. gr.)";
+                        s = Uniconta.ClientTools.Localization.lookup("IcelandVatExempt");
                         break;
                     case 4:
-                        s = "Útskattur efra þrep";
+                        s = Uniconta.ClientTools.Localization.lookup("IcelandVatOutputHigh");
                         break;
                     case 5:
-                        s = "Útskattur neðra þrep";
+                        s = Uniconta.ClientTools.Localization.lookup("IcelandVatOutputLow");
                         break;
                     case 6:
-                        s = "Innskattur efra þrep";
+                        s = Uniconta.ClientTools.Localization.lookup("IcelandVatInputHigh");
                         break;
                     case 7:
-                        s = "Innskattur neðra þrep";
+                        s = Uniconta.ClientTools.Localization.lookup("IcelandVatInputLow");
                         break;
                     default:
                         s = null;
@@ -112,15 +114,14 @@ namespace UnicontaClient.Pages.CustomPage
                 else if (rec._Line >= 4) sum -= rec._Amount;
             }
             dgVatReportIceland.ItemsSource = VatSumOperationLst;
-            txtSystemInfo.Text = sum < 0 ? $"Áætluð álagning: {-sum:C0}" : $"Áætluð endurgreiðsla: {sum:C0}";
+            txtSystemInfo.Text = string.Format(Uniconta.ClientTools.Localization.lookup(sum < 0 ? "IcelandVatEstimatedPayable" : "IcelandVatEstimatedRefund"), Math.Abs(sum).ToString("C0"));
             dgVatReportIceland.Visibility = Visibility.Visible;
 #if !SILVERLIGHT
             txtFromDate.DateTime = fromDate;
             txtToDate.DateTime = toDate;
             txtKennitala.Text = api.CompanyEntity._Id;
             txtVatNo.Text = api.CompanyEntity._VatNumber;
-            // Can add if necessary
-            //txtPassword.Text = (string)(api.CompanyEntity.GetUserField("RskPassword") ?? string.Empty);
+            txtKennitala.IsReadOnly = txtVatNo.IsReadOnly = true; // the server files with the company's own
 #endif
         }
 
@@ -128,39 +129,11 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var previousContent = busyIndicator.BusyContent;
 
-            //MessageBox.Show(ActionType);
             switch (ActionType)
             {
-#if !SILVERLIGHT
-                case "ResetTest": //Only for debug purposes. Not active for live web service
-                    busyIndicator.BusyContent = "Endurstilli prófun";
-                    busyIndicator.IsBusy = true;
-                    //MessageBox.Show("resetting");
-                    await ResetTestVSK(api, VatSumOperationLst);
-                    break;
-
                 case "SendToRSK":
-                    busyIndicator.BusyContent = "Sendi til RSK";
-                    busyIndicator.IsBusy = true;
-                    //MessageBox.Show("sending to rsk");
-                    var sendingResult = await SendToRSK(VatSumOperationLst);
-                    if (sendingResult != null)
-                    {
-                        var pdfBytes = sendingResult.PDFKvittun;
-                        var savingResult = await SavePdfFileToVouchers(api, sendingResult);
-                        if (savingResult == ErrorCodes.Succes)
-                        {
-                            Dispatcher?.Invoke(() => DisplaySavedPdf(pdfBytes));
-                            UnicontaMessageBox.Show("Kvittun vistuð í innhólf", "Aðgerð tókst"); // Success saving
-                        }
-                        else
-                        {
-                            UnicontaMessageBox.Show("Villa við vistun á skjali í innhólf", "Villa"); // Error saving
-                        }
-                    }
-
+                    await SendToRSK();
                     break;
-#endif
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
@@ -169,9 +142,34 @@ namespace UnicontaClient.Pages.CustomPage
             busyIndicator.IsBusy = false;
             busyIndicator.BusyContent = previousContent;
         }
-#if !SILVERLIGHT
-        private void DisplaySavedPdf(
-          byte[] pdfBytes)
+
+        // The server files the saved settlement of the period (VatAPI.Upload), so it must be saved first
+        private async Task SendToRSK()
+        {
+            var settlement = new GLVatReported() { _ToDate = ToDate };
+            if (await api.Read(settlement) != ErrorCodes.Succes || settlement._FromDate == DateTime.MinValue)
+            {
+                if (owner == null)
+                {
+                    UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("IcelandVatSaveBeforeFiling"), Uniconta.ClientTools.Localization.lookup("ReportTo"));
+                    return;
+                }
+                if (UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("SaveChanges"), Uniconta.ClientTools.Localization.lookup("ReportTo"), MessageBoxButton.YesNo) != MessageBoxResult.Yes ||
+                    !await owner.SaveVatReportNow())
+                    return;
+                settlement = new GLVatReported() { _ToDate = ToDate };
+                if (await api.Read(settlement) != ErrorCodes.Succes || settlement._FromDate == DateTime.MinValue)
+                    return;
+            }
+            busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
+            busyIndicator.IsBusy = true;
+            var receipt = await IcelandVatFiling.File(api, settlement, txtPassword.Text);
+            busyIndicator.IsBusy = false;
+            if (receipt != null)
+                DisplaySavedPdf(receipt);
+        }
+
+        private void DisplaySavedPdf(byte[] pdfBytes)
         {
             var ms = new MemoryStream(pdfBytes);
             pdfViewer.DocumentSource = ms;
@@ -179,98 +177,5 @@ namespace UnicontaClient.Pages.CustomPage
             gridColumn.Width = pdfColumn.Width;
             pdfColumn.Width = controlWidth;
         }
-
-        private async Task<ErrorCodes> SavePdfFileToVouchers(
-          CrudAPI crudApi,
-          docType_ns_VSKSkyrslaSvar reply)
-        {
-            var errorCode = ErrorCodes.NoSucces;
-            byte[] docBytes = reply.PDFKvittun;
-            var vc = new VouchersClient
-            {
-                _Data = docBytes,
-                Fileextension = FileextensionsTypes.PDF,
-                Text = "VSK skil",
-                _Amount = reply.NidurstadaSkila.Fjarhaedir.TilGreidslu ?? 0,
-                _Content = ContentTypes.Documents,
-            };
-            var success = false;
-            while (!success)
-            {
-                errorCode = await crudApi.Insert(vc);
-                success = errorCode == ErrorCodes.Succes;
-                if (!success)
-                    UnicontaMessageBox.Show(
-                      Localization.GetLocalization(Uniconta.Common.Language.Is).Lookup(errorCode.ToString()) + "\nReyna aftur?", // Try again?
-                      "Villa við vistun", // Error while saving
-                      messageBoxImage: MessageBoxImage.Error,
-                      messageBoxButton: MessageBoxButton.YesNo
-                    );
-            }
-            return errorCode;
-        }
-
-        private async Task ResetTestVSK(
-          CrudAPI crudApi,
-          List<VatSumOperationReport> vatSumOperationReports) // Only for test service URI
-        {
-#if !UNICORE
-            try
-            {
-
-                var client = new VskClient(txtKennitala.Text, txtPassword.Text);
-                var result = await client.ResetTestAsync(txtKennitala.Text, ToDate, api.CompanyEntity._VatNumber);
-                if (result.EydaSkyrsluIProfunSvar != null)
-                    UnicontaMessageBox.Show(result.EydaSkyrsluIProfunSvar.status.message, "Villa " + result.EydaSkyrsluIProfunSvar.status.code);
-            }
-            catch (MessageSecurityException)
-            {
-                UnicontaMessageBox.Show("Rangt notendanafn eða lykilorð", "Villa"); //Wrong UserName or Password
-            }
-            catch (Exception e)
-            {
-                UnicontaMessageBox.Show($"{e.Message} \n\n {e.StackTrace}", "Villa");
-            }
-#endif
-        }
-
-        private async Task<docType_ns_VSKSkyrslaSvar> SendToRSK(
-          List<VatSumOperationReport> vatSumOperationReports)
-        {
-            docType_ns_VSKSkyrslaSvar response = null;
-            try
-            {
-#if !UNICORE
-                var client = new VskClient(txtKennitala.Text, txtPassword.Text);
-                long[] longsOrdered = vatSumOperationReports.OrderBy(o => o._Line)
-                                                            .Select(i => (long)Math.Round(i._Amount != 0 ? i._Amount : i._AmountBase != 0 ? i._AmountBase : 0))
-                                                            .ToArray();
-                response = await client.SkilaVSKSkyrsluAsync(
-                  kennitala: txtKennitala.Text,
-                  vskNumer: txtVatNo.Text,
-                  toDate: ToDate,
-                  velta24: longsOrdered[0],
-                  velta11: longsOrdered[1],
-                  velta0: longsOrdered[2],
-                  ut24: longsOrdered[3],
-                  ut11: longsOrdered[4],
-                  inn24: longsOrdered[5],
-                  inn11: longsOrdered[6]
-                );
-#endif
-            }
-            catch (MessageSecurityException)
-            {
-                UnicontaMessageBox.Show("Rangt notendanafn eða lykilorð", "Villa"); // Wrong user/pass
-            }
-            catch (Exception e)
-            {
-                UnicontaMessageBox.Show(e, "Villa");
-            }
-
-            return response;
-        }
-
-#endif
-            }
+    }
 }

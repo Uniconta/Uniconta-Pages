@@ -229,13 +229,17 @@ namespace UnicontaClient.Pages.CustomPage
                 Task.Visible = Task.ShowInColumnChooser = false;
             else
                 Task.ShowInColumnChooser = true;
+            if (!company.InvDuty)
+                ExemptDuty.ShowInColumnChooser = ExemptDuty.Visible = false;
+            else
+                ExemptDuty.ShowInColumnChooser = ExemptDuty.Visible = true;
             SetVariantColumns();
             UnicontaClient.Utilities.Utility.SetDimensionsGrid(api, cldim1, cldim2, cldim3, cldim4, cldim5);
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
             if (company.HideCostPrice)
             {
                 Margin.Visible = Margin.ShowInColumnChooser = MarginRatio.Visible = MarginRatio.ShowInColumnChooser =
-         CostPrice.Visible = CostPrice.ShowInColumnChooser = CostValue.Visible = CostValue.ShowInColumnChooser = false;
+                CostPrice.Visible = CostPrice.ShowInColumnChooser = CostValue.Visible = CostValue.ShowInColumnChooser = false;
                 UtilDisplay.RemoveMenuCommand(rb, new string[] { "CostValue", "DB" });
             }
         }
@@ -631,11 +635,12 @@ namespace UnicontaClient.Pages.CustomPage
                     dgProjInvProposedLineGrid.DeleteRow();
                     break;
                 case "ShowInvoice":
+                case "ShowEInvoice":
                 case "CreateInvoice":
                     if (ord != null)
                     {
                         if (Utility.HasControlRights("GenerateInvoice", api.CompanyEntity))
-                            GenerateInvoice(ord, ActionType == "ShowInvoice" ? true : false);
+                            GenerateInvoice(ord, ActionType == "ShowInvoice" || ActionType == "ShowEInvoice", ActionType == "ShowEInvoice");
                         else
                             UtilDisplay.ShowControlAccessMsg("GenerateInvoice");
                     }
@@ -761,7 +766,7 @@ namespace UnicontaClient.Pages.CustomPage
                 return base.IsDataChaged;
             }
         }
-        private void GenerateInvoice(ProjectInvoiceProposalClient dbOrder, bool showProformaInvoice)
+        private void GenerateInvoice(ProjectInvoiceProposalClient dbOrder, bool showProformaInvoice, bool showEInvoice = false)
         {
             var savetask = saveGridLocal();
             var curpanel = dockCtrl.Activpanel;
@@ -795,7 +800,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (showProformaInvoice)
             {
-                ShowProformaInvoice(dbOrder);
+                ShowProformaInvoice(dbOrder, showEInvoice);
                 return;
             }
 
@@ -856,9 +861,10 @@ namespace UnicontaClient.Pages.CustomPage
             GenrateInvoiceDialog.Show();
         }
 
-        async private void ShowProformaInvoice(ProjectInvoiceProposalClient order)
+        async private void ShowProformaInvoice(ProjectInvoiceProposalClient order, bool showEInvoice)
         {
             var invoicePostingResult = SetupInvoicePostingPrintGenerator(order, DateTime.Now, true, true, false, false, 0, false, false, false, null, false);
+            invoicePostingResult.ShowEInvoice = showEInvoice;
 
             busyIndicator.IsBusy = true;
             busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("GeneratingPage");

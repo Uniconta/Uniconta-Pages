@@ -11,11 +11,12 @@
 	</RibbonItem>
 	<RibbonItem>
 		<RibbonItem Action="View" ShortcutKey="F7" LocalizedNameKey="View" LargeGlyph="View_Highlighted_32x32" />
+		<RibbonItem Action="ValidateDocument" LocalizedNameKey="Validate" LargeGlyph="Check_Journal_32x32" />
 	</RibbonItem>
 	<RibbonItem>
 		<RibbonItem LocalizedNameKey="Send" LargeGlyph="SendInvoiceMail_32x32">
 			<RibbonItem Action="SendUBL" LocalizedNameKey="SendInvoicebyUBL"/>
-			<RibbonItem Action="ImportUBL" LocalizedNameKey="ImportSendCustomOIOUBL"/>
+			<RibbonItem Action="ImportUBL" LocalizedNameKey="ImportOBJ" Parameter="XML"/>
 		</RibbonItem>
 		<RibbonItem Action="ExportUBL" LocalizedNameKey="ExportOBJ" Parameter="einvoice" LargeGlyph="Import_32x32"/>
 		<RibbonItem Action="DocSendLog" LocalizedNameKey="Log" ControlName="DocsSendLogGridPage" LargeGlyph="Server_Count_32x32" />

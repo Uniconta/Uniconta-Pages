@@ -241,6 +241,19 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
             }
 
+            // Iceland: the server sends through api.uniconta.is once the company is registered there (the state kept on the company,
+            // no call); for a debtor that takes e-invoices. No receiver lookup: Digisense does not serve Iceland.
+            if (api.CompanyEntity._EInvoiceProvider == Uniconta.DataModel.EInvoiceProvider.Iceland)
+            {
+                var registered = api.CompanyEntity._IcelandEInvoiceState == Uniconta.DataModel.IcelandEInvoiceState.Active;
+                var send = registered && (debtor != null ? debtor._einvoice : invoiceInXml);
+                IsSendXmlSalesInvoice = true;
+                chkOIOUBL.IsChecked = send;
+                liGenerateOIOUBLClicked.IsEnabled = send || (registered && forceEnableEinvoice);
+                lblReceiverEndPointStatus.Content = null;
+                return;
+            }
+
             if (api.CompanyEntity._DeactivateSendNemhandel && endPoint != null && endPoint.Item1 != NHRNetworkType.Peppol)
                 return;
 

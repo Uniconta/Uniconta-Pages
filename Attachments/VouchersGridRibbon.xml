@@ -35,17 +35,19 @@
     <RibbonItem Action="ViewDownloadRow" ShortcutKey="F7" LocalizedNameKey="View" LargeGlyph="View_Highlighted_32x32" />
     <RibbonItem Action="CheckIfPosted" LocalizedNameKey="CheckIfPosted" LargeGlyph="Check_Journal_32x32"/>
     <RibbonItem Action="Transactions" LocalizedNameKey="AccountsTransaction" LargeGlyph="Posted_Transaction_32x32"/>
+    <RibbonItem Action="VoucherLog" LocalizedNameKey="Log" LargeGlyph="Server_Count_32x32" />
   </RibbonItem>
 	<RibbonItem LocalizedNameKey="Posting">
 		<RibbonItem LocalizedNameKey="PostingRule" LargeGlyph="Match_32x32">
 			<RibbonItem Action="AddMapping" LocalizedNameKey="Add" Glyph="Add_16x16"/>
 			<RibbonItem Action="LookupAccounts" LocalizedNameKey="View" Glyph="Match_Add_16x16"/>
 			<RibbonItem Action="UnicontaScanSettings" LocalizedNameKey="Setup" Glyph="Settings_32x32"/>
-			<RibbonItem Action="ApplyPostingRules" LocalizedNameKey="Apply" Glyph="Invoice_16x16"/>
+      <RibbonItem Action="ApplyPostingRules" LocalizedNameKey="Apply" Glyph="Invoice_16x16"/>
+      <RibbonItem Action="Posting" LocalizedNameKey="AutoPosting" Glyph="Document_Attachment_16x16"/>
 		</RibbonItem>
 		<RibbonItem Action="GenerateJournalLines" LocalizedNameKey="GenerateJournalLines" ControlName="GL_DailyJournal" LargeGlyph="Move_32x32" ShortcutKey="Ctrl+J" />
-		<RibbonItem Action="ViewJournalLines" LocalizedNameKey="Journallines" ControlName="GL_DailyJournal" LargeGlyph="Journal_Lines_32x32" />
 		<RibbonItem Action="PostJournal" LocalizedNameKey="PostDirectly" ControlName="GL_DailyJournal" LargeGlyph="Posted_Journal_32x32"/>
+		<RibbonItem Action="ViewJournalLines" LocalizedNameKey="Journallines" ControlName="GL_DailyJournal" LargeGlyph="Journal_Lines_32x32" />
 		<RibbonItem Action="GeneratePurchaseOrder" LocalizedNameKey="GeneratePurchaseOrder" ControlName="CreditorOrders" LargeGlyph="Move_32x32" ShortcutKey="Ctrl+G" />
 		<RibbonItem Action="Attach" LocalizedNameKey="Attach" LargeGlyph="Attachments_32x32"/>
 	</RibbonItem>
@@ -54,13 +56,13 @@
 			<RibbonItem Action="DocumentScanUpload" LocalizedNameKey="BilagscanSend" Glyph="Export_16x16" />
 			<RibbonItem Action="BilagscanProfile" LocalizedNameKey="BilagscanProfile" Glyph="View_16x16" />
 			<RibbonItem Action="BilagscanCreateUser" LocalizedNameKey="CreateOBJ" Parameter="User" Glyph="save-16x16" />
+			<RibbonItem Action="VoucherScanSettings" LocalizedNameKey="VoucherScanSettings" Glyph="Settings_32x32" />
 		</RibbonItem>
 		<RibbonItem Action="UnicontaScan" LocalizedNameKey="UnicontaScan" LargeGlyph="Transfer_32x32">
 			<RibbonItem Action="DocumentScanUpload" LocalizedNameKey="Upload" Glyph="Export_16x16" />
 			<RibbonItem Action="CorrectScannedData" LocalizedNameKey="CorrectScannedData" Glyph="Edit_16x16" />
 			<RibbonItem Action="ViewCorrectScannedData" LocalizedNameKey="ViewCorrectScannedData" Glyph="View_16x16" />
 			<RibbonItem Action="VoucherScanSettings" LocalizedNameKey="VoucherScanSettings" Glyph="Settings_32x32" />
-			<RibbonItem Action="VoucherScannerLog" LocalizedNameKey="VoucherScannerLog" Glyph="Server_Count_32x32" />
 		</RibbonItem>
 	</RibbonItem>
 	<RibbonItem>

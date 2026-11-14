@@ -25,6 +25,7 @@ x:Class="UnicontaClient.Pages.CustomPage.DebtorSettlements"
                 <localPage:DebtorSettlementGrid.Columns>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SettlementType"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="SettleAmount" Width="90"/>
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="CloseDate" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Amount" Width="90"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Remaining" Width="90" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="90" />

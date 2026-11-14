@@ -15,6 +15,7 @@ namespace ISO20022CreditTransfer
         private readonly IEnumerable<CheckError> checkErrors;
         private readonly Encoding encoding;
         private readonly string fileName;
+        private readonly IList<string> adviceTruncated;
 
         public XMLDocumentGenerateResult(XmlDocument document, bool hasErrors, int payments, IEnumerable<PreCheckError> preCheckErrors)
         {
@@ -32,7 +33,7 @@ namespace ISO20022CreditTransfer
             this.checkErrors = checkErrors;
         }
 
-        public XMLDocumentGenerateResult(XmlDocument document, bool hasErrors, CreditTransferDocument doc, IEnumerable<CheckError> checkErrors, string fileName)
+        public XMLDocumentGenerateResult(XmlDocument document, bool hasErrors, CreditTransferDocument doc, IEnumerable<CheckError> checkErrors, string fileName, IList<string> adviceTruncated = null)
         {
             this.document = document;
             this.hasErrors = hasErrors;
@@ -40,6 +41,18 @@ namespace ISO20022CreditTransfer
             this.checkErrors = checkErrors;
             this.encoding = doc.EncodingFormat;
             this.fileName = fileName;
+            this.adviceTruncated = adviceTruncated;
+        }
+
+        /// <summary>
+        /// Merged payments where not all invoice numbers fit in the remittance information (Ustrd)
+        /// </summary>
+        public IList<string> AdviceTruncated
+        {
+            get
+            {
+                return adviceTruncated;
+            }
         }
 
         public XmlDocument Document

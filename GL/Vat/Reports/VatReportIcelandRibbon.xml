@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <root>
   <RibbonItem TabId="0" LocalizedNameKey="Home">
-    <RibbonItem Action="SendToRSK" LocalizedNameKey="Senda til RSK" LargeGlyph="Email_32x32"/>
+    <RibbonItem Action="SendToRSK" LocalizedNameKey="ReportTo" LargeGlyph="Email_32x32"/>
   </RibbonItem>
   <RibbonItem>
     <!---If we want to create a new group in same PageTab-->

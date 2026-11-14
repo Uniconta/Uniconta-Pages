@@ -1,0 +1,90 @@
+[
+  {
+    "Version": 13,
+    "TableId": 0,
+    "TileTypeId": "UnicontaClient.Pages.VoucherApprovalTileType",
+    "TileTypeParameters": "{\"OpenTarget\":\"DocumentsApprovalPage\"}",
+    "SourceName": null,
+    "Title": "Voucher Approvals Awaiting Your Review",
+    "Group": null,
+    "Filter": null,
+    "NavigationTarget": null,
+    "HtmlSource": null,
+    "HtmlSources": [],
+    "Visualization": 0,
+    "Aggregate": 0,
+    "IsDashboardDefinition": false,
+    "DateBucket": 0,
+    "Scope": 1,
+    "DashboardTab": null,
+    "Profile": null,
+    "GroupBy": null,
+    "ValueColumns": [],
+    "ChartGroup": null,
+    "Value2Field": null,
+    "WeightField": null,
+    "Order": 1,
+    "ColumnSpan": 4,
+    "RowSpan": 4,
+    "GridColumn": 3,
+    "GridRow": 0
+  },
+  {
+    "Version": 13,
+    "TableId": 0,
+    "TileTypeId": null,
+    "TileTypeParameters": null,
+    "SourceName": null,
+    "Title": "Uniconta",
+    "Group": null,
+    "Filter": null,
+    "NavigationTarget": null,
+    "HtmlSources": [
+      {
+        "CountryCode": 57,
+        "Url": "https://www.uniconta.com/da/uc-tile/"
+      },
+      {
+        "CountryCode": 148,
+        "Url": "https://www.uniconta.com/nl/uc-tegel/"
+      },
+      {
+        "CountryCode": 78,
+        "Url": "https://www.uniconta.com/de/uc-kachel/"
+      },
+      {
+        "CountryCode": 93,
+        "Url": "https://www.uniconta.com/is/uc-reitur/"
+      },
+      {
+        "CountryCode": 125,
+        "Url": "https://www.uniconta.com/lt/uc-modulis/"
+      },
+      {
+        "CountryCode": 209,
+        "Url": "https://www.uniconta.com/ch/uc-kachel/"
+      },
+      {
+        "CountryCode": null,
+        "Url": "https://www.uniconta.com/uc-tile/"
+      }
+    ],
+    "Visualization": 7,
+    "Aggregate": 0,
+    "IsDashboardDefinition": false,
+    "DateBucket": 0,
+    "Scope": 0,
+    "DashboardTab": null,
+    "Profile": null,
+    "GroupBy": null,
+    "ValueColumns": [],
+    "ChartGroup": null,
+    "Value2Field": null,
+    "WeightField": null,
+    "Order": 3,
+    "ColumnSpan": 3,
+    "RowSpan": 4,
+    "GridColumn": 0,
+    "GridRow": 0
+  }
+]

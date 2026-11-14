@@ -19,5 +19,7 @@
 	  <RibbonItem Action="UpdAddress" LocalizedNameKey="Address" IsCheckBox="True" />
 	  <RibbonItem Action="UpdIndustryCode" LocalizedNameKey="IndustryCode" IsCheckBox="True" />
 	  <RibbonItem Action="UpdCompanyState" LocalizedNameKey="CompanyState" IsCheckBox="True" />
+	  <RibbonItem Action="UpdVat" LocalizedNameKey="VatNumber" IsCheckBox="True" />
+	  <RibbonItem Action="UpdEInvoice" LocalizedNameKey="einvoice" IsCheckBox="True" />
   </RibbonItem>
 </root>

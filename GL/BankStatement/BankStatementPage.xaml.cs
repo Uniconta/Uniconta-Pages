@@ -95,6 +95,12 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (api.session.User._Role < (int)UserRoles.Admin)
                 UtilDisplay.RemoveMenuCommand(rb, new string[] { "AiiaAdmin", "NordeaAdmin" });
+
+            // Icelandic banks connect through api.uniconta.is; the Danish services do not serve them
+            if (Comp._CountryId == CountryCode.Iceland)
+                UtilDisplay.RemoveMenuCommand(rb, new string[] { "AiiaRegister", "AiiaSync", "Functions" });
+            else
+                UtilDisplay.RemoveMenuCommand(rb, "IcelandBankConnect");
         }
 
         void dgBankStatement_RowDoubleClick()
@@ -172,6 +178,14 @@ namespace UnicontaClient.Pages.CustomPage
                 case "NordeaAdmin":
                     if (selectedItem == null) return;
                     BankAiia(8, selectedItem); break;
+                case "IcelandBankConnect":
+                    if (selectedItem == null) return;
+                    // connect and fetch need the AutoBanking add-in; without it the dialog opens only on a connected statement, to disconnect it
+                    if (!api.CompanyEntity._DirectDebit && string.IsNullOrEmpty(selectedItem._ServiceId))
+                        UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("AutoBankingNotActivated"), Uniconta.ClientTools.Localization.lookup("Information"));
+                    else
+                        new CWIcelandBankConnect(api, selectedItem).Show();
+                    break;
                 case "ConnectToND":
                     if (selectedItem == null) return;
 
@@ -226,7 +240,13 @@ namespace UnicontaClient.Pages.CustomPage
                     var report = new PollReport();
                     report.DataSource = new PollReportSource[] { source };
                     var dockName = string.Concat(Uniconta.ClientTools.Localization.lookup("BankReconciliation"), ":", selectedItem._Account, ", ", selectedItem._Name);
+
+#if MAC
+                    var control = MacPageUtil.PreviewReportsOnMac(report);
+                    AddDockItem(TabControls.ShowControlPage, new object[] { control }, dockName);
+#else
                     AddDockItem(UnicontaTabs.StandardPrintReportPage, new object[] { report }, dockName);
+#endif
                 }
             };
             toFromDateDialog.Show();

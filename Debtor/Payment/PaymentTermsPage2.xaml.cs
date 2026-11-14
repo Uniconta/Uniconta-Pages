@@ -55,6 +55,9 @@ namespace UnicontaClient.Pages.CustomPage
             }
             layoutItems.DataContext = editrow;
             liPostOnDC.Visibility = Visibility.Collapsed;
+            // Iceland: invoices with this payment term are sent to the bank as online claims when posted
+            if (crudapi.CompanyEntity._CountryId == CountryCode.Iceland)
+                liAutoClaim.Visibility = Visibility.Visible;
             SetVisibility();
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
         }

@@ -109,6 +109,7 @@ x:Class="UnicontaClient.Pages.CustomPage.PartnerProspectPage"
                     <local:CorasauDataGridTemplateColumnClient x:Name="Crm" Width="70"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Asset" Width="70"/>
                     <local:CorasauDataGridTemplateColumnClient x:Name="VatNumber" Visible="False"/>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="JourneyId" Visible="False"/>
                 </local:PartnerProspectGrid.Columns>
             </local:PartnerProspectGrid>
         </CorasauControls:BusyIndicator>

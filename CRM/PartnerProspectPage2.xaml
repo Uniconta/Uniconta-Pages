@@ -89,6 +89,9 @@ x:Class="UnicontaClient.Pages.CustomPage.PartnerProspectPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="VatNumber" x:Name="liVatNumber">
                         <CorasauControls:TextEditor Text="{Binding VatNumber,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="JourneyId" x:Name="liJourneyId">
+                        <CorasauControls:TextEditor x:Name="txtJourneyId" Text="{Binding JourneyId,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
             </CorasauControls:CorasauLayoutGroup>
             <CorasauControls:CorasauLayoutGroup Orientation="Vertical" x:Name="lastGroup">
@@ -110,6 +113,9 @@ x:Class="UnicontaClient.Pages.CustomPage.PartnerProspectPage2"
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="NumberOfUsers" x:Name="liNumberOfUsers">
                         <CorasauControls:IntegerEditor EditValue="{Binding NumberOfUsers,Mode=TwoWay, Converter={StaticResource EmptyToZeroConverter}}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="Amount" x:Name="liAmount">
+                        <CorasauControls:DoubleEditor EditValue="{Binding Amount,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem FieldName="LinkedToUid" x:Name="liLinkedToUid">
                         <CorasauControls:IntegerEditor EditValue="{Binding LinkedToUid,Mode=TwoWay}" SetMask="False"/>
@@ -144,6 +150,12 @@ x:Class="UnicontaClient.Pages.CustomPage.PartnerProspectPage2"
                     <CorasauControls:CorasauLayoutItem FieldName="SubscriptionCreated" x:Name="liSubscriptionCreated">
                         <CorasauControls:DateEditor EditValue="{Binding SubscriptionCreated,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="ReasonLost" x:Name="liReasonLost">
+                        <CorasauControls:ComboBoxEditor x:Name="cbReasonLost" SelectedItem="{Binding ReasonLost,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="ReasonWon" x:Name="liReasonWon">
+                        <CorasauControls:ComboBoxEditor x:Name="cbReasonWon" SelectedItem="{Binding ReasonWon,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
                     <CorasauControls:CorasauLayoutItem Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Modules}" LabelVerticalAlignment="Top" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Margin="0 5 0 0">
                         <UniformGrid Columns="3" HorizontalAlignment="Stretch" >
                             <CorasauControls:CorasauLayoutItem x:Name="liLedger">
@@ -161,7 +173,7 @@ x:Class="UnicontaClient.Pages.CustomPage.PartnerProspectPage2"
                             <CorasauControls:CorasauLayoutItem x:Name="liProject" >
                                 <CorasauControls:CheckEditor IsChecked="{Binding Project,Mode=TwoWay}" Width="Auto"  Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Project}"/>
                             </CorasauControls:CorasauLayoutItem>
-                           <CorasauControls:CorasauLayoutItem x:Name="liCrm" >
+                            <CorasauControls:CorasauLayoutItem x:Name="liCrm" >
                                 <CorasauControls:CheckEditor IsChecked="{Binding Crm,Mode=TwoWay}" Width="Auto"  Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CRM}"/>
                             </CorasauControls:CorasauLayoutItem>
                             <CorasauControls:CorasauLayoutItem x:Name="liAsset" >
@@ -219,6 +231,15 @@ x:Class="UnicontaClient.Pages.CustomPage.PartnerProspectPage2"
                             </CorasauControls:CorasauLayoutItem>
                             <CorasauControls:CorasauLayoutItem x:Name="liOdataPowerBI">
                                 <CorasauControls:CheckEditor IsChecked="{Binding OdataPowerBI,Mode=TwoWay}" Width="Auto"  Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=OdataPowerBI}"/>
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem x:Name="liMCP">
+                                <CorasauControls:CheckEditor IsChecked="{Binding MCP,Mode=TwoWay}" Width="Auto"  Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=MCP}"/>
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem x:Name="liAIAsistant">
+                                <CorasauControls:CheckEditor IsChecked="{Binding AIAssistant,Mode=TwoWay}" Width="Auto"  Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=AIAssistant}"/>
+                            </CorasauControls:CorasauLayoutItem>
+                            <CorasauControls:CorasauLayoutItem x:Name="liAgents">
+                                <CorasauControls:CheckEditor IsChecked="{Binding Agents,Mode=TwoWay}" Width="Auto"  Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Agents}"/>
                             </CorasauControls:CorasauLayoutItem>
                             <CorasauControls:CorasauLayoutItem x:Name="liOther">
                                 <CorasauControls:CheckEditor IsChecked="{Binding Other,Mode=TwoWay}" Width="Auto"  Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Other}"/>

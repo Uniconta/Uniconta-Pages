@@ -267,9 +267,13 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void btnTextInHtml_Click(object sender, RoutedEventArgs e)
         {
+#if MAC
+            UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("FunctionNotSupported"), Uniconta.ClientTools.Localization.lookup("Warning"));
+#else
             var param = new object[1];
             param[0] = editrow.Body;
             AddDockItem(TabControls.TextInHtmlPage, param, true, Uniconta.ClientTools.Localization.lookup("TextInHtml"), null, new System.Windows.Point(250, 200));
+#endif
         }
 
         private void InsertProperty_ButtonClicked(object sender, RoutedEventArgs e)

@@ -82,6 +82,14 @@ x:Class="UnicontaClient.Pages.CustomPage.SubscriptionsPage"
                             <CorasauControls:LookupEditor x:Name="leIndustryCode" Text="{Binding IndustryCode ,Mode=TwoWay}" />
                         </CorasauControls:CorasauLayoutItem>
                     </CorasauControls:CorasauLayoutGroup>
+                    <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=CRM}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
+                        <CorasauControls:CorasauLayoutItem FieldName="ConvertedFrom">
+                            <CorasauControls:ComboBoxEditor x:Name="cmbConvertedFrom" SelectedItem="{Binding ConvertedFrom,Mode=TwoWay}" MinWidth="205"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="ReasonWon">
+                            <CorasauControls:ComboBoxEditor x:Name="cmbReasonWon" SelectedItem="{Binding ReasonWon,Mode=TwoWay}" MinWidth="205"/>
+                        </CorasauControls:CorasauLayoutItem>
+                    </CorasauControls:CorasauLayoutGroup>
                     <CorasauControls:CorasauLayoutGroup View="GroupBox" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Address}" Orientation="Vertical"  CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                         <CorasauControls:CorasauLayoutItem FieldName="Address1">
                             <CorasauControls:TextEditor Text="{Binding Address1,Mode=TwoWay}"/>
@@ -137,6 +145,9 @@ x:Class="UnicontaClient.Pages.CustomPage.SubscriptionsPage"
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="TransCount" MinWidth="150">
                             <CorasauControls:TextEditor Text="{Binding TransCount,Mode=OneWay}" IsReadOnly="True"/>
+                        </CorasauControls:CorasauLayoutItem>
+                        <CorasauControls:CorasauLayoutItem FieldName="InvTransCount" MinWidth="150">
+                            <CorasauControls:TextEditor Text="{Binding InvTransCount,Mode=OneWay}" IsReadOnly="True"/>
                         </CorasauControls:CorasauLayoutItem>
                         <CorasauControls:CorasauLayoutItem FieldName="Cancel">
                             <CorasauControls:CheckEditor IsChecked="{Binding Cancel,Mode=TwoWay}" />

@@ -142,6 +142,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CreditorOrderLines"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="UnitGroup" Width="100"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="IgnoreBlocked" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="DeleteLine" Width="50" Visible="False" />
+                    <localPage:CorasauDataGridTemplateColumnClient x:Name="ExemptDuty" Width="50" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="ReferenceNumber" Width="70" Visible="False"/>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Week" Width="100" Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Date" Width="100" Visible="False" />

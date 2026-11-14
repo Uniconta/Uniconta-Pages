@@ -1062,8 +1062,16 @@ namespace UnicontaClient.Pages.CustomPage
                 }
                 else
                 {
-                    invoiceType = "OIOUBL";
-                    xml = await GetEdeliveryMappingDoc(invClient, api, eDeliveryMappingGroups);
+                    invoiceType = Localization.lookup("eDocument");
+                    var mapped = await GetEdeliveryMappingDoc(invClient, api, eDeliveryMappingGroups);
+                    if (mapped.error != ErrorCodes.Succes)
+                    {
+                        countErr++;
+                        invClient._SystemInfo = EDeliveryMappingPage.GetSendErrorMessage(mapped.error, null);
+                        invClient.NotifyPropertyChanged("SystemInfo");
+                        continue;
+                    }
+                    xml = mapped.document;
                     if (xml == null)
                     {
                         var InvTransInvoiceLines =
@@ -1212,38 +1220,48 @@ namespace UnicontaClient.Pages.CustomPage
             return (listOfXmlPath.Count, countErr, string.Join(", ", listOfXmlPath.Select(Path.GetDirectoryName).Distinct()));
         }
 
-        private static async Task<XmlDocument> GetEdeliveryMappingDoc(DebtorInvoiceClient inv, CrudAPI api,
+        private static async Task<(XmlDocument document, ErrorCodes error)> GetEdeliveryMappingDoc(DebtorInvoiceClient inv, CrudAPI api,
             SQLCache eDeliveryMappingGroups)
+        {
+            if (inv == null || eDeliveryMappingGroups == null)
+                return (null, ErrorCodes.Succes);
+            var nhrApi = new NHRAPI(api);
+            return await GetMappedExportDocumentAsync(() => nhrApi.GetMappingsByInvoice(inv, eDeliveryMappingGroups),
+                mappings => GetMappingsWithTags(mappings, () => api.LoadCache(typeof(eDeliveryTagTypeClient), true),
+                    () => UnicontaMessageBox.Show(Localization.lookup(ErrorCodes.FieldCannotBeBlank.ToString()) + ": Tag", Localization.lookup("Error"))),
+                mappings => nhrApi.GetValidatedeDeliveryMappingDoc(inv, mappings), () => nhrApi.LastError, api.ReportException);
+        }
+
+        internal static async Task<(XmlDocument document, ErrorCodes error)> GetMappedExportDocumentAsync(
+            Func<Task<eDeliveryMappingClient[]>> loadMappings,
+            Func<eDeliveryMappingClient[], Task<List<eDeliveryMappingValidationRequest>>> loadTags,
+            Func<List<eDeliveryMappingValidationRequest>, Task<string>> generate,
+            Func<ErrorCodes> lastError, Action<Exception> reportException)
         {
             try
             {
-                if (inv == null || eDeliveryMappingGroups == null)
-                    return null;
-
-                var nhrApi = new NHRAPI(api);
-
-                var mappings = await nhrApi.GetMappingsByInvoice(inv, eDeliveryMappingGroups);
+                var mappings = await loadMappings();
+                if (lastError() != ErrorCodes.Succes)
+                    return (null, lastError());
                 if (mappings == null || mappings.Length == 0)
-                    return null; 
+                    return (null, ErrorCodes.Succes);
                 
-                var mappingsWithTags = await GetMappingsWithTags(mappings,
-                    () => api.LoadCache(typeof(eDeliveryTagTypeClient), true), () => UnicontaMessageBox.Show(
-                        Uniconta.ClientTools.Localization.lookup(ErrorCodes.FieldCannotBeBlank.ToString()) + ": Tag",
-                        Uniconta.ClientTools.Localization.lookup("Error")));
+                var mappingsWithTags = await loadTags(mappings);
                 if (mappingsWithTags == null)
-                    return null;
+                    return (null, ErrorCodes.FieldCannotBeBlank);
 
-                var xml = await nhrApi.GetValidatedeDeliveryMappingDoc(inv, mappingsWithTags);
+                var xml = await generate(mappingsWithTags);
                 if (xml == null)
-                    return null;
+                    return (null, lastError() == ErrorCodes.Succes ? ErrorCodes.CouldNotLoad : lastError());
 
                 var xmlDoc = new XmlDocument();
                 xmlDoc.LoadXml(xml);
-                return xmlDoc;
+                return (xmlDoc, ErrorCodes.Succes);
             }
             catch (Exception ex)
             {
-                return null;
+                reportException(ex);
+                return (null, ErrorCodes.Exception);
             }
         }
 

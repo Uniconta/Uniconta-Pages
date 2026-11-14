@@ -57,6 +57,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (!api.CompanyEntity.CreditorBankApprovement)
                 liNemhandelUpdateBankDetails.Visibility = Visibility.Collapsed;
             HideMenuItems();
+            InitIcelandEInvoice();
             Loaded += async (s, e) => await InitAsync();
             
         }
@@ -75,6 +76,71 @@ namespace UnicontaClient.Pages.CustomPage
                     clgDocumentScanner.Visibility = Visibility.Collapsed;
             }
         }
+
+        #region Iceland e-invoice registration (api.uniconta.is)
+
+        void InitIcelandEInvoice()
+        {
+            var comp = api.CompanyEntity;
+            if (comp._EInvoiceProvider != Uniconta.DataModel.EInvoiceProvider.Iceland || comp._CountryId != Uniconta.Common.CountryCode.Iceland)
+                return;
+            liIcelandEInvoice.Visibility = Visibility.Visible;
+            liIcelandEInvoice.Label = Uniconta.ClientTools.Localization.lookup("einvoice");
+            btnIcelandEInvoiceRegister.Content = Uniconta.ClientTools.Localization.lookup("Register");
+            btnIcelandEInvoiceUnregister.Content = Uniconta.ClientTools.Localization.lookup("Unregister");
+            ShowIcelandEInvoiceState();
+            if (api.CompanyEntity._IcelandEInvoiceState == Uniconta.DataModel.IcelandEInvoiceState.Pending)
+                RunIcelandEInvoice(2, false); // the server also asks every other minute; ask now so the page shows the latest
+        }
+
+        void ShowIcelandEInvoiceState()
+        {
+            var state = editrow._IcelandEInvoiceState;
+            switch (state)
+            {
+                case Uniconta.DataModel.IcelandEInvoiceState.Pending: txtIcelandEInvoiceState.Text = Uniconta.ClientTools.Localization.lookup("ToApprove"); break;
+                case Uniconta.DataModel.IcelandEInvoiceState.Active: txtIcelandEInvoiceState.Text = Uniconta.ClientTools.Localization.lookup("Registered"); break;
+                case Uniconta.DataModel.IcelandEInvoiceState.Off: txtIcelandEInvoiceState.Text = Uniconta.ClientTools.Localization.lookup("Disabled"); break;
+                default: txtIcelandEInvoiceState.Text = Uniconta.ClientTools.Localization.lookup("NotRegistered"); break;
+            }
+            btnIcelandEInvoiceRegister.IsEnabled = state == Uniconta.DataModel.IcelandEInvoiceState.None || state == Uniconta.DataModel.IcelandEInvoiceState.Off;
+            btnIcelandEInvoiceUnregister.IsEnabled = state != Uniconta.DataModel.IcelandEInvoiceState.None;
+        }
+
+        void IcelandEInvoiceRegister_Click(object sender, RoutedEventArgs e) { RunIcelandEInvoice(0, true); }
+        void IcelandEInvoiceUnregister_Click(object sender, RoutedEventArgs e) { RunIcelandEInvoice(1, true); }
+
+        async void RunIcelandEInvoice(byte function, bool showErrors)
+        {
+            var eApi = new Uniconta.API.DebtorCreditor.IcelandEInvoiceAPI(api);
+            busyIndicator.IsBusy = true;
+            Uniconta.API.DebtorCreditor.IcelandEInvoiceRegistrationResult r;
+            try
+            {
+                r = function == 0 ? await eApi.Register() : function == 1 ? await eApi.Unregister() : await eApi.RefreshRegistration();
+            }
+            finally
+            {
+                busyIndicator.IsBusy = false;
+            }
+            if (r != null && r.Err == ErrorCodes.Succes)
+            {
+                editrow._IcelandEInvoiceState = r.State;
+                api.CompanyEntity._IcelandEInvoiceState = r.State;
+            }
+            ShowIcelandEInvoiceState();
+            if (!showErrors)
+                return;
+            var err = r?.Err ?? eApi.LastError;
+            if (err == ErrorCodes.Succes)
+                return;
+            if (r?.Message != null)
+                UtilDisplay.ShowErrorCode(err, new[] { new StandardError { error = err, message = r.Message } });
+            else
+                UtilDisplay.ShowErrorCode(err);
+        }
+
+        #endregion
 
         private void frmRibbon_OnItemClicked(string ActionType)
         {

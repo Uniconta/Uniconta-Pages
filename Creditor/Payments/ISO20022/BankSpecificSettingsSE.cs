@@ -350,47 +350,12 @@ namespace UnicontaISO20022CreditTransfer
             return null;
         }
 
+        /// <summary>
+        /// SE: Short advice (Purp/Prtry) is not supported in the new Swedish clearing (account transfers from April 2026, Bankgiro/Plusgiro from September 2026) - the advice is sent in Ustrd
+        /// </summary>
         public override string RemittanceInfo(string externalAdvText, ISO20022PaymentTypes ISOPaymType, PaymentTypes paymentMethod)
         {
-            if (companyBankEnum == CompanyBankENUM.SEB)
-                return string.Empty;
-            
-            string remittanceInfo = StandardPaymentFunctions.RegularExpressionReplace(externalAdvText, allowedCharactersRegEx, replaceCharactersRegEx);
-
-            if (remittanceInfo != string.Empty && ISOPaymType == ISO20022PaymentTypes.DOMESTIC)
-            {
-                switch (paymentMethod)
-                {
-                    case PaymentTypes.IBAN:
-                    case PaymentTypes.VendorBankAccount:
-                        if (remittanceInfo.Length > 20)
-                            remittanceInfo = remittanceInfo.Substring(0, 20);
-                        break;
-
-
-                    case PaymentTypes.PaymentMethod3: //FIK71
-                        remittanceInfo = string.Empty;
-                        break;
-
-                    case PaymentTypes.PaymentMethod5: //FIK75
-                        remittanceInfo = string.Empty;
-                        break;
-
-                    case PaymentTypes.PaymentMethod4: //FIK73
-                        remittanceInfo = string.Empty;
-                        break;
-
-                    case PaymentTypes.PaymentMethod6: //FIK04
-                        remittanceInfo = string.Empty;
-                        break;
-                }
-            }
-            else
-            {
-                remittanceInfo = string.Empty;
-            }
-
-            return remittanceInfo;
+            return string.Empty;
         }
 
         /// <summary>
@@ -404,21 +369,14 @@ namespace UnicontaISO20022CreditTransfer
             if (ustrdText == null)
                 return null;
 
-            //Extended notification
-            if (ISOPaymType == ISO20022PaymentTypes.DOMESTIC)
-            {
-                if (extendedText)
-                {
-                    if (ustrdText.Length <= 20)
-                        return null;
-                }
-                else
-                    return null;
-            }
-
             int maxLines = 0;
             int maxStrLen = 0;
             List<string> resultList = new List<string>();
+
+            //New Swedish clearing: Bankgiro/Plusgiro accept one OCR reference or one unstructured message - not both
+            if (ISOPaymType == ISO20022PaymentTypes.DOMESTIC && (trans._PaymentMethod == PaymentTypes.PaymentMethod3 || trans._PaymentMethod == PaymentTypes.PaymentMethod5) &&
+                OCRPaymentType(trans._PaymentId) != null)
+                return resultList;
 
             switch (companyBankEnum)
             {
@@ -465,10 +423,16 @@ namespace UnicontaISO20022CreditTransfer
                     break;
             }
 
+            //New Swedish clearing: one unstructured message of max 140 characters
+            if (ISOPaymType == ISO20022PaymentTypes.DOMESTIC)
+            {
+                maxLines = 1;
+                maxStrLen = 140;
+            }
+
             if (ustrdText != string.Empty)
             {
-                if (ustrdText.Length > maxLines * maxStrLen)
-                    ustrdText = ustrdText.Substring(0, maxLines * maxStrLen);
+                ustrdText = LimitUstrdText(ustrdText, maxLines * maxStrLen, trans);
 
                 resultList = ustrdText.Select((x, i) => i)
                             .Where(i => i % maxStrLen == 0)

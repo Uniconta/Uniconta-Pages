@@ -14,10 +14,12 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Uniconta.API.Service;
+using Uniconta.API.System;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.ClientTools.Page;
 using Uniconta.Common;
 using Uniconta.DataModel;
+using UnicontaClient.Controls;
 using UnicontaClient.Controls.Dialogs.DutchXafExport.Model;
 using UnicontaClient.Models;
 using UnicontaClient.Pages;
@@ -31,7 +33,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             get
             {
-                return typeof(BankImportMapGridClient);
+                return typeof(BankImportMapClient);
             }
         }
         public override bool Readonly { get { return false; } }
@@ -74,18 +76,18 @@ namespace UnicontaClient.Pages.CustomPage
             if (dgBankImportMapping.masterRecord is VouchersClient)
                 HideColumns(this.AccountType, this.AccountTemplate, this.OffsetAccountType, this.Charge, this.RequireVoucher);
             else if (dgBankImportMapping.masterRecord is BankStatementClient)
-                HideColumns(this.Creditor, this.Approver1, this.Approver2);
+                HideColumns(this.Creditor, this.CreditorName, this.Approver1, this.Approver2);
         }
 
         void DataControl_CurrentItemChanged(object sender, DevExpress.Xpf.Grid.CurrentItemChangedEventArgs e)
         {
-            BankImportMapGridClient oldselectedItem = e.OldItem as BankImportMapGridClient;
+            var oldselectedItem = e.OldItem as BankImportMapClient;
             if (oldselectedItem != null)
             {
                 oldselectedItem.PropertyChanged -= BankImportMapGridClient_PropertyChanged;
             }
 
-            BankImportMapGridClient selectedItem = e.NewItem as BankImportMapGridClient;
+            var selectedItem = e.NewItem as BankImportMapClient;
             if (selectedItem != null)
             {
                 selectedItem.PropertyChanged += BankImportMapGridClient_PropertyChanged;
@@ -99,7 +101,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         void BankImportMapGridClient_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            var rec = sender as BankImportMapGridClient;
+            var rec = sender as BankImportMapClient;
             switch (e.PropertyName)
             {
                 case "AccountType":
@@ -111,7 +113,7 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        private void SetAccountSource(BankImportMapGridClient rec)
+        private void SetAccountSource(BankImportMapClient rec)
         {
             SQLCache cache;
             switch (rec._AccountType)
@@ -131,7 +133,7 @@ namespace UnicontaClient.Pages.CustomPage
             rec.NotifyPropertyChanged("AccountSource");
         }
 
-        private void SetOffsetAccountSource(BankImportMapGridClient rec)
+        private void SetOffsetAccountSource(BankImportMapClient rec)
         {
             SQLCache cache;
             switch (rec._OffsetAccountType)
@@ -164,10 +166,35 @@ namespace UnicontaClient.Pages.CustomPage
                 case "Delete":
                     dgBankImportMapping.DeleteRow();
                     break;
+                case "CopyFromAnotherCompany":
+                    CopyFromOtherCompany();
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;
             }
+        }
+
+        public async void CopyFromOtherCompany()
+        {
+            var companyDialog = new CWDefaultCompany(session, null, true);
+            companyDialog.HideUserRights = true;
+            companyDialog.Closing += async delegate
+            {
+                if (companyDialog.DialogResult == true)
+                {
+                    Company selectedCompany = companyDialog.selectedCompany;
+                    if (selectedCompany == null)
+                        return;
+                    busyIndicator.IsBusy = true;
+                    var copyCompanyAPI = new CrudAPI(BasePage.session, selectedCompany);
+                    var lstEntity = await copyCompanyAPI.Query<BankImportMapClient>(dgBankImportMapping.masterRecord);
+                    if (lstEntity?.Length > 0)
+                        dgBankImportMapping.PasteRows(lstEntity);
+                    busyIndicator.IsBusy = false;
+                }
+            };
+            companyDialog.Show();
         }
 
         protected override async System.Threading.Tasks.Task LoadCacheInBackGroundAsync()
@@ -184,7 +211,7 @@ namespace UnicontaClient.Pages.CustomPage
         CorasauGridLookupEditorClient prevAccount;
         private void Account_GotFocus(object sender, RoutedEventArgs e)
         {
-            BankImportMapGridClient selectedItem = dgBankImportMapping.SelectedItem as BankImportMapGridClient;
+            var selectedItem = dgBankImportMapping.SelectedItem as BankImportMapClient;
             if (selectedItem != null)
             {
                 SetAccountSource(selectedItem);
@@ -199,7 +226,7 @@ namespace UnicontaClient.Pages.CustomPage
         CorasauGridLookupEditorClient prevOffsetAccount;
         private void OffsetAccount_GotFocus(object sender, RoutedEventArgs e)
         {
-            BankImportMapGridClient selectedItem = dgBankImportMapping.SelectedItem as BankImportMapGridClient;
+            var selectedItem = dgBankImportMapping.SelectedItem as BankImportMapClient;
             if (selectedItem != null)
             {
                 SetOffsetAccountSource(selectedItem);
@@ -211,14 +238,5 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-    }
-
-    public class BankImportMapGridClient : BankImportMapClient
-    {
-        internal object accntSource;
-        public object AccountSource { get { return accntSource; } }
-
-        internal object offsetAccntSource;
-        public object OffsetAccountSource { get { return offsetAccntSource; } }
     }
 }

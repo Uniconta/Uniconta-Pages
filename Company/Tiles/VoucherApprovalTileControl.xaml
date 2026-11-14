@@ -73,8 +73,17 @@ x:Class="UnicontaClient.Pages.CustomPage.VoucherApprovalTileControl"
                             </Trigger>
                             <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource Self}}" Value="True">
                                 <Setter Property="Background" Value="{DynamicResource TertiaryButtonBackgroundBrush}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource TertiaryButtonForegroundBrush}"/>
                                 <Setter Property="FontWeight" Value="Bold"/>
                             </DataTrigger>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding Tag, RelativeSource={RelativeSource Self}}" Value="True"/>
+                                    <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Background" Value="{DynamicResource TertiaryButtonHoverBackgroundBrush}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource TertiaryButtonHoverForegroundBrush}"/>
+                            </MultiDataTrigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>

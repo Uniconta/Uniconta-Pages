@@ -130,14 +130,20 @@ namespace UnicontaISO20022CreditTransfer
               }
         }
 
+        // Empty elements are not allowed by the schema
+        private static void AppendValue(BaseDocument baseDoc, XmlDocument doc, XmlElement parent, string name, string value)
+        {
+            if (!string.IsNullOrWhiteSpace(value))
+                baseDoc.AppendElement(doc, parent, name, value);
+        }
+
         internal virtual void Append(BaseDocument baseDoc, XmlDocument doc, XmlElement parent, string addressName)
         {
             XmlElement postalAddress = baseDoc.AppendElement(doc, parent, addressName);
 
             if (unstructured)
             {
-                if (countryId != "")
-                    baseDoc.AppendElement(doc, postalAddress, BaseDocument.COUNTRY, countryId);
+                AppendValue(baseDoc, doc, postalAddress, BaseDocument.COUNTRY, countryId);
 
                 AppendLine(baseDoc, doc, postalAddress, addressLine1);
                 AppendLine(baseDoc, doc, postalAddress, addressLine2);
@@ -145,10 +151,10 @@ namespace UnicontaISO20022CreditTransfer
             }
             else
             {
-                baseDoc.AppendElement(doc, postalAddress, BaseDocument.STREET_NAME, streetName);
-                baseDoc.AppendElement(doc, postalAddress, BaseDocument.POSTAL_CODE, zipCode);
-                baseDoc.AppendElement(doc, postalAddress, BaseDocument.TOWN_NAME, cityName);
-                baseDoc.AppendElement(doc, postalAddress, BaseDocument.COUNTRY, countryId);
+                AppendValue(baseDoc, doc, postalAddress, BaseDocument.STREET_NAME, streetName);
+                AppendValue(baseDoc, doc, postalAddress, BaseDocument.POSTAL_CODE, zipCode);
+                AppendValue(baseDoc, doc, postalAddress, BaseDocument.TOWN_NAME, cityName);
+                AppendValue(baseDoc, doc, postalAddress, BaseDocument.COUNTRY, countryId);
             }
         }
     }

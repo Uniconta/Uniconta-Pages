@@ -58,9 +58,18 @@ namespace UnicontaClient.Pages.CustomPage
                 !editrow.FullPackage && BasePage.GetSystemDefaultDate() >= new DateTime(2022, 8, 15));
             InitializeComponent();
             frmRibbon.OnItemClicked += frmRibbon_OnItemClicked;
+            frmRibbon.OnCustomEditorValueChanged += frmRibbon_OnCustomEditorValueChanged;
+
+            ZoomEnabler.EnableZoom(LayoutRoot);
 
             if (api.session.User._Role < (byte)Uniconta.Common.User.UserRoles.Accountant)
                 Loaded += ConfigureFunctionalityPage_Loaded;
+        }
+
+        private void frmRibbon_OnCustomEditorValueChanged(string action, string value)
+        {
+            if (action == "SearchFeatures")
+                Functionality.SearchText = value;
         }
 
         private void ConfigureFunctionalityPage_Loaded(object sender, RoutedEventArgs e)
@@ -147,60 +156,148 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        public FunctionalityModuleViewModel Ledger { get; private set; }
+        public FunctionalityModuleViewModel Basics { get; private set; }
         public FunctionalityModuleViewModel Logistics { get; private set; }
         public FunctionalityModuleViewModel Sales { get; private set; }
-        public FunctionalityModuleViewModel Purchase { get; private set; }
+        //public FunctionalityModuleViewModel Purchase { get; private set; }
         public FunctionalityModuleViewModel Project { get; private set; }
-        public FunctionalityModuleViewModel ProgramModules { get; private set; }
+
+        public FunctionalityModuleViewModel CRM { get; private set; }
+        public FunctionalityModuleViewModel Production { get; private set; }
+        public FunctionalityModuleViewModel FixedAssets { get; private set; }
+
+        //public FunctionalityModuleViewModel ProgramModules { get; private set; }
+
         public FunctionalityModuleViewModel Addins { get; private set; }
         public FunctionalityModuleViewModel AIAgents { get; private set; }
 
         public IEnumerable<FunctionalityModuleViewModel> Modules
         {
-            get { return new[] { Ledger, Logistics, Sales, Purchase, Project, ProgramModules, Addins, AIAgents }; }
+            get { return new[] { Basics, Logistics, Sales, /*Purchase,*/ CRM, Production, FixedAssets, Project, Addins, AIAgents }; }
         }
 
         public ConfigureFunctionalityViewModel(Company company, object page, IEnumerable documentScannerValues, Action<int> documentScannerChanged, bool showOnlyPosting)
         {
-            Ledger = Module(company, "Ledger", F("Ledger", "LedgerFeature"), F("BankStatement", "BankReconciliation"),
-                F("PhycicalVoucher", "PhysicalVoucher"), F("Contacts", "Contacts"), F("Debtor", "Debtor"),
-                F("Creditor", "Creditor"), F("Inventory", "Inventory"), F("CollectionLetter", "InterestAndCollection"),
-                F("CreditorBankApprovement", "CreditorBankApprovement"), F("OnlyPosting", "OnlyPosting"));
-            Logistics = Module(company, "LogisticModule", F("InvBOM", "BOM"), F("InvPrice", "CustomerPriceLists"),
-                F("CreditorPrice", "VendorPriceLists"), F("InvClientName", "ClientItemNumber"), F("Storage", "Storage"),
-                F("StorageOnAll", "Allitems"), F("Warehouse", "Warehouse"), F("Location", "Location"),
-                F("ItemVariants", "ItemVariants"), F("InvBOMVariant", "InvBOMVariant"), F("UnitConversion", "UnitConversion"),
-                F("InvDuty", "Duty"), F("SerialBatchNumbers", "SerialBatchNumbers"), F("PurchaseAccounts", "PurchaseAccounts"),
-                F("ProductCatalog", "ProdCatalog"));
-            Sales = Module(company, "Orders", F("Order", "SalesOrders"), F("DeliveryAddress", "DeliveryAddr"),
-                F("Shipments", "Shipments"), F("Packnote", "SalesDeliveryNotes"), F("DebtorBudget", "DebtorBudget"),
-                F("InvPackaging", "ProducerResponsibility"));
-            Purchase = Module(company, "Purchase", F("Purchase", "PurchaseOrders"), F("PurchaseCharges", "PurchaseCharges"),
-                F("CreditorPacknote", "SupplierDeliveryNotes"));
+            var basicsModules = Module(company, "Basic",
+                F("Ledger", "LedgerFeature"),
+                F("Debtor", "Debtor"),
+                F("Creditor", "Creditor"),
+                F("Inventory", "Inventory"));
+
+            var basicsFeatures = Module(company, "Basic",
+                F("Contacts", "Contacts"),
+                F("BankStatement", "BankReconciliation"),
+                F("PhycicalVoucher", "PhysicalVoucher"),
+                F("CollectionLetter", "InterestAndCollection"),
+                F("CreditorBankApprovement", "CreditorBankApprovement"),
+                F("OnlyPosting", "OnlyPosting"),
+                F("Attachments", "Attachments"),
+                F("Profiles", "Profiles"),
+                F("BusinessRules", "BusinessRule"));
+
+            Basics = new FunctionalityModuleViewModel("Basic",
+                new[]
+                {
+                    new FunctionalityFeatureGroupViewModel(
+                        "Modules",
+                        basicsModules.FeatureGroups.SelectMany(group => group.Features)),
+                    new FunctionalityFeatureGroupViewModel(
+                        "Features",
+                        basicsFeatures.FeatureGroups.SelectMany(group => group.Features))
+                });
+
+            Basics.DescriptionKey = "Ledger_Description";
+
+            Logistics = Module(company, "LogisticModule",
+                            F("Storage", "Storage"),
+                            F("StorageOnAll", "Allitems"),
+                            F("InvPrice", "CustomerPriceLists"),
+                            F("CreditorPrice", "VendorPriceLists"),
+                            F("InvClientName", "ClientItemNumber"),
+                            F("Warehouse", "Warehouse"),
+                            F("Location", "Location"),
+                            F("InvBOM", "BOM"),
+                            F("InvBOMVariant", "InvBOMVariant"),
+                            F("ItemVariants", "ItemVariants"),
+                            F("UnitConversion", "UnitConversion"),
+                            F("InvDuty", "Duty"),
+                            F("SerialBatchNumbers", "SerialBatchNumbers"),
+                            F("PurchaseAccounts", "PurchaseAccounts"),
+                            F("ProductCatalog", "ProdCatalog"));
+            //Sales = Module(company, "Orders", F("Order", "SalesOrders"), F("DeliveryAddress", "DeliveryAddr"),
+            //    F("Shipments", "Shipments"), F("Packnote", "SalesDeliveryNotes"), F("DebtorBudget", "DebtorBudget"),
+            //    F("InvPackaging", "ProducerResponsibility"));
+            //Purchase = Module(company, "Purchase", F("Purchase", "PurchaseOrders"), F("PurchaseCharges", "PurchaseCharges"),
+            //    F("CreditorPacknote", "SupplierDeliveryNotes"));
+
+            var sales = Module(company, "Orders",
+                        F("Order", "SalesOrders"),
+                        F("DeliveryAddress", "DeliveryAddr"),
+                        F("Shipments", "Shipments"),
+                        F("Packnote", "SalesDeliveryNotes"),
+                        F("DebtorBudget", "DebtorBudget"),
+                        F("InvPackaging", "ProducerResponsibility"));
+
+            var purchase = Module(company, "Purchase",
+                           F("Purchase", "PurchaseOrders"),
+                           F("PurchaseCharges", "PurchaseCharges"),
+                           F("CreditorPacknote", "SupplierDeliveryNotes"));
+
+        Sales = new FunctionalityModuleViewModel("SalesAndPurchase",
+            new[]
+            {
+                new FunctionalityFeatureGroupViewModel("Orders",sales.FeatureGroups.SelectMany(group => group.Features)),
+                new FunctionalityFeatureGroupViewModel("Purchase", purchase.FeatureGroups.SelectMany(group => group.Features))
+            });
+
+
             Project = Module(company, "Project", F("Project", "ProjectManagement"), F("ProjectMaterial", "Materials"),
-                F("TimeManagement", "TimeManagement"), F("ProjectTask", "Tasks"), F("ProjectBudget", "ProjectBudget"),
-                F("Payroll", "Payroll"), F("MyProjects", "MyProjects"), F("ProjectPlanning", "ProjectBudgetSchedule"));
-            ProgramModules = Module(company, "ProgramModules", F("CRM", "CRM"), F("Production", "Production"), F("FixedAsset", "Asset"));
-            Addins = Module(company, "Addins", F("_DirectDebit", "AutoBanking"), F("TraceFieldChanges", "FieldChangeLog"),
-                F("IntegrationPack", "IntegrationPack"), F("DATEV", "DATEV"), F("Attachments", "Attachments"),
-                F("Profiles", "Profiles"), F("BusinessRules", "BusinessRule"));
-            Addins.Options.Add(new FunctionalityOptionViewModel("DocumentScannersPay", documentScannerValues, (int)company.DocumentScanner, documentScannerChanged));
+                                                 F("TimeManagement", "TimeManagement"), F("ProjectTask", "Tasks"), F("ProjectBudget", "ProjectBudget"),
+                                                 F("Payroll", "Payroll"), F("MyProjects", "MyProjects"), F("ProjectPlanning", "ProjectBudgetSchedule"));
+            CRM = Module(company, "CRM",
+                F("CRM", "CRM")
+                
+                );
+
+            Production = Module(company, "Production", F("Production", "Production") );
+            FixedAssets = Module(company, "Asset", F("FixedAsset", "Asset"));
+            Addins = new FunctionalityModuleViewModel("Addins",
+                new[]
+                {
+                    new FunctionalityFeatureGroupViewModel("Autobank & Scan",
+                        new[]
+                        {
+                            new FunctionalityFeatureViewModel(company, "_DirectDebit", "AutoBanking"),
+                            new FunctionalityFeatureViewModel("DocumentScannersPay", documentScannerValues,
+                                (int)company.DocumentScanner, documentScannerChanged)
+                        }),
+                    new FunctionalityFeatureGroupViewModel("Features",
+                        new[]
+                        {
+                            new FunctionalityFeatureViewModel(company, "IntegrationPack", "IntegrationPack"),
+                            new FunctionalityFeatureViewModel(company, "TraceFieldChanges", "FieldChangeLog"),
+                            new FunctionalityFeatureViewModel(company, "DATEV", "DATEV")
+                        })
+                });
+
             AIAgents = CreateAIAgents(company);
 
-            var storage = Logistics.Features.First(x => x.PropertyName == "Storage");
-            var storageOnAll = Logistics.Features.First(x => x.PropertyName == "StorageOnAll");
+            var logisticsFeatures = Logistics.FeatureGroups.SelectMany(group => group.Features).ToList();
+
+            var storage = logisticsFeatures.First(x => x.PropertyName == "Storage");
+
+            var storageOnAll = logisticsFeatures.First(x => x.PropertyName == "StorageOnAll");
+
             storageOnAll.CanEdit = storage.IsEnabled;
             storage.ValueChanged += value => storageOnAll.CanEdit = value;
 
-            Ledger.Features.First(x => x.PropertyName == "OnlyPosting").Visibility =
-                showOnlyPosting ? Visibility.Visible : Visibility.Collapsed;
+            Basics.FeatureGroups.SelectMany(group => group.Features)
+                                .First(x => x.PropertyName == "OnlyPosting")
+                                .Visibility = showOnlyPosting ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        static FunctionalityModuleViewModel Module(object entity, string key, params FeatureDefinition[] definitions)
-        {
-            return new FunctionalityModuleViewModel(key, definitions.Select(x => new FunctionalityFeatureViewModel(entity, x.Property, x.Key)));
-        }
+        static FunctionalityModuleViewModel Module(object entity, string key, params FeatureDefinition[] definitions) 
+            => new FunctionalityModuleViewModel(key, definitions.Select(x => new FunctionalityFeatureViewModel(entity, x.Property, x.Key)));
 
         public static FunctionalityModuleViewModel CreateAIAgents(object page)
         {
@@ -232,76 +329,157 @@ namespace UnicontaClient.Pages.CustomPage
 
     public sealed class FunctionalityModuleViewModel : NotifyPropertyChangedBase
     {
-        bool areFeaturesExpanded;
         string searchText = string.Empty;
-        public IEnumerable<FunctionalityFeatureViewModel> VisibleFeatures
+
+        public string TitleKey { get; private set; }
+        private string DefaultDescription => TitleKey + "_Description";
+        private string _descriptionKey;
+        public string DescriptionKey { get => _descriptionKey ?? DefaultDescription; set => _descriptionKey = value; }
+
+        public string Title
         {
-            get { return Features.Where(x => x.Visibility == Visibility.Visible && MatchesSearch(x.Title, x.Description)); }
+            get { return Uniconta.ClientTools.Localization.lookup(TitleKey); }
         }
-        public IEnumerable<FunctionalityOptionViewModel> VisibleOptions
+
+        public string Description
         {
-            get { return Options.Where(x => MatchesSearch(x.Title, x.Description)); }
+            get { return Uniconta.ClientTools.Localization.lookup(DescriptionKey); }
         }
+
+        public ObservableCollection<FunctionalityFeatureGroupViewModel> FeatureGroups
+        {
+            get;
+            private set;
+        }
+
         public Visibility Visibility
         {
-            get { return searchText.Length == 0 || VisibleFeatures.Any() || VisibleOptions.Any() ? Visibility.Visible : Visibility.Collapsed; }
+            get
+            {
+                return searchText.Length == 0 ||
+                       FeatureGroups.Any(x => x.Visibility == Visibility.Visible)
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
+            }
+        }
+
+        public FunctionalityModuleViewModel(string titleKey, IEnumerable<FunctionalityFeatureViewModel> features) : this(titleKey,
+                new[]
+                {
+                    new FunctionalityFeatureGroupViewModel("Features", features)
+                })
+        {
+        }
+
+        public FunctionalityModuleViewModel(
+            string titleKey,
+            IEnumerable<FunctionalityFeatureGroupViewModel> groups)
+        {
+            TitleKey = titleKey;
+            FeatureGroups =
+                new ObservableCollection<FunctionalityFeatureGroupViewModel>(groups);
+        }
+
+        internal void ApplySearch(string text)
+        {
+            text = text ?? string.Empty;
+
+            if (searchText == text)
+                return;
+
+            searchText = text;
+
+            foreach (var group in FeatureGroups)
+                group.ApplySearch(text);
+
+            OnPropertyChanged(nameof(Visibility));
+        }
+
+        public void SetExpanded(bool isExpanded)
+        {
+            foreach (var group in FeatureGroups)
+                group.SetExpanded(isExpanded);
+        }
+    }
+
+    public sealed class FunctionalityFeatureGroupViewModel : NotifyPropertyChangedBase
+    {
+        bool isExpanded;
+        string searchText = string.Empty;
+
+        public string TitleKey { get; private set; }
+
+        public string Title
+        {
+            get { return Uniconta.ClientTools.Localization.lookup(TitleKey); }
+        }
+
+        public ObservableCollection<FunctionalityFeatureViewModel> Features { get; private set; }
+
+        public IEnumerable<FunctionalityFeatureViewModel> VisibleFeatures => Features.Where(x => x.Visibility == Visibility.Visible && MatchesSearch(x.Title, x.Description));
+
+        public Visibility Visibility
+        {
+            get
+            {
+                return searchText.Length == 0 || VisibleFeatures.Any()
+                    ? Visibility.Visible : Visibility.Collapsed;
+            }
+        }
+
+        public bool IsExpanded
+        {
+            get { return isExpanded || searchText.Length != 0; }
+            set { Set(ref isExpanded, value, nameof(IsExpanded)); }
+        }
+
+        public FunctionalityFeatureGroupViewModel(
+            string titleKey,
+            IEnumerable<FunctionalityFeatureViewModel> features)
+        {
+            TitleKey = titleKey;
+
+            Features = new ObservableCollection<FunctionalityFeatureViewModel>(
+                features ?? Enumerable.Empty<FunctionalityFeatureViewModel>());
         }
 
         bool MatchesSearch(string title, string description)
         {
             return searchText.Length == 0 ||
-                (title ?? string.Empty).IndexOf(searchText, StringComparison.CurrentCultureIgnoreCase) >= 0 ||
-                (description ?? string.Empty).IndexOf(searchText, StringComparison.CurrentCultureIgnoreCase) >= 0;
+                (title ?? string.Empty).IndexOf(
+                    searchText,
+                    StringComparison.CurrentCultureIgnoreCase) >= 0 ||
+                (description ?? string.Empty).IndexOf(
+                    searchText,
+                    StringComparison.CurrentCultureIgnoreCase) >= 0;
         }
 
         internal void ApplySearch(string text)
         {
-            if (searchText == text) return;
+            text = text ?? string.Empty;
+
+            if (searchText == text)
+                return;
+
             searchText = text;
-            
+
             if (searchText.Length != 0)
             {
                 foreach (var feature in VisibleFeatures)
                     feature.IsDescriptionExpanded = true;
-                foreach (var option in VisibleOptions)
-                    option.IsDescriptionExpanded = true;
             }
 
             OnPropertyChanged(nameof(VisibleFeatures));
-            OnPropertyChanged(nameof(VisibleOptions));
             OnPropertyChanged(nameof(Visibility));
-            OnPropertyChanged(nameof(AreFeaturesExpanded));
+            OnPropertyChanged(nameof(IsExpanded));
         }
 
-        public string TitleKey { get; private set; }
-        public string DescriptionKey { get { return TitleKey + "_Description"; } }
-        public string Title { get { return Uniconta.ClientTools.Localization.lookup(TitleKey); } }
-        public string Description { get { return Uniconta.ClientTools.Localization.lookup(DescriptionKey); } }
-        public string FeaturesTitle { get { return Uniconta.ClientTools.Localization.lookup("Features"); } }
-        public ObservableCollection<FunctionalityFeatureViewModel> Features { get; private set; }
-        public ObservableCollection<FunctionalityOptionViewModel> Options { get; private set; }
-        public bool AreFeaturesExpanded
+        public void SetExpanded(bool expanded)
         {
-            get { return areFeaturesExpanded || searchText.Length != 0; }
-            set { Set(ref areFeaturesExpanded, value, nameof(AreFeaturesExpanded)); }
-        }
-
-        public FunctionalityModuleViewModel(string titleKey, IEnumerable<FunctionalityFeatureViewModel> features)
-        {
-            TitleKey = titleKey;
-            Features = new ObservableCollection<FunctionalityFeatureViewModel>(features);
-            Options = new ObservableCollection<FunctionalityOptionViewModel>();
-        }
-
-        public void SetExpanded(bool isExpanded)
-        {
-            AreFeaturesExpanded = isExpanded;
+            IsExpanded = expanded;
 
             foreach (var feature in Features)
-                feature.IsDescriptionExpanded = isExpanded;
-
-            foreach (var option in Options)
-                option.IsDescriptionExpanded = isExpanded;
+                feature.IsDescriptionExpanded = expanded;
         }
     }
 
@@ -309,6 +487,8 @@ namespace UnicontaClient.Pages.CustomPage
     {
         readonly object entity;
         readonly PropertyInfo property;
+        readonly Action<int> selectionChanged;
+        int selectedIndex;
         bool canEdit = true;
         bool isDescriptionExpanded;
         Visibility visibility = Visibility.Visible;
@@ -319,6 +499,20 @@ namespace UnicontaClient.Pages.CustomPage
         public string DescriptionKey { get { return TitleKey + "_FeatureDescription"; } }
         public string Title { get { return Uniconta.ClientTools.Localization.lookup(TitleKey); } }
         public string Description { get { return Uniconta.ClientTools.Localization.lookup(DescriptionKey); } }
+        public bool IsComboBox { get { return Items != null; } }
+        public IEnumerable Items { get; private set; }
+        public int SelectedIndex
+        {
+            get { return selectedIndex; }
+            set
+            {
+                if (!IsComboBox || selectedIndex == value) return;
+                selectedIndex = value;
+                OnPropertyChanged(nameof(SelectedIndex));
+                selectionChanged(value);
+            }
+        }
+
         internal object Entity { get { return entity; } }
         internal PropertyInfo Property { get { return property; } }
 
@@ -347,38 +541,13 @@ namespace UnicontaClient.Pages.CustomPage
             if (property == null || !property.CanRead || !property.CanWrite || (property.PropertyType != typeof(bool) && property.PropertyType != typeof(bool?)))
                 throw new ArgumentException("Feature property must be a writable Boolean: " + propertyName, nameof(propertyName));
         }
-    }
 
-
-    public sealed class FunctionalityOptionViewModel : NotifyPropertyChangedBase
-    {
-        readonly Action<int> selectionChanged;
-        int selectedIndex;
-        bool isDescriptionExpanded;
-        public string TitleKey { get; private set; }
-        public string DescriptionKey { get { return TitleKey + "_FeatureDescription"; } }
-        public string Title { get { return Uniconta.ClientTools.Localization.lookup(TitleKey); } }
-        public string Description { get { return Uniconta.ClientTools.Localization.lookup(DescriptionKey); } }
-        public IEnumerable Items { get; private set; }
-        public bool IsDescriptionExpanded { get { return isDescriptionExpanded; } set { Set(ref isDescriptionExpanded, value, nameof(IsDescriptionExpanded)); } }
-        public int SelectedIndex
-        {
-            get { return selectedIndex; }
-            set
-            {
-                if (selectedIndex == value) return;
-                selectedIndex = value;
-                OnPropertyChanged(nameof(SelectedIndex));
-                selectionChanged(value);
-            }
-        }
-
-        public FunctionalityOptionViewModel(string titleKey, IEnumerable items, int selectedIndex, Action<int> selectionChanged)
+        public FunctionalityFeatureViewModel(string titleKey, IEnumerable items, int selectedIndex, Action<int> selectionChanged)
         {
             TitleKey = titleKey;
-            Items = items;
+            Items = items ?? throw new ArgumentNullException(nameof(items));
             this.selectedIndex = selectedIndex;
-            this.selectionChanged = selectionChanged;
+            this.selectionChanged = selectionChanged ?? throw new ArgumentNullException(nameof(selectionChanged));
         }
     }
 
@@ -423,17 +592,20 @@ namespace UnicontaClient.Pages.CustomPage
                 return new Feature[0];
 
             return page.Functionality.Modules
-                .SelectMany(module => module.Features.Select(feature => new Feature
-                {
-                    ModuleKey = module.TitleKey,
-                    Module = Uniconta.ClientTools.Localization.lookup(module.TitleKey),
-                    Key = feature.TitleKey,
-                    Caption = Uniconta.ClientTools.Localization.lookup(feature.TitleKey),
-                    DescriptionKey = feature.DescriptionKey,
-                    Description = Uniconta.ClientTools.Localization.lookup(feature.DescriptionKey),
-                    Enabled = feature.IsEnabled,
-                    ViewModel = feature
-                }))
+                .SelectMany(module => module.FeatureGroups
+                    .SelectMany(group => group.Features)
+                    .Where(feature => !feature.IsComboBox)
+                    .Select(feature => new Feature
+                    {
+                        ModuleKey = module.TitleKey,
+                        Module = Uniconta.ClientTools.Localization.lookup(module.TitleKey),
+                        Key = feature.TitleKey,
+                        Caption = Uniconta.ClientTools.Localization.lookup(feature.TitleKey),
+                        DescriptionKey = feature.DescriptionKey,
+                        Description = Uniconta.ClientTools.Localization.lookup(feature.DescriptionKey),
+                        Enabled = feature.IsEnabled,
+                        ViewModel = feature
+                    }))
                 .GroupBy(x => x.Key, StringComparer.OrdinalIgnoreCase)
                 .Select(x => x.First())
                 .ToArray();

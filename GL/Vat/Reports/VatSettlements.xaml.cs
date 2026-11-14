@@ -128,7 +128,7 @@ namespace UnicontaClient.Pages.CustomPage
 
                         if (api.CompanyEntity._CountryId == CountryCode.Iceland)
                         {
-                            var cwTextControl = new CWTextControl(Localization.lookup("ReportTo") + " " + Localization.lookup("CustomsService"), Uniconta.ClientTools.Localization.lookup("Key"));
+                            var cwTextControl = new CWTextControl(Uniconta.ClientTools.Localization.lookup("ReportTo"), Uniconta.ClientTools.Localization.lookup("Password"));
                             cwTextControl.Closed += CwTextControl_Closed;
                             cwTextControl.Show();
                         }
@@ -210,9 +210,21 @@ namespace UnicontaClient.Pages.CustomPage
             var selectedItem = dgVatVatSettlements.SelectedItem as GLVatReportedClient;
             var cwTextControl = (CWTextControl)sender;
             if (cwTextControl.DialogResult == true)
+                FileIceland(selectedItem, cwTextControl.InputValue);
+        }
+
+        // Iceland: the server files the settlement through api.uniconta.is; RSK's receipt is kept on it (View)
+        async void FileIceland(GLVatReportedClient selectedItem, string password)
+        {
+            busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("SendingWait");
+            busyIndicator.IsBusy = true;
+            var receipt = await IcelandVatFiling.File(api, selectedItem, password);
+            busyIndicator.IsBusy = false;
+            busyIndicator.BusyContent = Uniconta.ClientTools.Localization.lookup("LoadingMsg");
+            if (receipt != null)
             {
-                var key = cwTextControl.InputValue;
-                UploadSettlements(selectedItem, key);
+                await dgVatVatSettlements.RefreshTask();
+                View(selectedItem);
             }
         }
 

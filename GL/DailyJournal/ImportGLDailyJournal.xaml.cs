@@ -52,6 +52,7 @@ namespace UnicontaClient.Pages.CustomPage
         int selectedFormatIndex;
         readonly UnicontaBaseEntity importMaster;
         bool ImportToBankStatement;
+        DateTime defaultFromDate;
         string BankAccount;
 
         public ImportGLDailyJournal(UnicontaBaseEntity sourceData) :
@@ -403,6 +404,22 @@ namespace UnicontaClient.Pages.CustomPage
             }
             else
                 grpUserLogin.Visibility = Visibility.Collapsed;
+            SetDefaultFromDate();
+        }
+
+        // An Icelandic bank with a blank from-date would fetch the statement's whole history: start at the last imported line.
+        // The user can still type an earlier date. Another format gets the blank back, unless the user changed the date.
+        void SetDefaultFromDate()
+        {
+            var bsClient = importMaster as Uniconta.DataModel.BankStatement;
+            if (bsClient == null)
+                return;
+            var from = IcelandBankImport.IsIcelandicBank(currentBankFormat.Format) ? IcelandBankImport.DefaultFromDate(bsClient._LastTransaction, bsClient._LastBankRequest, bsClient._DaysSlip) : DateTime.MinValue;
+            if (txtFromDate.DateTime == DateTime.MinValue || txtFromDate.DateTime == defaultFromDate)
+            {
+                txtFromDate.DateTime = from;
+                defaultFromDate = from;
+            }
         }
 
         void SetMaster(BankImportFormatClient currentBankFormat)

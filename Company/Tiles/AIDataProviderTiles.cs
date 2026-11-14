@@ -87,7 +87,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         internal static IReadOnlyList<TileTypeMetadata> GetTileTypeOptions(Type tableType)
         {
-            var options = TileTableCapabilities.GetVisualizations(tableType).Select(value => new TileTypeMetadata
+            var options = TileTableCapabilities.GetVisibleVisualizations(tableType).Select(value => new TileTypeMetadata
             {
                 Id = value.ToString(),
                 Caption = value.DisplayName(),
@@ -243,7 +243,7 @@ namespace UnicontaClient.Pages.CustomPage
         public override string Description => "Returns the exact IDs and definitions of tiles currently on this dashboard. Use it before identifying a tile to remove or copying an existing tile.";
         protected override Task<AIDataProviderInvokeResult> Invoke(TilePageDataRequest request)
         {
-            var data = page.CurrentTiles.Select(menu => { var d = TileDefinition.FromUserMenu(menu); return new { Id = menu.RowId, d.Title, d.TileTypeId, d.SourceName, Visualization = d.Visualization.ToString(), DataSourceId = d.TableId, ValueFields = d.ValueColumns, Aggregation = d.Aggregate.ToString(), d.GroupBy, d.Filter, d.Group, d.ColumnSpan, d.RowSpan }; }).ToArray();
+            var data = page.CurrentTiles.Select(menu => { var d = TileDefinition.FromUserMenu(menu); return new { Id = menu.RowId, d.Title, d.TileTypeId, d.SourceName, Visualization = d.Visualization.ToString(), DataSourceId = d.TableId, ValueFields = d.ValueColumns, Aggregation = d.Aggregate.ToString(), d.GroupBy, d.Filter, d.ColumnSpan, d.RowSpan }; }).ToArray();
             return Task.FromResult(Result(data.Length, JsonConvert.SerializeObject(data)));
         }
     }
@@ -283,7 +283,7 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 DataSource = source.Name,
                 Fields = fields,
-                Visualizations = TileTableCapabilities.GetVisualizations(source.Type)
+                Visualizations = TileTableCapabilities.GetVisibleVisualizations(source.Type)
                     .Where(value => value != TileVisualization.HtmlWidget)
                     .Select(value => value.ToString()).ToArray(),
                 Aggregations = TileTableCapabilities.GetAggregates(source.Type).Select(value => value.ToString()).ToArray()

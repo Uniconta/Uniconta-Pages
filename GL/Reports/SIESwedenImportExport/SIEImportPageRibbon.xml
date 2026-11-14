@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <RibbonItem TabId="0" LocalizedNameKey="Home">
+    <RibbonItem Action="ImportData" LocalizedNameKey="Import" LargeGlyph="Import_32x32" />
+    <RibbonItem Action="MapSeriesToJournals" LocalizedNameKey="Mappings" LargeGlyph="Match_32x32" />
+    <RibbonItem Action="Simulate" LocalizedNameKey="Simulate" LargeGlyph="Validate_32x32" />
+    <RibbonItem Action="SaveData" LocalizedNameKey="GenerateJournalLines" Glyph="save-16x16" LargeGlyph="save-32x32" />
+    <RibbonItem Action="PostJournal" LocalizedNameKey="PostJournal" LargeGlyph="Posted_Journal_32x32"/>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem Action="Layout" LocalizedNameKey="Layout" LargeGlyph="Layout_32x32">
+      <!---If we want Inner menu-->
+      <RibbonItem Action="Edit" LocalizedNameKey="Edit" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
+      <RibbonItem Action="AddNestedProperty" LocalizedNameKey="AddNestedProperty" EnableSeperator="True" Glyph="Nested_16x16" ShortcutKey="" />
+      <RibbonItem Action="SaveLayout" LocalizedNameKey="SaveLayout" Glyph="Edit_16x16" LargeGlyph="Edit_32x32" ShortcutKey=""/>
+      <RibbonItem Action="SwitchToDefault" LocalizedNameKey="DeleteLayout" Glyph="Delete_16x16" ShortcutKey=""/>
+      <RibbonItem Action="LoadSavedLayout" LocalizedNameKey="LoadSavedLayout" Glyph="LoadLayout_16x16" ShortcutKey="Ctrl+U"/>
+      <RibbonItem Action="ExportLayout" LocalizedNameKey="ExportLayout" EnableSeperator="True" Glyph="ExportLayout_16x16" LargeGlyph="ExportLayout_16x16" ShortcutKey=""/>
+      <RibbonItem Action="ImportLayout" LocalizedNameKey="ImportLayout" Glyph="Import_16x16" LargeGlyph="Import_16x16" ShortcutKey=""/>
+      <RibbonItem Action="WindowSetting" LocalizedNameKey="WindowSetting" EnableSeperator="True" Glyph="Setup_16x16" ShortcutKey=""/>
+    </RibbonItem>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem LocalizedNameKey="FromDate" Action="FromDate" StatusValue=""/>
+    <RibbonItem LocalizedNameKey="ToDate" Action="ToDate" StatusValue=""/>
+    <RibbonItem LocalizedNameKey="Type" Action="FormatType" StatusValue=""/>
+    <RibbonItem LocalizedNameKey="Application" Action="Application" StatusValue=""/>
+    <RibbonItem LocalizedNameKey="CreatedBy" Action="CreatedBy" StatusValue=""/>
+  </RibbonItem>
+  <RibbonItem>
+    <RibbonItem LocalizedNameKey="CompanyName" Action="CompanyName" StatusValue=""/>
+    <RibbonItem LocalizedNameKey="CompanyRegNo" Action="CompanyRegNo" StatusValue=""/>
+    <RibbonItem LocalizedNameKey="CompanyId" Action="CompanyId" StatusValue=""/>
+    <RibbonItem LocalizedNameKey="address" Action="Address" StatusValue=""/>
+    <RibbonItem LocalizedNameKey="CurrencyCode" Action="CurrencyCode" StatusValue=""/>
+  </RibbonItem>
+</root>

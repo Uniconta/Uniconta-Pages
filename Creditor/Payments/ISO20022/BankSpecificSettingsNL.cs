@@ -239,29 +239,8 @@ namespace UnicontaISO20022CreditTransfer
             var adr2 = StandardPaymentFunctions.RegularExpressionReplace(company._Address2, allowedCharactersRegEx, replaceCharactersRegEx);
             var adr3 = StandardPaymentFunctions.RegularExpressionReplace(company._Address3, allowedCharactersRegEx, replaceCharactersRegEx);
 
-            if (NewPaymentFormat())
-            {
-                var zipCity = OIOUBL.GetZipCodeCity(adr3, company._CountryId);
-                if (zipCity == null)
-                {
-                    zipCity = OIOUBL.GetZipCodeCity(adr2, company._CountryId);
-                    if (zipCity != null)
-                        adr2 = null;
-                }
-                else
-                    adr3 = null;
-
-                if (zipCity != null)
-                {
-                    var address = StringBuilderReuse.Create().Append(adr1).Append(adr2 != null ? ", " : null).Append(adr2).Append(adr3 != null ? ", " : null).Append(adr3).ToStringAndRelease();
-                    debtorAddress.StreetName = address;
-                    debtorAddress.ZipCode = zipCity.Item1;
-                    debtorAddress.CityName = zipCity.Item2;
-                    debtorAddress.CountryId = ((CountryISOCode)company._CountryId).ToString();
-                    debtorAddress.Unstructured = false;
-                    return debtorAddress;
-                }
-            }
+            if (StructuredDebtorAddress(company, debtorAddress, adr1, adr2, adr3))
+                return debtorAddress;
 
             switch (companyBankEnum)
             {
@@ -304,12 +283,8 @@ namespace UnicontaISO20022CreditTransfer
             var zipCode = StandardPaymentFunctions.RegularExpressionReplace(creditor._ZipCode, allowedCharactersRegEx, replaceCharactersRegEx);
             var city = StandardPaymentFunctions.RegularExpressionReplace(creditor._City, allowedCharactersRegEx, replaceCharactersRegEx);
 
-            if (creditor._ZipCode != null)
-            {
-                creditorAddress.ZipCode = zipCode;
-                creditorAddress.CityName = city;
-                creditorAddress.StreetName = adr1;
-            }
+            if (!string.IsNullOrEmpty(city))
+                StructuredCreditorAddress(creditorAddress, adr1, adr2, adr3, zipCode, city);
             else
             {
                 if (companyBankEnum == CompanyBankENUM.Rabobank) //Rabobank: Only two Addresslines are accepted
@@ -435,8 +410,7 @@ namespace UnicontaISO20022CreditTransfer
 
             if (ustrdText != string.Empty)
             {
-                if (ustrdText.Length > maxLines * maxStrLen)
-                    ustrdText = ustrdText.Substring(0, maxLines * maxStrLen);
+                ustrdText = LimitUstrdText(ustrdText, maxLines * maxStrLen, trans);
 
                 resultList = ustrdText.Select((x, i) => i)
                             .Where(i => i % maxStrLen == 0)

@@ -10,6 +10,7 @@ using Uniconta.ClientTools.Page;
 using Uniconta.ClientTools.Util;
 using Uniconta.DataModel;
 using UnicontaClient.Models;
+using Localization = Uniconta.ClientTools.Localization;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -112,6 +113,10 @@ namespace UnicontaClient.Pages.CustomPage
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
             UtilDisplay.RemoveMenuCommand(rb, new string[] { "AddRow", "EditRow", "SaveGrid", "Layout" });
             base.OnLayoutLoaded();
+
+            var undoChanges = UtilDisplay.GetMenuCommandByName(rb, "RefreshGrid");
+            if (undoChanges != null)
+                undoChanges.Caption = Localization.lookup("UndoDelete");
 
             var floatGroup = this.ParentControl?.Parent as DevExpress.Xpf.Docking.FloatGroup;
             if (floatGroup != null)

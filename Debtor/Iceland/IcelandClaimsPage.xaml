@@ -1,0 +1,60 @@
+<Pages:GridBasePage xmlns:Pages="clr-namespace:Uniconta.ClientTools.Page;assembly=ClientTools"
+        xmlns:UC="clr-namespace:UnicontaClient.Pages;assembly=UnicontaPages"
+x:Class="UnicontaClient.Pages.CustomPage.IcelandClaimsPage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:UnicontaClient.Pages.CustomPage"
+        xmlns:dxn="http://schemas.devexpress.com/winfx/2008/xaml/navbar"
+        xmlns:UnicontaControls="clr-namespace:Uniconta.ClientTools.Controls;assembly=ClientTools">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="2" x:Name="rowgridSplitter"/>
+            <RowDefinition Height="Auto" x:Name="rowStatusInfoSection"/>
+        </Grid.RowDefinitions>
+        <UnicontaControls:CorasauRibbonControl XMLSourcePath=";component/Pages/Debtor/Iceland/IcelandClaimsPageRibbon.xml" x:Name="localMenu"/>
+        <UnicontaControls:BusyIndicator x:Name="busyIndicator" Grid.Row="1" BusyContent="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=LoadingMsg}">
+            <local:IcelandClaimsGrid x:Name="dgIcelandClaimsGrid" AutoGenerateColumns="None">
+                <local:IcelandClaimsGrid.Columns>
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PaymentId" Width="80" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="ClaimantId" Width="90" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Branch" Width="60" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="CollectionAccount" Width="100" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Account" Width="90" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Name" Width="150" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="StatusText" Width="100" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Send" ShowTime="True" Width="130" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="DueDate" Width="90" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Deadline" Width="90" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Amount" Width="100" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Capital" Width="100" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Notefee" Width="80" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Penalty" Width="80" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="CapitalTax" Width="80" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Otherfee" Width="80" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="PayDate" Width="90" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Invoices" Width="120" />
+                    <local:CorasauDataGridTemplateColumnClient x:Name="SystemInfo" Width="250" />
+                </local:IcelandClaimsGrid.Columns>
+            </local:IcelandClaimsGrid>
+        </UnicontaControls:BusyIndicator>
+
+        <GridSplitter Grid.Row="2" x:Name="gridSplitter" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+
+        <dxn:NavBarControl Grid.Row="3" x:Name="StatusInfoWindow" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <dxn:NavBarControl.Groups>
+                <dxn:NavBarGroup IsExpanded="True">
+                    <Grid DataContext="{Binding Path=SelectedItem,ElementName=dgIcelandClaimsGrid}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=SystemInfo}" FontWeight="Bold" />
+                        <TextBlock Grid.Row="1" TextWrapping="Wrap" Text="{Binding Path=SystemInfo}" />
+                    </Grid>
+                </dxn:NavBarGroup>
+            </dxn:NavBarControl.Groups>
+        </dxn:NavBarControl>
+    </Grid>
+</Pages:GridBasePage>

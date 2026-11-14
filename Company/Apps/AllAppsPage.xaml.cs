@@ -131,7 +131,7 @@ namespace UnicontaClient.Pages.CustomPage
                         if (err == ErrorCodes.Succes)
                         {
                             app.IsSubscribed = false;
-                            globalEvents.OnRefresh(NameOfControl, api.CompanyEntity.CompanyId);/*Setup Company again in mainpage */
+                            RefreshCompany();
                         }
                         else
                             UtilDisplay.ShowErrorCode(err);
@@ -154,11 +154,18 @@ namespace UnicontaClient.Pages.CustomPage
             };
             var err = await api.Insert(appShare);
             if (err == ErrorCodes.Succes)
+            {
                 app.IsSubscribed = true;
+                RefreshCompany();
+            }
             else
                 UtilDisplay.ShowErrorCode(err);
         }
-
+        public void RefreshCompany()
+        {
+           dockCtrl.CloseAllDocuments(false);
+           globalEvents.OnRefresh(NameOfControl, api.CompanyEntity.CompanyId);/*Setup Company again in mainpage */
+        }
         private void ViewAppURL(AppClient app)
         {
             var text = app._URL;

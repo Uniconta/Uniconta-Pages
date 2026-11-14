@@ -18,14 +18,6 @@ x:Class="UnicontaClient.Pages.CustomPage.EDeliveryMappingPage"
                 </DataTrigger>
             </Style.Triggers>
         </Style>
-        <Style x:Key="MappingRemoveTagCellStyle" TargetType="dxg:LightweightCellEditor"
-            BasedOn="{StaticResource {dxgt:GridRowThemeKey ResourceKey=LightweightCellStyle}}">
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding RowData.Row.CanRemoveTag}" Value="False">
-                    <Setter Property="IsEnabled" Value="False" />
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
     </Pages:GridBasePage.Resources>
     <Grid x:Name="LayoutRoot" Background="{StaticResource LayoutGridColor}">
         <Grid.RowDefinitions>
@@ -115,9 +107,24 @@ x:Class="UnicontaClient.Pages.CustomPage.EDeliveryMappingPage"
                             </DataTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
                     </localPage:CorasauDataGridTemplateColumnClient>
-                    <localPage:CorasauDataGridTemplateColumnClient x:Name="RemoveTag" Width="110" CellStyle="{StaticResource MappingRemoveTagCellStyle}"
-                        ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=eDeliveryRemoveTagHelp}" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="TableId" Width="270" CellStyle="{StaticResource MappingSourceCellStyle}">
+                        <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                            <ControlTemplate>
+                                <TextBlock Margin="2" VerticalAlignment="Center">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Text" Value="{Binding DisplayText, RelativeSource={RelativeSource TemplatedParent}}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding DataContext.RowData.Row.RemoveTag, RelativeSource={RelativeSource TemplatedParent}}" Value="True">
+                                                    <Setter Property="Text" Value="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=eDeliveryRemovedFromDocument}" />
+                                                    <Setter Property="FontStyle" Value="Italic" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </ControlTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                         <localPage:CorasauDataGridTemplateColumnClient.EditSettings>
                             <CorasauControls:ComboBoxEditSettingsCustom x:Name="cmbTableIds"
                                 DisplayMember="DisplayName"
@@ -127,9 +134,18 @@ x:Class="UnicontaClient.Pages.CustomPage.EDeliveryMappingPage"
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Property" Width="100" CellStyle="{StaticResource MappingSourceCellStyle}">
                         <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                             <ControlTemplate>
-                                <TextBlock Margin="2"
-                                    VerticalAlignment="Center"
-                                    Text="{Binding DataContext.RowData.Row.Property, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
+                                <TextBlock Margin="2" VerticalAlignment="Center">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Text" Value="{Binding DataContext.RowData.Row.Property, RelativeSource={RelativeSource TemplatedParent}}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding DataContext.RowData.Row.RemoveTag, RelativeSource={RelativeSource TemplatedParent}}" Value="True">
+                                                    <Setter Property="Text" Value="" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
                             </ControlTemplate>
                         </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
                         <localPage:CorasauDataGridTemplateColumnClient.CellTemplate>
@@ -144,6 +160,7 @@ x:Class="UnicontaClient.Pages.CustomPage.EDeliveryMappingPage"
                     </localPage:CorasauDataGridTemplateColumnClient>
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="Value"
                         Width="150"
+                        AllowEditing="False" ReadOnly="True"
                         CellStyle="{StaticResource MappingSourceCellStyle}"
                         Visible="False" />
                     <localPage:CorasauDataGridTemplateColumnClient x:Name="FallbackDefaultValue" Width="190" CellStyle="{StaticResource MappingSourceCellStyle}"
@@ -209,7 +226,7 @@ x:Class="UnicontaClient.Pages.CustomPage.EDeliveryMappingPage"
                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                             ScrollViewer.CanContentScroll="True"
                             VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
-                            SelectionChanged="OioUblFields_SelectionChanged">
+                            SelectionChanged="OioUblFields_SelectionChanged" MouseDoubleClick="OioUblFields_MouseDoubleClick">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <Grid Margin="5,4">
@@ -338,6 +355,8 @@ x:Class="UnicontaClient.Pages.CustomPage.EDeliveryMappingPage"
                             Click="CancelOioUblField_Click" />
                         <Button x:Name="btnUseOioUblField" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=Select}" MinWidth="100"
                             Padding="10,5" IsEnabled="False" Click="UseOioUblField_Click" />
+                        <Button x:Name="btnRemoveOioUblField" Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=eDeliveryRemoveFromDocument}"
+                            MinWidth="100" Padding="10,5" Margin="8,0,0,0" Visibility="Collapsed" IsEnabled="False" Click="RemoveOioUblField_Click" />
                     </StackPanel>
                 </Grid>
             </Border>

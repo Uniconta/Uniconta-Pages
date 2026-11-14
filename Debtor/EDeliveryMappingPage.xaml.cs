@@ -80,8 +80,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
         [Browsable(false)]
-        public bool CanRemoveTag => FieldDefinition != null && !FieldDefinition.IsProtected &&
-            !FieldDefinition.IsContainer && FieldDefinition.MinOccurs == 0;
+        public bool CanRemoveTag => FieldDefinition?.CanRemove == true;
     }
 
     public class EDeliveryMappingSort : IComparer
@@ -358,9 +357,10 @@ namespace UnicontaClient.Pages.CustomPage
             }
             catch (Exception ex)
             {
+                api.ReportException(ex);
                 if (request == _oioUblFieldRequest)
                 {
-                    txtOioUblFieldCount.Text = Localization.lookup("Error") + ": " + ex.Message;
+                    txtOioUblFieldCount.Text = Localization.lookup(ErrorCodes.CouldNotLoad.ToString());
                     btnRetryOioUblFields.Visibility = Visibility.Visible;
                 }
             }
@@ -372,7 +372,7 @@ namespace UnicontaClient.Pages.CustomPage
                     oioUblGroupNavigation.IsEnabled = true;
                     btnOioUblGroupUp.IsEnabled = _oioUblParentPath.Length > 0;
                     txtOioUblFieldSearch.IsEnabled = true;
-                    btnUseOioUblField.IsEnabled = (lstOioUblFields.SelectedItem as eDeliveryFieldDefinition)?.CanMap == true;
+                    UpdateFieldPickerActions();
                     if (_oioUblFields != null)
                         txtOioUblFieldSearch.Focus();
                 }
@@ -400,6 +400,17 @@ namespace UnicontaClient.Pages.CustomPage
                 ?? lstOioUblFields.SelectedItem as eDeliveryFieldDefinition;
             if (!_isOioUblFieldLoading && field != null && field.IsContainer)
                 await LoadOioUblFieldsAsync(field.Path);
+        }
+
+        private async void OioUblFields_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            var item = System.Windows.Controls.ItemsControl.ContainerFromElement(lstOioUblFields,
+                e.OriginalSource as DependencyObject) as ListBoxItem;
+            if (!_isOioUblFieldLoading && item?.Content is eDeliveryFieldDefinition field && field.IsContainer)
+            {
+                e.Handled = true;
+                await LoadOioUblFieldsAsync(field.Path);
+            }
         }
 
         private void OioUblFieldSearch_TextChanged(object sender, TextChangedEventArgs e) =>
@@ -437,8 +448,19 @@ namespace UnicontaClient.Pages.CustomPage
             txtOioUblFieldRequirement.Text = field == null ? string.Empty
                 : Localization.lookup(field.MinOccurs > 0 ? "Required" : "Optional");
             txtOioUblFieldRepetitions.Text = field == null ? string.Empty : GetOioUblFieldRepetitionsLabel(field);
-            if (btnUseOioUblField != null)
-                btnUseOioUblField.IsEnabled = !_isOioUblFieldLoading && field?.CanMap == true;
+            UpdateFieldPickerActions();
+        }
+
+        private void UpdateFieldPickerActions()
+        {
+            if (btnUseOioUblField == null || btnRemoveOioUblField == null)
+                return;
+            var field = lstOioUblFields.SelectedItem as eDeliveryFieldDefinition;
+            var used = (dgEdeliveryMappingGrid.ItemsSource as IEnumerable<EDeliveryMappingClientExtended>)?
+                .Any(row => !ReferenceEquals(row, _oioUblMappingRow) && row.DisplayFieldPath == field?.Path) == true;
+            btnUseOioUblField.IsEnabled = !_isOioUblFieldLoading && !used && field?.CanMap == true;
+            btnRemoveOioUblField.Visibility = field?.CanRemove == true ? Visibility.Visible : Visibility.Collapsed;
+            btnRemoveOioUblField.IsEnabled = !_isOioUblFieldLoading && !used && field?.CanRemove == true;
         }
 
         private static string GetOioUblFieldTypeLabel(eDeliveryFieldDefinition field)
@@ -471,21 +493,35 @@ namespace UnicontaClient.Pages.CustomPage
             return string.Format(Localization.lookup("FromTo"), field.MinOccurs, field.MaxOccurs.Value);
         }
 
-        private void UseOioUblField_Click(object sender, RoutedEventArgs e)
+        private void UseOioUblField_Click(object sender, RoutedEventArgs e) => SelectOioUblField(false);
+
+        private void RemoveOioUblField_Click(object sender, RoutedEventArgs e) => SelectOioUblField(true);
+
+        private void SelectOioUblField(bool remove)
         {
             if (_isOioUblFieldLoading || _oioUblMappingRow == null || !_oioUblMappingRow.CanChooseField ||
-                !(lstOioUblFields.SelectedItem is eDeliveryFieldDefinition field) || !field.CanMap)
+                !(lstOioUblFields.SelectedItem is eDeliveryFieldDefinition field) ||
+                (remove ? !field.CanRemove : !field.CanMap))
                 return;
 
+            var rows = dgEdeliveryMappingGrid.ItemsSource as IEnumerable<EDeliveryMappingClientExtended>;
+            if (rows?.Any(row => !ReferenceEquals(row, _oioUblMappingRow) &&
+                (row.DisplayFieldPath == field.Path ||
+                 (remove && row.DisplayFieldPath?.StartsWith(field.Path + "/", StringComparison.Ordinal) == true) ||
+                 (row.RemoveTag && field.Path.StartsWith(row.DisplayFieldPath + "/", StringComparison.Ordinal)))) == true)
+            {
+                UnicontaMessageBox.Show(Localization.lookup("eDeliveryMappingConflictingRemoval"), Localization.lookup("Error"));
+                return;
+            }
+
             var changed = !string.Equals(_oioUblMappingRow.DisplayFieldPath, field.Path, StringComparison.Ordinal) ||
-                (field.MinOccurs > 0 && _oioUblMappingRow.RemoveTag);
+                _oioUblMappingRow.RemoveTag != remove;
             if (changed)
                 dgEdeliveryMappingGrid.SetLoadedRow(_oioUblMappingRow);
 
             _oioUblMappingRow.SelectedFieldPath = field.Path;
             _oioUblMappingRow.FieldDefinition = field;
-            if (field.MinOccurs > 0)
-                _oioUblMappingRow.RemoveTag = false;
+            _oioUblMappingRow.RemoveTag = remove;
             if (changed)
             {
                 dgEdeliveryMappingGrid.SetModifiedRow(_oioUblMappingRow);
@@ -547,6 +583,11 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void MappingTableView_ShowingEditor(object sender, ShowingEditorEventArgs e)
         {
+            if (e.Column.FieldName == nameof(EDeliveryMappingClientExtended.Value))
+            {
+                e.Cancel = true;
+                return;
+            }
             var row = dgEdeliveryMappingGrid.GetRow(e.RowHandle) as EDeliveryMappingClientExtended;
             if (row != null && e.Column.FieldName == nameof(row.RemoveTag) && !row.CanRemoveTag)
                 e.Cancel = true;
@@ -628,6 +669,7 @@ namespace UnicontaClient.Pages.CustomPage
                     break;
                 case "SendUBL":
                 case "ExportUBL":
+                case "ValidateDocument":
                     SaveAndSendOrExportAsync(ActionType);
                     break;
                 case "DocSendLog":
@@ -645,13 +687,20 @@ namespace UnicontaClient.Pages.CustomPage
 
         private async void SaveAndSendOrExportAsync(string actionType)
         {
+            if (_isMappingBusy || oioUblFieldPicker.Visibility == Visibility.Visible)
+                return;
+
+            dgEdeliveryMappingGrid.View.PostEditor();
+            RemoveEmptyAddedMappingRows();
+            ClearLocalChangeTrackingIfGridIsClean();
             if (invoice == null)
             {
                 UnicontaMessageBox.Show(Localization.lookup("ZeroInvoice"), Localization.lookup("Error"));
                 return;
             }
 
-            if (HasUnsavedChanges)
+            var mustSave = HasUnsavedChanges || dgEdeliveryMappingGrid.HasUnsavedData;
+            if (mustSave)
             {
                 var msg = UnicontaMessageBox.Show(
                     string.Format(Localization.lookup("SaveChangesFor"), Localization.lookup("EDeliveryMapping")),
@@ -662,21 +711,162 @@ namespace UnicontaClient.Pages.CustomPage
                     return;
             }
 
-            await SaveAndSendOrExportAsync(HasUnsavedChanges ? saveGrid : (Func<Task<ErrorCodes>>)null, () =>
+            try
             {
-                if (actionType == "SendUBL")
-                    Invoices.SendUBL(new DebtorInvoiceClient[1] { invoice }, api, null, busyIndicator);
-                else if (actionType == "ExportUBL")
-                    Invoices.ExportUBL(new DebtorInvoiceClient[1] { invoice }, api, null, null, null, mapppingGrpCache, false);
-            });
+                await SaveAndSendOrExportAsync(mustSave ? saveGrid : (Func<Task<ErrorCodes>>)null, async () =>
+                {
+                    _isMappingBusy = true;
+                    LayoutRoot.IsEnabled = false;
+                    xmlDocument = null;
+                    var group = dgEdeliveryMappingGrid.masterRecord as eDeliveryMappingGroupClient;
+                    if (actionType == "SendUBL")
+                    {
+                        if (UnicontaMessageBox.Show(Localization.lookup("SendInvoicebyUBL"), Localization.lookup("Send"),
+                            MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK)
+                            return;
+                        var result = await SendMappedInvoiceAsync(dgEdeliveryMappingGrid.ItemsSource as List<EDeliveryMappingClientExtended>, group);
+                        var message = result == ErrorCodes.Succes ? Localization.lookup("OIOSent")
+                            : GetSendErrorMessage(result, await api.session.GetErrors(result));
+                        UnicontaMessageBox.Show(message,
+                            Localization.lookup(result == ErrorCodes.Succes ? "Message" : "Error"));
+                        return;
+                    }
+
+                    // Preview/export/validation regenerate from the selected group, including fallback-only changes.
+                    var error = await ValidateReturnErrMsg();
+                    if (error != null)
+                    {
+                        UnicontaMessageBox.Show(error, Localization.lookup("Error"));
+                        return;
+                    }
+                    if (actionType == "ExportUBL")
+                    {
+                        using (var dialog = new System.Windows.Forms.SaveFileDialog
+                        {
+                            Filter = "XML files (*.xml)|*.xml", DefaultExt = "xml", AddExtension = true,
+                            FileName = group._DocVersion + "_" + invoice.InvoiceNumber + ".xml"
+                        })
+                            if (dialog.ShowDialog() == DialogResult.OK)
+                            {
+                                var result = await ExportMappedDocumentAsync(dialog.FileName, xmlDocument, invoice, new InvoiceAPI(api));
+                                if (result != ErrorCodes.Succes)
+                                    UnicontaMessageBox.Show(Localization.lookup("eDeliveryExportStatusFailed") + Environment.NewLine +
+                                        GetSendErrorMessage(result, null), Localization.lookup("Error"));
+                            }
+                    }
+                    else if (actionType == "ValidateDocument")
+                    {
+                        var edoc = new EDocumentAPI(api);
+                        var validation = await edoc.EDocumentValidateDocument(GetDocumentPayload(xmlDocument));
+                        if (validation == null)
+                            UnicontaMessageBox.Show(GetSendErrorMessage(edoc.LastError, null), Localization.lookup("Error"));
+                        else
+                        {
+                            UnicontaMessageBox.Show(validation.IsValid ? Localization.lookup("Success")
+                                : GetSendErrorMessage(ErrorCodes.eDocumentValidationFailed, null),
+                                Localization.lookup(validation.IsValid ? "Message" : "Error"));
+                        }
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                api.ReportException(ex);
+                var message = actionType == "ExportUBL" && (ex is IOException || ex is UnauthorizedAccessException)
+                    ? Localization.lookup("eDeliveryExportFileFailed") : GetSendErrorMessage(ErrorCodes.Exception, null);
+                UnicontaMessageBox.Show(message, Localization.lookup("Error"));
+            }
+            finally
+            {
+                LayoutRoot.IsEnabled = true;
+                _isMappingBusy = false;
+            }
         }
 
-        internal static async Task SaveAndSendOrExportAsync(Func<Task<ErrorCodes>> save, Action sendOrExport)
+        internal static async Task<ErrorCodes> ExportMappedDocumentAsync(string filename, string xml,
+            DebtorInvoiceClient invoice, InvoiceAPI invoiceApi)
+        {
+            var document = new System.Xml.XmlDocument();
+            document.LoadXml(xml);
+            using (var writer = System.Xml.XmlWriter.Create(filename,
+                new System.Xml.XmlWriterSettings { Encoding = new UTF8Encoding(false) }))
+                document.Save(writer);
+
+            // Match invoice-page export, but only mark it after the file was successfully written.
+            var result = await invoiceApi.MarkSendInvoiceOIO(invoice);
+            if (result == ErrorCodes.Succes)
+                invoice.SendTimeOIO = BasePage.GetSystemDefaultDate();
+            return result;
+        }
+
+        internal Task<ErrorCodes> SendMappedInvoiceAsync(List<EDeliveryMappingClientExtended> mappings, eDeliveryMappingGroupClient group)
+        {
+            if (invoice == null || group == null || mappings == null)
+                return Task.FromResult(ErrorCodes.CouldNotFind);
+            var type = invoice.TotalAmount < 0 ? eDeliveryDocumentType.CreditNote : eDeliveryDocumentType.Invoice;
+            if (group._DocType != type)
+                return Task.FromResult(ErrorCodes.FieldCannotBeChangedToNewValue);
+            return nhrApi.SendMappedInvoice(invoice, mappings.Select(mapping => new eDeliveryMappingValidationRequest
+            {
+                Mapping = mapping, TagPath = mapping.DisplayFieldPath
+            }).ToList(), group._DocVersion);
+        }
+
+        internal static string GetSendErrorMessage(ErrorCodes error, StandardError[] errors)
+        {
+            // StandardError.message can contain untranslated provider text or exception details.
+            var property = errors?.FirstOrDefault(detail => detail != null && detail.error == error)?.inProperty;
+            var key = eDeliverySendErrorMessages.GetLabelKey(error, property);
+            var message = Localization.lookup(key);
+            return string.IsNullOrWhiteSpace(message) || message == key ? Localization.lookup("Error") : message;
+        }
+
+        private Task<ErrorCodes> SendImportedXmlAsync(string xml)
+        {
+            var payload = GetDocumentPayload(xml);
+            var document = new System.Xml.XmlDocument();
+            document.LoadXml(payload);
+            var customization = document.DocumentElement.SelectSingleNode(
+                "*[local-name()='CustomizationID' and namespace-uri()='urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2']")?.InnerText;
+            var peppol = customization?.Contains("urn:fdc:peppol.eu:2017:poacc:billing:3.0") == true;
+            if (peppol || api.CompanyEntity._UseEDocumentNemhandelInvoice)
+                return new EDocumentAPI(api).EDocumentSendCustom(payload);
+            if (customization?.StartsWith("OIOUBL-", StringComparison.Ordinal) != true)
+                return Task.FromResult(ErrorCodes.eDeliveryXmlNotRecognised);
+            return nhrApi.SendOIOUBL(xml);
+        }
+
+        // Digisense accepts the business document; legacy OIOUBL delivery can retain its SBD envelope.
+        internal static string GetDocumentPayload(string xml)
+        {
+            var document = new System.Xml.XmlDocument();
+            document.LoadXml(xml);
+            if (document.DocumentElement.LocalName == "StandardBusinessDocument")
+            {
+                var payload = document.DocumentElement.SelectSingleNode("*[local-name()='Invoice' or local-name()='CreditNote']");
+                if (payload == null)
+                    throw new InvalidDataException("Invoice or CreditNote not found in StandardBusinessDocument.");
+                return payload.OuterXml;
+            }
+            if (document.FirstChild is System.Xml.XmlDeclaration declaration)
+                declaration.Encoding = "utf-8";
+
+            return document.OuterXml;
+        }
+
+        internal static Task SaveAndSendOrExportAsync(Func<Task<ErrorCodes>> save, Action sendOrExport) =>
+            SaveAndSendOrExportAsync(save, () =>
+            {
+                sendOrExport();
+                return Task.CompletedTask;
+            });
+
+        internal static async Task SaveAndSendOrExportAsync(Func<Task<ErrorCodes>> save, Func<Task> sendOrExport)
         {
             if (save != null && await save() != ErrorCodes.Succes)
                 return;
 
-            sendOrExport();
+            await sendOrExport();
         }
 
         public override void PerformAction(ShortcutAction action)
@@ -758,7 +948,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (xmlDocument == null)
             {
-                if (mappings == null || mappings.Count == 0)
+                if (mappings == null || grp == null)
                     return Localization.lookup(ErrorCodes.CouldNotFind.ToString());
 
                 xmlCache = await loadCache();
@@ -783,7 +973,11 @@ namespace UnicontaClient.Pages.CustomPage
                     .Select(m => new eDeliveryMappingValidationRequest { Mapping = m, TagPath = m.DisplayFieldPath})
                     .ToList();
 
-                var validatedDocument = await nhrApi.GetValidatedeDeliveryMappingDoc(invoice, mappingsWithTags);
+                var invoiceType = invoice.TotalAmount < 0 ? eDeliveryDocumentType.CreditNote : eDeliveryDocumentType.Invoice;
+                if (invoiceType != grp._DocType)
+                    return Localization.lookup(ErrorCodes.FieldCannotBeChangedToNewValue.ToString()) + ": " + grp.DocType;
+
+                var validatedDocument = await nhrApi.GetValidatedeDeliveryMappingDoc(invoice, mappingsWithTags, grp._DocVersion);
                 if (validatedDocument == null)
                     return Localization.lookup(nhrApi.LastError.ToString());
 
@@ -882,9 +1076,9 @@ namespace UnicontaClient.Pages.CustomPage
 
         private async void CustomXmlFile()
         {
-            string file = null;
             try
             {
+                string file;
                 using (var openFileDialog = new OpenFileDialog())
                 {
                     openFileDialog.Filter = "XML files (*.xml)|*.xml";
@@ -894,16 +1088,29 @@ namespace UnicontaClient.Pages.CustomPage
 
                     file = File.ReadAllText(openFileDialog.FileName);
                 }
+
+                if (UnicontaMessageBox.Show(Localization.lookup("SendInvoicebyUBL"), Localization.lookup("Send"),
+                    MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK)
+                    return;
+
+                _isMappingBusy = true;
+                LayoutRoot.IsEnabled = false;
+
+                var errCode = await SendImportedXmlAsync(file);
+                UnicontaMessageBox.Show(errCode == ErrorCodes.Succes ? Localization.lookup("OIOSent") : GetSendErrorMessage(errCode, null),
+                    Localization.lookup(errCode == ErrorCodes.Succes ? "Message" : "Error"));
             }
-            catch { }
-            if (file != null)
+            catch (Exception ex)
             {
-                var errCode = await nhrApi.SendOIOUBL(file);
-                if (errCode != 0)
-                    UnicontaMessageBox.Show(Localization.lookup(errCode.ToString()), Localization.lookup("Error"));
+                api.ReportException(ex);
+                var error = ex is System.Xml.XmlException ? ErrorCodes.eDeliveryXmlNotRecognised : ErrorCodes.Exception;
+                UnicontaMessageBox.Show(GetSendErrorMessage(error, null), Localization.lookup("Error"));
             }
-            else
-                UnicontaMessageBox.Show(Localization.lookup("ViewerFailed"), Localization.lookup("Error"));
+            finally
+            {
+                _isMappingBusy = false;
+                LayoutRoot.IsEnabled = true;
+            }
         }
 
         private void SetMappingGroups(eDeliveryMappingGroupClient master)

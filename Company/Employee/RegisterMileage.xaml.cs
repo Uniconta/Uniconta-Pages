@@ -93,7 +93,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     editrow.FromCity = city[0];
                     var add1 = city[1];
-                    if (!string.IsNullOrEmpty(add1))
+                    if (!string.IsNullOrEmpty(add1) && string.IsNullOrWhiteSpace(editrow.FromAddress1))
                         editrow.FromAddress1 = add1;
                     var zip = city[2];
                     if (!string.IsNullOrEmpty(zip))
@@ -107,7 +107,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     editrow.ToCity = city[0];
                     var add1 = city[1];
-                    if (!string.IsNullOrEmpty(add1))
+                    if (!string.IsNullOrEmpty(add1) && string.IsNullOrWhiteSpace(editrow.ToAddress1))
                         editrow.ToAddress1 = add1;
                     var zip = city[2];
                     if (!string.IsNullOrEmpty(zip))

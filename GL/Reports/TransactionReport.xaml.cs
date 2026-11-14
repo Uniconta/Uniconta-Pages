@@ -63,9 +63,9 @@ namespace UnicontaClient.Pages.CustomPage
         public TransactionReport(SynchronizeEntity master)
             : base(master, true)
         {
-            this.DataContext = this;
             pageMaster = master;
             InitializeComponent();
+            this.DataContext = this;
             var corasauMaster = master.Row;
             InitMaster(corasauMaster);
             Initialize();
@@ -80,9 +80,9 @@ namespace UnicontaClient.Pages.CustomPage
         }
         public TransactionReport(UnicontaBaseEntity master, bool LateLoading) : base(master)
         {
-            this.DataContext = this;
             this.LateLoading = LateLoading;
             InitializeComponent();
+            this.DataContext = this;
             InitMaster(master);
             Initialize();
         }

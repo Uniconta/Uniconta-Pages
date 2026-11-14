@@ -13,9 +13,10 @@ x:Class="UnicontaClient.Pages.CustomPage.Vouchers"
            xmlns:dxat="http://schemas.devexpress.com/winfx/2008/xaml/accordion/themekeys"
            xmlns:editor="http://schemas.devexpress.com/winfx/2008/xaml/editors">
     <UserControl.Resources>
-        <converter:VoucherStatusConverter x:Key="VoucherStatusConverter" />
         <converter:VisibilityBoolConverter x:Key="VisibilityBoolConverter" />
         <converter:RowIndexConverter x:Key="RowIndexConverter" />
+        <localPage:VoucherStatusBrushConverter x:Key="VoucherStatusBrushConverter" />
+        <localPage:VoucherStatusVisibilityConverter x:Key="VoucherStatusVisibilityConverter" />
         <sys:Double x:Key="{dxat:AccordionItemThemeKeys ResourceKey=RootItemHeaderHeight, IsThemeIndependent=true}">20</sys:Double>
         <DataTemplate x:Key="MainMenuControlGlyphTemplate">
             <Rectangle  Height="16" Width="16">
@@ -99,6 +100,27 @@ x:Class="UnicontaClient.Pages.CustomPage.Vouchers"
                 </localControls:AccordionAppEnumView>
                 <localPage:VouchersGrid x:Name="dgVoucherGrid" AutoGenerateColumns="None" Grid.Column="1">
                     <localPage:VouchersGrid.Columns>
+                        <localPage:CorasauDataGridTemplateColumnClient x:Name="StatusIndicator" FieldName="Status" Header="" Width="30" Fixed="Left" AllowEditing="False" ReadOnly="True" IsEditSettingSet="True">
+                            <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                                <ControlTemplate>
+                                    <Button Width="24" Height="24" Padding="0" BorderThickness="0" Background="Transparent" Cursor="Hand"
+                                            DataContext="{Binding DataContext.RowData.Row, RelativeSource={RelativeSource TemplatedParent}}"
+                                            Tag="{Binding}" ToolTip="{Binding ErrorMessage}"
+                                            AutomationProperties.Name="{Binding Converter={StaticResource GlobalLocalizationValueConverter}, ConverterParameter=Log}"
+                                            AutomationProperties.ItemStatus="{Binding Status}"
+                                            Click="VoucherStatus_Click">
+                                        <Button.Visibility>
+                                            <MultiBinding Converter="{StaticResource VoucherStatusVisibilityConverter}">
+                                                <Binding Path="Status" />
+                                                <Binding Path="ErrorMessage" />
+                                            </MultiBinding>
+                                        </Button.Visibility>
+                                        <Ellipse Width="10" Height="10"
+                                                 Fill="{Binding Status, Converter={StaticResource VoucherStatusBrushConverter}}" />
+                                    </Button>
+                                </ControlTemplate>
+                            </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
+                        </localPage:CorasauDataGridTemplateColumnClient>
                         <localPage:CorasauDataGridTemplateColumnClient FieldName="Image" Width="60" Visible="False">
                             <localPage:CorasauDataGridTemplateColumnClient.CellTemplateSelector >
                                 <localPage:VoucherThumbnailTemplateSelector PDFTemplate="{StaticResource VoucherPhotoPdfTemplate}" ImageTemplate="{StaticResource VoucherPhotoImageTemplate}" 
@@ -229,14 +251,6 @@ x:Class="UnicontaClient.Pages.CustomPage.Vouchers"
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="SizeKB" Width="70" Visible="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="OnHold" HideHeaderCheck="False"/>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="Reference" Visible="False" />
-                        <localPage:CorasauDataGridTemplateColumnClient x:Name="Status" Width="60" ReadOnly="True" AllowEditing="False" Visible="False" >
-                            <localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
-                                <ControlTemplate>
-                                    <Image Margin="5" VerticalAlignment="Center" Source="{Binding DataContext.RowData.Row.Status,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource VoucherStatusConverter}}" 
-                                           Stretch="Fill" Width="16" Height="16" RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" />
-                                </ControlTemplate>
-                            </localPage:CorasauDataGridTemplateColumnClient.DisplayTemplate>
-                        </localPage:CorasauDataGridTemplateColumnClient>
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="ErrorMessage" Visible="False" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="JournalPostedId" Visible="False" AllowEditing="False" />
                         <localPage:CorasauDataGridTemplateColumnClient x:Name="ViewInFolder" Visible="False" ColumnFilterMode="DisplayText" ReadOnly="True"/>

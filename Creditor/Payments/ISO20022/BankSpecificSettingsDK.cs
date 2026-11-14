@@ -129,10 +129,15 @@ namespace UnicontaISO20022CreditTransfer
         public override void AllowedCharactersRegEx(bool internationalPayment = false)
         {
             if (internationalPayment)
+            {
                 allowedCharactersRegEx = "[^a-zA-Z0-9 -?:().,'+/]";
+                replaceCharactersRegEx = TransliterateCharacters; //æøå/äöüß omskrives i stedet for at blive fjernet
+            }
             else
+            {
                 allowedCharactersRegEx = "[^a-zA-Z0-9æøåÆØÅ &-?:().,'+/]";
-
+                replaceCharactersRegEx = TransliterateGermanCharacters; //æøå bevares, äöüß omskrives
+            }
         }
 
         /// <summary>
@@ -326,6 +331,32 @@ namespace UnicontaISO20022CreditTransfer
         }
 
         /// <summary>
+        /// An account number without BIC is a Danish account: reg.no. (4) + account no. (max 10), see CreditorBBAN.
+        /// Used so a creditor with a foreign address but a Danish account is paid as a domestic payment
+        /// </summary>
+        public override string CreditorBBANCountryId(string recBBAN)
+        {
+            var bban = Regex.Replace(recBBAN ?? string.Empty, "[^0-9]", "");
+            return bban.Length > 4 && bban.Length <= 14 ? "DK" : null;
+        }
+
+        /// <summary>
+        /// Inpayment forms (FIK) are always paid to a Danish account
+        /// </summary>
+        public override string CreditorFIKCountryId()
+        {
+            return "DK";
+        }
+
+        /// <summary>
+        /// Company bank account without IBAN is a Danish account (reg.no. + account no.) - not the company country (e.g. a German company with a Danish bank account)
+        /// </summary>
+        public override bool InternationalPayment(string companyIBAN, string creditorIBAN, string creditorSWIFT, string creditorCountryId, string companyCountryId)
+        {
+            return base.InternationalPayment(companyIBAN, creditorIBAN, creditorSWIFT, creditorCountryId, string.IsNullOrWhiteSpace(companyIBAN) ? "DK" : companyCountryId);
+        }
+
+        /// <summary>
         /// Danish Inpayment Form FIK04
         /// </summary>
         public override Tuple<string, string> CreditorFIK04(string ocrLine)
@@ -488,39 +519,10 @@ namespace UnicontaISO20022CreditTransfer
             var zipCode = StandardPaymentFunctions.RegularExpressionReplace(creditor._ZipCode, allowedCharactersRegEx, replaceCharactersRegEx);
             var city = StandardPaymentFunctions.RegularExpressionReplace(creditor._City, allowedCharactersRegEx, replaceCharactersRegEx);
 
-            if (paymentType != ISO20022PaymentTypes.DOMESTIC && (companyBankEnum == CompanyBankENUM.Nordea_DK || companyBankEnum == CompanyBankENUM.Nordea_NO || companyBankEnum == CompanyBankENUM.Nordea_SE))
-            {
-                int maxLines = 2;
-                int maxStrLen = 34;
-
-                if (paymentType == ISO20022PaymentTypes.SEPA)
-                    maxLines = 3;
-
-                var adrText = StringBuilderReuse.Create().Append(adr1).Append(adr2 != null ? ", " : null).Append(adr2).Append(adr3 != null ? ", " : null).Append(adr3). Append(zipCode != null ? ", " : null).Append(zipCode).Append(city != null ? ", " : null).Append(city).ToStringAndRelease();
-                if (adrText.Length > maxLines * maxStrLen)
-                    adrText = adrText.Substring(0, maxLines * maxStrLen);
-
-                var resultList = adrText.Select((x, i) => i)
-                            .Where(i => i % maxStrLen == 0)
-                            .Select(i => adrText.Substring(i, adrText.Length - i >= maxStrLen ? maxStrLen : adrText.Length - i)).ToArray();
-
-                var len = resultList.Length;
-                adr1 = len > 0 ? resultList[0].Trim() : null;
-                adr2 = len > 1 ? resultList[1].Trim() : null;
-                adr3 = len > 2 ? resultList[2].Trim() : null;
-
-                unstructured = true;
-            }
-
-            if (companyBankEnum == CompanyBankENUM.BEC || companyBankEnum == CompanyBankENUM.BankData || companyBankEnum == CompanyBankENUM.SDC)
-                adr1 = adr1 ?? "na"; //adresse skal mindst være en karakter lang for at undgå fejl i banken
-
-            if (zipCode != null && !unstructured)
-            {
-                creditorAddress.ZipCode = zipCode;
-                creditorAddress.CityName = city;
-                creditorAddress.StreetName = adr1;
-            }
+            if (!string.IsNullOrEmpty(city) && !unstructured)
+                StructuredCreditorAddress(creditorAddress, adr1, adr2, adr3, zipCode, city);
+            else if (paymentType == ISO20022PaymentTypes.DOMESTIC && !unstructured)
+                creditorAddress.Unstructured = true; //Address is optional for domestic payments, but unstructured address lines are not allowed - only country is sent
             else
             {
                 creditorAddress.AddressLine1 = adr1;
@@ -583,6 +585,19 @@ namespace UnicontaISO20022CreditTransfer
         }
 
 
+        static readonly DateTime ShortAdviceDiscontinuedDate = new DateTime(2027, 4, 1);
+
+        /// <summary>
+        /// Batch payments move to STEP2 DKK and the NPC format in Q2 2027 (Finans Danmark).
+        /// Domestic account transfers: short advice (20 characters) is discontinued and the message to the beneficiary is limited to 1 x 140 characters.
+        /// </summary>
+        public override bool ShortAdviceDiscontinued(ISO20022PaymentTypes ISOPaymType, CreditorTransPayment trans)
+        {
+            return ISOPaymType == ISO20022PaymentTypes.DOMESTIC &&
+                   (trans._PaymentMethod == PaymentTypes.VendorBankAccount || trans._PaymentMethod == PaymentTypes.IBAN) &&
+                   trans._PaymentDate >= ShortAdviceDiscontinuedDate;
+        }
+
         /// <summary>
         /// Unstructured Remittance Information
         /// </summary>
@@ -594,8 +609,10 @@ namespace UnicontaISO20022CreditTransfer
             if (ustrdText == null)
                 return null;
 
+            var shortAdviceDiscontinued = ShortAdviceDiscontinued(ISOPaymType, trans);
+
             //Extended notification
-            if (ISOPaymType == ISO20022PaymentTypes.DOMESTIC && companyBankEnum != CompanyBankENUM.SDC) //SDC benytter den første linie i <RmtInf><Ustrd> som posteringstekst
+            if (ISOPaymType == ISO20022PaymentTypes.DOMESTIC && companyBankEnum != CompanyBankENUM.SDC && !shortAdviceDiscontinued) //SDC benytter den første linie i <RmtInf><Ustrd> som posteringstekst
             {
                 if (extendedText)
                 {
@@ -621,15 +638,10 @@ namespace UnicontaISO20022CreditTransfer
                         maxLines = 10;
                         maxStrLen = 140;
                     }
-                    else if (ISOPaymType == ISO20022PaymentTypes.SEPA)
+                    else //International (incl. SEPA): one occurrence of 140 characters (Nordea MIG 2.4)
                     {
                         maxLines = 1;
                         maxStrLen = 140;
-                    }
-                    else
-                    {
-                        maxLines = 1;
-                        maxStrLen = 105;
                     }
                     break;
 
@@ -641,8 +653,16 @@ namespace UnicontaISO20022CreditTransfer
                     break;
 
                 case CompanyBankENUM.DanskeBank:
-                    maxLines = 4;
-                    maxStrLen = 35;
+                    if (ISOPaymType == ISO20022PaymentTypes.DOMESTIC)
+                    {
+                        maxLines = 4;
+                        maxStrLen = 35;
+                    }
+                    else //SEPA and CBPR+ only allow one occurrence of max 140 characters
+                    {
+                        maxLines = 1;
+                        maxStrLen = 140;
+                    }
                     break;
 
                 case CompanyBankENUM.BankData:
@@ -653,10 +673,10 @@ namespace UnicontaISO20022CreditTransfer
                         maxLines = 41;
                         maxStrLen = 35;
                     }
-                    else
+                    else //CBPR+: one line of max 140 characters from 10-11-2026
                     {
-                        maxLines = 4;
-                        maxStrLen = 35;
+                        maxLines = 1;
+                        maxStrLen = 140;
                     }
                     break;
 
@@ -666,10 +686,16 @@ namespace UnicontaISO20022CreditTransfer
                     break;
             }
 
+            //STEP2 DKK/NPC: message to beneficiary is one line of max 140 characters for all banks
+            if (shortAdviceDiscontinued)
+            {
+                maxLines = 1;
+                maxStrLen = 140;
+            }
+
             if (ustrdText != string.Empty)
             {
-                if (ustrdText.Length > maxLines * maxStrLen)
-                    ustrdText = ustrdText.Substring(0, maxLines * maxStrLen);
+                ustrdText = LimitUstrdText(ustrdText, maxLines * maxStrLen, trans);
 
                 resultList = ustrdText.Select((x, i) => i)
                             .Where(i => i % maxStrLen == 0)
@@ -723,7 +749,7 @@ namespace UnicontaISO20022CreditTransfer
             if (companyIBAN != null && companyIBAN.Length >= 2)
                 companyBankCountryId = companyIBAN.Substring(0, 2);
             else
-                companyBankCountryId = companyCountryId;
+                companyBankCountryId = "DK"; //Account without IBAN is a Danish account (reg.no. + account no.) - not the company country
 
             //Creditor
             string creditorBankCountryId = null;

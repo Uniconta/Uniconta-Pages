@@ -109,27 +109,15 @@ namespace UnicontaISO20022CreditTransfer
         public override void AllowedCharactersRegEx(bool internationalPayment = false)
         {
             if (internationalPayment)
-                allowedCharactersRegEx = "[^a-zA-Z0-9 -?:().,'+/]";
-            else
-                allowedCharactersRegEx = "[^a-zA-Z0-9äöüÄÖÜß -?:().,'+/]";
-        }
-
-        /// <summary>
-        /// Replacement characters
-        /// </summary>
-        public override Dictionary<string, string> ReplaceCharactersRegEx()
-        {
-            replaceCharactersRegEx = new Dictionary<string, string>
             {
-                ["Æ"] = "AE",
-                ["Ø"] = "OE",
-                ["Å"] = "AA",
-                ["æ"] = "ae",
-                ["ø"] = "oe",
-                ["å"] = "aa"
-            };
-
-            return replaceCharactersRegEx;
+                allowedCharactersRegEx = "[^a-zA-Z0-9 -?:().,'+/]";
+                replaceCharactersRegEx = TransliterateCharacters; //æøå/äöüß omskrives i stedet for at blive fjernet
+            }
+            else
+            {
+                allowedCharactersRegEx = "[^a-zA-Z0-9äöüÄÖÜß -?:().,'+/]";
+                replaceCharactersRegEx = TransliterateNordicCharacters; //äöüß bevares, æøå omskrives
+            }
         }
 
         /// <summary>
