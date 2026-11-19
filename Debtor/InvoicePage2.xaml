@@ -109,10 +109,10 @@ x:Class="UnicontaClient.Pages.CustomPage.InvoicePage2"
                     <CorasauControls:DoubleEditor  FieldName="CashDiscount"/>
                 </CorasauControls:CorasauLayoutItem>
                 <CorasauControls:CorasauLayoutItem FieldName="CashDiscountDate" x:Name="liCashDiscountDate">
-                    <CorasauControls:DateEditor x:Name="dateCashDiscountDate" DateTime="{Binding CashDiscountDate,Mode=TwoWay}"/>
+                    <CorasauControls:DateEditor x:Name="dateCashDiscountDate" EditValue="{Binding CashDiscountDate,Mode=TwoWay}"/>
                 </CorasauControls:CorasauLayoutItem>
                 <CorasauControls:CorasauLayoutItem FieldName="DeliveryDate" x:Name="liDeliveryDate">
-                    <CorasauControls:DateEditor x:Name="dateDeliveryDate" DateTime="{Binding DeliveryDate,Mode=TwoWay}"/>
+                    <CorasauControls:DateEditor x:Name="dateDeliveryDate" EditValue="{Binding DeliveryDate,Mode=TwoWay}"/>
                 </CorasauControls:CorasauLayoutItem>
                 <CorasauControls:CorasauLayoutItem FieldName="Installation " x:Name="liInstallation">
                     <CorasauControls:LookupEditor x:Name="leInstallation" Text="{Binding Installation ,Mode=TwoWay}"/>

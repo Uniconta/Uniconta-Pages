@@ -159,7 +159,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void Table_ShowingEditor(object sender, DevExpress.Xpf.Grid.ShowingEditorEventArgs e)
         {
-            if (e.Column.FieldName == "PaymentDate" || e.Column.FieldName == "PartialPaymentAmount")
+            if (e.Column.FieldName == "PaymentDate" || e.Column.FieldName == "PartialPaymentAmount" || e.Column.FieldName == "GraceDate")
             {
                 var row = e.Row as DCTransOpen;
 
@@ -1013,6 +1013,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             PaymentFormatCache = PaymentFormatCache ?? await api.LoadCache(typeof(Uniconta.DataModel.DebtorPaymentFormat));
             DebtorCache = DebtorCache ?? await api.LoadCache(typeof(Uniconta.DataModel.Debtor));
+            SetIcelandClaimColumns();
 
             foreach (var rec in lst)
             {
@@ -1028,14 +1029,16 @@ namespace UnicontaClient.Pages.CustomPage
                 if (rec.PaymentFormat != null)
                     paymFormatClient = (DebtorPaymentFormat)PaymentFormatCache.Get(rec.PaymentFormat);
 
+                var icelandClaims = IcelandClaimsFormat(paymFormatClient);
                 if (rec.PaymentDate < today && rec._PaymentStatus == PaymentStatusLevel.None)
                 {
-                    var paymDate = rec.GetPayDate();
+                    var paymDate = icelandClaims != null ? IcelandPayDate(rec) : rec.GetPayDate();
                     rec.PaymentDate = today > paymDate ? today : paymDate;
 
                     if (paymFormatClient != null && paymFormatClient._PaymentAction != NoneBankDayAction.None)
                         rec.PaymentDate = Common.AdjustToNextBankDay(company._CountryId, rec._PaymentDate, paymFormatClient._PaymentAction == NoneBankDayAction.After ? true : false);
                 }
+                IcelandEindagi(rec, icelandClaims);
 
                 if (paymFormatClient != null && paymFormatClient._ExportFormat == (byte)DebtorPaymFormatType.SEPA)
                 {

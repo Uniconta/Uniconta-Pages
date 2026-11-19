@@ -17,7 +17,7 @@ namespace UnicontaClient.Pages.CustomPage
         TileDetailsWizardViewModel(TileDataViewModel data) : 
         base(new WizardStepViewModel[] 
             { 
-                new TileTypeStepViewModel(data), new TileConfigurationStepViewModel(data),
+                new TileSourceStepViewModel(data), new TileTypeStepViewModel(data), new TileConfigurationStepViewModel(data),
                 new TilePlacementStepViewModel(data), new TileReviewStepViewModel(data) 
             },
             data.IsExisting ? Uniconta.ClientTools.Localization.lookup("TileEditYourTile") : Uniconta.ClientTools.Localization.lookup("TileCreateYourTile"), Uniconta.ClientTools.Localization.lookup("TileConfigureATileForYourDashboard"), logo: null /* no logo */)
@@ -25,7 +25,7 @@ namespace UnicontaClient.Pages.CustomPage
             Data = data;
             data.Attach(this);
             var parameters = new TileParametersStepViewModel(data);
-            data.ParameterTypeChanged += () => SetOptionalStep(2, parameters, data.HasParameters);
+            data.ParameterTypeChanged += () => SetOptionalStep(3, parameters, data.HasParameters);
             SetOptionalStep(2, parameters, data.HasParameters);
             data.Edited += index => ((TileDetailsStepViewModel)Steps[index]).Invalidate();
             if (data.IsExisting)
@@ -47,6 +47,16 @@ namespace UnicontaClient.Pages.CustomPage
             if (Data.IsProfile) await Data.LoadProfilesAsync(cancellationToken);
             ValidationMessage = Data.ValidationError();
             return string.IsNullOrEmpty(ValidationMessage);
+        }
+    }
+    public sealed class TileSourceStepViewModel : TileDetailsStepViewModel
+    {
+        public TileSourceStepViewModel(TileDataViewModel data) : base(data, Uniconta.ClientTools.Localization.lookup("TileDataSource"), Uniconta.ClientTools.Localization.lookup("TileDataSourceHelp"), Uniconta.ClientTools.Localization.lookup("TileDataSource")) { }
+        public override bool CanContinue => Data.SelectedSource != null;
+        public override Task<bool> ValidateAsync(CancellationToken cancellationToken)
+        {
+            ValidationMessage = CanContinue ? null : Uniconta.ClientTools.Localization.lookup("TileSelectAnAvailableDataSource");
+            return Task.FromResult(CanContinue);
         }
     }
     public sealed class TileTypeStepViewModel : TileDetailsStepViewModel

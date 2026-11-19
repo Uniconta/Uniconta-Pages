@@ -213,6 +213,23 @@ namespace UnicontaClient.Pages.CustomPage
                 appTable.SetMaster(uf);
                 appTable.SetMaster(currentApp);
                 var err = await api.Insert(appTable);
+                if (err == ErrorCodes.Succes)
+                {
+                    var lst = await api.Query<TableField>(uf);
+                    if (lst != null && lst.Length > 0)
+                    {
+                        int i = 0;
+                        var lst2 = new AppTableField[lst.Length];
+                        foreach (var field in lst)
+                        {
+                            var appField = new AppTableField();
+                            appField.SetMaster(field);
+                            appField.SetMaster(appTable);
+                            lst2[i++] = appField;
+                        }
+                        err = await api.Insert(lst2);
+                    }
+                }
                 UtilDisplay.ShowErrorCode(err);
             }
         }

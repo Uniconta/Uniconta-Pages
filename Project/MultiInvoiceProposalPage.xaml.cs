@@ -185,7 +185,7 @@ namespace UnicontaClient.Pages.CustomPage
             GenrateInvoiceDialog.DialogTableId = 2000000011;
             GenrateInvoiceDialog.HideOutlookOption(true);
             GenrateInvoiceDialog.SetInvPrintPreview(printPreview);
-            GenrateInvoiceDialog.SentByEInvoice(api, null, true);
+            GenrateInvoiceDialog.SentByEInvoice(api, (Tuple<NHRNetworkType, NHREndPointType, string, string>)null, true);
 
             GenrateInvoiceDialog.Closed += async delegate
             {
@@ -224,7 +224,7 @@ namespace UnicontaClient.Pages.CustomPage
             bool isOrderOrQuickInv = api.CompanyEntity._CountryId == CountryCode.Germany ? false : true;
             var GenrateInvoiceDialog = new UnicontaClient.Pages.CWGenerateInvoice(true, string.Empty, false, true, true, showNoEmailMsg: !showSendByMail, debtorName: debtorName, isDebtorOrder: true, isOrderOrQuickInv: isOrderOrQuickInv, InvoiceInXML: invoiceInXML);
             GenrateInvoiceDialog.DialogTableId = 2000000013;
-            GenrateInvoiceDialog.SentByEInvoice(api, UtilCommon.GetEndPoint(dbOrder, debtor, api), debtor: debtor, isOneTimeDebtor: dbOrder._OneTimeDC != null);
+            GenrateInvoiceDialog.SentByEInvoice(api, UtilCommon.GetEndPointEx(dbOrder, debtor, api), debtor: debtor, isOneTimeDebtor: dbOrder._OneTimeDC != null);
 
             GenrateInvoiceDialog.Closed += async delegate
             {

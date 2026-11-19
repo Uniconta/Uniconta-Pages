@@ -218,6 +218,7 @@ namespace UnicontaClient.Pages.CustomPage
                         Content = true,
                         ContentTemplate = (DataTemplate)FindResource("DeleteIconTemplate"),
                         Tag = dashboard,
+                        IsEnabled = !tiles.Any(tile => DashboardKey.From(tile).Equals(dashboard) && TileDefinition.FromUserMenu(tile).IsLocked),
                         ToolTip = Uniconta.ClientTools.Localization.lookup("Delete"),
                         Style = (Style)FindResource("DashboardTabButtonStyle"),
                         Margin = new Thickness(3, 0, 18, 0),
@@ -245,7 +246,7 @@ namespace UnicontaClient.Pages.CustomPage
             btnCopyToApp.Visibility = Utility.GetCurrentApp() != null ? Visibility.Visible : Visibility.Collapsed;
             // new tiles default to My Dashboard, regardless of the active tab.
             btnAdd.Visibility = btnAddEmptyDashboard.Visibility = btnAddDashboard.Visibility = Visibility.Visible;
-            btnCreateWithAI.Visibility = btnCreateWithAIBottom.Visibility = !GPTServiceFactory.HideAIControls ? Visibility.Visible : Visibility.Collapsed;
+            btnCreateWithAI.Visibility = btnCreateWithAIBottom.Visibility = GPTServiceFactory.IsAIAssistantEnabled(api.CompanyEntity, api.session) ? Visibility.Visible : Visibility.Collapsed;
             btnAdd.IsEnabled = btnAddEmptyDashboard.IsEnabled = btnAddDashboard.IsEnabled = btnCreateWithAI.IsEnabled = btnCreateWithAIBottom.IsEnabled = !savingPlacement;
         }
 
@@ -287,11 +288,18 @@ namespace UnicontaClient.Pages.CustomPage
                 return;
             CancelInteractions();
             var dashboard = (DashboardKey)((System.Windows.Controls.Button)sender).Tag;
+            var dashboardItems = tiles.Where(tile => DashboardKey.From(tile).Equals(dashboard)).ToList();
+            var controller = new TileCRUDController(api);
+            if (dashboardItems.Any(controller.IsLocked))
+                return;
+
             if (UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("DeleteConfirmation"),
                 Uniconta.ClientTools.Localization.lookup("Confirmation"), MessageBoxButton.OKCancel) != MessageBoxResult.OK)
                 return;
 
-            var dashboardItems = tiles.Where(tile => DashboardKey.From(tile).Equals(dashboard)).ToList();
+            if (dashboardItems.Any(controller.IsLocked))
+                return;
+
             var result = await api.Delete(dashboardItems);
             if (result != ErrorCodes.Succes)
             {
@@ -449,7 +457,11 @@ namespace UnicontaClient.Pages.CustomPage
         private void ShowTileMenu(TileControl control, UserMenuClient menu)
         {
             var contextMenu = new ContextMenu();
-            var edit = new MenuItem { Header = Uniconta.ClientTools.Localization.lookup("Edit") };
+            var edit = new MenuItem 
+            { 
+                Header = Uniconta.ClientTools.Localization.lookup("Edit"),
+                IsEnabled   = !new TileCRUDController(api).IsLocked(menu)
+            };
             edit.Click += (sender, args) => { if (!savingPlacement && !pageClosing) control.EditTile(); };
             contextMenu.Items.Add(edit);
 
@@ -467,9 +479,24 @@ namespace UnicontaClient.Pages.CustomPage
 
             contextMenu.Items.Add(new Separator());
 
+
+            var isLocked = TileDefinition.FromUserMenu(menu).IsLocked;
+            if (CanAddCompanyTiles)
+            {
+                var toggleLock = new MenuItem
+                {
+                    Header = Uniconta.ClientTools.Localization.lookup("Lock"),
+                    IsCheckable = true,
+                    IsChecked = isLocked
+                };
+                toggleLock.Click += async (sender, args) => await SetTileLockAsync(menu, toggleLock.IsChecked);
+                contextMenu.Items.Add(toggleLock);
+            }
+
             var delete = new MenuItem
             {
-                Header = Uniconta.ClientTools.Localization.lookup("Delete")
+                Header = Uniconta.ClientTools.Localization.lookup(isLocked ? "IsLocked" : "Delete"),
+                IsEnabled = !isLocked
             };
 
             delete.Click += async (sender, args) =>
@@ -488,6 +515,63 @@ namespace UnicontaClient.Pages.CustomPage
             contextMenu.PlacementTarget = control;
             contextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.MousePoint;
             contextMenu.IsOpen = true;
+        }
+
+        private async Task SetTileLockAsync(UserMenuClient menu, bool isLocked)
+        {
+            if (savingPlacement || pageClosing || reloadTilesTask != null || !CanAddCompanyTiles || !hosts.ContainsKey(menu))
+                return;
+
+            CancelInteractions();
+            SetPlacementBusy(true);
+            try
+            {
+                var definition = TileDefinition.FromUserMenu(menu);
+
+                if (definition.IsLocked && definition.IsUnicontaHtmlTile())
+                    return;
+
+                definition.IsLocked = isLocked;
+                var updated = (UserMenuClient)StreamingManager.Clone(menu);
+                definition.ApplyTo(updated);
+                var defaults = defaultTiles.Contains(menu)
+                    ? defaultTiles.Where(tile => DashboardKey.From(tile).Equals(DashboardKey.From(menu))).ToList()
+                    : null;
+                var inserted = defaults?.Select(tile => ReferenceEquals(tile, menu) ? updated : (UserMenuClient)StreamingManager.Clone(tile)).ToList();
+                var result = inserted == null ? await api.Update(updated) : await api.Insert(inserted);
+                if (result != ErrorCodes.Succes)
+                {
+                    UtilDisplay.ShowErrorCode(result);
+                    return;
+                }
+
+                if (defaults == null)
+                {
+                    menu.Copy(updated);
+                    TileCRUDController.UpdateTileCache(api.CompanyEntity, menu);
+                }
+                else
+                {
+                    for (int i = 0; i < defaults.Count; i++)
+                    {
+                        var tile = defaults[i];
+                        defaultTiles.Remove(tile);
+                        tile.Copy(inserted[i]);
+                        TileCRUDController.UpdateTileCache(api.CompanyEntity, tile);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                UnicontaMessageBox.Show(ex, Uniconta.ClientTools.Localization.lookup("Exception"), MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                SetPlacementBusy(false);
+            }
+
+            if (!pageClosing)
+                RebuildTiles();
         }
 
         private async Task MoveTileAsync(UserMenuClient menu, DashboardKey destination)
@@ -904,8 +988,11 @@ namespace UnicontaClient.Pages.CustomPage
                 var copies = new List<AppUserMenuClient>();
                 foreach (var tile in copyFrom)
                 {
+                    var definition = TileDefinition.FromUserMenu(tile);
+                    var source = tile;
+                    
                     var appTile = new AppUserMenuClient();
-                    appTile.SetMaster(tile);
+                    appTile.SetMaster(source);
                     appTile.SetMaster(currentApp);
                     copies.Add(appTile);
                 }
@@ -1055,6 +1142,7 @@ namespace UnicontaClient.Pages.CustomPage
                 {
                     // Import adds tiles to the selected dashboard; never copies record IDs or ownership.
                     if (definition.IsDashboardDefinition) continue;
+                    definition.IsLocked = false;
                     definition.Scope = selectedDashboard.Scope;
                     definition.Profile = selectedDashboard.Profile;
                     definition.DashboardTab = selectedDashboard.Name;
@@ -1093,7 +1181,12 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (savingPlacement || pageClosing)
                 return;
-            if(App.MainPageObj.assistantHost is AIAssistantHost assistantHost)
+            if (!api.CompanyEntity.AIAssistant)
+            {
+                UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("AINotConfigured"), Uniconta.ClientTools.Localization.lookup("Warning"));
+                return;
+            }
+            if (App.MainPageObj.assistantHost is AIAssistantHost assistantHost)
             {
                 assistantHost.SetActiveConsumer(this);
                 assistantHost.Show();
@@ -1160,6 +1253,9 @@ namespace UnicontaClient.Pages.CustomPage
         internal async Task<ErrorCodes> RemoveTileAsync(UserMenuClient menu)
         {
             if (savingPlacement || pageClosing)
+                return ErrorCodes.NoChange;
+            menu = tiles?.FirstOrDefault(tile => tile.Equals(menu));
+            if (menu == null)
                 return ErrorCodes.NoChange;
             CancelInteractions();
 
@@ -1487,6 +1583,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (existing == null || existing.RowId == 0)
                 definition.NormalizeNewDashboard();
+            definition.IsLocked = existing != null && IsLocked(existing);
             definition.Validate();
 
             if (definition.IsCustomTile)
@@ -1511,13 +1608,9 @@ namespace UnicontaClient.Pages.CustomPage
             ErrorCodes error;
             if (scopeChanged && existing.RowId > 0)
             {
-                error = await api.Delete(existing);
-
-                if (error != ErrorCodes.Succes)
-                    return Tuple.Create(error, existing);
-
-                UpdateTileCache(api.CompanyEntity, existing, deleted: true);
-                error = await api.Insert(menu);
+                error = await api.MultiCrud(new[] { menu }, Array.Empty<UserMenuClient>(), new[] { existing });
+                if (error == ErrorCodes.Succes)
+                    UpdateTileCache(api.CompanyEntity, existing, deleted: true);
             }
             else if (menu.RowId == 0)
             {
@@ -1539,9 +1632,17 @@ namespace UnicontaClient.Pages.CustomPage
         {
             if (menu == null)
                 throw new ArgumentNullException(nameof(menu));
+            if (IsLocked(menu))
+                return ErrorCodes.NoChange;
             var error = await api.Delete(menu);
             if (error == ErrorCodes.Succes) UpdateTileCache(api.CompanyEntity, menu, true);
             return error;
+        }
+
+        internal bool IsLocked(UserMenu menu)
+        {
+            var cached = menu.RowId == 0 ? null : api.CompanyEntity.userMenuDefs?.FirstOrDefault(tile => tile.RowId == menu.RowId);
+            return TileDefinition.FromUserMenu(cached ?? menu).IsLocked;
         }
 
         internal static void UpdateTileCache(Company company, UserMenuClient menu, bool deleted = false)

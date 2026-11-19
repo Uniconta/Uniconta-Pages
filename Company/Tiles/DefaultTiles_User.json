@@ -36,7 +36,8 @@
     "TileTypeParameters": null,
     "SourceName": null,
     "Title": "Uniconta",
-    "Group": null,
+    "Group": "Uniconta",
+    "IsLocked": true,
     "Filter": null,
     "NavigationTarget": null,
     "HtmlSources": [
@@ -45,7 +46,7 @@
         "Url": "https://www.uniconta.com/da/uc-tile/"
       },
       {
-        "CountryCode": 148,
+        "CountryCode": 150,
         "Url": "https://www.uniconta.com/nl/uc-tegel/"
       },
       {
@@ -53,11 +54,11 @@
         "Url": "https://www.uniconta.com/de/uc-kachel/"
       },
       {
-        "CountryCode": 93,
+        "CountryCode": 94,
         "Url": "https://www.uniconta.com/is/uc-reitur/"
       },
       {
-        "CountryCode": 125,
+        "CountryCode": 122,
         "Url": "https://www.uniconta.com/lt/uc-modulis/"
       },
       {

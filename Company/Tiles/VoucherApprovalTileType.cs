@@ -27,6 +27,8 @@ namespace UnicontaClient.Pages.CustomPage
     [DisplayName("Voucher approval")]
     public sealed class VoucherApprovalTileType : ITileTypeWithParms, ITileDropTarget
     {
+        const int MaxVoucherItems = 100;
+
         public VoucherApprovalTileParameters Settings { get; private set; } = new VoucherApprovalTileParameters();
         public object Parameters => Settings;
         public string Serialize() => Newtonsoft.Json.JsonConvert.SerializeObject(Settings);
@@ -96,9 +98,18 @@ namespace UnicontaClient.Pages.CustomPage
 
         async Task FetchCoreAsync()
         {
+            /*
+            var vouchers = await Api.Query<VouchersClient>(new DocumentNoRef(), new[]
+            {
+                PropValuePair.GenereteWhereElements(nameof(VouchersClient.Created), DateTime.Now.AddMonths(-6), CompareOperator.GreaterThanOrEqual),
+                PropValuePair.GenereteTakeN(100),
+                PropValuePair.GenereteOrderByElement(nameof(VouchersClient.RowId), Descending: true)
+            }) ?? new VouchersClient[0];
+            */
+
             var vouchers = await Api.Query<VouchersClient>(new DocumentNoRef()) ?? new VouchersClient[0];
             var voucherType = Api.CompanyEntity.GetUserType(typeof(VouchersClient)) ?? typeof(VouchersClient);
-            var approvalVouchers = (VouchersClient[])await documentApi.DocumentsForApproval((VouchersClient)Activator.CreateInstance(voucherType));
+            var approvalVouchers = (VouchersClient[])await documentApi.DocumentsForApproval((VouchersClient)Activator.CreateInstance(voucherType), shortList: true);
             var employees = await Api.LoadCache<EmployeeClient>();
             var currentApprovers = new HashSet<string>(employees?.Where(employee => employee.UserLoginId == Api.session.LoginId && !string.IsNullOrWhiteSpace(employee.Number))
                 .Select(employee => employee.Number) ?? Enumerable.Empty<string>());
@@ -106,6 +117,7 @@ namespace UnicontaClient.Pages.CustomPage
             // The service owns eligibility, including sequential/delegated approval rules.
             var needsApproval = (approvalVouchers ?? new VouchersClient[0])
                 .OrderByDescending(x => x.RowId)
+                .Take(MaxVoucherItems + 1)
                 .Select(CreateTileItem)
                 .ToArray();
 
@@ -120,6 +132,7 @@ namespace UnicontaClient.Pages.CustomPage
                      (!x._Approved2 && !currentApprovers.Contains(x._Approver2))))
                 .OrderByDescending(x => CurrentUserApprovalDate(x, currentApprovers))
                 .ThenByDescending(x => x.RowId)
+                .Take(MaxVoucherItems + 1)
                 .Select(CreateTileItem)
                 .ToArray();
 
@@ -134,8 +147,9 @@ namespace UnicontaClient.Pages.CustomPage
 
             var summary = new VoucherApprovalTileData
             {
-                NeedsApproval = needsApproval,
-                AwaitingOthers = awaitingOthers,
+                IsTruncated = needsApproval.Length > MaxVoucherItems || awaitingOthers.Length > MaxVoucherItems,
+                NeedsApproval = needsApproval.Take(MaxVoucherItems).ToArray(),
+                AwaitingOthers = awaitingOthers.Take(MaxVoucherItems).ToArray(),
                 Approved = approved
             };
 
@@ -537,6 +551,8 @@ namespace UnicontaClient.Pages.CustomPage
 
     public sealed class VoucherApprovalTileData : UnicontaBaseEntity
     {
+        public bool IsTruncated { get; set; }
+
         public int NeedsApprovalCount => NeedsApproval?.Count ?? 0;
         public int AwaitingOthersCount => AwaitingOthers?.Count ?? 0;
         public int ApprovedCount => Approved?.Count ?? 0;

@@ -1344,7 +1344,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (additionalOrdersList != null)
                 GenrateInvoiceDialog.SetAdditionalOrders(additionalOrdersList);
 
-            GenrateInvoiceDialog.SentByEInvoice(api, UtilCommon.GetEndPoint(dbOrder, debtor, api), debtor: debtor, isOneTimeDebtor: dbOrder._OneTimeDC != null);
+            GenrateInvoiceDialog.SentByEInvoice(api, UtilCommon.GetEndPointEx(dbOrder, debtor, api), debtor: debtor, isOneTimeDebtor: dbOrder._OneTimeDC != null);
 
             GenrateInvoiceDialog.ShowAllowCredMax(debtor?._CreditMax != 0);
 

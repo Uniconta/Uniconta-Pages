@@ -31,60 +31,8 @@ namespace UnicontaClient.Pages.CustomPage
 
     public class TableChangeEventLocalClient : TableChangeEventClient
     {
-        public string _table;
-
         [Display(Name = "Table", ResourceType = typeof(TableChangeEventClientText))]
-        public string Table { get { return GetTableName(_TableId); } set { _table = value; _TableId = GetClassId(_table); } }
-
-        string GetTableName(int id)
-        {
-            if (id != 0)
-            {
-                foreach (var type in Global.GetStandardRefTables())
-                {
-                    var table = Activator.CreateInstance(type) as UnicontaBaseEntity;
-                    if (id == table.ClassId())
-                        return type.Name;
-                }
-
-                foreach (var usrType in Global.GetUserTables(Company.Get(CompanyId)))
-                {
-                    var usrTable = Activator.CreateInstance(usrType) as UnicontaBaseEntity;
-                    if (usrTable is TableData tblData && id == tblData.GetClassIdSpecial())
-                        return usrType.Name;
-                }
-
-                if (id == InvItemStorage.CLASSID)
-                    return "InvItemStorage";
-            }
-            return string.Empty;
-        }
-
-        int GetClassId(string key)
-        {
-            if (!string.IsNullOrEmpty(key))
-            {
-                var table = Global.GetStandardRefTables().FirstOrDefault(x => x.Name == key);
-                if (table != null)
-                {
-                    var tableType = Activator.CreateInstance(table) as UnicontaBaseEntity;
-                    return tableType.ClassId();
-                }
-
-                var usrTable = Global.GetUserTables(Company.Get(CompanyId)).FirstOrDefault(x => x.Name == key);
-                if (usrTable != null)
-                {
-                    var usrTableType = Activator.CreateInstance(usrTable) as UnicontaBaseEntity;
-                    if (usrTableType is TableData tblData)
-                        return tblData.GetClassIdSpecial();
-                }
-
-                if (key == "InvItemStorage")
-                    return InvItemStorage.CLASSID;
-
-            }
-            return 0;
-        }
+        public int Table { get { return _TableId; } set { _TableId = value; NotifyPropertyChanged("Table"); } }
     }
     public partial class ChangeNotificationPage : GridBasePage
     {
@@ -103,21 +51,26 @@ namespace UnicontaClient.Pages.CustomPage
 
         private void BindRefTable()
         {
-            var referenceTables = new List<string>(100);
-            foreach (Type tabletype in Global.GetTables(api.CompanyEntity))
+            var comp = api.CompanyEntity;
+            var referenceTables = new List<KeyValuePair<string, int>>(300);
+            var ids = new HashSet<int>();
+            foreach (Type tabletype in Global.GetTables(comp, true))
             {
-                if (typeof(IRowId).IsAssignableFrom(tabletype))
-                    referenceTables.Add(tabletype.Name);
+                if (typeof(IRowId).IsAssignableFrom(tabletype) && Activator.CreateInstance(tabletype) is UnicontaBaseEntity rec && ids.Add(rec.ClassId()))
+                    referenceTables.Add(new KeyValuePair<string, int>(tabletype.Name, rec.ClassId()));
             }
 
             //UserDefined Tables
-            foreach (var userRefTable in Global.GetUserTables(api.CompanyEntity))
+            foreach (var userRefTable in Global.GetUserTables(comp))
             {
-                if (typeof(IRowId).IsAssignableFrom(userRefTable))
-                    referenceTables.Add(userRefTable.Name);
+                if (Activator.CreateInstance(userRefTable) is TableData tblData && ids.Add(tblData.GetClassIdSpecial()))
+                    referenceTables.Add(new KeyValuePair<string, int>(userRefTable.Name, tblData.GetClassIdSpecial()));
             }
-            referenceTables.Add("InvItemStorage");
-            referenceTables.Sort();
+
+            if (ids.Add(InvItemStorage.CLASSID))
+                referenceTables.Add(new KeyValuePair<string, int>("InvItemStorage", InvItemStorage.CLASSID));
+
+            referenceTables.Sort((a, b) => string.Compare(a.Key, b.Key));
             cmbTableTypes.ItemsSource = referenceTables;
         }
 

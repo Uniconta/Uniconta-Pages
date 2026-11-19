@@ -23,9 +23,9 @@ x:Class="UnicontaClient.Pages.CustomPage.ChangeNotificationPage"
                             <editor:ComboBoxEditSettings x:Name="cmbJobs" AutoComplete="True" IncrementalFiltering="True" />
                         </local:CorasauDataGridTemplateColumnClient.EditSettings>
                     </local:CorasauDataGridTemplateColumnClient>
-                    <local:CorasauDataGridTemplateColumnClient x:Name="Table" Width="150">
+                    <local:CorasauDataGridTemplateColumnClient x:Name="Table" Width="150" ColumnFilterMode="DisplayText" SortMode="DisplayText">
                         <local:CorasauDataGridTemplateColumnClient.EditSettings>
-                            <editor:ComboBoxEditSettings x:Name="cmbTableTypes" AutoComplete="True" IncrementalFiltering="True" ></editor:ComboBoxEditSettings>
+                            <editor:ComboBoxEditSettings x:Name="cmbTableTypes" DisplayMember="Key" ValueMember="Value" AutoComplete="True" IncrementalFiltering="True" ></editor:ComboBoxEditSettings>
                         </local:CorasauDataGridTemplateColumnClient.EditSettings>
                     </local:CorasauDataGridTemplateColumnClient>
                     <local:CorasauDataGridTemplateColumnClient x:Name="Url" Width="300">

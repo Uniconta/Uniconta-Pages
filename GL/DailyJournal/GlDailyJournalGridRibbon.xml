@@ -31,6 +31,7 @@
     <RibbonItem Action="MatchVoucherToLines" LocalizedNameKey="MatchVoucherToLines" ControlName="MatchPhysicalVoucherToGLDailyJournalLines" LargeGlyph="Match_32x32" />
   </RibbonItem>
   <RibbonItem LocalizedNameKey="Load">
+    <RibbonItem Action="Mappings" LocalizedNameKey="PostingRule" LargeGlyph="Match_32x32" />
     <RibbonItem Action="ImportBankStatement" LocalizedNameKey="ImportOBJ" Parameter="BankStatement" ControlName="ImportGLDailyJournal" LargeGlyph="Import_32x32"/>
     <RibbonItem Action="ImportData" LocalizedNameKey="ImportFromFile" Parameter="" LargeGlyph="Import_32x32"/>
   </RibbonItem>

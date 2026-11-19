@@ -18,13 +18,11 @@ using UnicontaClient.Utilities;
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
 {
-    public class AppClientSort : IComparer
+    class AppClientSort : IComparer
     {
         public int Compare(object x, object y)
         {
-            var xTag = Convert.ToString(x);
-            var yTag = Convert.ToString(y);
-            return string.Compare(xTag, yTag, StringComparison.Ordinal);
+            return ((AppClient)x).AppId - ((AppClient)y).AppId;
         }
     }
 

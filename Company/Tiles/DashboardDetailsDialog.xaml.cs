@@ -96,9 +96,11 @@ namespace UnicontaClient.Pages.CustomPage
                 var updates = new List<UserMenuClient>();
                 var deletes = new List<UserMenuClient>();
                 UserMenuClient dashboardMenu = null;
+                var controller = new TileCRUDController(api);
                 foreach (var original in dashboardItems)
                 {
                     var tile = TileDefinition.FromUserMenu(original);
+                    tile.IsLocked = controller.IsLocked(original);
                     tile.DashboardTab = definition.DashboardTab;
                     tile.Scope = definition.Scope;
                     tile.Profile = definition.Profile;

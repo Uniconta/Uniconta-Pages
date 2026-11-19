@@ -27,6 +27,7 @@ x:Class="UnicontaClient.Pages.CustomPage.CWTileDetails"
             <Setter Property="ImmediatePopup" Value="True"/>
             <Setter Property="ValidateOnTextInput" Value="False"/>
         </Style>
+        <DataTemplate DataType="{x:Type local:TileSourceStepViewModel}"><local:TileSourceStepView/></DataTemplate>
         <DataTemplate DataType="{x:Type local:TileTypeStepViewModel}"><local:TileTypeStepView/></DataTemplate>
         <DataTemplate DataType="{x:Type local:TileConfigurationStepViewModel}"><local:TileConfigurationStepView/></DataTemplate>
         <DataTemplate DataType="{x:Type local:TileParametersStepViewModel}"><local:TileParametersStepView/></DataTemplate>

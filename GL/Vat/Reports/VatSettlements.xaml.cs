@@ -244,15 +244,16 @@ namespace UnicontaClient.Pages.CustomPage
                 dgVatVatSettlements.Refresh();
         }
 
-        static long Generate(VatReportLine[] lst, List<GLTransClientTotal> Trans, DateTime Date, int CompanyId, string Offset, string Text)
+        static long Generate(VatReportLine[] lst, List<GLTransClientTotal> Trans, DateTime Date, int CompanyId, string Offset, string dif, string Text)
         {
-            long total = 0;
+            bool doRound = (dif != null);
+            long total = 0, l, d;
             for (var i = 0; i < lst.Length; i++)
             {
                 var lin = lst[i];
                 if (lin.AccountIsVat != 0 && lin.AmountWithVat != 0 && lin.AccountNumber != null)
                 {
-                    var l = NumberConvert.ToLong(lin.AmountWithVat * 100d, true);
+                    l = NumberConvert.ToLong(lin.AmountWithVat * 100d, !doRound);
                     total += l;
                     Trans.Add(new GLTransClientTotal
                     {
@@ -263,12 +264,29 @@ namespace UnicontaClient.Pages.CustomPage
                         _Text = Text ?? Util.ConcatParenthesis(Localization.lookup("VatSettlement"), lin.Vat?._Vat),
                         _Origin = LedgerPostingType.VatSettlement
                     });
+                    if (doRound)
+                    {
+                        d = l - NumberConvert.ToLong(lin.AmountWithVat * 100d, true);
+                        if (d != 0)
+                        {
+                            total -= d;
+                            Trans.Add(new GLTransClientTotal
+                            {
+                                CompanyId = CompanyId,
+                                _Date = Date,
+                                _Account = dif,
+                                _AmountCent = d,
+                                _Text = Text,
+                                _Origin = LedgerPostingType.VatSettlement
+                            });
+                        }
+                    }
                 }
                 else if (lin.AmountWithout != 0 && lin.Account != null &&
                         (lin.Account._SystemAccount == (byte)SystemAccountTypes.ManuallyReceivableVAT ||
                          lin.Account._SystemAccount == (byte)SystemAccountTypes.ManuallyPayableVAT))
                 {
-                    var l = NumberConvert.ToLong(lin.AmountWithout * 100d, true);
+                    l = NumberConvert.ToLong(lin.AmountWithout * 100d, !doRound);
                     total += l;
                     Trans.Add(new GLTransClientTotal
                     {
@@ -279,7 +297,23 @@ namespace UnicontaClient.Pages.CustomPage
                         _Text = Text,
                         _Origin = LedgerPostingType.VatSettlement
                     });
-
+                    if (doRound)
+                    {
+                        d = l - NumberConvert.ToLong(lin.AmountWithout * 100d, true);
+                        if (d != 0)
+                        {
+                            total -= d;
+                            Trans.Add(new GLTransClientTotal
+                            {
+                                CompanyId = CompanyId,
+                                _Date = Date,
+                                _Account = dif,
+                                _AmountCent = d,
+                                _Text = Text,
+                                _Origin = LedgerPostingType.VatSettlement
+                            });
+                        }
+                    }
                 }
             }
             if (total != 0 && Offset != null)
@@ -298,15 +332,16 @@ namespace UnicontaClient.Pages.CustomPage
             return total;
         }
 
-        static long Generate(VatSumOperationReport[] lst, List<GLTransClientTotal> Trans, DateTime Date, int CompanyId, string Offset, string Text)
+        static long Generate(VatSumOperationReport[] lst, List<GLTransClientTotal> Trans, DateTime Date, int CompanyId, string Offset, string dif, string Text)
         {
+            bool doRound = (dif != null);
             long total = 0;
             for (var i = 13; (i < lst.Length && i < 19); i++)
             {
                 var lin = lst[i];
                 if (lin._Amount != 0)
                 {
-                    var l = NumberConvert.ToLong(lin._Amount * 100d, true);
+                    var l = NumberConvert.ToLong(lin._Amount * 100d, !doRound);
                     total += l;
                     Trans.Add(new GLTransClientTotal
                     {
@@ -317,6 +352,23 @@ namespace UnicontaClient.Pages.CustomPage
                         _Text = Text,
                         _Origin = LedgerPostingType.VatSettlement
                     });
+                    if (doRound)
+                    {
+                        var d = l - NumberConvert.ToLong(lin._Amount * 100d, true);
+                        if (d != 0)
+                        {
+                            total -= d;
+                            Trans.Add(new GLTransClientTotal
+                            {
+                                CompanyId = CompanyId,
+                                _Date = Date,
+                                _Account = dif,
+                                _AmountCent = d,
+                                _Text = Text,
+                                _Origin = LedgerPostingType.VatSettlement
+                            });
+                        }
+                    }
                 }
             }
             if (total != 0 && Offset != null)
@@ -337,16 +389,17 @@ namespace UnicontaClient.Pages.CustomPage
 
         void Post(GLVatReportedClient rec, bool post)
         {
-            string Offset = null;
+            string Offset = null, dif = null;
             var Accounts = api.GetCache(typeof(GLAccount));
             var arr = (GLAccount[])Accounts.GetRecords;
             for (int i = 0; (i < arr.Length); i++)
             {
-                if (arr[i].SystemAccountEnum == SystemAccountTypes.VATSettlement)
-                {
+                if (arr[i].SystemAccountEnum == 0)
+                    continue;
+                else if (arr[i].SystemAccountEnum == SystemAccountTypes.VATSettlement)
                     Offset = arr[i]._Account;
-                    break;
-                }
+                else if (arr[i].SystemAccountEnum == SystemAccountTypes.VatRounding)
+                    dif = arr[i]._Account;
             }
 
             SQLCache vattypes = null;
@@ -373,16 +426,16 @@ namespace UnicontaClient.Pages.CustomPage
             var sumPeriod = (VatSumOperationReport[])cs.ToArray(typeof(VatSumOperationReport));
 
             var Trans = new List<GLTransClientTotal>(50);
-            var total = Generate(lstPeriod, Trans, rec._ToDate, rec.CompanyId, Offset, null);
+            var total = Generate(lstPeriod, Trans, rec._ToDate, rec.CompanyId, Offset, dif, null);
             if (country == CountryCode.Denmark || country == CountryCode.Greenland || country == CountryCode.FaroeIslands)
-                total += Generate(sumPeriod, Trans, rec._ToDate, rec.CompanyId, Offset, null);
+                total += Generate(sumPeriod, Trans, rec._ToDate, rec.CompanyId, Offset, dif, null);
 
             // last period
             lstPeriod = (VatReportLine[])cs.ToArray(typeof(VatReportLine));
             sumPeriod = (VatSumOperationReport[])cs.ToArray(typeof(VatSumOperationReport));
             cs.Release();
 
-            total += Generate(lstPeriod, Trans, rec._ToDate, rec.CompanyId, Offset, Uniconta.Common.Utility.Util.ConcatParenthesis(Localization.lookup("VatSettlement"), Localization.lookup("LastPeriod")));
+            total += Generate(lstPeriod, Trans, rec._ToDate, rec.CompanyId, Offset, dif, Uniconta.Common.Utility.Util.ConcatParenthesis(Localization.lookup("VatSettlement"), Localization.lookup("LastPeriod")));
 
             if (!post || total != 0)
                 AddDockItem(TabControls.SimulatedTransactions, Trans.ToArray(), Uniconta.ClientTools.Localization.lookup("SimulatedTransactions"), null, true);

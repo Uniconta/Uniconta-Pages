@@ -225,5 +225,10 @@ namespace UnicontaClient.Pages.CustomPage
             }
             busyIndicator.IsBusy = false;
         }
+
+        private void Name_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            DgDashboardpage_RowDoubleClick();
+        }
     }
 }

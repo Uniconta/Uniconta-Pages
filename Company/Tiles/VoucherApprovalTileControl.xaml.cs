@@ -96,6 +96,7 @@ namespace UnicontaClient.Pages.CustomPage
         public void SetSummary(VoucherApprovalTileData summary)
         {
             this.summary = summary;
+            SubtitleText.Text = Uniconta.ClientTools.Localization.lookup(summary?.IsTruncated == true ? "TileOnlyFirst100ItemsShown" : "TileUploadAndTrackYourInvoices");
 
             if (summary == null)
             {

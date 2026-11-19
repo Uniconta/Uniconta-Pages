@@ -113,9 +113,10 @@ namespace UnicontaClient.Pages.CustomPage
             set
             {
                 isDeleteMode = value;
-                btnEditTile.Content = value ? (object)true : "⋮";
-                btnEditTile.ContentTemplate = value ? (DataTemplate)FindResource("DeleteIconTemplate") : null;
-                btnEditTile.ToolTip = value ? Uniconta.ClientTools.Localization.lookup("Delete") : Uniconta.ClientTools.Localization.lookup("Edit");
+                var showDelete = value && !Definition.IsLocked;
+                btnEditTile.Content = showDelete ? (object)true : "⋮";
+                btnEditTile.ContentTemplate = showDelete ? (DataTemplate)FindResource("DeleteIconTemplate") : null;
+                btnEditTile.ToolTip = Uniconta.ClientTools.Localization.lookup(showDelete ? "Delete" : "Edit");
                 TileDragHandle.Visibility = ResizeGrip.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
                 TileDragHandle.IsEnabled = ResizeGrip.IsEnabled = value;
                 if (!value)
@@ -136,6 +137,7 @@ namespace UnicontaClient.Pages.CustomPage
             var tileData = new TileData() { Header = userMenu._Prompt, TileType = Definition.IsCustomTile ? Definition.TileTypeId : Definition.Visualization.ToString() };
             this.tile = tileData;
             this.DataContext = tileData;
+            UpdateTableTypeLabelVisibility();
 
             SizeChanged += (sender, args) => RenderChart();
             Unloaded += (sender, args) => CloseHtmlWidget();
@@ -246,6 +248,7 @@ namespace UnicontaClient.Pages.CustomPage
             ResizeSizePopup.Visibility = Visibility.Visible;
         }
         readonly List<ChartValue> chartValues = new List<ChartValue>();
+        bool chartHasSourceSorting;
         public List<Uniconta.ClientTools.Page.BasePage.ValuePair> GetFilterPair(string filterString)
         {
             if (string.IsNullOrEmpty(filterString))
@@ -271,6 +274,15 @@ namespace UnicontaClient.Pages.CustomPage
             }
             return GridFilter;
         }
+        void UpdateTableTypeLabelVisibility()
+        {
+            var isTableSource = !Definition.IsCustomTile &&
+                                Definition.Visualization != TileVisualization.HtmlWidget &&
+                                string.IsNullOrWhiteSpace(Definition.SourceName) &&
+                                Definition.TableId > 0;
+            TableTypeLabel.Visibility = isTableSource ? Visibility.Visible : Visibility.Collapsed;
+        }
+
         public async Task LoadAsync()
         {
             if (!Dispatcher.CheckAccess())
@@ -287,6 +299,8 @@ namespace UnicontaClient.Pages.CustomPage
             {
                 reloadDefinitionPending = false;
                 Definition = TileDefinition.FromUserMenu(userMenu);
+                tile.TableName = null;
+                UpdateTableTypeLabelVisibility();
                 dataSource = null;
                 standaloneTile = null;
                 customTile = null;
@@ -354,6 +368,10 @@ namespace UnicontaClient.Pages.CustomPage
                     if (rows == null)
                         throw new InvalidOperationException("The tile datasource did not return rows for aggregation.");
 
+                    var sorter = Definition.Visualization == TileVisualization.Number ? null : Definition.GetRowSorter(dataSource.DataType);
+                    if (sorter != null)
+                        rows = rows.OrderBy(row => row, Comparer<UnicontaBaseEntity>.Create(sorter.Compare));
+
                     if (Definition.Visualization == TileVisualization.RecordText)
                     {
                         var record = rows.FirstOrDefault();
@@ -362,7 +380,7 @@ namespace UnicontaClient.Pages.CustomPage
                     else if (Definition.Visualization == TileVisualization.Number)
                         tile.Value = Aggregate(rows, Definition.Aggregate, Definition.ValueColumns?.FirstOrDefault()).ToString("N2");
                     else
-                        BuildChartValues(rows, dataSource.DataType);
+                        BuildChartValues(rows, dataSource.DataType, sorter != null);
                 }
                 tile.TableName = dataSource.DisplayName;
                 tile.Header = Definition.Title;
@@ -386,8 +404,9 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        void BuildChartValues(IEnumerable<UnicontaBaseEntity> rows, Type rowType)
+        void BuildChartValues(IEnumerable<UnicontaBaseEntity> rows, Type rowType, bool hasSourceSorting)
         {
+            chartHasSourceSorting = hasSourceSorting;
             var groupProperty = rowType.GetProperty(Definition.GroupBy) ??
                 CorasauDataGridTemplateColumn.GetPropertyFromFieldName(rowType, Definition.GroupBy);
             if (groupProperty == null)
@@ -424,7 +443,8 @@ namespace UnicontaClient.Pages.CustomPage
                     });
                 }
             }
-            if (Definition.Visualization == TileVisualization.Pie || Definition.Visualization == TileVisualization.Donut || Definition.Visualization == TileVisualization.Funnel)
+            if (!hasSourceSorting && (Definition.Visualization == TileVisualization.Pie ||
+                Definition.Visualization == TileVisualization.Donut || Definition.Visualization == TileVisualization.Funnel))
                 chartValues.Sort((left, right) => right.Value.CompareTo(left.Value));
             tile.Value = chartValues.Sum(item => item.Value).ToString("N2");
         }
@@ -547,12 +567,18 @@ namespace UnicontaClient.Pages.CustomPage
         {
             ValidateChartData();
             var diagram = CreateDiagram();
+            var orderCategories = chartHasSourceSorting && ApplyChartCategoryOrder(diagram);
+            var orderSimpleSeries = chartHasSourceSorting && diagram is DevExpress.Xpf.Charts.SimpleDiagram2D;
             var groupedValues = chartValues.GroupBy(item => item.Series ?? string.Empty).ToList();
             foreach (var values in groupedValues)
             {
                 var series = CreateSeries();
                 series.DisplayName = string.IsNullOrWhiteSpace(values.Key) ? Definition.ValueColumns?.FirstOrDefault() ?? Definition.Aggregate.DisplayName() : values.Key;
-                series.ArgumentDataMember = nameof(ChartValue.Argument);
+                series.ArgumentDataMember = orderCategories || orderSimpleSeries ? nameof(ChartValue.Category) : nameof(ChartValue.Argument);
+                if (orderCategories || orderSimpleSeries)
+                    series.ArgumentScaleType = DevExpress.Xpf.Charts.ScaleType.Qualitative;
+                if (orderSimpleSeries)
+                    series.DataSourceSorted = true;
                 series.ValueDataMember = nameof(ChartValue.Value);
                 series.DataSource = values.ToList();
                 series.LabelsVisibility = false;
@@ -565,6 +591,30 @@ namespace UnicontaClient.Pages.CustomPage
                 diagram.Series.Add(series);
             }
             TileChart.Diagram = diagram;
+        }
+
+        bool ApplyChartCategoryOrder(DevExpress.Xpf.Charts.Diagram diagram)
+        {
+            DevExpress.Xpf.Charts.AxisBase axis;
+            if (diagram is DevExpress.Xpf.Charts.XYDiagram2D xy)
+                axis = xy.AxisX;
+            else if (diagram is DevExpress.Xpf.Charts.RadarDiagram2D radar)
+                axis = radar.AxisX ?? (radar.AxisX = new DevExpress.Xpf.Charts.RadarAxisX2D());
+            else
+                return false;
+
+            // Several series can share an axis. Use the first occurrence across all groups
+            // to keep categories in the order of the sorted source rows.
+            var positions = chartValues.Select(value => value.Category).Distinct()
+                .Select((category, index) => new { Category = category, Index = index })
+                .ToDictionary(value => value.Category, value => value.Index);
+            axis.QualitativeScaleComparer = Comparer<string>.Create((left, right) =>
+            {
+                var leftIndex = left != null && positions.TryGetValue(left, out var l) ? l : int.MaxValue;
+                var rightIndex = right != null && positions.TryGetValue(right, out var r) ? r : int.MaxValue;
+                return leftIndex.CompareTo(rightIndex);
+            });
+            return true;
         }
 
         void ValidateChartData()
@@ -650,6 +700,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             var positive = chartValues.Where(item => item.Value > 0m).ToList();
             TilePieSeries.HoleRadiusPercent = donut ? 55 : 0;
+            TilePieSeries.DataSourceSorted = chartHasSourceSorting;
             PieChart.DataSource = positive;
         }
 
@@ -657,6 +708,7 @@ namespace UnicontaClient.Pages.CustomPage
         {
             public object Argument { get; set; }
             public string Label { get; set; }
+            public string Category => Argument is DateTime date && date.TimeOfDay != TimeSpan.Zero ? date.ToString("yyyy-MM-dd HH:mm:ss.FFFFFFF", CultureInfo.CurrentCulture) : Label;
             public string Series { get; set; }
             public decimal Value { get; set; }
             public decimal? Value2 { get; set; }
@@ -694,7 +746,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         private async void btnEditTile_Click(object sender, RoutedEventArgs e)
         {
-            if (IsDeleteMode)
+            if (IsDeleteMode && !Definition.IsLocked)
             {
                 if (UnicontaMessageBox.Show(Uniconta.ClientTools.Localization.lookup("DeleteConfirmation"),
                     Uniconta.ClientTools.Localization.lookup("Confirmation"), MessageBoxButton.OKCancel) != MessageBoxResult.OK)
@@ -718,6 +770,9 @@ namespace UnicontaClient.Pages.CustomPage
 
         internal void EditTile()
         {
+            if (new TileCRUDController(Api).IsLocked(userMenu))
+                return;
+
             var editTile = new CWTileDetails(Api, userMenu);
             editTile.Closed += (s, args) =>
             {

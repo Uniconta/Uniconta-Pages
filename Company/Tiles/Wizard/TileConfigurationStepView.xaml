@@ -6,14 +6,13 @@ x:Class="UnicontaClient.Pages.CustomPage.TileConfigurationStepView"
     <StackPanel>
         <TextBlock Text="{Binding Data.SelectionSummary}" TextWrapping="Wrap" Foreground="{DynamicResource WizardSecondaryTextBrush}"/>
         <StackPanel Visibility="{Binding Data.ShowData, Converter={StaticResource bool2VisibilityConverter}}">
-            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileDataSource}" Style="{DynamicResource TileWizardLabelStyle}"/>
-            <controls:ComboBoxEditor IsEditable="True" ItemsSource="{Binding Data.Sources}" DisplayMember="DisplayCaption"
-                                     SelectedItem="{Binding Data.SelectedSource, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{DynamicResource TileWizardComboBoxStyle}" AutomationProperties.Name="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileDataSource}"
-                                     ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileDataSourceHelp}"/>
-            <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Filter}" Style="{DynamicResource TileWizardLabelStyle}"/>
+            <TextBlock Style="{DynamicResource TileWizardLabelStyle}">
+                <Run Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Filter,Mode=OneWay}"/>
+                <Run Text=" / "/>
+                <Run Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Sorting,Mode=OneWay}"/>
+            </TextBlock>
             <DockPanel>
-                <Button Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileEditFilter}" Command="{Binding Data.EditFiltersCommand}" DockPanel.Dock="Right" Height="32"
+                <Button Content="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Edit}" Command="{Binding Data.EditFiltersCommand}" DockPanel.Dock="Right" Height="32"
                         Style="{DynamicResource PrimaryButtonStyle}" Margin="8,0,0,0"
                         ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileFilterHelp}"/>
                 <TextBlock Text="{Binding Data.FilterSummary}" TextWrapping="Wrap" VerticalAlignment="Center"/>
@@ -49,6 +48,9 @@ x:Class="UnicontaClient.Pages.CustomPage.TileConfigurationStepView"
                                      Style="{DynamicResource TileWizardComboBoxStyle}" AutomationProperties.Name="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileAggregate}"
                                      ToolTip="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileAggregateHelp}"/>
         </StackPanel>
+        <TextBlock Text="Aggregation is currently unavailable for tables without an IdKey." TextWrapping="Wrap"
+                   Foreground="{DynamicResource WizardSecondaryTextBrush}" Margin="0,16,0,4"
+                   Visibility="{Binding Data.AggregationUnavailable, Converter={StaticResource bool2VisibilityConverter}}"/>
         <StackPanel Visibility="{Binding Data.ShowSingleValue, Converter={StaticResource bool2VisibilityConverter}}">
             <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileValueColumn}" Style="{DynamicResource TileWizardLabelStyle}"/>
             <controls:ComboBoxEditor IsEditable="True" ItemsSource="{Binding Data.NumericFields}" SelectedItem="{Binding Data.SingleValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -63,7 +65,7 @@ x:Class="UnicontaClient.Pages.CustomPage.TileConfigurationStepView"
                         <Setter Property="ToolTip" Value="Compare several amounts or quantities as separate chart series. Each uses the selected aggregate calculation; Count counts records regardless of the field."/>
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding Data.ShowAggregate}" Value="False">
-                                <Setter Property="ToolTip" Value="Show these fields from the first record matching the filter. Narrow the filter to identify the record you want to see."/>
+                                <Setter Property="ToolTip" Value="Show these fields from the first record after filtering and sorting."/>
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>

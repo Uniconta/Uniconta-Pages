@@ -229,6 +229,12 @@ namespace UnicontaClient.Pages.CustomPage
 
         public void SetOIOUBLLabelText(bool sendXmlSalesInvoice) { } //Method to backward compatible
 
+        public void SentByEInvoice(CrudAPI api, Tuple<NHRNetworkType, NHREndPointType, string> endPoint, bool forceEnableEinvoice = false)
+        {
+            var scheme = endPoint == null ? null : endPoint.Item2 == NHREndPointType.GLN ? UnicontaClient.Utilities.EDocumentHelper.GlnScheme : endPoint.Item2 == NHREndPointType.CVR ? "0184" : null;
+            SentByEInvoice(api, endPoint == null ? null : new Tuple<NHRNetworkType, NHREndPointType, string, string>(endPoint.Item1, endPoint.Item2, endPoint.Item3, scheme), forceEnableEinvoice);
+        }
+
         public void SentByEInvoice(CrudAPI api, Tuple<NHRNetworkType, NHREndPointType, string, string> endPoint, bool forceEnableEinvoice = false, DCAccount debtor = null, bool isOneTimeDebtor = false)
         {
             // ZUGFeRD: the XML is embedded in the invoice PDF, there is no separate e-invoice delivery

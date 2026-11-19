@@ -104,7 +104,7 @@ namespace UnicontaClient.Pages.CustomPage
             localMenu.OnItemClicked += localMenu_OnItemClicked;
         }
 
-        internal static bool HasMessage(VouchersClient voucher) =>
+        public static bool HasMessage(VouchersClient voucher) =>
             voucher != null && voucher._Status != DocumentStatus.Unknown && !string.IsNullOrWhiteSpace(voucher.ErrorMessage);
 
         protected override Filter[] DefaultFilters()
@@ -133,7 +133,7 @@ namespace UnicontaClient.Pages.CustomPage
                 gridRibbon_BaseActions(ActionType);
         }
 
-        internal static async Task<ErrorCodes> ClearStatus(VouchersClient voucher, Func<Task<ErrorCodes>> save, Func<Task> refresh)
+        public static async Task<ErrorCodes> ClearStatus(VouchersClient voucher, Func<Task<ErrorCodes>> save, Func<Task> refresh)
         {
             voucher.ErrorMessage = null;
             voucher.Status = AppEnums.LineStatus.ToString(0);

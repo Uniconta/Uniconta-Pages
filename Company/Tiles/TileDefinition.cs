@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Uniconta.ClientTools.Controls;
 using Uniconta.ClientTools.DataModel;
 using Uniconta.Common;
 
@@ -16,6 +17,12 @@ namespace UnicontaClient.Pages.CustomPage
     {
         public CountryCode? CountryCode { get; set; }
         public string Url { get; set; }
+    }
+
+    public sealed class TileSortField
+    {
+        public string Field { get; set; }
+        public bool Descending { get; set; }
     }
 
     public sealed class TileDefinition
@@ -40,6 +47,7 @@ namespace UnicontaClient.Pages.CustomPage
         public string Title { get; set; }
         public string Group { get; set; }
         public string Filter { get; set; }
+        public TileSortField[] Sorting { get; set; }
         public string NavigationTarget { get; set; }
         // Retained for definitions saved before country-specific URLs were introduced.
         public string HtmlSource { get; set; }
@@ -63,11 +71,36 @@ namespace UnicontaClient.Pages.CustomPage
         public string ChartGroup { get; set; }
         public string Value2Field { get; set; }
         public string WeightField { get; set; }
+        public bool IsLocked { get; set; }
         public int Order { get; set; }
+
         public int ColumnSpan { get; set; } = 1;
         public int RowSpan { get; set; } = 1;
         public int? GridColumn { get; set; }
         public int? GridRow { get; set; }
+
+        internal FilterSorter GetRowSorter(Type rowType)
+        {
+            if (Sorting == null || Sorting.Length == 0)
+                return null;
+
+            var fields = new List<SortingProperties>(Sorting.Length);
+            foreach (var field in Sorting)
+            {
+                if (string.IsNullOrWhiteSpace(field?.Field))
+                    continue;
+                var property = rowType.GetProperty(field.Field);
+                if (property == null || !property.CanRead || property.GetIndexParameters().Length != 0)
+                    continue;
+                var valueType = Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType;
+                if (typeof(IComparable).IsAssignableFrom(valueType))
+                    fields.Add(new SortingProperties(field.Field) { Ascending = !field.Descending, propInfo = property });
+            }
+            return fields.Count == 0 ? null : new FilterSorter(fields);
+        }
+
+        public bool IsUnicontaHtmlTile() => Visualization == TileVisualization.HtmlWidget && Group == nameof(Uniconta);
+        
 
         internal void NormalizeNewDashboard()
         {
@@ -150,7 +183,7 @@ namespace UnicontaClient.Pages.CustomPage
                 throw new ArgumentOutOfRangeException(nameof(GridColumn), "Grid coordinates must be nonnegative.");
         }
 
-        internal static TileDefinition FromUserMenu(UserMenuClient menu)
+        internal static TileDefinition FromUserMenu(Uniconta.DataModel.UserMenu menu)
         {
             TileDefinition definition = null;
 
@@ -171,7 +204,7 @@ namespace UnicontaClient.Pages.CustomPage
             definition.NavigationTarget = menu._Control ?? definition.NavigationTarget;
             definition.Order = menu._LineNumber;
             definition.Scope = !string.IsNullOrWhiteSpace(menu._Profile) ? TileScope.Profile : menu._Uid != 0 || (menu.RowId == 0 && !menu._IsCompanyTile) ? TileScope.User : TileScope.Company;
-            definition.Profile = menu._Profile;
+            definition.Profile = menu._Profile;            
             /*
             definition.Visualization = menu.TileVisualization;
             definition.Aggregate = menu.TileAggregate;
@@ -190,7 +223,7 @@ namespace UnicontaClient.Pages.CustomPage
             // Check before mutating the record: the server would truncate oversized JSON.
             var args = JsonConvert.SerializeObject(this, Formatting.None, StorageSettings);
             if (args.Length > MaximumArgsLength)
-                throw new ArgumentException("The tile configuration is too large to save (maximum 1,000 characters). Reduce its fields, filters or widget URLs.");
+                throw new ArgumentException("The tile configuration is too large to save (maximum 1,000 characters). Reduce its fields, filters, sort fields or widget URLs.");
 
             menu._Profile = Scope == TileScope.Profile ? Profile?.Trim() : null;
             menu._IsUserTile = Scope == TileScope.User;

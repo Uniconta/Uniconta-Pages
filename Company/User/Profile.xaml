@@ -122,6 +122,12 @@ x:Class="UnicontaClient.Pages.CustomPage.Profile"
                     <CorasauControls:CorasauLayoutItem FieldName="UseNewOutlook" x:Name="liUseNewOutlook">
                         <CorasauControls:CheckEditor x:Name="chkUseNewOutlook" IsChecked="{Binding UseNewOutlook,Mode=TwoWay}"/>
                     </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="DisableStartPage" x:Name="liDisableStartPage">
+                        <CorasauControls:CheckEditor IsChecked="{Binding DisableStartPage,Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
+                    <CorasauControls:CorasauLayoutItem FieldName="HideAIAssistant" x:Name="liHideAIAssistant">
+                        <CorasauControls:CheckEditor IsChecked="{Binding HideAIAssistant, Mode=TwoWay}"/>
+                    </CorasauControls:CorasauLayoutItem>
                 </CorasauControls:CorasauLayoutGroup>
                 <CorasauControls:CorasauLayoutGroup View="GroupBox" x:Name="grpInformation" Header="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=Information}" Orientation="Vertical" Width="500" CorasauControls:CorasauLayoutControl.AllowHorizontalSizing="True" HorizontalAlignment="Left">
                     <CorasauControls:CorasauLayoutItem x:Name="liXapBuildDate" Label="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter= XapBuildDate,StringFormat=\{0\}:}">

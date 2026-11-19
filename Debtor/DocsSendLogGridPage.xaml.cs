@@ -195,7 +195,7 @@ namespace UnicontaClient.Pages.CustomPage
                 else
                 {
                     var xmlLst = await new InvoiceAPI(api).GetEdeliveryDoc(selectedItem);
-                    if (xmlLst != null)
+                    if (xmlLst != null && xmlLst.Count > 0)
                     {
                         var cw = new CWPreviewXMLViewer(xmlLst[0]);
                         cw?.Show();

@@ -584,7 +584,7 @@ namespace UnicontaClient.Pages.CustomPage
                 }
             }
 
-            dgReOrderList.ItemsSource = lst.ToArray();
+            dgReOrderList.ItemsSource = lst;
             dgReOrderList.Visibility = Visibility.Visible;
 
             ClearBusy();

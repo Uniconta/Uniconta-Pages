@@ -940,30 +940,53 @@ namespace UnicontaClient.Pages.CustomPage
             }
         }
 
-        private List<string> GetSettledItems(BankStatementLineGridClient currentRow, string account, byte actType)
+        private Dictionary<string, List<string>> GetSettledItems(BankStatementLineGridClient currentRow, string account, byte actType)
         {
             var gridRows = (IEnumerable<BankStatementLineGridClient>)dgBankStatementLine.ItemsSource;
             if (gridRows == null)
                 return null;
 
-            List<string> lines = null;
+            Dictionary<string, List<string>> lines = null;
 
             foreach (var row in gridRows)
             {
                 if ((row._Settlement != null || row._Invoice != null) && (row._AccountType == actType && row._Account == account))
                 {
-                    if (!object.ReferenceEquals(row, currentRow))
+                    if(!object.ReferenceEquals(row, currentRow))
                     {
-                        if (lines == null)
-                            lines = new List<string>();
+                        if(lines == null)
+                            lines = new Dictionary<string, List<string>>();
+
                         if (row._Settlement != null)
-                            lines.Add(row._Settlement);
+                        {
+                            List<string> strValues = new List<string>();
+                            if(lines.TryGetValue(row.SettleValue, out strValues))
+                            {
+                                strValues.AddRange(row._Settlement.Split(';').ToList());
+                                lines[row.SettleValue] = strValues;
+                            }
+                            else
+                            {
+                                lines.Add(row.SettleValue,row._Settlement.Split(';').ToList());
+                            }
+                        }
                         else if (row._Invoice != null)
-                            lines.Add(row._Invoice);
+                        {
+                            List<string> strValues ;
+                            if(lines.TryGetValue(row.SettleValue,out strValues))
+                            {
+                                strValues.Add(row._Invoice);
+                                lines[row.SettleValue] = strValues;
+                            }
+                            else
+                            {
+                                strValues = new List<string>() { row._Invoice };
+                                lines.Add(row.SettleValue, strValues);
+                            }
+                        }
                     }
                 }
             }
-
             return lines;
         }
 

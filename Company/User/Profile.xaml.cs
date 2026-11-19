@@ -163,6 +163,8 @@ namespace UnicontaClient.Pages.CustomPage
                     user._AutoSave = editrow._AutoSave;
                     user._UseDefaultBrowser = editrow._UseDefaultBrowser;
                     user._HighlightRow = editrow._HighlightRow;
+                    user._DisableStartPage = editrow._DisableStartPage;
+                    user._HideAIAssistant = editrow._HideAIAssistant;
                     //user._IncludeFilterInLayout = editrow._IncludeFilterInLayout;
                     string msg;
                     if (Curlanguage != editrow._Language)

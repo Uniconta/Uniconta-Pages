@@ -821,7 +821,7 @@ namespace UnicontaClient.Pages.CustomPage
             if (dbOrder._InvoiceDate != DateTime.MinValue)
                 GenrateInvoiceDialog.SetInvoiceDate(dbOrder._InvoiceDate);
 
-            GenrateInvoiceDialog.SentByEInvoice(api, UtilCommon.GetEndPoint(dbOrder, dc, api), debtor: dc, isOneTimeDebtor: dbOrder.OneTimeDebtor != null);
+            GenrateInvoiceDialog.SentByEInvoice(api, UtilCommon.GetEndPointEx(dbOrder, dc, api), debtor: dc, isOneTimeDebtor: dbOrder.OneTimeDebtor != null);
 
             GenrateInvoiceDialog.ShowAllowCredMax(dc._CreditMax != 0);
             GenrateInvoiceDialog.Closed += async delegate

@@ -227,7 +227,7 @@ namespace UnicontaClient.Pages.CustomPage
         public string Caption { get; set; }
         public Type Type { get; set; }
 
-        public string DisplayCaption => $"{Caption} [{Name}]";
+        public string DisplayCaption => String.IsNullOrEmpty(Name) ? Caption : $"{Caption} [{Name}]";
     }
     internal sealed class TileFieldMetadata { public string Name; public string Caption; public string DataType; public bool CanAggregate; public bool CanGroup; public PropertyInfo Property; }
 
@@ -510,6 +510,8 @@ namespace UnicontaClient.Pages.CustomPage
             var tile = page.CurrentTiles.SingleOrDefault(x => x.RowId == request.TileId);
             if (tile == null) return Task.FromResult(AIAssistantCapabilityResult.Fail(Uniconta.ClientTools.Localization.lookup("TileThatTileIsNotPresentOnTheCurrent")));
             var definition = TileDefinition.FromUserMenu(tile);
+            if (definition.IsLocked)
+                return Task.FromResult(AIAssistantCapabilityResult.Fail(Uniconta.ClientTools.Localization.lookup("Blocked")));
             return Task.FromResult(new AIAssistantCapabilityResult { Succeeded = true, Message = Uniconta.ClientTools.Localization.lookup("TileConfirmRemove") + "\n\n" + definition.Title + "\n" + definition.Visualization.DisplayName(), Actions = new[] { new AIAssistantCapabilityResult.CapabilityAction { Caption = Localization.lookup("Yes"), ExecuteAsync = async () => { var error = await page.RemoveTileAsync(tile); return error == ErrorCodes.Succes ? AIAssistantCapabilityResult.Success(string.Format(Uniconta.ClientTools.Localization.lookup("TileRemovedMessage"), definition.Title)) : AIAssistantCapabilityResult.Fail(string.Format(Uniconta.ClientTools.Localization.lookup("TileRemoveFailed"), error)); } }, new AIAssistantCapabilityResult.CapabilityAction { Caption = Localization.lookup("No"), ExecuteAsync = () => Task.FromResult(AIAssistantCapabilityResult.Success(Uniconta.ClientTools.Localization.lookup("TileTheTileWasNotRemoved"))) } } });
         }
     }

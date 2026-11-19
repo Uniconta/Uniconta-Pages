@@ -161,7 +161,8 @@ namespace UnicontaClient.Pages.CustomPage
                         .Cast<UnicontaBaseEntity>();
                 }
 
-                var resultRows = Definition.Visualization == TileVisualization.RecordText
+                // A sorted record-text tile selects its first row after ordering the filtered result.
+                var resultRows = Definition.Visualization == TileVisualization.RecordText && !(Definition.Sorting?.Length > 0)
                     ? filteredRows.Take(1).ToArray() : filteredRows.ToArray();
 
                 return isCount

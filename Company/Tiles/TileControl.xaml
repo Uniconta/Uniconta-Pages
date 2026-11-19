@@ -256,7 +256,8 @@ x:Class="UnicontaClient.Pages.CustomPage.TileControl"
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Column="0"
+                    <TextBlock x:Name="TableTypeLabel"
+                               Grid.Column="0"
                                Text="{Binding TableName, Mode=TwoWay}"
                                TextWrapping="Wrap"
                                FontSize="12"

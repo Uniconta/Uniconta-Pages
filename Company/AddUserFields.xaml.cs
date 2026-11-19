@@ -15,6 +15,7 @@ using UnicontaClient.Utilities;
 using static Uniconta.DataModel.TableField;
 using DevExpress.Xpf.Grid;
 using Uniconta.ClientTools.Controls;
+using DevExpress.XtraSpreadsheet.Commands.Internal;
 
 using UnicontaClient.Pages;
 namespace UnicontaClient.Pages.CustomPage
@@ -75,7 +76,19 @@ namespace UnicontaClient.Pages.CustomPage
             dgUserField.UpdateMaster(master);
             dgUserField.BusyIndicator = busyIndicator;
             localMenu.OnItemClicked += localMenu_OnItemClicked;
+            HideCopyToApp();
+
         }
+        void HideCopyToApp()
+        {
+            if (master is TableHeader)
+            {
+                RibbonBase rb = (RibbonBase)localMenu.DataContext;
+                if (rb != null)
+                    UtilDisplay.RemoveMenuCommand(rb, "CopyToApp");
+            }
+        }
+        
         public override void SetParameter(IEnumerable<ValuePair> Parameters)
         {
             foreach (var rec in Parameters)
@@ -92,6 +105,7 @@ namespace UnicontaClient.Pages.CustomPage
                             dgUserField.UpdateMaster(master);
                             var header = string.Concat(Localization.lookup("UserFields"), ": ", Localization.lookup(rec.Value));
                             SetHeader(header);
+                            HideCopyToApp();
                         }
                     }
                 }

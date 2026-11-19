@@ -177,6 +177,9 @@ namespace UnicontaClient.Pages.CustomPage
                     if (selectedItem != null)
                         AddDockItem(TabControls.Iceland_ImportPSPSettlements, selectedItem, string.Concat("Sækja uppgjör færsluhirðis", " : ", selectedItem._Journal), null, true);
                     break;
+                case "Mappings":
+                    AddDockItem(TabControls.BankImportMapping, new BankStatementClient(), Uniconta.ClientTools.Localization.lookup("Mappings"));
+                    break;
                 default:
                     gridRibbon_BaseActions(ActionType);
                     break;

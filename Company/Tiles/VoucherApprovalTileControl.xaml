@@ -148,7 +148,8 @@ x:Class="UnicontaClient.Pages.CustomPage.VoucherApprovalTileControl"
                            FontWeight="SemiBold"
                            Foreground="{StaticResource ForegroundBrush}"/>
 
-                <TextBlock Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileUploadAndTrackYourInvoices}"
+                <TextBlock x:Name="SubtitleText"
+                           Text="{Binding Converter={StaticResource GlobalLocalizationValueConverter},ConverterParameter=TileUploadAndTrackYourInvoices}"
                            Margin="0,1,0,0"
                            FontSize="11"
                            Opacity="0.62"

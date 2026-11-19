@@ -552,7 +552,7 @@ namespace UnicontaClient.Pages.CustomPage
             var additionalOrdersList = Utility.GetAdditionalOrders(api, projInvProp);
             if (additionalOrdersList != null)
                 GenrateInvoiceDialog.SetAdditionalOrders(additionalOrdersList);
-            GenrateInvoiceDialog.SentByEInvoice(api, null, true);
+            GenrateInvoiceDialog.SentByEInvoice(api, (Tuple<NHRNetworkType, NHREndPointType, string, string>)null, true);
 
             GenrateInvoiceDialog.ShowAllowCredMax(debtor?._CreditMax != 0);
             GenrateInvoiceDialog.Closed += async delegate

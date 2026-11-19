@@ -151,8 +151,10 @@ namespace UnicontaClient.Pages.CustomPage
             RibbonBase rb = (RibbonBase)localMenu.DataContext;
             InitEDocumentMenu(rb, master);
 #if MAC
-            UtilDisplay.RemoveMenuCommand(rb, new string[] { "ExportUBL" });
+            UtilDisplay.RemoveMenuCommand(rb, new string[] { "ExportUBL", "ExportUBLNoMark" });
 #endif
+            if (api.session.User._Role < (byte)Uniconta.Common.User.UserRoles.Admin)
+                UtilDisplay.RemoveMenuCommand(rb, "ExportUBLNoMark");
             if (!Comp.Order && !Comp.Purchase)
                 UtilDisplay.RemoveMenuCommand(rb, "CreateOrder");
             dgInvoicesGrid.CustomSummary += dgInvoicesGrid_CustomSummary;
@@ -389,6 +391,11 @@ namespace UnicontaClient.Pages.CustomPage
                     selectedInvoiceUBL = dgInvoicesGrid.SelectedItems?.Cast<DebtorInvoiceClient>();
                     if (selectedInvoiceUBL != null)
                         ExportUBL(selectedInvoiceUBL);
+                    break;
+                case "ExportUBLNoMark":
+                    selectedInvoiceUBL = dgInvoicesGrid.SelectedItems?.Cast<DebtorInvoiceClient>();
+                    if (selectedInvoiceUBL != null)
+                        ExportUBL(selectedInvoiceUBL, false);
                     break;
                 case "SendUBL":
                     selectedInvoiceUBL = dgInvoicesGrid.SelectedItems?.Cast<DebtorInvoiceClient>();
@@ -806,7 +813,7 @@ namespace UnicontaClient.Pages.CustomPage
         }
 
 
-        async private Task<(int saved, int failed, string targetDir)> ExportPeppol(IEnumerable<DebtorInvoiceClient> invoices, string preSelectedFolder = null)
+        async private Task<(int saved, int failed, string targetDir)> ExportPeppol(IEnumerable<DebtorInvoiceClient> invoices, string preSelectedFolder = null, bool markAsSent = true)
         {
             var invList = invoices.ToList();
             if (invList.Count == 0) return (0, 0, null);
@@ -856,8 +863,11 @@ namespace UnicontaClient.Pages.CustomPage
                     }
                     TrimAndWrite(saveDialog.FileName, xmlBytes);
                     var inv0 = invList[0];
-                    await new InvoiceAPI(api).MarkSendInvoiceOIO(inv0);
-                    inv0.SendTimeOIO = BasePage.GetSystemDefaultDate();
+                    if (markAsSent)
+                    {
+                        await new InvoiceAPI(api).MarkSendInvoiceOIO(inv0);
+                        inv0.SendTimeOIO = BasePage.GetSystemDefaultDate();
+                    }
                     inv0._SystemInfo = "Ok";
                     inv0.NotifyPropertyChanged("SystemInfo");
                     return (1, 0, Path.GetDirectoryName(saveDialog.FileName));
@@ -896,8 +906,11 @@ namespace UnicontaClient.Pages.CustomPage
                         if (xmlBytes == null || xmlBytes.Length == 0) { failed++; continue; }
                         var path = System.IO.Path.Combine(targetDir, string.Format(FileNameMask(inv), inv.InvoiceNum));
                         TrimAndWrite(path, xmlBytes);
-                        await invApi.MarkSendInvoiceOIO(inv);
-                        inv.SendTimeOIO = BasePage.GetSystemDefaultDate();
+                        if (markAsSent)
+                        {
+                            await invApi.MarkSendInvoiceOIO(inv);
+                            inv.SendTimeOIO = BasePage.GetSystemDefaultDate();
+                        }
                         inv._SystemInfo = "Ok";
                         inv.NotifyPropertyChanged("SystemInfo");
                         saved++;
@@ -922,7 +935,7 @@ namespace UnicontaClient.Pages.CustomPage
 
 
 
-        private async void ExportUBL(IEnumerable<DebtorInvoiceClient> invoiceUBL)
+        private async void ExportUBL(IEnumerable<DebtorInvoiceClient> invoiceUBL, bool markAsSent = true)
         {
             eDeliveryMappingGroups = eDeliveryMappingGroups ?? api.GetCache(typeof(eDeliveryMappingGroupClient))
                 ?? await api.LoadCache(typeof(eDeliveryMappingGroupClient));
@@ -948,7 +961,7 @@ namespace UnicontaClient.Pages.CustomPage
 
             if (UnicontaMessageBox.Show(
                     string.Concat(Uniconta.ClientTools.Localization.lookup("QtyMarked"), " ", totalCnt),
-                    string.Format(Uniconta.ClientTools.Localization.lookup("ExportOBJ"), Uniconta.ClientTools.Localization.lookup("einvoice")),
+                    string.Format(Uniconta.ClientTools.Localization.lookup(markAsSent ? "ExportOBJ" : "ExportNotMarkedSentOBJ"), Uniconta.ClientTools.Localization.lookup("einvoice")),
                     MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK)
                 return;
 
@@ -973,10 +986,10 @@ namespace UnicontaClient.Pages.CustomPage
             string exportPath = null, ublExportPath = null;
 
             if (peppolList.Count > 0)
-                (peppolSaved, peppolFailed, exportPath) = await ExportPeppol(peppolList, sharedFolder);
+                (peppolSaved, peppolFailed, exportPath) = await ExportPeppol(peppolList, sharedFolder, markAsSent);
 
             if (oioublList.Count > 0)
-                (oioublSaved, oioublErrors, ublExportPath) = await ExportUBL(oioublList, api, SystemInfo, LayoutGroupCache, Debcache, eDeliveryMappingGroups, false, sharedFolder);
+                (oioublSaved, oioublErrors, ublExportPath) = await ExportUBL(oioublList, api, SystemInfo, LayoutGroupCache, Debcache, eDeliveryMappingGroups, false, sharedFolder, markAsSent);
             
             int totalSaved = peppolSaved + oioublSaved;
             if (totalSaved > 0)
@@ -993,7 +1006,7 @@ namespace UnicontaClient.Pages.CustomPage
 
         public static async Task<(int saved, int errors, string targetDir)> ExportUBL(IEnumerable<DebtorInvoiceClient> invoiceUBL, CrudAPI api,
             CorasauDataGridTemplateColumnClient SystemInfo, SQLCache LayoutGroupCache, SQLCache Debcache,
-            SQLCache eDeliveryMappingGroups, bool isInvoicePage, string preSelectedFolder = null)
+            SQLCache eDeliveryMappingGroups, bool isInvoicePage, string preSelectedFolder = null, bool markAsSent = true)
         {
             int cnt = invoiceUBL.Count();
             if (isInvoicePage && UnicontaMessageBox.Show(string.Concat(Uniconta.ClientTools.Localization.lookup("QtyMarked"), " ", cnt),
@@ -1203,8 +1216,11 @@ namespace UnicontaClient.Pages.CustomPage
                     {
                         Uniconta.ClientTools.Controls.UnicontaMessageBox.Show(ex);
                     }
-                    await Invapi.MarkSendInvoiceOIO(invClient);
-                    invClient.SendTimeOIO = BasePage.GetSystemDefaultDate();
+                    if (markAsSent)
+                    {
+                        await Invapi.MarkSendInvoiceOIO(invClient);
+                        invClient.SendTimeOIO = BasePage.GetSystemDefaultDate();
+                    }
                     invClient._SystemInfo = "Ok";
                 }
 
